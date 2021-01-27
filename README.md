@@ -7,5 +7,5 @@
 * mybatis-plus 3.4.2
 
 ## 使用方法
-* 参考测试类
+* [参考测试类](https://github.com/yulichang/mybatis-plus-join/blob/master/src/test/java/com/example/mp/MpJoinTest.java)
 

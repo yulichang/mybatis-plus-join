@@ -42,7 +42,8 @@
 
 #### 左连接 leftJoin(UserEntity::getId,UserAddressEntity::getUserId,right -> right)
 
-前连个参数是两个表的连接条件 -> user left join user_address on user.id = User_address.user_id  
+前连个参数是两个表的连接条件:  
+user left join user_address on user.id = User_address.user_id  
 第三个参数是右表wrapper对象,可以继续使用,以上方法.
 
 #### 条件查询eq()

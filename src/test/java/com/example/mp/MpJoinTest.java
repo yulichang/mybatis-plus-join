@@ -17,6 +17,7 @@ import java.util.List;
 /**
  * 连表
  */
+@SuppressWarnings("all")
 @SpringBootTest
 class MpJoinTest {
 
@@ -111,19 +112,10 @@ class MpJoinTest {
     }
 
 
-    /**
-     * 自定义别名支持
-     * 如果表重复(自连接,或join同一张表多次 需要用到别名)
-     * <p>
-     * 不只是两张表,这个框架没有限制join数量,理论上可以无限join但不建议 [狗头]
-     * <p>
-     * 自己去探索发现吧!
-     */
-    @SuppressWarnings("all")
     @Test
     void test4() {
         userMapper.selectJoinList(new MyLambdaQueryWrapper<UserEntity>()
-                        .as(UserEntity::getHeadImg,UserDTO::getUserHeadImg)
+                        .as(UserEntity::getHeadImg, UserDTO::getUserHeadImg)
                         .leftJoin(UserEntity::getId, UserAddressEntity::getUserId,
                                 right -> right.select(UserAddressEntity::getAddress, UserAddressEntity::getTel))
                 , UserDTO.class);

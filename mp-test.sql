@@ -1,19 +1,3 @@
-/*
- Navicat Premium Data Transfer
-
- Source Server         : rm-bp1f1jf1i3x66k1p6go.mysql.rds.aliyuncs.com
- Source Server Type    : MySQL
- Source Server Version : 50725
- Source Host           : rm-bp1f1jf1i3x66k1p6go.mysql.rds.aliyuncs.com:3306
- Source Schema         : mp-test
-
- Target Server Type    : MySQL
- Target Server Version : 50725
- File Encoding         : 65001
-
- Date: 27/01/2021 15:29:40
-*/
-
 SET NAMES utf8mb4;
 SET FOREIGN_KEY_CHECKS = 0;
 

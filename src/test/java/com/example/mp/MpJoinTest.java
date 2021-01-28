@@ -113,11 +113,41 @@ class MpJoinTest {
 
 
     @Test
-    void test4() {
-        userMapper.selectJoinList(new MyLambdaQueryWrapper<UserEntity>()
+    void select() {
+        List<UserDTO> list = userMapper.selectJoinList(new MyLambdaQueryWrapper<UserEntity>()
+                        .select(UserEntity::getHeadImg, UserEntity::getHeadImg)
+                        .leftJoin(UserEntity::getId, UserAddressEntity::getUserId,
+                                right -> right.select(UserAddressEntity::getAddress, UserAddressEntity::getTel))
+                , UserDTO.class);
+    }
+
+    @Test
+    void selectAll() {
+        List<UserDTO> list = userMapper.selectJoinList(new MyLambdaQueryWrapper<UserEntity>()
+                        .selectAll(UserEntity.class)
+                        .leftJoin(UserEntity::getId, UserAddressEntity::getUserId,
+                                right -> right.select(UserAddressEntity::getAddress, UserAddressEntity::getTel))
+                , UserDTO.class);
+    }
+
+    @Test
+    void selectAs() {
+        List<UserDTO> list = userMapper.selectJoinList(new MyLambdaQueryWrapper<UserEntity>()
                         .as(UserEntity::getHeadImg, UserDTO::getUserHeadImg)
                         .leftJoin(UserEntity::getId, UserAddressEntity::getUserId,
                                 right -> right.select(UserAddressEntity::getAddress, UserAddressEntity::getTel))
+                , UserDTO.class);
+    }
+
+    @Test
+    void selectEq() {
+        List<UserDTO> list = userMapper.selectJoinList(new MyLambdaQueryWrapper<UserEntity>()
+                        .selectAll(UserEntity.class)
+                        .leftJoin(UserEntity::getId, UserAddressEntity::getUserId,
+                                right -> right.select(UserAddressEntity::getAddress, UserAddressEntity::getTel))
+                        .eq(true, UserEntity::getId, 1)
+                        .like(UserAddressEntity::getTel, "1")
+                        .eq(UserEntity::getId, UserAddressEntity::getUserId)
                 , UserDTO.class);
     }
 

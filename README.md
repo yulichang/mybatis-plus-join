@@ -2,6 +2,8 @@
 
 支持连表查询的[mybatis-plus](https://gitee.com/baomidou/mybatis-plus)
 
+[goto gitee](https://gitee.com/best_handsome/mybatis-plus-join)
+
 ## 运行环境
 
 * mysql8

@@ -40,9 +40,14 @@ class test {
 对应sql
 
 ```sql
-SELECT t0.head_img, t0.head_img, t1.address, t1.tel
-FROM user t0
-         LEFT JOIN user_address t1 ON t0.id = t1.user_id
+SELECT 
+    t0.head_img,
+    t0.head_img,
+    t1.address,
+    t1.tel
+FROM 
+user t0
+LEFT JOIN user_address t1 ON t0.id = t1.user_id
 ```
 
 #### selectAll(UserEntity.class) 查询UserEntity全部字段
@@ -67,9 +72,16 @@ class test {
 对应sql
 
 ```sql
-SELECT t0.name, t0.sex, t0.head_img, t0.id, t1.address, t1.tel
-FROM user t0
-         LEFT JOIN user_address t1 ON t0.id = t1.user_id
+SELECT 
+    t0.name,
+    t0.sex, 
+    t0.head_img, 
+    t0.id, 
+    t1.address, 
+    t1.tel
+FROM 
+user t0
+LEFT JOIN user_address t1 ON t0.id = t1.user_id
 ```
 
 #### as(UserEntity::getHeadImg,UserDTO::getUserHeadImg)
@@ -94,9 +106,13 @@ class test {
 对应sql
 
 ```sql
-SELECT t0.head_img AS userHeadImg, t1.address, t1.tel
-FROM user t0
-         LEFT JOIN user_address t1 ON t0.id = t1.user_id
+SELECT 
+    t0.head_img AS userHeadImg, 
+    t1.address,
+    t1.tel
+FROM 
+user t0
+LEFT JOIN user_address t1 ON t0.id = t1.user_id
 ```
 
 #### 左连接 leftJoin(UserEntity::getId,UserAddressEntity::getUserId,right -> right)
@@ -128,10 +144,20 @@ class test {
 对应sql
 
 ```sql
-SELECT t0.name, t0.sex, t0.head_img, t0.id, t1.address, t1.tel
-FROM user t0
-         LEFT JOIN user_address t1 ON t0.id = t1.user_id
-WHERE (t0.id = ? AND t1.tel LIKE ? AND t0.id = t1.user_id)
+SELECT 
+    t0.name,
+    t0.sex, 
+    t0.head_img,
+    t0.id, 
+    t1.address,
+    t1.tel
+FROM 
+user t0
+LEFT JOIN user_address t1 ON t0.id = t1.user_id
+WHERE (
+    t0.id = ? 
+    AND t1.tel LIKE ? 
+    AND t0.id = t1.user_id)
 ```
 
 #### [参考测试类](https://gitee.com/best_handsome/mybatis-plus-join/blob/master/src/test/java/com/example/mp/MpJoinTest.java)

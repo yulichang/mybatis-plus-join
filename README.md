@@ -2,8 +2,6 @@
 
 支持连表查询的[mybatis-plus](https://gitee.com/baomidou/mybatis-plus)
 
-[goto gitee](https://gitee.com/best_handsome/mybatis-plus-join)
-
 ## 运行环境
 
 * mysql8
@@ -27,9 +25,12 @@
 
 ```java
 class test {
+    @Resource
+    private UserMapper userMapper;
+    
     void testJoin() {
         List<UserDTO> list = userMapper.selectJoinList(new MyLambdaQueryWrapper<UserEntity>()
-                        .select(UserEntity::getHeadImg, UserEntity::getHeadImg)
+                        .select(UserEntity::getHeadImg, UserEntity::getName)
                         .leftJoin(UserEntity::getId, UserAddressEntity::getUserId,
                                 right -> right.select(UserAddressEntity::getAddress, UserAddressEntity::getTel))
                 , UserDTO.class);
@@ -42,7 +43,7 @@ class test {
 ```sql
 SELECT 
     t0.head_img,
-    t0.head_img,
+    t0.name,
     t1.address,
     t1.tel
 FROM 

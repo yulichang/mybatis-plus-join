@@ -111,9 +111,9 @@ public class MyJoinLambdaQueryWrapper<T extends MyBaseEntity> extends MyAbstract
         setEntityClass(clazz);
         TableInfo info = TableInfoHelper.getTableInfo(getEntityClass());
         info.getFieldList().forEach(s ->
-                selectColumnList.add(new SelectColumn(this.rUid, s.getColumn(), s.getColumn()/*s.getProperty()*/, null)));
+                selectColumnList.add(new SelectColumn(this.rUid, s.getColumn(), null, null)));
         if (StringUtils.isNotBlank(info.getKeyColumn())) {
-            selectColumnList.add(new SelectColumn(this.rUid, info.getKeyColumn(),info.getKeyColumn()/* info.getKeyProperty()*/, null));
+            selectColumnList.add(new SelectColumn(this.rUid, info.getKeyColumn(), null, null));
         }
         return typedThis;
     }

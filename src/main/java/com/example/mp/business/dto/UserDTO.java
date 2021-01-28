@@ -12,6 +12,8 @@ public class UserDTO {
     private String sex;
     /** user */
     private String headImg;
+    /** user */
+    private String userHeadImg;//同 headImg 别名测试
     /** user_address */
     private String tel;
     /** user_address */

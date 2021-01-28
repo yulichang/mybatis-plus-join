@@ -119,9 +119,14 @@ class MpJoinTest {
      * <p>
      * 自己去探索发现吧!
      */
+    @SuppressWarnings("all")
     @Test
     void test4() {
-        //todo
+        userMapper.selectJoinList(new MyLambdaQueryWrapper<UserEntity>()
+                        .as(UserEntity::getHeadImg,UserDTO::getUserHeadImg)
+                        .leftJoin(UserEntity::getId, UserAddressEntity::getUserId,
+                                right -> right.select(UserAddressEntity::getAddress, UserAddressEntity::getTel))
+                , UserDTO.class);
     }
 
 

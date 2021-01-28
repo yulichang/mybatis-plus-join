@@ -10,12 +10,23 @@
 
 ## 使用方法
 
+1. 将代码down到本地，使用maven install
+
+2. 在自己的项目中替换mybatisplus依赖(框架依赖mybatisplus<3.4.2>)
+
+   ```xml
+   <dependency>
+       <groupId>com.github.mybatisplus</groupId>
+       <artifactId>join</artifactId>
+       <version>1.0-SNAPSHOT</version>
+   </dependency>
+   ```
 ### 使用
 
-* entity继承MyBaseEntity
-* mapper继承MyBaseMapper
-* service继承MyBaseService
-* serviceImpl继承MyBaseServiceImpl
+* entity继承MyBaseEntity (需要连表的实体类必须继承,其他可以不继承)
+* mapper继承MyBaseMapper (必选)
+* service继承MyBaseService (可选)
+* serviceImpl继承MyBaseServiceImpl (可选)
 
 ### MyLambdaQueryWrapper用法
 

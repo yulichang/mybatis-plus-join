@@ -7,9 +7,9 @@ import com.baomidou.mybatisplus.core.metadata.TableFieldInfo;
 import com.baomidou.mybatisplus.core.metadata.TableInfo;
 import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
 import com.baomidou.mybatisplus.core.toolkit.ArrayUtils;
+import com.baomidou.mybatisplus.core.toolkit.Assert;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
-import com.github.mybatisplus.base.MyBaseEntity;
 import com.github.mybatisplus.toolkit.Constant;
 import com.github.mybatisplus.toolkit.MyLambdaUtils;
 import com.github.mybatisplus.wrapper.interfaces.MyJoin;
@@ -30,7 +30,7 @@ import java.util.stream.Collectors;
  * @see com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper
  * @since 2021/01/19
  */
-public class MyJoinLambdaQueryWrapper<T extends MyBaseEntity> extends MyAbstractLambdaWrapper<T, MyJoinLambdaQueryWrapper<T>>
+public class MyJoinLambdaQueryWrapper<T> extends MyAbstractLambdaWrapper<T, MyJoinLambdaQueryWrapper<T>>
         implements Query<MyJoinLambdaQueryWrapper<T>, T, SFunction<T, ?>>, MyJoin<MyJoinLambdaQueryWrapper<T>, T> {
 
     protected SharedString sqlSelect = new SharedString();
@@ -108,6 +108,7 @@ public class MyJoinLambdaQueryWrapper<T extends MyBaseEntity> extends MyAbstract
     public MyJoinLambdaQueryWrapper<T> selectAll(Class<T> clazz) {
         setEntityClass(clazz);
         TableInfo info = TableInfoHelper.getTableInfo(getEntityClass());
+        Assert.notNull(info, "can not find table to entity %s", clazz);
         info.getFieldList().forEach(s ->
                 selectColumnList.add(new SelectColumn(this.rUid, s.getColumn(), null, null)));
         if (StringUtils.isNotBlank(info.getKeyColumn())) {
@@ -158,6 +159,7 @@ public class MyJoinLambdaQueryWrapper<T extends MyBaseEntity> extends MyAbstract
     public MyJoinLambdaQueryWrapper<T> select(Class<T> entityClass, Predicate<TableFieldInfo> predicate) {
         this.setEntityClass(entityClass);
         TableInfo info = TableInfoHelper.getTableInfo(getEntityClass());
+        Assert.notNull(info, "can not find table to entity %s", entityClass);
         info.getFieldList().stream().filter(predicate).forEach(s ->
                 selectColumnList.add(new SelectColumn(this.rUid, s.getColumn(), null, null)));
         return typedThis;
@@ -207,7 +209,7 @@ public class MyJoinLambdaQueryWrapper<T extends MyBaseEntity> extends MyAbstract
      * @param rightWrapper   子表的wrapper
      */
     @Override
-    public <R extends MyBaseEntity, TE, RE> MyJoinLambdaQueryWrapper<T> leftJoin(boolean condition, String alias, MySFunction<T, TE> leftCondition, MySFunction<R, RE> rightCondition, Function<MyJoinLambdaQueryWrapper<R>, MyJoinLambdaQueryWrapper<R>> rightWrapper) {
+    public <R, TE, RE> MyJoinLambdaQueryWrapper<T> leftJoin(boolean condition, String alias, MySFunction<T, TE> leftCondition, MySFunction<R, RE> rightCondition, Function<MyJoinLambdaQueryWrapper<R>, MyJoinLambdaQueryWrapper<R>> rightWrapper) {
         return join(condition, alias, Constant.LEFT_JOIN, leftCondition, rightCondition, rightWrapper);
     }
 
@@ -215,7 +217,7 @@ public class MyJoinLambdaQueryWrapper<T extends MyBaseEntity> extends MyAbstract
      * 右连接查询(参考左连接)
      */
     @Override
-    public <R extends MyBaseEntity, TE, RE> MyJoinLambdaQueryWrapper<T> rightJoin(boolean condition, String alias, MySFunction<T, TE> leftCondition, MySFunction<R, RE> rightCondition, Function<MyJoinLambdaQueryWrapper<R>, MyJoinLambdaQueryWrapper<R>> rightWrapper) {
+    public <R, TE, RE> MyJoinLambdaQueryWrapper<T> rightJoin(boolean condition, String alias, MySFunction<T, TE> leftCondition, MySFunction<R, RE> rightCondition, Function<MyJoinLambdaQueryWrapper<R>, MyJoinLambdaQueryWrapper<R>> rightWrapper) {
         return join(condition, alias, Constant.RIGHT_JOIN, leftCondition, rightCondition, rightWrapper);
     }
 
@@ -223,15 +225,18 @@ public class MyJoinLambdaQueryWrapper<T extends MyBaseEntity> extends MyAbstract
      * 内连接查询(参考左连接)
      */
     @Override
-    public <R extends MyBaseEntity, TE, RE> MyJoinLambdaQueryWrapper<T> innerJoin(boolean condition, String alias, MySFunction<T, TE> leftCondition, MySFunction<R, RE> rightCondition, Function<MyJoinLambdaQueryWrapper<R>, MyJoinLambdaQueryWrapper<R>> rightWrapper) {
+    public <R, TE, RE> MyJoinLambdaQueryWrapper<T> innerJoin(boolean condition, String alias, MySFunction<T, TE> leftCondition, MySFunction<R, RE> rightCondition, Function<MyJoinLambdaQueryWrapper<R>, MyJoinLambdaQueryWrapper<R>> rightWrapper) {
         return join(condition, alias, Constant.INNER_JOIN, leftCondition, rightCondition, rightWrapper);
     }
 
-    private <R extends MyBaseEntity, TE, RE> MyJoinLambdaQueryWrapper<T> join(boolean condition, String alias, String keyWord, MySFunction<T, TE> leftCondition, MySFunction<R, RE> rightCondition, Function<MyJoinLambdaQueryWrapper<R>, MyJoinLambdaQueryWrapper<R>> rightWrapper) {
+    private <R, TE, RE> MyJoinLambdaQueryWrapper<T> join(boolean condition, String alias, String keyWord, MySFunction<T, TE> leftCondition, MySFunction<R, RE> rightCondition, Function<MyJoinLambdaQueryWrapper<R>, MyJoinLambdaQueryWrapper<R>> rightWrapper) {
         if (condition) {
             setEntityClass(MyLambdaUtils.getEntityClass(leftCondition));
             int childrenId = rUid + 1;
-            classList.add(new SubTable(alias, keyWord, rUid, MyLambdaUtils.getColumn(leftCondition), childrenId, MyLambdaUtils.getColumn(rightCondition), TableInfoHelper.getTableInfo(MyLambdaUtils.getEntityClass(rightCondition)).getTableName()));
+            Class<R> clazz = MyLambdaUtils.getEntityClass(rightCondition);
+            TableInfo info = TableInfoHelper.getTableInfo(clazz);
+            Assert.notNull(info, "can not find table to entity %s", clazz);
+            classList.add(new SubTable(alias, keyWord, rUid, MyLambdaUtils.getColumn(leftCondition), childrenId, MyLambdaUtils.getColumn(rightCondition), info.getTableName()));
             MyJoinLambdaQueryWrapper<R> apply = rightWrapper.apply(new MyJoinLambdaQueryWrapper<>(childrenId));
             classList.addAll(apply.classList);
             this.selectColumnList.addAll(apply.selectColumnList);

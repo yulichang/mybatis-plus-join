@@ -12,7 +12,7 @@ import java.util.Map;
  * @author yulichang
  * @see IService
  */
-public interface MyBaseService<T extends MyBaseEntity> extends IService<T> {
+public interface MyBaseService<T> extends IService<T> {
 
     /**
      * ignore

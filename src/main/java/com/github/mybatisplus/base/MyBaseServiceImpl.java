@@ -11,7 +11,7 @@ import java.util.Map;
  * @author yulichang
  * @see ServiceImpl
  */
-public class MyBaseServiceImpl<M extends MyBaseMapper<T>, T extends MyBaseEntity> extends ServiceImpl<M, T> implements MyBaseService<T> {
+public class MyBaseServiceImpl<M extends MyBaseMapper<T>, T> extends ServiceImpl<M, T> implements MyBaseService<T> {
 
 
     @Override

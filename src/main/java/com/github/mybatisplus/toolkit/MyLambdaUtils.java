@@ -3,7 +3,6 @@ package com.github.mybatisplus.toolkit;
 import com.baomidou.mybatisplus.core.toolkit.LambdaUtils;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
-import com.github.mybatisplus.base.MyBaseEntity;
 import com.github.mybatisplus.func.MySFunction;
 import org.apache.ibatis.reflection.property.PropertyNamer;
 
@@ -18,11 +17,11 @@ public class MyLambdaUtils {
         return PropertyNamer.methodToProperty(LambdaUtils.resolve(fn).getImplMethodName());
     }
 
-    public static <T extends MyBaseEntity> String getColumn(MySFunction<T, ?> fn) {
+    public static <T> String getColumn(MySFunction<T, ?> fn) {
         return StringUtils.camelToUnderline(getName(fn));
     }
 
-    public static <T extends MyBaseEntity> Class<T> getEntityClass(MySFunction<T, ?> fn) {
+    public static <T> Class<T> getEntityClass(MySFunction<T, ?> fn) {
         return (Class<T>) LambdaUtils.resolve(fn).getImplClass();
     }
 }

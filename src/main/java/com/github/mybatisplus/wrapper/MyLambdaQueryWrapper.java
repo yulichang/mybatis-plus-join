@@ -7,17 +7,14 @@ import com.baomidou.mybatisplus.core.enums.SqlKeyword;
 import com.baomidou.mybatisplus.core.enums.SqlLike;
 import com.baomidou.mybatisplus.core.exceptions.MybatisPlusException;
 import com.baomidou.mybatisplus.core.metadata.TableFieldInfo;
+import com.baomidou.mybatisplus.core.metadata.TableInfo;
 import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
-import com.baomidou.mybatisplus.core.toolkit.ArrayUtils;
-import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
-import com.baomidou.mybatisplus.core.toolkit.StringPool;
-import com.baomidou.mybatisplus.core.toolkit.StringUtils;
+import com.baomidou.mybatisplus.core.toolkit.*;
 import com.baomidou.mybatisplus.core.toolkit.sql.SqlUtils;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.github.mybatisplus.wrapper.interfaces.MyCompare;
 import com.github.mybatisplus.wrapper.interfaces.MyFunc;
 import com.github.mybatisplus.wrapper.interfaces.MyNested;
-import com.github.mybatisplus.base.MyBaseEntity;
 import com.github.mybatisplus.func.MySFunction;
 import com.github.mybatisplus.toolkit.Constant;
 import com.github.mybatisplus.toolkit.MyLambdaUtils;
@@ -43,7 +40,7 @@ import static java.util.stream.Collectors.joining;
  * @see com.baomidou.mybatisplus.core.conditions.interfaces.Func
  * @since 2021/01/19
  */
-public class MyLambdaQueryWrapper<T extends MyBaseEntity> extends MyJoinLambdaQueryWrapper<T>
+public class MyLambdaQueryWrapper<T> extends MyJoinLambdaQueryWrapper<T>
         implements MyCompare<MyLambdaQueryWrapper<T>>, MyNested<MyLambdaQueryWrapper<T>, MyLambdaQueryWrapper<T>>,
         MyFunc<MyLambdaQueryWrapper<T>> {
 
@@ -94,68 +91,71 @@ public class MyLambdaQueryWrapper<T extends MyBaseEntity> extends MyJoinLambdaQu
 
 
     @Override
-    public <R extends MyBaseEntity, TE, RE> MyLambdaQueryWrapper<T> leftJoin(boolean condition, String alias, MySFunction<T, TE> leftCondition, MySFunction<R, RE> rightCondition, Function<MyJoinLambdaQueryWrapper<R>, MyJoinLambdaQueryWrapper<R>> rightWrapper) {
+    public <R, TE, RE> MyLambdaQueryWrapper<T> leftJoin(boolean condition, String alias, MySFunction<T, TE> leftCondition, MySFunction<R, RE> rightCondition, Function<MyJoinLambdaQueryWrapper<R>, MyJoinLambdaQueryWrapper<R>> rightWrapper) {
         return join(condition, alias, Constant.LEFT_JOIN, leftCondition, rightCondition, rightWrapper);
     }
 
     @Override
-    public <R extends MyBaseEntity, TE, RE> MyLambdaQueryWrapper<T> leftJoin(MySFunction<T, TE> leftCondition, MySFunction<R, RE> rightCondition, Function<MyJoinLambdaQueryWrapper<R>, MyJoinLambdaQueryWrapper<R>> rightWrapper) {
+    public <R, TE, RE> MyLambdaQueryWrapper<T> leftJoin(MySFunction<T, TE> leftCondition, MySFunction<R, RE> rightCondition, Function<MyJoinLambdaQueryWrapper<R>, MyJoinLambdaQueryWrapper<R>> rightWrapper) {
         return this.leftJoin(true, null, leftCondition, rightCondition, rightWrapper);
     }
 
     @Override
-    public <R extends MyBaseEntity, TE, RE> MyLambdaQueryWrapper<T> leftJoin(String alias, MySFunction<T, TE> leftCondition, MySFunction<R, RE> rightCondition, Function<MyJoinLambdaQueryWrapper<R>, MyJoinLambdaQueryWrapper<R>> rightWrapper) {
+    public <R, TE, RE> MyLambdaQueryWrapper<T> leftJoin(String alias, MySFunction<T, TE> leftCondition, MySFunction<R, RE> rightCondition, Function<MyJoinLambdaQueryWrapper<R>, MyJoinLambdaQueryWrapper<R>> rightWrapper) {
         return this.leftJoin(true, alias, leftCondition, rightCondition, rightWrapper);
     }
 
     @Override
-    public <R extends MyBaseEntity, TE, RE> MyLambdaQueryWrapper<T> leftJoin(boolean condition, MySFunction<T, TE> leftCondition, MySFunction<R, RE> rightCondition, Function<MyJoinLambdaQueryWrapper<R>, MyJoinLambdaQueryWrapper<R>> rightWrapper) {
+    public <R, TE, RE> MyLambdaQueryWrapper<T> leftJoin(boolean condition, MySFunction<T, TE> leftCondition, MySFunction<R, RE> rightCondition, Function<MyJoinLambdaQueryWrapper<R>, MyJoinLambdaQueryWrapper<R>> rightWrapper) {
         return this.leftJoin(condition, null, leftCondition, rightCondition, rightWrapper);
     }
 
-    public <R extends MyBaseEntity, TE, RE> MyLambdaQueryWrapper<T> rightJoin(boolean condition, String alias, MySFunction<T, TE> leftCondition, MySFunction<R, RE> rightCondition, Function<MyJoinLambdaQueryWrapper<R>, MyJoinLambdaQueryWrapper<R>> rightWrapper) {
+    public <R, TE, RE> MyLambdaQueryWrapper<T> rightJoin(boolean condition, String alias, MySFunction<T, TE> leftCondition, MySFunction<R, RE> rightCondition, Function<MyJoinLambdaQueryWrapper<R>, MyJoinLambdaQueryWrapper<R>> rightWrapper) {
         return join(condition, alias, Constant.RIGHT_JOIN, leftCondition, rightCondition, rightWrapper);
     }
 
     @Override
-    public <R extends MyBaseEntity, TE, RE> MyLambdaQueryWrapper<T> rightJoin(MySFunction<T, TE> leftCondition, MySFunction<R, RE> rightCondition, Function<MyJoinLambdaQueryWrapper<R>, MyJoinLambdaQueryWrapper<R>> rightWrapper) {
+    public <R, TE, RE> MyLambdaQueryWrapper<T> rightJoin(MySFunction<T, TE> leftCondition, MySFunction<R, RE> rightCondition, Function<MyJoinLambdaQueryWrapper<R>, MyJoinLambdaQueryWrapper<R>> rightWrapper) {
         return this.rightJoin(true, null, leftCondition, rightCondition, rightWrapper);
     }
 
     @Override
-    public <R extends MyBaseEntity, TE, RE> MyLambdaQueryWrapper<T> rightJoin(String alias, MySFunction<T, TE> leftCondition, MySFunction<R, RE> rightCondition, Function<MyJoinLambdaQueryWrapper<R>, MyJoinLambdaQueryWrapper<R>> rightWrapper) {
+    public <R, TE, RE> MyLambdaQueryWrapper<T> rightJoin(String alias, MySFunction<T, TE> leftCondition, MySFunction<R, RE> rightCondition, Function<MyJoinLambdaQueryWrapper<R>, MyJoinLambdaQueryWrapper<R>> rightWrapper) {
         return this.rightJoin(true, alias, leftCondition, rightCondition, rightWrapper);
     }
 
     @Override
-    public <R extends MyBaseEntity, TE, RE> MyLambdaQueryWrapper<T> rightJoin(boolean condition, MySFunction<T, TE> leftCondition, MySFunction<R, RE> rightCondition, Function<MyJoinLambdaQueryWrapper<R>, MyJoinLambdaQueryWrapper<R>> rightWrapper) {
+    public <R, TE, RE> MyLambdaQueryWrapper<T> rightJoin(boolean condition, MySFunction<T, TE> leftCondition, MySFunction<R, RE> rightCondition, Function<MyJoinLambdaQueryWrapper<R>, MyJoinLambdaQueryWrapper<R>> rightWrapper) {
         return this.rightJoin(condition, null, leftCondition, rightCondition, rightWrapper);
     }
 
 
-    public <R extends MyBaseEntity, TE, RE> MyLambdaQueryWrapper<T> innerJoin(boolean condition, String alias, MySFunction<T, TE> leftCondition, MySFunction<R, RE> rightCondition, Function<MyJoinLambdaQueryWrapper<R>, MyJoinLambdaQueryWrapper<R>> rightWrapper) {
+    public <R, TE, RE> MyLambdaQueryWrapper<T> innerJoin(boolean condition, String alias, MySFunction<T, TE> leftCondition, MySFunction<R, RE> rightCondition, Function<MyJoinLambdaQueryWrapper<R>, MyJoinLambdaQueryWrapper<R>> rightWrapper) {
         return join(condition, alias, Constant.INNER_JOIN, leftCondition, rightCondition, rightWrapper);
     }
 
     @Override
-    public <R extends MyBaseEntity, TE, RE> MyLambdaQueryWrapper<T> innerJoin(MySFunction<T, TE> leftCondition, MySFunction<R, RE> rightCondition, Function<MyJoinLambdaQueryWrapper<R>, MyJoinLambdaQueryWrapper<R>> rightWrapper) {
+    public <R, TE, RE> MyLambdaQueryWrapper<T> innerJoin(MySFunction<T, TE> leftCondition, MySFunction<R, RE> rightCondition, Function<MyJoinLambdaQueryWrapper<R>, MyJoinLambdaQueryWrapper<R>> rightWrapper) {
         return this.innerJoin(true, null, leftCondition, rightCondition, rightWrapper);
     }
 
     @Override
-    public <R extends MyBaseEntity, TE, RE> MyLambdaQueryWrapper<T> innerJoin(String alias, MySFunction<T, TE> leftCondition, MySFunction<R, RE> rightCondition, Function<MyJoinLambdaQueryWrapper<R>, MyJoinLambdaQueryWrapper<R>> rightWrapper) {
+    public <R, TE, RE> MyLambdaQueryWrapper<T> innerJoin(String alias, MySFunction<T, TE> leftCondition, MySFunction<R, RE> rightCondition, Function<MyJoinLambdaQueryWrapper<R>, MyJoinLambdaQueryWrapper<R>> rightWrapper) {
         return this.innerJoin(true, alias, leftCondition, rightCondition, rightWrapper);
     }
 
     @Override
-    public <R extends MyBaseEntity, TE, RE> MyLambdaQueryWrapper<T> innerJoin(boolean condition, MySFunction<T, TE> leftCondition, MySFunction<R, RE> rightCondition, Function<MyJoinLambdaQueryWrapper<R>, MyJoinLambdaQueryWrapper<R>> rightWrapper) {
+    public <R, TE, RE> MyLambdaQueryWrapper<T> innerJoin(boolean condition, MySFunction<T, TE> leftCondition, MySFunction<R, RE> rightCondition, Function<MyJoinLambdaQueryWrapper<R>, MyJoinLambdaQueryWrapper<R>> rightWrapper) {
         return this.innerJoin(condition, null, leftCondition, rightCondition, rightWrapper);
     }
 
-    private <R extends MyBaseEntity, TE, RE> MyLambdaQueryWrapper<T> join(boolean condition, String alias, String keyWord, MySFunction<T, TE> leftCondition, MySFunction<R, RE> rightCondition, Function<MyJoinLambdaQueryWrapper<R>, MyJoinLambdaQueryWrapper<R>> rightWrapper) {
+    private <R, TE, RE> MyLambdaQueryWrapper<T> join(boolean condition, String alias, String keyWord, MySFunction<T, TE> leftCondition, MySFunction<R, RE> rightCondition, Function<MyJoinLambdaQueryWrapper<R>, MyJoinLambdaQueryWrapper<R>> rightWrapper) {
         if (condition) {
             setEntityClass(MyLambdaUtils.getEntityClass(leftCondition));
-            classList.add(new SubTable(alias, keyWord, rUid, MyLambdaUtils.getColumn(leftCondition), classList.size() + 1, MyLambdaUtils.getColumn(rightCondition), TableInfoHelper.getTableInfo(MyLambdaUtils.getEntityClass(rightCondition)).getTableName()));
+            Class<R> clazz = MyLambdaUtils.getEntityClass(rightCondition);
+            TableInfo info = TableInfoHelper.getTableInfo(clazz);
+            Assert.notNull(info, "can not find table to entity %s", clazz);
+            classList.add(new SubTable(alias, keyWord, rUid, MyLambdaUtils.getColumn(leftCondition), classList.size() + 1, MyLambdaUtils.getColumn(rightCondition), info.getTableName()));
             MyJoinLambdaQueryWrapper<R> apply = rightWrapper.apply(new MyJoinLambdaQueryWrapper<>(classList.size()));
             classList.addAll(apply.classList);
             this.selectColumnList.addAll(apply.selectColumnList);
@@ -285,11 +285,13 @@ public class MyLambdaQueryWrapper<T extends MyBaseEntity> extends MyJoinLambdaQu
     /**
      * 获取表前缀
      */
-    private String getClassTablePrefix(Class<?> tag) {
-        if (getEntityClass() == tag) {
+    private String getClassTablePrefix(Class<?> clazz) {
+        if (getEntityClass() == clazz) {
             return Constant.TABLE_ALIAS + rUid;
         } else {
-            String tableName = TableInfoHelper.getTableInfo(tag).getTableName();
+            TableInfo info = TableInfoHelper.getTableInfo(clazz);
+            Assert.notNull(info, "can not find table to entity %s", clazz);
+            String tableName = info.getTableName();
             for (SubTable sub : classList) {
                 if (sub.getRightTableName().equals(tableName)) {
                     return Constant.TABLE_ALIAS + sub.getRightUid();
@@ -302,7 +304,7 @@ public class MyLambdaQueryWrapper<T extends MyBaseEntity> extends MyJoinLambdaQu
     /**
      * 获取column
      */
-    private <E extends MyBaseEntity, F> String getColumn(MySFunction<E, F> column, String alias) {
+    private <E, F> String getColumn(MySFunction<E, F> column, String alias) {
         if (alias != null) {
             if (alias.equals(DEFAULT_ALIAS)) {
                 return Constant.TABLE_ALIAS + rUid + StringPool.DOT + column2String(column, true);
@@ -316,100 +318,100 @@ public class MyLambdaQueryWrapper<T extends MyBaseEntity> extends MyJoinLambdaQu
         return getClassTablePrefix(MyLambdaUtils.getEntityClass(column)) + StringPool.DOT + column2String(column, true);
     }
 
-    private <E extends MyBaseEntity, F> String getColumn(String alias, MySFunction<E, F>... column) {
+    private <E, F> String getColumn(String alias, MySFunction<E, F>... column) {
         return Arrays.stream(column).map(i -> getColumn(i, alias)).collect(joining(StringPool.COMMA));
     }
 
     @Override
-    public <E extends MyBaseEntity, F> MyLambdaQueryWrapper<T> eq(boolean condition, String alias, MySFunction<E, F> column, Object val) {
+    public <E, F> MyLambdaQueryWrapper<T> eq(boolean condition, String alias, MySFunction<E, F> column, Object val) {
         return doIt(condition, () -> getColumn(column, alias), EQ,
                 () -> formatSql("{0}", val));
     }
 
     @Override
-    public <E extends MyBaseEntity, F, X extends MyBaseEntity, Y> MyLambdaQueryWrapper<T> eq(boolean condition, String alias, MySFunction<E, F> column, String as, MySFunction<X, Y> val) {
+    public <E, F, X, Y> MyLambdaQueryWrapper<T> eq(boolean condition, String alias, MySFunction<E, F> column, String as, MySFunction<X, Y> val) {
         return doIt(condition, () -> getColumn(column, alias), EQ, () -> getColumn(val, as));
     }
 
     @Override
-    public <E extends MyBaseEntity, F> MyLambdaQueryWrapper<T> ne(boolean condition, String alias, MySFunction<E, F> column, Object val) {
+    public <E, F> MyLambdaQueryWrapper<T> ne(boolean condition, String alias, MySFunction<E, F> column, Object val) {
         return doIt(condition, () -> getColumn(column, alias), NE, () -> formatSql("{0}", val));
     }
 
     @Override
-    public <E extends MyBaseEntity, F, X extends MyBaseEntity, Y> MyLambdaQueryWrapper<T> ne(boolean condition, String alias, MySFunction<E, F> column, String as, MySFunction<X, Y> val) {
+    public <E, F, X, Y> MyLambdaQueryWrapper<T> ne(boolean condition, String alias, MySFunction<E, F> column, String as, MySFunction<X, Y> val) {
         return doIt(condition, () -> getColumn(column, alias), NE, () -> getColumn(val, as));
     }
 
     @Override
-    public <E extends MyBaseEntity, F> MyLambdaQueryWrapper<T> gt(boolean condition, String alias, MySFunction<E, F> column, Object val) {
+    public <E, F> MyLambdaQueryWrapper<T> gt(boolean condition, String alias, MySFunction<E, F> column, Object val) {
         return doIt(condition, () -> getColumn(column, alias), GT, () -> formatSql("{0}", val));
     }
 
     @Override
-    public <E extends MyBaseEntity, F, X extends MyBaseEntity, Y> MyLambdaQueryWrapper<T> gt(boolean condition, String alias, MySFunction<E, F> column, String as, MySFunction<X, Y> val) {
+    public <E, F, X, Y> MyLambdaQueryWrapper<T> gt(boolean condition, String alias, MySFunction<E, F> column, String as, MySFunction<X, Y> val) {
         return doIt(condition, () -> getColumn(column, alias), GT, () -> getColumn(val, as));
     }
 
     @Override
-    public <E extends MyBaseEntity, F> MyLambdaQueryWrapper<T> ge(boolean condition, String alias, MySFunction<E, F> column, Object val) {
+    public <E, F> MyLambdaQueryWrapper<T> ge(boolean condition, String alias, MySFunction<E, F> column, Object val) {
         return doIt(condition, () -> getColumn(column, alias), GE, () -> formatSql("{0}", val));
     }
 
     @Override
-    public <E extends MyBaseEntity, F, X extends MyBaseEntity, Y> MyLambdaQueryWrapper<T> ge(boolean condition, String alias, MySFunction<E, F> column, String as, MySFunction<X, Y> val) {
+    public <E, F, X, Y> MyLambdaQueryWrapper<T> ge(boolean condition, String alias, MySFunction<E, F> column, String as, MySFunction<X, Y> val) {
         return doIt(condition, () -> getColumn(column, alias), GE, () -> getColumn(val, as));
     }
 
     @Override
-    public <E extends MyBaseEntity, F> MyLambdaQueryWrapper<T> lt(boolean condition, String alias, MySFunction<E, F> column, Object val) {
+    public <E, F> MyLambdaQueryWrapper<T> lt(boolean condition, String alias, MySFunction<E, F> column, Object val) {
         return doIt(condition, () -> getColumn(column, alias), LT, () -> formatSql("{0}", val));
     }
 
     @Override
-    public <E extends MyBaseEntity, F, X extends MyBaseEntity, Y> MyLambdaQueryWrapper<T> lt(boolean condition, String alias, MySFunction<E, F> column, String as, MySFunction<X, Y> val) {
+    public <E, F, X, Y> MyLambdaQueryWrapper<T> lt(boolean condition, String alias, MySFunction<E, F> column, String as, MySFunction<X, Y> val) {
         return doIt(condition, () -> getColumn(column, alias), LT, () -> getColumn(val, as));
     }
 
     @Override
-    public <E extends MyBaseEntity, F> MyLambdaQueryWrapper<T> le(boolean condition, String alias, MySFunction<E, F> column, Object val) {
+    public <E, F> MyLambdaQueryWrapper<T> le(boolean condition, String alias, MySFunction<E, F> column, Object val) {
         return doIt(condition, () -> getColumn(column, alias), LE, () -> formatSql("{0}", val));
     }
 
     @Override
-    public <E extends MyBaseEntity, F, X extends MyBaseEntity, Y> MyLambdaQueryWrapper<T> le(boolean condition, String alias, MySFunction<E, F> column, String as, MySFunction<X, Y> val) {
+    public <E, F, X, Y> MyLambdaQueryWrapper<T> le(boolean condition, String alias, MySFunction<E, F> column, String as, MySFunction<X, Y> val) {
         return doIt(condition, () -> getColumn(column, alias), LE, () -> getColumn(val, as));
     }
 
     @Override
-    public <E extends MyBaseEntity, F> MyLambdaQueryWrapper<T> between(boolean condition, String alias, MySFunction<E, F> column, Object val1, Object val2) {
+    public <E, F> MyLambdaQueryWrapper<T> between(boolean condition, String alias, MySFunction<E, F> column, Object val1, Object val2) {
         return doIt(condition, () -> getColumn(column, alias), BETWEEN, () -> formatSql("{0}", val1), AND,
                 () -> formatSql("{0}", val2));
     }
 
     @Override
-    public <E extends MyBaseEntity, F> MyLambdaQueryWrapper<T> notBetween(boolean condition, String alias, MySFunction<E, F> column, Object val1, Object val2) {
+    public <E, F> MyLambdaQueryWrapper<T> notBetween(boolean condition, String alias, MySFunction<E, F> column, Object val1, Object val2) {
         return doIt(condition, () -> getColumn(column, alias), NOT_BETWEEN, () -> formatSql("{0}", val1), AND,
                 () -> formatSql("{0}", val2));
     }
 
     @Override
-    public <E extends MyBaseEntity, F> MyLambdaQueryWrapper<T> like(boolean condition, String alias, MySFunction<E, F> column, Object val) {
+    public <E, F> MyLambdaQueryWrapper<T> like(boolean condition, String alias, MySFunction<E, F> column, Object val) {
         return likeValue(condition, LIKE, getColumn(column, alias), val, SqlLike.DEFAULT);
     }
 
     @Override
-    public <E extends MyBaseEntity, F> MyLambdaQueryWrapper<T> notLike(boolean condition, String alias, MySFunction<E, F> column, Object val) {
+    public <E, F> MyLambdaQueryWrapper<T> notLike(boolean condition, String alias, MySFunction<E, F> column, Object val) {
         return likeValue(condition, NOT_LIKE, getColumn(column, alias), val, SqlLike.DEFAULT);
     }
 
     @Override
-    public <E extends MyBaseEntity, F> MyLambdaQueryWrapper<T> likeLeft(boolean condition, String alias, MySFunction<E, F> column, Object val) {
+    public <E, F> MyLambdaQueryWrapper<T> likeLeft(boolean condition, String alias, MySFunction<E, F> column, Object val) {
         return likeValue(condition, LIKE, getColumn(column, alias), val, SqlLike.LEFT);
     }
 
     @Override
-    public <E extends MyBaseEntity, F> MyLambdaQueryWrapper<T> likeRight(boolean condition, String alias, MySFunction<E, F> column, Object val) {
+    public <E, F> MyLambdaQueryWrapper<T> likeRight(boolean condition, String alias, MySFunction<E, F> column, Object val) {
         return likeValue(condition, LIKE, getColumn(column, alias), val, SqlLike.RIGHT);
     }
 
@@ -453,11 +455,11 @@ public class MyLambdaQueryWrapper<T extends MyBaseEntity> extends MyJoinLambdaQu
         return this;
     }
 
-    private <E extends MyBaseEntity, F> MyLambdaQueryWrapper<T> likeValue(boolean condition, SqlKeyword keyword, String column, Object val, SqlLike sqlLike) {
+    private <E, F> MyLambdaQueryWrapper<T> likeValue(boolean condition, SqlKeyword keyword, String column, Object val, SqlLike sqlLike) {
         return doIt(condition, () -> column, keyword, () -> formatSql("{0}", SqlUtils.concatLike(val, sqlLike)));
     }
 
-    protected <E extends MyBaseEntity, F> MyLambdaQueryWrapper<T> addCondition(boolean condition, String column, SqlKeyword sqlKeyword, Object val) {
+    protected <E, F> MyLambdaQueryWrapper<T> addCondition(boolean condition, String column, SqlKeyword sqlKeyword, Object val) {
         return doIt(condition, () -> column, sqlKeyword, () -> formatSql("{0}", val));
     }
 
@@ -476,37 +478,37 @@ public class MyLambdaQueryWrapper<T extends MyBaseEntity> extends MyJoinLambdaQu
     }
 
     @Override
-    public <E extends MyBaseEntity, F> MyLambdaQueryWrapper<T> isNull(boolean condition, String alias, MySFunction<E, F> column) {
+    public <E, F> MyLambdaQueryWrapper<T> isNull(boolean condition, String alias, MySFunction<E, F> column) {
         return doIt(condition, () -> getColumn(column, alias), IS_NULL);
     }
 
     @Override
-    public <E extends MyBaseEntity, F> MyLambdaQueryWrapper<T> isNotNull(boolean condition, String alias, MySFunction<E, F> column) {
+    public <E, F> MyLambdaQueryWrapper<T> isNotNull(boolean condition, String alias, MySFunction<E, F> column) {
         return doIt(condition, () -> getColumn(column, alias), IS_NOT_NULL);
     }
 
     @Override
-    public <E extends MyBaseEntity, F> MyLambdaQueryWrapper<T> in(boolean condition, String alias, MySFunction<E, F> column, Collection<?> coll) {
+    public <E, F> MyLambdaQueryWrapper<T> in(boolean condition, String alias, MySFunction<E, F> column, Collection<?> coll) {
         return doIt(condition, () -> getColumn(column, alias), IN, inExpression(coll));
     }
 
     @Override
-    public <E extends MyBaseEntity, F> MyLambdaQueryWrapper<T> notIn(boolean condition, String alias, MySFunction<E, F> column, Collection<?> coll) {
+    public <E, F> MyLambdaQueryWrapper<T> notIn(boolean condition, String alias, MySFunction<E, F> column, Collection<?> coll) {
         return doIt(condition, () -> getColumn(column, alias), NOT_IN, inExpression(coll));
     }
 
     @Override
-    public <E extends MyBaseEntity, F> MyLambdaQueryWrapper<T> inSql(boolean condition, String alias, MySFunction<E, F> column, String inValue) {
+    public <E, F> MyLambdaQueryWrapper<T> inSql(boolean condition, String alias, MySFunction<E, F> column, String inValue) {
         return doIt(condition, () -> getColumn(column, alias), IN, () -> String.format("(%s)", inValue));
     }
 
     @Override
-    public <E extends MyBaseEntity, F> MyLambdaQueryWrapper<T> notInSql(boolean condition, String alias, MySFunction<E, F> column, String inValue) {
+    public <E, F> MyLambdaQueryWrapper<T> notInSql(boolean condition, String alias, MySFunction<E, F> column, String inValue) {
         return doIt(condition, () -> getColumn(column, alias), NOT_IN, () -> String.format("(%s)", inValue));
     }
 
     @Override
-    public <E extends MyBaseEntity, F> MyLambdaQueryWrapper<T> groupBy(boolean condition, String alias, MySFunction<E, F>... columns) {
+    public <E, F> MyLambdaQueryWrapper<T> groupBy(boolean condition, String alias, MySFunction<E, F>... columns) {
         if (ArrayUtils.isEmpty(columns)) {
             return this;
         }
@@ -515,7 +517,7 @@ public class MyLambdaQueryWrapper<T extends MyBaseEntity> extends MyJoinLambdaQu
     }
 
     @Override
-    public <E extends MyBaseEntity, F> MyLambdaQueryWrapper<T> orderBy(boolean condition, String alias, boolean isAsc, MySFunction<E, F>... columns) {
+    public <E, F> MyLambdaQueryWrapper<T> orderBy(boolean condition, String alias, boolean isAsc, MySFunction<E, F>... columns) {
         if (ArrayUtils.isEmpty(columns)) {
             return this;
         }
@@ -527,12 +529,12 @@ public class MyLambdaQueryWrapper<T extends MyBaseEntity> extends MyJoinLambdaQu
     }
 
     @Override
-    public <E extends MyBaseEntity, F> MyLambdaQueryWrapper<T> having(boolean condition, String alias, String sqlHaving, Object... params) {
+    public <E, F> MyLambdaQueryWrapper<T> having(boolean condition, String alias, String sqlHaving, Object... params) {
         return doIt(condition, HAVING, () -> formatSqlIfNeed(condition, sqlHaving, params));
     }
 
     @Override
-    public <E extends MyBaseEntity, F> MyLambdaQueryWrapper<T> func(boolean condition, String alias, Consumer<MyLambdaQueryWrapper<T>> consumer) {
+    public <E, F> MyLambdaQueryWrapper<T> func(boolean condition, String alias, Consumer<MyLambdaQueryWrapper<T>> consumer) {
         if (condition) {
             consumer.accept(this);
         }

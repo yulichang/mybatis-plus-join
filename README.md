@@ -61,10 +61,10 @@ class test {
     void testJoin() {
         List<UserDTO> list = userMapper.selectJoinList(new MyLambdaQueryWrapper<UserEntity>()
                         .selectAll(UserEntity.class)
-                        .leftJoin(UserEntity::getId, UserAddressEntity::getUserId, r1 -> r1
-                                .select(UserAddressEntity::getAddress)
-                                .leftJoin(UserAddressEntity::getAreaId, AreaEntity::getId,
-                                        r2 -> r2.select(AreaEntity::getProvince)))
+                        .leftJoin(UserEntity::getId, UserAddressEntity::getUserId,
+                                r1 -> r1.select(UserAddressEntity::getAddress)
+                                        .leftJoin(UserAddressEntity::getAreaId, AreaEntity::getId,
+                                                r2 -> r2.select(AreaEntity::getProvince)))
                 , UserDTO.class);
     }
 }
@@ -93,8 +93,8 @@ class test {
                         .selectAll(主表实体类.class)
                         .leftJoin(主表实体类on属性, 子表实体类on属性, 子表对象 -> 子表对象
                                 .select(子表查询字段)
-                                .leftJoin(UserAddressEntity::getAreaId, AreaEntity::getId,
-                                        r2 -> r2.select(AreaEntity::getProvince)))
+                                .leftJoin(第二个表的on属性, 第三个表的on属性,
+                                        r2 -> r2.select(第三个表的查询字段)))
                 , UserDTO.class);//返回对象class
     }
 }

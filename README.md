@@ -91,10 +91,11 @@ class test {
     void testJoin() {
         List<UserDTO> list = userMapper.selectJoinList(new MyLambdaQueryWrapper<user表>()
                         .selectAll(user表实体类.class)//查询user表全部字段
-                        .leftJoin(user表on字段, user_address表on字段, user_address表对象 -> user_address表对象
-                                .select(user_address表address字段)
-                                .leftJoin(user_address表表的on字段, area表的on字段,
-                                        r2 -> r2.select(area表的province字段)))
+                        .leftJoin(user表on字段, user_address表on字段,
+                                user_address表对象 -> user_address表对象
+                                        .select(user_address表address字段)
+                                        .leftJoin(user_address表表的on字段, area表的on字段,
+                                                area表对象 -> area表对象.select(area表的province字段)))
                 , UserDTO.class);//返回对象class
     }
 }

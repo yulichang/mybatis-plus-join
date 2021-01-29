@@ -31,6 +31,17 @@
 2. 如果mybatisplus目录不在springboot扫描路径下,  
    将MybatisPlusConfiguration移动到springboot扫描路径下或添加springboot扫描路径
 
+3. 添加cglib依赖
+
+```xml
+
+<dependency>
+    <groupId>cglib</groupId>
+    <artifactId>cglib</artifactId>
+    <version>3.3.0</version>
+</dependency>
+```
+
 ### 使用
 
 * mapper继承MyBaseMapper (必选)

@@ -74,6 +74,22 @@ FROM user t0
          LEFT JOIN area t2 ON t1.area_id = t2.id
 ```
 
+伪代码
+
+```java
+class test {
+    void testJoin() {
+        List<UserDTO> list = userMapper.selectJoinList(new MyLambdaQueryWrapper<主表实体类>()
+                        .selectAll(主表实体类.class)
+                        .leftJoin(主表实体类on属性, 子表实体类on属性, 子表对象 -> 子表对象
+                                .select(子表查询字段)
+                                .leftJoin(UserAddressEntity::getAreaId, AreaEntity::getId,
+                                        r2 -> r2.select(AreaEntity::getProvince)))
+                , UserDTO.class);//返回对象class
+    }
+}
+```
+
 #### selectAll(UserEntity.class) 查询UserEntity全部字段
 
 查询user全部字段和user_address表中的address,tel

@@ -51,7 +51,7 @@
 
 #### select(UserEntity::getId)  查询指定的字段,支持可变参数
 
-查询user表中的head_img,name和user_address表中的address,tel
+简单的3表查询
 
 ```java
 class test {
@@ -100,7 +100,7 @@ class test {
 }
 ```
 
-#### selectAll(UserEntity.class) 查询UserEntity全部字段
+#### selectAll() 查询UserEntity全部字段
 
 查询user全部字段和user_address表中的address,tel
 
@@ -134,7 +134,7 @@ FROM user t0
 
 #### as(UserEntity::getHeadImg,UserDTO::getUserHeadImg)
 
-查询字段head_img as userHeadImg
+查询字段别名 head_img as userHeadImg
 
 ```java
 class test {

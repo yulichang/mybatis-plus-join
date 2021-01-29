@@ -10,6 +10,8 @@
 
 ## 使用方法
 
+### 方法一
+
 1. 将代码down到本地，使用maven install
 
 2. 在自己的项目中替换mybatisplus依赖(框架依赖mybatisplus<3.4.2>)
@@ -21,9 +23,16 @@
        <version>1.0-SNAPSHOT</version>
    </dependency>
    ```
+
+### 方法二
+
+1. 将mybatisplus目录复制到你的工程中
+
+2. 如果mybatisplus目录不在springboot扫描路径下,  
+   将MybatisPlusConfiguration移动到springboot扫描路径下或添加springboot扫描路径
+
 ### 使用
 
-* entity继承MyBaseEntity (需要连表的实体类必须继承,其他可以不继承)
 * mapper继承MyBaseMapper (必选)
 * service继承MyBaseService (可选)
 * serviceImpl继承MyBaseServiceImpl (可选)
@@ -38,12 +47,14 @@
 class test {
     @Resource
     private UserMapper userMapper;
-    
+
     void testJoin() {
         List<UserDTO> list = userMapper.selectJoinList(new MyLambdaQueryWrapper<UserEntity>()
-                        .select(UserEntity::getHeadImg, UserEntity::getName)
-                        .leftJoin(UserEntity::getId, UserAddressEntity::getUserId,
-                                right -> right.select(UserAddressEntity::getAddress, UserAddressEntity::getTel))
+                        .selectAll(UserEntity.class)
+                        .leftJoin(UserEntity::getId, UserAddressEntity::getUserId, r1 -> r1
+                                .select(UserAddressEntity::getAddress)
+                                .leftJoin(UserAddressEntity::getAreaId, AreaEntity::getId,
+                                        r2 -> r2.select(AreaEntity::getProvince)))
                 , UserDTO.class);
     }
 }
@@ -52,14 +63,15 @@ class test {
 对应sql
 
 ```sql
-SELECT 
-    t0.head_img,
-    t0.name,
-    t1.address,
-    t1.tel
-FROM 
-user t0
-LEFT JOIN user_address t1 ON t0.id = t1.user_id
+SELECT t0.name,
+       t0.sex,
+       t0.head_img,
+       t0.id,
+       t1.address,
+       t2.province
+FROM user t0
+         LEFT JOIN user_address t1 ON t0.id = t1.user_id
+         LEFT JOIN area t2 ON t1.area_id = t2.id
 ```
 
 #### selectAll(UserEntity.class) 查询UserEntity全部字段
@@ -84,16 +96,14 @@ class test {
 对应sql
 
 ```sql
-SELECT 
-    t0.name,
-    t0.sex, 
-    t0.head_img, 
-    t0.id, 
-    t1.address, 
-    t1.tel
-FROM 
-user t0
-LEFT JOIN user_address t1 ON t0.id = t1.user_id
+SELECT t0.name,
+       t0.sex,
+       t0.head_img,
+       t0.id,
+       t1.address,
+       t1.tel
+FROM user t0
+         LEFT JOIN user_address t1 ON t0.id = t1.user_id
 ```
 
 #### as(UserEntity::getHeadImg,UserDTO::getUserHeadImg)
@@ -118,13 +128,11 @@ class test {
 对应sql
 
 ```sql
-SELECT 
-    t0.head_img AS userHeadImg, 
-    t1.address,
-    t1.tel
-FROM 
-user t0
-LEFT JOIN user_address t1 ON t0.id = t1.user_id
+SELECT t0.head_img AS userHeadImg,
+       t1.address,
+       t1.tel
+FROM user t0
+         LEFT JOIN user_address t1 ON t0.id = t1.user_id
 ```
 
 #### 左连接 leftJoin(UserEntity::getId,UserAddressEntity::getUserId,right -> right)
@@ -156,20 +164,18 @@ class test {
 对应sql
 
 ```sql
-SELECT 
-    t0.name,
-    t0.sex, 
-    t0.head_img,
-    t0.id, 
-    t1.address,
-    t1.tel
-FROM 
-user t0
-LEFT JOIN user_address t1 ON t0.id = t1.user_id
+SELECT t0.name,
+       t0.sex,
+       t0.head_img,
+       t0.id,
+       t1.address,
+       t1.tel
+FROM user t0
+         LEFT JOIN user_address t1 ON t0.id = t1.user_id
 WHERE (
-    t0.id = ? 
-    AND t1.tel LIKE ? 
-    AND t0.id = t1.user_id)
+              t0.id = ?
+              AND t1.tel LIKE ?
+              AND t0.id = t1.user_id)
 ```
 
 #### [参考测试类](https://gitee.com/best_handsome/mybatis-plus-join/blob/master/src/test/java/com/example/mp/MpJoinTest.java)

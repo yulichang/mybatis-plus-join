@@ -33,14 +33,13 @@
 
 3. 添加cglib依赖
 
-```xml
-
-<dependency>
-    <groupId>cglib</groupId>
-    <artifactId>cglib</artifactId>
-    <version>3.3.0</version>
-</dependency>
-```
+   ```xml
+   <dependency>
+       <groupId>cglib</groupId>
+       <artifactId>cglib</artifactId>
+       <version>3.3.0</version>
+   </dependency>
+   ```
 
 ### 使用
 

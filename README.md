@@ -84,17 +84,17 @@ FROM user t0
          LEFT JOIN area t2 ON t1.area_id = t2.id
 ```
 
-伪代码
+sql -> 伪代码
 
 ```java
 class test {
     void testJoin() {
-        List<UserDTO> list = userMapper.selectJoinList(new MyLambdaQueryWrapper<主表实体类>()
-                        .selectAll(主表实体类.class)
-                        .leftJoin(主表实体类on属性, 子表实体类on属性, 子表对象 -> 子表对象
-                                .select(子表查询字段)
-                                .leftJoin(第二个表的on属性, 第三个表的on属性,
-                                        r2 -> r2.select(第三个表的查询字段)))
+        List<UserDTO> list = userMapper.selectJoinList(new MyLambdaQueryWrapper<user表>()
+                        .selectAll(user表实体类.class)//查询user表全部字段
+                        .leftJoin(user表on字段, user_address表on字段, user_address表对象 -> user_address表对象
+                                .select(user_address表address字段)
+                                .leftJoin(user_address表表的on字段, area表的on字段,
+                                        r2 -> r2.select(area表的province字段)))
                 , UserDTO.class);//返回对象class
     }
 }

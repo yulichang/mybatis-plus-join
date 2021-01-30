@@ -3,6 +3,7 @@ package com.github.mybatisplus.interceptor;
 import com.baomidou.mybatisplus.core.MybatisParameterHandler;
 import com.baomidou.mybatisplus.core.toolkit.ClassUtils;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
+import com.github.mybatisplus.toolkit.Constant;
 import org.apache.ibatis.executor.resultset.DefaultResultSetHandler;
 import org.apache.ibatis.executor.resultset.ResultSetHandler;
 import org.apache.ibatis.plugin.*;
@@ -74,7 +75,7 @@ public class MyResultInterceptor implements Interceptor {
                     Object object = mybatisParameterHandler.getParameterObject();
                     if (object instanceof Map) {
                         Map<?, ?> args = (Map<?, ?>) object;
-                        return (Class<?>) args.get("clazz");
+                        return (Class<?>) args.get(Constant.CLAZZ);
                     }
                 } catch (Exception e) {
                     return null;

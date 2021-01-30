@@ -1,5 +1,9 @@
 package com.github.mybatisplus.method;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
 /**
  * @author yulichang
  * @see com.baomidou.mybatisplus.core.enums.SqlMethod
@@ -50,4 +54,6 @@ public enum SqlMethod {
         return sql;
     }
 
+
+    public static final List<String> collect = Arrays.stream(SqlMethod.values()).map(SqlMethod::getMethod).collect(Collectors.toList());
 }

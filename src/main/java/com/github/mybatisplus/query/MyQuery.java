@@ -16,24 +16,24 @@ import java.util.function.Predicate;
  * copy {@link com.baomidou.mybatisplus.core.conditions.query.QueryWrapper}
  */
 @SuppressWarnings("serial")
-public class MyQueryWrapper<T> extends MyAbstractWrapper<T, String, MyQueryWrapper<T>>
-        implements Query<MyQueryWrapper<T>, T, String> {
+public class MyQuery<T> extends MyAbstractWrapper<T, String, MyQuery<T>>
+        implements Query<MyQuery<T>, T, String> {
 
     /**
      * 查询字段
      */
     private SharedString sqlSelect = new SharedString();
 
-    public MyQueryWrapper() {
+    public MyQuery() {
         this(null);
     }
 
-    public MyQueryWrapper(T entity) {
+    public MyQuery(T entity) {
         super.setEntity(entity);
         super.initNeed();
     }
 
-    public MyQueryWrapper(T entity, String... columns) {
+    public MyQuery(T entity, String... columns) {
         super.setEntity(entity);
         super.initNeed();
         this.select(columns);
@@ -44,9 +44,9 @@ public class MyQueryWrapper<T> extends MyAbstractWrapper<T, String, MyQueryWrapp
      *
      * @param entityClass 本不应该需要的
      */
-    public MyQueryWrapper(T entity, Class<T> entityClass, AtomicInteger paramNameSeq,
-                          Map<String, Object> paramNameValuePairs, MergeSegments mergeSegments,
-                          SharedString sqlSelect, SharedString from, SharedString lastSql, SharedString sqlComment, SharedString sqlFirst) {
+    public MyQuery(T entity, Class<T> entityClass, AtomicInteger paramNameSeq,
+                   Map<String, Object> paramNameValuePairs, MergeSegments mergeSegments,
+                   SharedString sqlSelect, SharedString from, SharedString lastSql, SharedString sqlComment, SharedString sqlFirst) {
         super.setEntity(entity);
         super.setEntityClass(entityClass);
         this.paramNameSeq = paramNameSeq;
@@ -60,7 +60,7 @@ public class MyQueryWrapper<T> extends MyAbstractWrapper<T, String, MyQueryWrapp
     }
 
     @Override
-    public MyQueryWrapper<T> select(String... columns) {
+    public MyQuery<T> select(String... columns) {
         if (ArrayUtils.isNotEmpty(columns)) {
             this.sqlSelect.setStringValue(String.join(StringPool.COMMA, columns));
         }
@@ -68,7 +68,7 @@ public class MyQueryWrapper<T> extends MyAbstractWrapper<T, String, MyQueryWrapp
     }
 
     @Override
-    public MyQueryWrapper<T> select(Class<T> entityClass, Predicate<TableFieldInfo> predicate) {
+    public MyQuery<T> select(Class<T> entityClass, Predicate<TableFieldInfo> predicate) {
         super.setEntityClass(entityClass);
         this.sqlSelect.setStringValue(TableInfoHelper.getTableInfo(getEntityClass()).chooseSelect(predicate));
         return typedThis;
@@ -99,8 +99,8 @@ public class MyQueryWrapper<T> extends MyAbstractWrapper<T, String, MyQueryWrapp
      * </p>
      */
     @Override
-    protected MyQueryWrapper<T> instance() {
-        return new MyQueryWrapper<>(getEntity(), getEntityClass(), paramNameSeq, paramNameValuePairs, new MergeSegments(),
+    protected MyQuery<T> instance() {
+        return new MyQuery<>(getEntity(), getEntityClass(), paramNameSeq, paramNameValuePairs, new MergeSegments(),
                 null, null, SharedString.emptyString(), SharedString.emptyString(), SharedString.emptyString());
     }
 

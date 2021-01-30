@@ -156,8 +156,8 @@ public class MyLambdaQuery<T> extends MyAbstractLambda<T, MyLambdaQuery<T>>
     /**
      * 返回一个支持 lambda 函数写法的 wrapper
      */
-    public MyQueryWrapper<T> stringQuery() {
-        return new MyQueryWrapper<>(getEntity(), getEntityClass(), paramNameSeq, paramNameValuePairs,
+    public MyQuery<T> stringQuery() {
+        return new MyQuery<>(getEntity(), getEntityClass(), paramNameSeq, paramNameValuePairs,
                 expression, sqlSelect, from, lastSql, sqlComment, sqlFirst);
     }
 

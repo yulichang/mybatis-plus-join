@@ -44,9 +44,9 @@
 * service继承MyBaseService (可选)
 * serviceImpl继承MyBaseServiceImpl (可选)
 
-## MyQueryWrapper用法
+## MyQuery用法
 
-简单的3表查询
+### 简单的3表查询
 ```java
 class test {
     @Resource
@@ -99,7 +99,7 @@ WHERE (
 * lambda() string查询转lambda查询
 * sql组装由mp完成,正常使用没有sql注入风险
 
-分页查询
+### 分页查询
   
 ```java
 class test {
@@ -136,7 +136,7 @@ RIGHT JOIN area a on addr.area_id = a.id
 LIMIT ?,?
 ```
 
-还可以怎么操作,但不建议
+### 还可以这么操作,但不建议
 
 ```java
 class test {
@@ -187,11 +187,11 @@ WHERE (
 ORDER BY addr.id DESC
 ```
 
-# MyLambdaQueryWrapper用法
+## MyLambdaQueryWrapper用法
 
 ### MyLambdaQueryWrapper更符合面向对象(OOP),没有难以理解的常量(魔术值),全部基于lambda,但好像不那么好理解
 
-简单的3表查询
+#### 简单的3表查询
 
 ```java
 class test {
@@ -199,13 +199,12 @@ class test {
     private UserMapper userMapper;
 
     void testJoin() {
-        List<UserDTO> list = userMapper.selectJoinList(new MyLambdaQueryWrapper<UserEntity>()
+        List<UserDTO> list = userMapper.selectJoinList(UserDTO.class, new MyLambdaQueryWrapper<UserEntity>()
                         .selectAll(UserEntity.class)
                         .leftJoin(UserEntity::getId, UserAddressEntity::getUserId,
                                 r1 -> r1.select(UserAddressEntity::getAddress)
                                         .leftJoin(UserAddressEntity::getAreaId, AreaEntity::getId,
-                                                r2 -> r2.select(AreaEntity::getProvince)))
-                , UserDTO.class);
+                                                r2 -> r2.select(AreaEntity::getProvince))));
     }
 }
 ```
@@ -229,48 +228,18 @@ sql -> 伪代码
 ```java
 class test {
     void testJoin() {
-        List<UserDTO> list = userMapper.selectJoinList(new MyLambdaQueryWrapper<user表>()
+        List<UserDTO> list = userMapper.selectJoinList(UserDTO.class, new MyLambdaQueryWrapper<user表>()
                         .selectAll(user表实体类.class)//查询user表全部字段
                         .leftJoin(user表on字段, user_address表on字段,
                                 user_address表对象 -> user_address表对象
                                         .select(user_address表address字段)
                                         .leftJoin(user_address表表的on字段, area表的on字段,
-                                                area表对象 -> area表对象.select(area表的province字段)))
-                , UserDTO.class);//返回对象class
+                                                area表对象 -> area表对象.select(area表的province字段))));
     }
 }
 ```
 
-查询user全部字段和user_address表中的address,tel
-
-```java
-class test {
-    @Resource
-    private UserMapper userMapper;
-
-    void testJoin() {
-        List<UserDTO> list = userMapper.selectJoinList(UserDTO.class, new MyLambdaQueryWrapper<UserEntity>()
-                        .selectAll(UserEntity.class)
-                        .leftJoin(UserEntity::getId, UserAddressEntity::getUserId,
-                                right -> right.select(UserAddressEntity::getAddress, UserAddressEntity::getTel)));
-    }
-}
-```
-
-对应sql
-
-```sql
-SELECT t0.name,
-       t0.sex,
-       t0.head_img,
-       t0.id,
-       t1.address,
-       t1.tel
-FROM user t0
-         LEFT JOIN user_address t1 ON t0.id = t1.user_id
-```
-
-查询字段别名 head_img as userHeadImg
+#### 字段别名,查询字段别名 head_img as userHeadImg
 
 ```java
 class test {
@@ -302,7 +271,7 @@ FROM user t0
 user left join user_address on user.id = User_address.user_id  
 第三个参数是右表wrapper对象,可以继续使用,以上方法.
 
-连表条件查询
+#### 条件查询
 
 ```java
 class test {

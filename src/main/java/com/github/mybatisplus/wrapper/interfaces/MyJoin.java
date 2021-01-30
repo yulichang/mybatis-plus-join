@@ -1,6 +1,7 @@
 package com.github.mybatisplus.wrapper.interfaces;
 
 import com.github.mybatisplus.func.MySFunction;
+import com.github.mybatisplus.toolkit.Constant;
 import com.github.mybatisplus.wrapper.MyJoinLambdaQueryWrapper;
 
 import java.util.function.Function;
@@ -11,11 +12,13 @@ import java.util.function.Function;
 public interface MyJoin<Children, T> {
 
 
-    <R, TE, RE> Children leftJoin(boolean condition,
-                                  String alias,
-                                  MySFunction<T, TE> leftCondition,
-                                  MySFunction<R, RE> rightCondition,
-                                  Function<MyJoinLambdaQueryWrapper<R>, MyJoinLambdaQueryWrapper<R>> rightWrapper);
+    default <R, TE, RE> Children leftJoin(boolean condition,
+                                          String alias,
+                                          MySFunction<T, TE> leftCondition,
+                                          MySFunction<R, RE> rightCondition,
+                                          Function<MyJoinLambdaQueryWrapper<R>, MyJoinLambdaQueryWrapper<R>> rightWrapper) {
+        return join(condition, alias, Constant.LEFT_JOIN, leftCondition, rightCondition, rightWrapper);
+    }
 
 
     default <R, TE, RE> Children leftJoin(MySFunction<T, TE> leftCondition,
@@ -24,7 +27,10 @@ public interface MyJoin<Children, T> {
         return leftJoin(true, null, leftCondition, rightCondition, rightWrapper);
     }
 
-    default <R, TE, RE> Children leftJoin(String alias, MySFunction<T, TE> leftCondition, MySFunction<R, RE> rightCondition, Function<MyJoinLambdaQueryWrapper<R>, MyJoinLambdaQueryWrapper<R>> rightWrapper) {
+    default <R, TE, RE> Children leftJoin(String alias,
+                                          MySFunction<T, TE> leftCondition,
+                                          MySFunction<R, RE> rightCondition,
+                                          Function<MyJoinLambdaQueryWrapper<R>, MyJoinLambdaQueryWrapper<R>> rightWrapper) {
         return leftJoin(true, alias, leftCondition, rightCondition, rightWrapper);
     }
 
@@ -36,11 +42,13 @@ public interface MyJoin<Children, T> {
     }
 
 
-    <R, TE, RE> Children rightJoin(boolean condition,
-                                   String alias,
-                                   MySFunction<T, TE> leftCondition,
-                                   MySFunction<R, RE> rightCondition,
-                                   Function<MyJoinLambdaQueryWrapper<R>, MyJoinLambdaQueryWrapper<R>> rightWrapper);
+    default <R, TE, RE> Children rightJoin(boolean condition,
+                                           String alias,
+                                           MySFunction<T, TE> leftCondition,
+                                           MySFunction<R, RE> rightCondition,
+                                           Function<MyJoinLambdaQueryWrapper<R>, MyJoinLambdaQueryWrapper<R>> rightWrapper) {
+        return join(condition, alias, Constant.RIGHT_JOIN, leftCondition, rightCondition, rightWrapper);
+    }
 
 
     default <R, TE, RE> Children rightJoin(MySFunction<T, TE> leftCondition,
@@ -49,7 +57,10 @@ public interface MyJoin<Children, T> {
         return rightJoin(true, null, leftCondition, rightCondition, rightWrapper);
     }
 
-    default <R, TE, RE> Children rightJoin(String alias, MySFunction<T, TE> leftCondition, MySFunction<R, RE> rightCondition, Function<MyJoinLambdaQueryWrapper<R>, MyJoinLambdaQueryWrapper<R>> rightWrapper) {
+    default <R, TE, RE> Children rightJoin(String alias,
+                                           MySFunction<T, TE> leftCondition,
+                                           MySFunction<R, RE> rightCondition,
+                                           Function<MyJoinLambdaQueryWrapper<R>, MyJoinLambdaQueryWrapper<R>> rightWrapper) {
         return rightJoin(true, alias, leftCondition, rightCondition, rightWrapper);
     }
 
@@ -61,11 +72,13 @@ public interface MyJoin<Children, T> {
     }
 
 
-    <R, TE, RE> Children innerJoin(boolean condition,
-                                   String alias,
-                                   MySFunction<T, TE> leftCondition,
-                                   MySFunction<R, RE> rightCondition,
-                                   Function<MyJoinLambdaQueryWrapper<R>, MyJoinLambdaQueryWrapper<R>> rightWrapper);
+    default <R, TE, RE> Children innerJoin(boolean condition,
+                                           String alias,
+                                           MySFunction<T, TE> leftCondition,
+                                           MySFunction<R, RE> rightCondition,
+                                           Function<MyJoinLambdaQueryWrapper<R>, MyJoinLambdaQueryWrapper<R>> rightWrapper) {
+        return join(condition, alias, Constant.INNER_JOIN, leftCondition, rightCondition, rightWrapper);
+    }
 
 
     default <R, TE, RE> Children innerJoin(MySFunction<T, TE> leftCondition,
@@ -74,7 +87,10 @@ public interface MyJoin<Children, T> {
         return innerJoin(true, null, leftCondition, rightCondition, rightWrapper);
     }
 
-    default <R, TE, RE> Children innerJoin(String alias, MySFunction<T, TE> leftCondition, MySFunction<R, RE> rightCondition, Function<MyJoinLambdaQueryWrapper<R>, MyJoinLambdaQueryWrapper<R>> rightWrapper) {
+    default <R, TE, RE> Children innerJoin(String alias,
+                                           MySFunction<T, TE> leftCondition,
+                                           MySFunction<R, RE> rightCondition,
+                                           Function<MyJoinLambdaQueryWrapper<R>, MyJoinLambdaQueryWrapper<R>> rightWrapper) {
         return innerJoin(true, alias, leftCondition, rightCondition, rightWrapper);
     }
 
@@ -86,4 +102,10 @@ public interface MyJoin<Children, T> {
     }
 
 
+    <R, TE, RE> Children join(boolean condition,
+                              String alias,
+                              String keyWord,
+                              MySFunction<T, TE> leftCondition,
+                              MySFunction<R, RE> rightCondition,
+                              Function<MyJoinLambdaQueryWrapper<R>, MyJoinLambdaQueryWrapper<R>> rightWrapper);
 }

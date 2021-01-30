@@ -2,6 +2,7 @@ package com.github.mybatisplus.wrapper;
 
 import com.baomidou.mybatisplus.core.conditions.ISqlSegment;
 import com.baomidou.mybatisplus.core.conditions.SharedString;
+import com.baomidou.mybatisplus.core.conditions.query.Query;
 import com.baomidou.mybatisplus.core.conditions.segments.MergeSegments;
 import com.baomidou.mybatisplus.core.enums.SqlKeyword;
 import com.baomidou.mybatisplus.core.enums.SqlLike;
@@ -12,12 +13,10 @@ import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
 import com.baomidou.mybatisplus.core.toolkit.*;
 import com.baomidou.mybatisplus.core.toolkit.sql.SqlUtils;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
-import com.github.mybatisplus.wrapper.interfaces.MyCompare;
-import com.github.mybatisplus.wrapper.interfaces.MyFunc;
-import com.github.mybatisplus.wrapper.interfaces.MyNested;
 import com.github.mybatisplus.func.MySFunction;
 import com.github.mybatisplus.toolkit.Constant;
 import com.github.mybatisplus.toolkit.MyLambdaUtils;
+import com.github.mybatisplus.wrapper.interfaces.*;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -31,6 +30,8 @@ import static java.util.stream.Collectors.joining;
 
 /**
  * 连接查询Query
+ * 只允许主表有条件查询,内部的表只允许select和继续连表的功能,
+ * 所以将条件查询接口在此实现 结构臃肿,有待进一步优化
  *
  * @author yulichang
  * @see com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper
@@ -40,125 +41,85 @@ import static java.util.stream.Collectors.joining;
  * @see com.baomidou.mybatisplus.core.conditions.interfaces.Func
  * @since 2021/01/19
  */
-public class MyLambdaQueryWrapper<T> extends MyJoinLambdaQueryWrapper<T>
-        implements MyCompare<MyLambdaQueryWrapper<T>>, MyNested<MyLambdaQueryWrapper<T>, MyLambdaQueryWrapper<T>>,
-        MyFunc<MyLambdaQueryWrapper<T>> {
+@SuppressWarnings("all")
+public class MyLambdaQueryWrapper<T> extends MyAbstractLambdaWrapper<T, MyLambdaQueryWrapper<T>>
+        implements
+        Query<MyLambdaQueryWrapper<T>, T, SFunction<T, ?>>,
+        MyJoin<MyLambdaQueryWrapper<T>, T>,
+        MyCompare<MyLambdaQueryWrapper<T>>,
+        MyNested<MyLambdaQueryWrapper<T>, MyLambdaQueryWrapper<T>>,
+        MyFunc<MyLambdaQueryWrapper<T>>,
+        MyMPJoin<MyLambdaQueryWrapper<T>> {
+
+
+    private MyJoinLambdaQueryWrapper<T> wrapper = new MyJoinLambdaQueryWrapper<>();
+
 
     /**
      * 表别名初始序号
      */
     public static final int TABLE_ALIAS_INDEX = 0;
 
-    /**
-     * 主表默认别名
-     */
-    public static final String DEFAULT_ALIAS = "t";
 
     public MyLambdaQueryWrapper() {
         this(null);
     }
 
     public MyLambdaQueryWrapper(T entity) {
-        super.rUid = TABLE_ALIAS_INDEX;
-        super.setEntity(entity);
+        wrapper.rUid = TABLE_ALIAS_INDEX;
+        wrapper.setEntity(entity);
         super.initNeed();
     }
 
     MyLambdaQueryWrapper(T entity, Class<T> entityClass, SharedString sqlSelect, AtomicInteger paramNameSeq,
                          Map<String, Object> paramNameValuePairs, MergeSegments mergeSegments,
                          SharedString lastSql, SharedString sqlComment, SharedString sqlFirst,
-                         int rUid, List<SelectColumn> selectColumns, List<SubTable> classList) {
+                         int rUid, List<MyJoinLambdaQueryWrapper.SelectColumn> selectColumns, List<MyJoinLambdaQueryWrapper.SubTable> classList) {
         super.setEntity(entity);
         super.setEntityClass(entityClass);
         this.paramNameSeq = paramNameSeq;
         this.paramNameValuePairs = paramNameValuePairs;
         this.expression = mergeSegments;
-        this.sqlSelect = sqlSelect;
+        this.wrapper.sqlSelect = sqlSelect;
         this.lastSql = lastSql;
         this.sqlComment = sqlComment;
         this.sqlFirst = sqlFirst;
-        this.rUid = rUid;
-        this.selectColumnList = selectColumns;
-        this.classList = classList;
+
+        wrapper.rUid = rUid;
+        wrapper.selectColumnList = selectColumns;
+        wrapper.classList = classList;
     }
 
     @Override
     protected MyLambdaQueryWrapper<T> instance() {
         return new MyLambdaQueryWrapper<>(getEntity(), getEntityClass(), null, paramNameSeq, paramNameValuePairs,
                 new MergeSegments(), SharedString.emptyString(), SharedString.emptyString(), SharedString.emptyString(),
-                rUid, selectColumnList, classList);
+                wrapper.rUid, wrapper.selectColumnList, wrapper.classList);
     }
 
 
     @Override
-    public <R, TE, RE> MyLambdaQueryWrapper<T> leftJoin(boolean condition, String alias, MySFunction<T, TE> leftCondition, MySFunction<R, RE> rightCondition, Function<MyJoinLambdaQueryWrapper<R>, MyJoinLambdaQueryWrapper<R>> rightWrapper) {
-        return join(condition, alias, Constant.LEFT_JOIN, leftCondition, rightCondition, rightWrapper);
-    }
-
-    @Override
-    public <R, TE, RE> MyLambdaQueryWrapper<T> leftJoin(MySFunction<T, TE> leftCondition, MySFunction<R, RE> rightCondition, Function<MyJoinLambdaQueryWrapper<R>, MyJoinLambdaQueryWrapper<R>> rightWrapper) {
-        return this.leftJoin(true, null, leftCondition, rightCondition, rightWrapper);
-    }
-
-    @Override
-    public <R, TE, RE> MyLambdaQueryWrapper<T> leftJoin(String alias, MySFunction<T, TE> leftCondition, MySFunction<R, RE> rightCondition, Function<MyJoinLambdaQueryWrapper<R>, MyJoinLambdaQueryWrapper<R>> rightWrapper) {
-        return this.leftJoin(true, alias, leftCondition, rightCondition, rightWrapper);
-    }
-
-    @Override
-    public <R, TE, RE> MyLambdaQueryWrapper<T> leftJoin(boolean condition, MySFunction<T, TE> leftCondition, MySFunction<R, RE> rightCondition, Function<MyJoinLambdaQueryWrapper<R>, MyJoinLambdaQueryWrapper<R>> rightWrapper) {
-        return this.leftJoin(condition, null, leftCondition, rightCondition, rightWrapper);
-    }
-
-    public <R, TE, RE> MyLambdaQueryWrapper<T> rightJoin(boolean condition, String alias, MySFunction<T, TE> leftCondition, MySFunction<R, RE> rightCondition, Function<MyJoinLambdaQueryWrapper<R>, MyJoinLambdaQueryWrapper<R>> rightWrapper) {
-        return join(condition, alias, Constant.RIGHT_JOIN, leftCondition, rightCondition, rightWrapper);
-    }
-
-    @Override
-    public <R, TE, RE> MyLambdaQueryWrapper<T> rightJoin(MySFunction<T, TE> leftCondition, MySFunction<R, RE> rightCondition, Function<MyJoinLambdaQueryWrapper<R>, MyJoinLambdaQueryWrapper<R>> rightWrapper) {
-        return this.rightJoin(true, null, leftCondition, rightCondition, rightWrapper);
-    }
-
-    @Override
-    public <R, TE, RE> MyLambdaQueryWrapper<T> rightJoin(String alias, MySFunction<T, TE> leftCondition, MySFunction<R, RE> rightCondition, Function<MyJoinLambdaQueryWrapper<R>, MyJoinLambdaQueryWrapper<R>> rightWrapper) {
-        return this.rightJoin(true, alias, leftCondition, rightCondition, rightWrapper);
-    }
-
-    @Override
-    public <R, TE, RE> MyLambdaQueryWrapper<T> rightJoin(boolean condition, MySFunction<T, TE> leftCondition, MySFunction<R, RE> rightCondition, Function<MyJoinLambdaQueryWrapper<R>, MyJoinLambdaQueryWrapper<R>> rightWrapper) {
-        return this.rightJoin(condition, null, leftCondition, rightCondition, rightWrapper);
-    }
-
-
-    public <R, TE, RE> MyLambdaQueryWrapper<T> innerJoin(boolean condition, String alias, MySFunction<T, TE> leftCondition, MySFunction<R, RE> rightCondition, Function<MyJoinLambdaQueryWrapper<R>, MyJoinLambdaQueryWrapper<R>> rightWrapper) {
-        return join(condition, alias, Constant.INNER_JOIN, leftCondition, rightCondition, rightWrapper);
-    }
-
-    @Override
-    public <R, TE, RE> MyLambdaQueryWrapper<T> innerJoin(MySFunction<T, TE> leftCondition, MySFunction<R, RE> rightCondition, Function<MyJoinLambdaQueryWrapper<R>, MyJoinLambdaQueryWrapper<R>> rightWrapper) {
-        return this.innerJoin(true, null, leftCondition, rightCondition, rightWrapper);
-    }
-
-    @Override
-    public <R, TE, RE> MyLambdaQueryWrapper<T> innerJoin(String alias, MySFunction<T, TE> leftCondition, MySFunction<R, RE> rightCondition, Function<MyJoinLambdaQueryWrapper<R>, MyJoinLambdaQueryWrapper<R>> rightWrapper) {
-        return this.innerJoin(true, alias, leftCondition, rightCondition, rightWrapper);
-    }
-
-    @Override
-    public <R, TE, RE> MyLambdaQueryWrapper<T> innerJoin(boolean condition, MySFunction<T, TE> leftCondition, MySFunction<R, RE> rightCondition, Function<MyJoinLambdaQueryWrapper<R>, MyJoinLambdaQueryWrapper<R>> rightWrapper) {
-        return this.innerJoin(condition, null, leftCondition, rightCondition, rightWrapper);
-    }
-
-    private <R, TE, RE> MyLambdaQueryWrapper<T> join(boolean condition, String alias, String keyWord, MySFunction<T, TE> leftCondition, MySFunction<R, RE> rightCondition, Function<MyJoinLambdaQueryWrapper<R>, MyJoinLambdaQueryWrapper<R>> rightWrapper) {
+    public <R, TE, RE> MyLambdaQueryWrapper<T> join(boolean condition,
+                                                    String alias,
+                                                    String keyWord,
+                                                    MySFunction<T, TE> leftCondition,
+                                                    MySFunction<R, RE> rightCondition,
+                                                    Function<MyJoinLambdaQueryWrapper<R>, MyJoinLambdaQueryWrapper<R>> rightWrapper) {
         if (condition) {
             setEntityClass(MyLambdaUtils.getEntityClass(leftCondition));
             Class<R> clazz = MyLambdaUtils.getEntityClass(rightCondition);
             TableInfo info = TableInfoHelper.getTableInfo(clazz);
             Assert.notNull(info, "can not find table to entity %s", clazz);
-            classList.add(new SubTable(alias, keyWord, rUid, MyLambdaUtils.getColumn(leftCondition), classList.size() + 1, MyLambdaUtils.getColumn(rightCondition), info.getTableName()));
-            MyJoinLambdaQueryWrapper<R> apply = rightWrapper.apply(new MyJoinLambdaQueryWrapper<>(classList.size()));
-            classList.addAll(apply.classList);
-            this.selectColumnList.addAll(apply.selectColumnList);
+            wrapper.classList.add(new MyJoinLambdaQueryWrapper.SubTable(alias,
+                    keyWord,
+                    wrapper.rUid,
+                    MyLambdaUtils.getColumn(leftCondition),
+                    wrapper.classList.size() + 1,
+                    MyLambdaUtils.getColumn(rightCondition),
+                    info.getTableName()));
+            MyJoinLambdaQueryWrapper<R> apply = rightWrapper.apply(new MyJoinLambdaQueryWrapper<>(wrapper.classList.size()));
+            wrapper.classList.addAll(apply.classList);
+            wrapper.selectColumnList.addAll(apply.selectColumnList);
         }
         return this;
     }
@@ -166,77 +127,39 @@ public class MyLambdaQueryWrapper<T> extends MyJoinLambdaQueryWrapper<T>
     @SafeVarargs
     @Override
     public final MyLambdaQueryWrapper<T> select(SFunction<T, ?>... columns) {
-        super.select(columns);
-        return this;
-    }
-
-    @Override
-    public MyLambdaQueryWrapper<T> selectAll(Class<T> clazz) {
-        super.selectAll(clazz);
-        return this;
-    }
-
-    @Override
-    public MyLambdaQueryWrapper<T> selectDistinct() {
-        super.selectDistinct();
+        wrapper.select(columns);
         return this;
     }
 
     @Override
     public MyLambdaQueryWrapper<T> select(Predicate<TableFieldInfo> predicate) {
-        super.select(predicate);
+        wrapper.select(predicate);
         return this;
     }
 
     @Override
     public MyLambdaQueryWrapper<T> select(Class<T> entityClass, Predicate<TableFieldInfo> predicate) {
-        super.select(entityClass, predicate);
+        wrapper.select(entityClass, predicate);
         return this;
     }
 
-    @Override
-    public <DTO> MyLambdaQueryWrapper<T> as(SFunction<T, ?> entityColumn, SFunction<DTO, ?> DTOColumn) {
-        super.as(entityColumn, DTOColumn);
+
+    public MyLambdaQueryWrapper<T> selectAll(Class<T> clazz) {
+        wrapper.selectAll(clazz);
         return this;
     }
 
-    public <DTO> MyLambdaQueryWrapper<T> asCount(MySFunction<T, ?> entityColumn, SFunction<DTO, ?> DTOColumn) {
-        super.asCount(entityColumn, DTOColumn);
+    public MyLambdaQueryWrapper<T> selectDistinct() {
+        wrapper.selectDistinct();
         return this;
     }
-
-    public <DTO> MyLambdaQueryWrapper<T> asSum(MySFunction<T, ?> entityColumn, SFunction<DTO, ?> DTOColumn) {
-        super.asSum(entityColumn, DTOColumn);
-        return this;
-    }
-
-    public <DTO> MyLambdaQueryWrapper<T> asAvg(MySFunction<T, ?> entityColumn, SFunction<DTO, ?> DTOColumn) {
-        super.asAvg(entityColumn, DTOColumn);
-        return this;
-    }
-
-    public <DTO> MyLambdaQueryWrapper<T> asMax(MySFunction<T, ?> entityColumn, SFunction<DTO, ?> DTOColumn) {
-        super.asMax(entityColumn, DTOColumn);
-        return this;
-    }
-
-    public <DTO> MyLambdaQueryWrapper<T> asMin(MySFunction<T, ?> entityColumn, SFunction<DTO, ?> DTOColumn) {
-        super.asMin(entityColumn, DTOColumn);
-        return this;
-    }
-
-    public <DTO> MyLambdaQueryWrapper<T> asDateFormat(MySFunction<T, ?> entityColumn, SFunction<DTO, ?> DTOColumn) {
-        super.asDateFormat(entityColumn, DTOColumn);
-        return this;
-    }
-
 
     @Override
     public String getSqlSelect() {
-        if (StringUtils.isBlank(sqlSelect.getStringValue()) && CollectionUtils.isNotEmpty(selectColumnList)) {
+        if (StringUtils.isBlank(wrapper.sqlSelect.getStringValue()) && CollectionUtils.isNotEmpty(wrapper.selectColumnList)) {
             List<String> collect = new ArrayList<>();
-            selectColumnList.forEach(c -> {
-                String s = Constant.TABLE_ALIAS + c.getUid() + StringPool.DOT + c.getColumn();
+            wrapper.selectColumnList.forEach(c -> {
+                String s = Constant.TABLE_ALIAS + (c.getUid() == TABLE_ALIAS_INDEX ? "" : c.getUid()) + StringPool.DOT + c.getColumn();
                 if (c.getFunction() != null) {
                     s = String.format(c.getFunction().getSql(), s);
                 }
@@ -246,9 +169,9 @@ public class MyLambdaQueryWrapper<T> extends MyJoinLambdaQueryWrapper<T>
                     collect.add(s + Constant.AS + c.getAs());
                 }
             });
-            this.sqlSelect.setStringValue(String.join(StringPool.COMMA, collect));
+            wrapper.sqlSelect.setStringValue(String.join(StringPool.COMMA, collect));
         }
-        return sqlSelect.getStringValue();
+        return wrapper.sqlSelect.getStringValue();
     }
 
     @Override
@@ -257,29 +180,29 @@ public class MyLambdaQueryWrapper<T> extends MyJoinLambdaQueryWrapper<T>
     }
 
     public String getFrom() {
-        if (StringUtils.isNotBlank(from.getStringValue())) {
-            return from.getStringValue();
+        if (StringUtils.isNotBlank(wrapper.from.getStringValue())) {
+            return wrapper.from.getStringValue();
         }
         StringBuilder sb = new StringBuilder();
-        this.classList.forEach(right ->
+        wrapper.classList.forEach(right ->
                 sb.append(right.getKeyWord()).append(right.getRightTableName())
                         .append(StringPool.SPACE)
                         .append(Constant.TABLE_ALIAS)
-                        .append(right.getRightUid())
+                        .append(right.getRightUid() == TABLE_ALIAS_INDEX ? StringPool.EMPTY : right.getRightUid())
                         .append(Constant.ON)
                         .append(Constant.TABLE_ALIAS)
-                        .append(right.getLeftUid())
+                        .append(right.getLeftUid() == TABLE_ALIAS_INDEX ? StringPool.EMPTY : right.getLeftUid())
                         .append(StringPool.DOT)
                         .append(right.getLeftColumn())
                         .append(Constant.EQUALS)
                         .append(Constant.TABLE_ALIAS)
-                        .append(right.getRightUid())
+                        .append(right.getRightUid() == TABLE_ALIAS_INDEX ? StringPool.EMPTY : right.getRightUid())
                         .append(StringPool.DOT)
                         .append(right.getRightColumn())
                         .append(StringPool.SPACE)
         );
-        this.from.setStringValue(sb.toString());
-        return this.from.getStringValue();
+        wrapper.from.setStringValue(sb.toString());
+        return wrapper.from.getStringValue();
     }
 
     /**
@@ -287,12 +210,12 @@ public class MyLambdaQueryWrapper<T> extends MyJoinLambdaQueryWrapper<T>
      */
     private String getClassTablePrefix(Class<?> clazz) {
         if (getEntityClass() == clazz) {
-            return Constant.TABLE_ALIAS + rUid;
+            return Constant.TABLE_ALIAS;
         } else {
             TableInfo info = TableInfoHelper.getTableInfo(clazz);
             Assert.notNull(info, "can not find table to entity %s", clazz);
             String tableName = info.getTableName();
-            for (SubTable sub : classList) {
+            for (MyJoinLambdaQueryWrapper.SubTable sub : wrapper.classList) {
                 if (sub.getRightTableName().equals(tableName)) {
                     return Constant.TABLE_ALIAS + sub.getRightUid();
                 }
@@ -306,10 +229,10 @@ public class MyLambdaQueryWrapper<T> extends MyJoinLambdaQueryWrapper<T>
      */
     private <E, F> String getColumn(MySFunction<E, F> column, String alias) {
         if (alias != null) {
-            if (alias.equals(DEFAULT_ALIAS)) {
-                return Constant.TABLE_ALIAS + rUid + StringPool.DOT + column2String(column, true);
+            if (alias.equals(Constant.TABLE_ALIAS)) {
+                return Constant.TABLE_ALIAS + StringPool.DOT + column2String(column, true);
             }
-            for (SubTable sub : classList) {
+            for (MyJoinLambdaQueryWrapper.SubTable sub : wrapper.classList) {
                 if (alias.equals(sub.getAlias())) {
                     return Constant.TABLE_ALIAS + sub.getRightUid() + StringPool.DOT + column2String(column, true);
                 }
@@ -440,8 +363,48 @@ public class MyLambdaQueryWrapper<T> extends MyJoinLambdaQueryWrapper<T>
         return doIt(condition, AND);
     }
 
-    private MyLambdaQueryWrapper<T> or(boolean condition) {
+    @Override
+    public MyLambdaQueryWrapper<T> or(boolean condition) {
         return doIt(condition, OR);
+    }
+
+    @Override
+    public MyLambdaQueryWrapper<T> apply(boolean condition, String applySql, Object... value) {
+        return doIt(condition, APPLY, () -> formatSql(applySql, value));
+    }
+
+    @Override
+    public MyLambdaQueryWrapper<T> last(boolean condition, String lastSql) {
+        if (condition) {
+            this.lastSql.setStringValue(StringPool.SPACE + lastSql);
+        }
+        return typedThis;
+    }
+
+    @Override
+    public MyLambdaQueryWrapper<T> comment(boolean condition, String comment) {
+        if (condition) {
+            this.sqlComment.setStringValue(comment);
+        }
+        return typedThis;
+    }
+
+    @Override
+    public MyLambdaQueryWrapper<T> first(boolean condition, String firstSql) {
+        if (condition) {
+            this.sqlFirst.setStringValue(firstSql);
+        }
+        return typedThis;
+    }
+
+    @Override
+    public MyLambdaQueryWrapper<T> exists(boolean condition, String existsSql) {
+        return doIt(condition, EXISTS, () -> String.format("(%s)", existsSql));
+    }
+
+    @Override
+    public MyLambdaQueryWrapper<T> notExists(boolean condition, String existsSql) {
+        return not(condition).exists(condition, existsSql);
     }
 
     private MyLambdaQueryWrapper<T> not(boolean condition) {
@@ -455,11 +418,11 @@ public class MyLambdaQueryWrapper<T> extends MyJoinLambdaQueryWrapper<T>
         return this;
     }
 
-    private <E, F> MyLambdaQueryWrapper<T> likeValue(boolean condition, SqlKeyword keyword, String column, Object val, SqlLike sqlLike) {
+    private MyLambdaQueryWrapper<T> likeValue(boolean condition, SqlKeyword keyword, String column, Object val, SqlLike sqlLike) {
         return doIt(condition, () -> column, keyword, () -> formatSql("{0}", SqlUtils.concatLike(val, sqlLike)));
     }
 
-    protected <E, F> MyLambdaQueryWrapper<T> addCondition(boolean condition, String column, SqlKeyword sqlKeyword, Object val) {
+    protected MyLambdaQueryWrapper<T> addCondition(boolean condition, String column, SqlKeyword sqlKeyword, Object val) {
         return doIt(condition, () -> column, sqlKeyword, () -> formatSql("{0}", val));
     }
 
@@ -529,12 +492,12 @@ public class MyLambdaQueryWrapper<T> extends MyJoinLambdaQueryWrapper<T>
     }
 
     @Override
-    public <E, F> MyLambdaQueryWrapper<T> having(boolean condition, String alias, String sqlHaving, Object... params) {
+    public MyLambdaQueryWrapper<T> having(boolean condition, String alias, String sqlHaving, Object... params) {
         return doIt(condition, HAVING, () -> formatSqlIfNeed(condition, sqlHaving, params));
     }
 
     @Override
-    public <E, F> MyLambdaQueryWrapper<T> func(boolean condition, String alias, Consumer<MyLambdaQueryWrapper<T>> consumer) {
+    public MyLambdaQueryWrapper<T> func(boolean condition, String alias, Consumer<MyLambdaQueryWrapper<T>> consumer) {
         if (condition) {
             consumer.accept(this);
         }

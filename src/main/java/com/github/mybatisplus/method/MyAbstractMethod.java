@@ -5,7 +5,6 @@ import com.baomidou.mybatisplus.core.metadata.TableInfo;
 import com.baomidou.mybatisplus.core.toolkit.StringPool;
 import com.baomidou.mybatisplus.core.toolkit.sql.SqlScriptUtils;
 import com.github.mybatisplus.toolkit.Constant;
-import com.github.mybatisplus.wrapper.MyLambdaQueryWrapper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,7 +23,7 @@ public abstract class MyAbstractMethod extends AbstractMethod {
             String[] columns = selectColumns.split(StringPool.COMMA);
             List<String> selectColumnList = new ArrayList<>();
             for (String c : columns) {
-                selectColumnList.add(Constant.TABLE_ALIAS + MyLambdaQueryWrapper.TABLE_ALIAS_INDEX + StringPool.DOT + c);
+                selectColumnList.add(Constant.TABLE_ALIAS + StringPool.DOT + c);
             }
             selectColumns = String.join(StringPool.COMMA, selectColumnList);
         }

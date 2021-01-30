@@ -1,4 +1,4 @@
-package com.github.mybatisplus.wrapper;
+package com.github.mybatisplus.query;
 
 import com.baomidou.mybatisplus.core.toolkit.Assert;
 import com.baomidou.mybatisplus.core.toolkit.LambdaUtils;
@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.core.toolkit.StringPool;
 import com.baomidou.mybatisplus.core.toolkit.support.ColumnCache;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.baomidou.mybatisplus.core.toolkit.support.SerializedLambda;
+import com.github.mybatisplus.toolkit.Constant;
 import org.apache.ibatis.reflection.property.PropertyNamer;
 
 import java.util.Arrays;
@@ -17,11 +18,22 @@ import static java.util.stream.Collectors.joining;
  * copy {@link com.baomidou.mybatisplus.core.conditions.AbstractLambdaWrapper}
  */
 @SuppressWarnings("serial")
-public abstract class MyAbstractLambdaWrapper<T, Children extends MyAbstractLambdaWrapper<T, Children>>
+public abstract class MyAbstractLambda<T, Children extends MyAbstractLambda<T, Children>>
         extends MyAbstractWrapper<T, SFunction<T, ?>, Children> {
 
     private Map<String, ColumnCache> columnMap = null;
+    private boolean initColumnMap = false;
 
+    @SuppressWarnings("unchecked")
+    @Override
+    protected String columnsToString(SFunction<T, ?>... columns) {
+        return columnsToString(true, columns);
+    }
+
+    @SuppressWarnings("unchecked")
+    protected String columnsToString(boolean onlyColumn, SFunction<T, ?>... columns) {
+        return Arrays.stream(columns).map(i -> Constant.TABLE_ALIAS + StringPool.DOT + columnToString(i, onlyColumn)).collect(joining(StringPool.COMMA));
+    }
 
     @Override
     protected String columnToString(SFunction<T, ?> column) {
@@ -29,13 +41,8 @@ public abstract class MyAbstractLambdaWrapper<T, Children extends MyAbstractLamb
     }
 
     protected String columnToString(SFunction<T, ?> column, boolean onlyColumn) {
-        return getColumn(LambdaUtils.resolve(column), onlyColumn);
+        return Constant.TABLE_ALIAS + StringPool.DOT + getColumn(LambdaUtils.resolve(column), onlyColumn);
     }
-
-    protected String column2String(SFunction<?, ?> column, boolean onlyColumn) {
-        return getColumn(LambdaUtils.resolve(column), onlyColumn);
-    }
-
 
     /**
      * 获取 SerializedLambda 对应的列信息，从 lambda 表达式中推测实体类
@@ -58,7 +65,14 @@ public abstract class MyAbstractLambdaWrapper<T, Children extends MyAbstractLamb
     }
 
     private void tryInitCache(Class<?> lambdaClass) {
-        columnMap = LambdaUtils.getColumnMap(lambdaClass);
+        if (!initColumnMap) {
+            final Class<T> entityClass = getEntityClass();
+            if (entityClass != null) {
+                lambdaClass = entityClass;
+            }
+            columnMap = LambdaUtils.getColumnMap(lambdaClass);
+            initColumnMap = true;
+        }
         Assert.notNull(columnMap, "can not find lambda cache for this entity [%s]", lambdaClass.getName());
     }
 

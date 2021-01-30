@@ -183,31 +183,31 @@ public interface MyFunc<Children> extends Serializable {
 
     <E, F> Children orderBy(boolean condition, String alias, boolean isAsc, MySFunction<E, F>... columns);
 
-    default <E, F> Children having(String sqlHaving, Object... params) {
+    default Children having(String sqlHaving, Object... params) {
         return having(true, null, sqlHaving, params);
     }
 
-    default <E, F> Children having(boolean condition, String sqlHaving, Object... params) {
+    default Children having(boolean condition, String sqlHaving, Object... params) {
         return having(condition, null, sqlHaving, params);
     }
 
-    default <E, F> Children having(String alias, String sqlHaving, Object... params) {
+    default Children having(String alias, String sqlHaving, Object... params) {
         return having(true, alias, sqlHaving, params);
     }
 
-    <E, F> Children having(boolean condition, String alias, String sqlHaving, Object... params);
+    Children having(boolean condition, String alias, String sqlHaving, Object... params);
 
-    default <E, F> Children func(Consumer<Children> consumer) {
+    default Children func(Consumer<Children> consumer) {
         return func(true, null, consumer);
     }
 
-    default <E, F> Children func(boolean condition, Consumer<Children> consumer) {
+    default Children func(boolean condition, Consumer<Children> consumer) {
         return func(condition, null, consumer);
     }
 
-    default <E, F> Children func(String alias, Consumer<Children> consumer) {
+    default Children func(String alias, Consumer<Children> consumer) {
         return func(true, alias, consumer);
     }
 
-    <E, F> Children func(boolean condition, String alias, Consumer<Children> consumer);
+    Children func(boolean condition, String alias, Consumer<Children> consumer);
 }

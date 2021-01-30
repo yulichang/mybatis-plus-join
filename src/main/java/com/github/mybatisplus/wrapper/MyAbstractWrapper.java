@@ -171,24 +171,12 @@ public abstract class MyAbstractWrapper<T, R, Children extends MyAbstractWrapper
         return expression;
     }
 
-    public Map<String, Object> getParamNameValuePairs() {
-        return paramNameValuePairs;
-    }
 
     /**
      * 获取 columnName
      */
     protected String columnToString(R column) {
         return (String) column;
-    }
-
-    /**
-     * 多字段转换为逗号 "," 分割字符串
-     *
-     * @param columns 多字段
-     */
-    protected String columnsToString(R... columns) {
-        return Arrays.stream(columns).map(this::columnToString).collect(joining(StringPool.COMMA));
     }
 
     @Override

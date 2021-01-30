@@ -17,39 +17,39 @@ public interface MyBaseService<T> extends IService<T> {
     /**
      * ignore
      */
-    default <DTO> DTO selectJoinOne(MyWrapperFunc<T> wrapperFunc, Class<DTO> clazz) {
-        return selectJoinOne(wrapperFunc.apply(new MyLambdaQueryWrapper<>()), clazz);
+    default <DTO> DTO selectJoinOne(Class<DTO> clazz, MyWrapperFunc<T> wrapperFunc) {
+        return selectJoinOne(clazz, wrapperFunc.apply(new MyLambdaQueryWrapper<>()));
     }
 
     /**
      * 连接查询返回一条记录
      */
-    <DTO> DTO selectJoinOne(MyLambdaQueryWrapper<T> wrapper, Class<DTO> clazz);
+    <DTO> DTO selectJoinOne(Class<DTO> clazz, MyLambdaQueryWrapper<T> wrapper);
 
     /**
      * ignore
      */
-    default <DTO> List<DTO> selectJoinList(MyWrapperFunc<T> wrapperFunc, Class<DTO> clazz) {
-        return selectJoinList(wrapperFunc.apply(new MyLambdaQueryWrapper<>()), clazz);
+    default <DTO> List<DTO> selectJoinList(Class<DTO> clazz, MyWrapperFunc<T> wrapperFunc) {
+        return selectJoinList(clazz, wrapperFunc.apply(new MyLambdaQueryWrapper<>()));
     }
 
     /**
      * 连接查询返回集合
      */
-    <DTO> List<DTO> selectJoinList(MyLambdaQueryWrapper<T> wrapper, Class<DTO> clazz);
+    <DTO> List<DTO> selectJoinList(Class<DTO> clazz, MyLambdaQueryWrapper<T> wrapper);
 
 
     /**
      * ignore
      */
-    default <DTO, P extends IPage<?>> IPage<DTO> selectJoinListPage(P page, MyWrapperFunc<T> wrapperFunc, Class<DTO> clazz) {
-        return selectJoinListPage(page, wrapperFunc.apply(new MyLambdaQueryWrapper<>()), clazz);
+    default <DTO, P extends IPage<?>> IPage<DTO> selectJoinListPage(P page, Class<DTO> clazz, MyWrapperFunc<T> wrapperFunc) {
+        return selectJoinListPage(page, clazz, wrapperFunc.apply(new MyLambdaQueryWrapper<>()));
     }
 
     /**
      * 连接查询返回集合并分页
      */
-    <DTO, P extends IPage<?>> IPage<DTO> selectJoinListPage(P page, MyLambdaQueryWrapper<T> wrapper, Class<DTO> clazz);
+    <DTO, P extends IPage<?>> IPage<DTO> selectJoinListPage(P page, Class<DTO> clazz, MyLambdaQueryWrapper<T> wrapper);
 
 
     /**

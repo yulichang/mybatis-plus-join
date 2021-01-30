@@ -15,19 +15,19 @@ public class MyBaseServiceImpl<M extends MyBaseMapper<T>, T> extends ServiceImpl
 
 
     @Override
-    public <DTO> DTO selectJoinOne(MyLambdaQueryWrapper<T> wrapper, Class<DTO> clazz) {
-        return baseMapper.selectJoinOne(wrapper, clazz);
+    public <DTO> DTO selectJoinOne(Class<DTO> clazz, MyLambdaQueryWrapper<T> wrapper) {
+        return baseMapper.selectJoinOne(clazz, wrapper);
 
     }
 
     @Override
-    public <DTO> List<DTO> selectJoinList(MyLambdaQueryWrapper<T> wrapper, Class<DTO> clazz) {
-        return baseMapper.selectJoinList(wrapper, clazz);
+    public <DTO> List<DTO> selectJoinList(Class<DTO> clazz, MyLambdaQueryWrapper<T> wrapper) {
+        return baseMapper.selectJoinList(clazz, wrapper);
     }
 
     @Override
-    public <DTO, P extends IPage<?>> IPage<DTO> selectJoinListPage(P page, MyLambdaQueryWrapper<T> wrapper, Class<DTO> clazz) {
-        return baseMapper.selectJoinPage(page, wrapper, clazz);
+    public <DTO, P extends IPage<?>> IPage<DTO> selectJoinListPage(P page, Class<DTO> clazz, MyLambdaQueryWrapper<T> wrapper) {
+        return baseMapper.selectJoinPage(page, clazz, wrapper);
     }
 
     @Override

@@ -20,9 +20,9 @@ public interface MyBaseMapper<T> extends BaseMapper<T> {
      * 连表查询返回一条记录
      *
      * @param queryWrapper joinWrapper
-     * @param clazz        返回对象class
+     * @param clazz        resultType
      */
-    <DTO> DTO selectJoinOne(@Param(Constants.WRAPPER) Wrapper<?> queryWrapper, @Param(Constant.CLAZZ) Class<DTO> clazz);
+    <DTO> DTO selectJoinOne(@Param(Constant.CLAZZ) Class<DTO> clazz, @Param(Constants.WRAPPER) Wrapper<?> queryWrapper);
 
     /**
      * 连表查询返回Map
@@ -35,9 +35,9 @@ public interface MyBaseMapper<T> extends BaseMapper<T> {
      * 连表查询返回记录集合
      *
      * @param queryWrapper joinWrapper
-     * @param clazz        返回对象class
+     * @param clazz        resultType
      */
-    <DTO> List<DTO> selectJoinList(@Param(Constants.WRAPPER) Wrapper<?> queryWrapper,@Param(Constant.CLAZZ) Class<DTO> clazz);
+    <DTO> List<DTO> selectJoinList(@Param(Constant.CLAZZ) Class<DTO> clazz, @Param(Constants.WRAPPER) Wrapper<?> queryWrapper);
 
     /**
      * 连表查询返回Map集合
@@ -50,9 +50,12 @@ public interface MyBaseMapper<T> extends BaseMapper<T> {
      * 连表查询返回记录集合并分页
      *
      * @param queryWrapper joinWrapper
+     * @param clazz        resultType
      * @param <DTO>        分页返回对象
      */
-    <DTO, P extends IPage<?>> IPage<DTO> selectJoinPage(P page, @Param(Constants.WRAPPER) Wrapper<?> queryWrapper, @Param(Constant.CLAZZ) Class<DTO> clazz);
+    <DTO, P extends IPage<?>> IPage<DTO> selectJoinPage(P page,
+                                                        @Param(Constant.CLAZZ) Class<DTO> clazz,
+                                                        @Param(Constants.WRAPPER) Wrapper<?> queryWrapper);
 
     /**
      * 连表查询返回Map集合并分页

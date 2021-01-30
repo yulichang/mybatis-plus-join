@@ -21,7 +21,6 @@ import java.util.Objects;
  * @author yulichang
  */
 @Intercepts({@Signature(type = ResultSetHandler.class, method = "handleResultSets", args = {Statement.class})})
-//@Intercepts({@Signature(type = ResultSetHandler.class, method = "handleCursorResultSets", args = {Statement.class})})
 public class MyResultInterceptor implements Interceptor {
 
 
@@ -78,7 +77,7 @@ public class MyResultInterceptor implements Interceptor {
                         return (Class<?>) args.get("clazz");
                     }
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    return null;
                 }
             }
         }

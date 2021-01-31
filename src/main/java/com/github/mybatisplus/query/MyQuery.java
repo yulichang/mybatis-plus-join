@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.core.metadata.TableFieldInfo;
 import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
 import com.baomidou.mybatisplus.core.toolkit.ArrayUtils;
 import com.baomidou.mybatisplus.core.toolkit.StringPool;
+import com.github.mybatisplus.toolkit.Constant;
 
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -23,6 +24,11 @@ public class MyQuery<T> extends MyAbstractWrapper<T, String, MyQuery<T>>
      * 查询字段
      */
     private SharedString sqlSelect = new SharedString();
+
+    /**
+     * 主表别名
+     */
+    private SharedString alias = new SharedString(Constant.TABLE_ALIAS);
 
     public MyQuery() {
         this(null);
@@ -82,6 +88,10 @@ public class MyQuery<T> extends MyAbstractWrapper<T, String, MyQuery<T>>
 
     public String getFrom() {
         return from.getStringValue();
+    }
+
+    public String getAlias() {
+        return alias.getStringValue();
     }
 
     /**

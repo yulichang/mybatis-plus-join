@@ -11,6 +11,7 @@ import com.baomidou.mybatisplus.core.toolkit.Assert;
 import com.baomidou.mybatisplus.core.toolkit.StringPool;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
+import com.github.mybatisplus.query.interfaces.MyJoin;
 import com.github.mybatisplus.toolkit.Constant;
 
 import java.util.ArrayList;
@@ -28,12 +29,17 @@ import java.util.stream.Collectors;
  */
 @SuppressWarnings("serial")
 public class MyLambdaQuery<T> extends MyAbstractLambda<T, MyLambdaQuery<T>>
-        implements Query<MyLambdaQuery<T>, T, SFunction<T, ?>> {
+        implements Query<MyLambdaQuery<T>, T, SFunction<T, ?>>, MyJoin<MyLambdaQuery<T>> {
 
     /**
      * 查询字段
      */
     private SharedString sqlSelect = new SharedString();
+
+    /**
+     * 主表别名
+     */
+    private SharedString alias = new SharedString(Constant.TABLE_ALIAS);
 
 
     /**
@@ -170,6 +176,11 @@ public class MyLambdaQuery<T> extends MyAbstractLambda<T, MyLambdaQuery<T>>
         return from.getStringValue();
     }
 
+
+    public String getAlias() {
+        return alias.getStringValue();
+    }
+
     /**
      * 用于生成嵌套 sql
      * <p>故 sqlSelect from不向下传递</p>
@@ -185,4 +196,13 @@ public class MyLambdaQuery<T> extends MyAbstractLambda<T, MyLambdaQuery<T>>
         super.clear();
         sqlSelect.toNull();
     }
+
+    @Override
+    public MyLambdaQuery<T> join(String keyWord, boolean condition, String joinSql) {
+        if (condition) {
+            from.setStringValue(from.getStringValue() + keyWord + joinSql);
+        }
+        return typedThis;
+    }
+
 }

@@ -191,7 +191,7 @@ ORDER BY addr.id DESC
 
 ## MyLambdaQueryWrapper用法
 
-### MyLambdaQueryWrapper更符合面向对象(OOP),没有难以理解的常量(魔术值),全部基于lambda,但好像不那么好理解
+### MyLambdaQueryWrapper更符合面向对象(OOP),没有难以理解的常量(魔术值),全部基于lambda,但灵活性不如上面的
 
 #### 简单的3表查询
 

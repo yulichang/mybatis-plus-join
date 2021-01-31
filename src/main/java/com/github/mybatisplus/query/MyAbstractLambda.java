@@ -32,7 +32,7 @@ public abstract class MyAbstractLambda<T, Children extends MyAbstractLambda<T, C
 
     @SuppressWarnings("unchecked")
     protected String columnsToString(boolean onlyColumn, SFunction<T, ?>... columns) {
-        return Arrays.stream(columns).map(i -> Constant.TABLE_ALIAS + StringPool.DOT + columnToString(i, onlyColumn)).collect(joining(StringPool.COMMA));
+        return Arrays.stream(columns).map(i -> columnToString(i, onlyColumn)).collect(joining(StringPool.COMMA));
     }
 
     @Override

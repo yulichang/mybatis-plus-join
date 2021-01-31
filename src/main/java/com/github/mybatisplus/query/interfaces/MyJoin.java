@@ -1,22 +1,32 @@
 package com.github.mybatisplus.query.interfaces;
 
+import com.github.mybatisplus.toolkit.Constant;
+
 public interface MyJoin<Children> {
 
     default Children leftJoin(String joinSql) {
         return leftJoin(true, joinSql);
     }
 
-    Children leftJoin(boolean condition, String joinSql);
+    default Children leftJoin(boolean condition, String joinSql) {
+        return join(Constant.LEFT_JOIN, condition, joinSql);
+    }
 
     default Children rightJoin(String joinSql) {
         return rightJoin(true, joinSql);
     }
 
-    Children rightJoin(boolean condition, String joinSql);
+    default Children rightJoin(boolean condition, String joinSql){
+        return join(Constant.RIGHT_JOIN, condition, joinSql);
+    }
 
     default Children innerJoin(String joinSql) {
         return innerJoin(true, joinSql);
     }
 
-    Children innerJoin(boolean condition, String joinSql);
+    default Children innerJoin(boolean condition, String joinSql){
+        return join(Constant.INNER_JOIN, condition, joinSql);
+    }
+
+    Children join(String keyWord, boolean condition, String joinSql);
 }

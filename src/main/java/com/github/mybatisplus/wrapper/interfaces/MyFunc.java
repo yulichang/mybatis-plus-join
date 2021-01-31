@@ -1,6 +1,21 @@
+/*
+ * Copyright (c) 2011-2021, baomidou (jobob@qq.com).
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.github.mybatisplus.wrapper.interfaces;
 
-import com.github.mybatisplus.func.MySFunction;
+import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 
 import java.io.Serializable;
 import java.util.Arrays;
@@ -11,203 +26,289 @@ import java.util.function.Consumer;
 import static java.util.stream.Collectors.toList;
 
 /**
- * copy {@link com.baomidou.mybatisplus.core.conditions.interfaces.Func}
+ * 查询条件封装
+ *
+ * @author hubin miemie HCL
+ * @since 2017-05-26
  */
 @SuppressWarnings("unchecked")
 public interface MyFunc<Children> extends Serializable {
 
-    default <E, F> Children isNull(MySFunction<E, F> column) {
-        return isNull(true, null, column);
+    /**
+     * ignore
+     */
+    default <R> Children isNull(SFunction<R,?> column) {
+        return isNull(true, column);
     }
 
-    default <E, F> Children isNull(boolean condition, MySFunction<E, F> column) {
-        return isNull(condition, null, column);
-    }
+    /**
+     * 字段 IS NULL
+     * <p>例: isNull("name")</p>
+     *
+     * @param condition 执行条件
+     * @param column    字段
+     * @return children
+     */
+    <R> Children isNull(boolean condition, SFunction<R,?> column);
 
-    default <E, F> Children isNull(String alias, MySFunction<E, F> column) {
-        return isNull(true, alias, column);
-    }
-
-    <E, F> Children isNull(boolean condition, String alias, MySFunction<E, F> column);
-
-
-    default <E, F> Children isNotNull(MySFunction<E, F> column) {
+    /**
+     * ignore
+     */
+    default <R> Children isNotNull(SFunction<R,?> column) {
         return isNotNull(true, column);
     }
 
-    default <E, F> Children isNotNull(boolean condition, MySFunction<E, F> column) {
-        return isNotNull(condition, null, column);
+    /**
+     * 字段 IS NOT NULL
+     * <p>例: isNotNull("name")</p>
+     *
+     * @param condition 执行条件
+     * @param column    字段
+     * @return children
+     */
+    <R> Children isNotNull(boolean condition, SFunction<R,?> column);
+
+    /**
+     * ignore
+     */
+    default <R> Children in(SFunction<R,?> column, Collection<?> coll) {
+        return in(true, column, coll);
     }
 
-    default <E, F> Children isNotNull(String alias, MySFunction<E, F> column) {
-        return isNotNull(true, alias, column);
+    /**
+     * 字段 IN (value.get(0), value.get(1), ...)
+     * <p>例: in("id", Arrays.asList(1, 2, 3, 4, 5))</p>
+     *
+     * <li> 如果集合为 empty 则不会进行 sql 拼接 </li>
+     *
+     * @param condition 执行条件
+     * @param column    字段
+     * @param coll      数据集合
+     * @return children
+     */
+    <R> Children in(boolean condition, SFunction<R,?> column, Collection<?> coll);
+
+    /**
+     * ignore
+     */
+    default <R> Children in(SFunction<R,?> column, Object... values) {
+        return in(true, column, values);
     }
 
-    <E, F> Children isNotNull(boolean condition, String alias, MySFunction<E, F> column);
-
-    default <E, F> Children in(MySFunction<E, F> column, Collection<?> coll) {
-        return in(true, null, column, coll);
-    }
-
-    default <E, F> Children in(boolean condition, MySFunction<E, F> column, Collection<?> coll) {
-        return in(condition, null, column, coll);
-    }
-
-    default <E, F> Children in(String alias, MySFunction<E, F> column, Collection<?> coll) {
-        return in(true, alias, column, coll);
-    }
-
-    <E, F> Children in(boolean condition, String alias, MySFunction<E, F> column, Collection<?> coll);
-
-    default <E, F> Children in(MySFunction<E, F> column, Object... values) {
-        return in(true, null, column, values);
-    }
-
-    default <E, F> Children in(boolean condition, MySFunction<E, F> column, Object... values) {
-        return in(condition, null, column, values);
-    }
-
-    default <E, F> Children in(String alias, MySFunction<E, F> column, Object... values) {
-        return in(true, alias, column, values);
-    }
-
-    default <E, F> Children in(boolean condition, String alias, MySFunction<E, F> column, Object... values) {
-        return in(condition, alias, column, Arrays.stream(Optional.ofNullable(values).orElseGet(() -> new Object[]{}))
+    /**
+     * 字段 IN (v0, v1, ...)
+     * <p>例: in("id", 1, 2, 3, 4, 5)</p>
+     *
+     * <li> 如果动态数组为 empty 则不会进行 sql 拼接 </li>
+     *
+     * @param condition 执行条件
+     * @param column    字段
+     * @param values    数据数组
+     * @return children
+     */
+    default <R> Children in(boolean condition, SFunction<R,?> column, Object... values) {
+        return in(condition, column, Arrays.stream(Optional.ofNullable(values).orElseGet(() -> new Object[]{}))
                 .collect(toList()));
     }
 
-    default <E, F> Children notIn(MySFunction<E, F> column, Collection<?> coll) {
-        return notIn(true, null, column, coll);
+    /**
+     * ignore
+     */
+    default <R> Children notIn(SFunction<R,?> column, Collection<?> coll) {
+        return notIn(true, column, coll);
     }
 
-    default <E, F> Children notIn(boolean condition, MySFunction<E, F> column, Collection<?> coll) {
-        return notIn(condition, null, column, coll);
+    /**
+     * 字段 NOT IN (value.get(0), value.get(1), ...)
+     * <p>例: notIn("id", Arrays.asList(1, 2, 3, 4, 5))</p>
+     *
+     * @param condition 执行条件
+     * @param column    字段
+     * @param coll      数据集合
+     * @return children
+     */
+    <R> Children notIn(boolean condition, SFunction<R,?> column, Collection<?> coll);
+
+    /**
+     * ignore
+     */
+    default <R> Children notIn(SFunction<R,?> column, Object... value) {
+        return notIn(true, column, value);
     }
 
-    default <E, F> Children notIn(String alias, MySFunction<E, F> column, Collection<?> coll) {
-        return notIn(true, alias, column, coll);
-    }
-
-    <E, F> Children notIn(boolean condition, String alias, MySFunction<E, F> column, Collection<?> coll);
-
-    default <E, F> Children notIn(MySFunction<E, F> column, Object... value) {
-        return notIn(true, null, column, value);
-    }
-
-    default <E, F> Children notIn(boolean condition, MySFunction<E, F> column, Object... value) {
-        return notIn(condition, null, column, value);
-    }
-
-    default <E, F> Children notIn(String alias, MySFunction<E, F> column, Object... value) {
-        return notIn(true, alias, column, value);
-    }
-
-    default <E, F> Children notIn(boolean condition, String alias, MySFunction<E, F> column, Object... values) {
-        return notIn(condition, alias, column, Arrays.stream(Optional.ofNullable(values).orElseGet(() -> new Object[]{}))
+    /**
+     * 字段 NOT IN (v0, v1, ...)
+     * <p>例: notIn("id", 1, 2, 3, 4, 5)</p>
+     *
+     * @param condition 执行条件
+     * @param column    字段
+     * @param values    数据数组
+     * @return children
+     */
+    default <R> Children notIn(boolean condition, SFunction<R,?> column, Object... values) {
+        return notIn(condition, column, Arrays.stream(Optional.ofNullable(values).orElseGet(() -> new Object[]{}))
                 .collect(toList()));
     }
 
-    default <E, F> Children inSql(MySFunction<E, F> column, String inValue) {
-        return inSql(true, null, column, inValue);
+    /**
+     * ignore
+     */
+    default <R> Children inSql(SFunction<R,?> column, String inValue) {
+        return inSql(true, column, inValue);
     }
 
-    default <E, F> Children inSql(boolean condition, MySFunction<E, F> column, String inValue) {
-        return inSql(condition, null, column, inValue);
+    /**
+     * 字段 IN ( sql语句 )
+     * <p>!! sql 注入方式的 in 方法 !!</p>
+     * <p>例1: inSql("id", "1, 2, 3, 4, 5, 6")</p>
+     * <p>例2: inSql("id", "select id from table where id &lt; 3")</p>
+     *
+     * @param condition 执行条件
+     * @param column    字段
+     * @param inValue   sql语句
+     * @return children
+     */
+    <R> Children inSql(boolean condition, SFunction<R,?> column, String inValue);
+
+    /**
+     * ignore
+     */
+    default <R> Children notInSql(SFunction<R,?> column, String inValue) {
+        return notInSql(true, column, inValue);
     }
 
-    default <E, F> Children inSql(String alias, MySFunction<E, F> column, String inValue) {
-        return inSql(true, alias, column, inValue);
+    /**
+     * 字段 NOT IN ( sql语句 )
+     * <p>!! sql 注入方式的 not in 方法 !!</p>
+     * <p>例1: notInSql("id", "1, 2, 3, 4, 5, 6")</p>
+     * <p>例2: notInSql("id", "select id from table where id &lt; 3")</p>
+     *
+     * @param condition 执行条件
+     * @param column    字段
+     * @param inValue   sql语句 ---&gt; 1,2,3,4,5,6 或者 select id from table where id &lt; 3
+     * @return children
+     */
+    <R> Children notInSql(boolean condition, SFunction<R,?> column, String inValue);
+
+    /**
+     * ignore
+     */
+    default <R> Children groupBy(SFunction<R,?> column) {
+        return groupBy(true, column);
     }
 
-    <E, F> Children inSql(boolean condition, String alias, MySFunction<E, F> column, String inValue);
-
-    default <E, F> Children notInSql(MySFunction<E, F> column, String inValue) {
-        return notInSql(true, null, column, inValue);
+    /**
+     * ignore
+     */
+    default <R> Children groupBy(SFunction<R,?>... columns) {
+        return groupBy(true, columns);
     }
 
-    default <E, F> Children notInSql(boolean condition, MySFunction<E, F> column, String inValue) {
-        return notInSql(condition, null, column, inValue);
+    /**
+     * 分组：GROUP BY 字段, ...
+     * <p>例: groupBy("id", "name")</p>
+     *
+     * @param condition 执行条件
+     * @param columns   字段数组
+     * @return children
+     */
+    <R> Children groupBy(boolean condition, SFunction<R,?>... columns);
+
+    /**
+     * ignore
+     */
+    default <R> Children orderByAsc(SFunction<R,?> column) {
+        return orderByAsc(true, column);
     }
 
-    default <E, F> Children notInSql(String alias, MySFunction<E, F> column, String inValue) {
-        return notInSql(true, alias, column, inValue);
+    /**
+     * ignore
+     */
+    default <R> Children orderByAsc(SFunction<R,?>... columns) {
+        return orderByAsc(true, columns);
     }
 
-    <E, F> Children notInSql(boolean condition, String alias, MySFunction<E, F> column, String inValue);
-
-    default <E, F> Children groupBy(MySFunction<E, F>... columns) {
-        return groupBy(true, null, columns);
+    /**
+     * 排序：ORDER BY 字段, ... ASC
+     * <p>例: orderByAsc("id", "name")</p>
+     *
+     * @param condition 执行条件
+     * @param columns   字段数组
+     * @return children
+     */
+    default <R> Children orderByAsc(boolean condition, SFunction<R,?>... columns) {
+        return orderBy(condition, true, columns);
     }
 
-    default <E, F> Children groupBy(boolean condition, MySFunction<E, F>... columns) {
-        return groupBy(condition, null, columns);
+    /**
+     * ignore
+     */
+    default <R> Children orderByDesc(SFunction<R,?> column) {
+        return orderByDesc(true, column);
     }
 
-    default <E, F> Children groupBy(String alias, MySFunction<E, F>... columns) {
-        return groupBy(true, alias, columns);
+    /**
+     * ignore
+     */
+    default <R> Children orderByDesc(SFunction<R,?>... columns) {
+        return orderByDesc(true, columns);
     }
 
-    <E, F> Children groupBy(boolean condition, String alias, MySFunction<E, F>... columns);
-
-    default <E, F> Children orderByAsc(MySFunction<E, F>... columns) {
-        return orderByAsc(true, null, columns);
+    /**
+     * 排序：ORDER BY 字段, ... DESC
+     * <p>例: orderByDesc("id", "name")</p>
+     *
+     * @param condition 执行条件
+     * @param columns   字段数组
+     * @return children
+     */
+    default <R> Children orderByDesc(boolean condition, SFunction<R,?>... columns) {
+        return orderBy(condition, false, columns);
     }
 
-    default <E, F> Children orderByAsc(boolean condition, MySFunction<E, F>... columns) {
-        return orderByAsc(condition, null, columns);
-    }
+    /**
+     * 排序：ORDER BY 字段, ...
+     * <p>例: orderBy(true, "id", "name")</p>
+     *
+     * @param condition 执行条件
+     * @param isAsc     是否是 ASC 排序
+     * @param columns   字段数组
+     * @return children
+     */
+    <R> Children orderBy(boolean condition, boolean isAsc, SFunction<R,?>... columns);
 
-    default <E, F> Children orderByAsc(String alias, MySFunction<E, F>... columns) {
-        return orderByAsc(true, alias, columns);
-    }
-
-    default <E, F> Children orderByAsc(boolean condition, String alias, MySFunction<E, F>... columns) {
-        return orderBy(condition, alias, true, columns);
-    }
-
-    default <E, F> Children orderByDesc(MySFunction<E, F>... columns) {
-        return orderByDesc(true, null, columns);
-    }
-
-    default <E, F> Children orderByDesc(boolean condition, MySFunction<E, F>... columns) {
-        return orderByDesc(condition, null, columns);
-    }
-
-    default <E, F> Children orderByDesc(String alias, MySFunction<E, F>... columns) {
-        return orderByDesc(true, alias, columns);
-    }
-
-    default <E, F> Children orderByDesc(boolean condition, String alias, MySFunction<E, F>... columns) {
-        return orderBy(condition, alias, false, columns);
-    }
-
-    <E, F> Children orderBy(boolean condition, String alias, boolean isAsc, MySFunction<E, F>... columns);
-
+    /**
+     * ignore
+     */
     default Children having(String sqlHaving, Object... params) {
-        return having(true, null, sqlHaving, params);
+        return having(true, sqlHaving, params);
     }
 
-    default Children having(boolean condition, String sqlHaving, Object... params) {
-        return having(condition, null, sqlHaving, params);
-    }
+    /**
+     * HAVING ( sql语句 )
+     * <p>例1: having("sum(age) &gt; 10")</p>
+     * <p>例2: having("sum(age) &gt; {0}", 10)</p>
+     *
+     * @param condition 执行条件
+     * @param sqlHaving sql 语句
+     * @param params    参数数组
+     * @return children
+     */
+    Children having(boolean condition, String sqlHaving, Object... params);
 
-    default Children having(String alias, String sqlHaving, Object... params) {
-        return having(true, alias, sqlHaving, params);
-    }
-
-    Children having(boolean condition, String alias, String sqlHaving, Object... params);
-
+    /**
+     * ignore
+     */
     default Children func(Consumer<Children> consumer) {
-        return func(true, null, consumer);
+        return func(true, consumer);
     }
 
-    default Children func(boolean condition, Consumer<Children> consumer) {
-        return func(condition, null, consumer);
-    }
-
-    default Children func(String alias, Consumer<Children> consumer) {
-        return func(true, alias, consumer);
-    }
-
-    Children func(boolean condition, String alias, Consumer<Children> consumer);
+    /**
+     * 消费函数
+     *
+     * @param consumer 消费函数
+     * @return children
+     * @since 3.3.1
+     */
+    Children func(boolean condition, Consumer<Children> consumer);
 }

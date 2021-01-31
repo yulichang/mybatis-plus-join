@@ -1,422 +1,287 @@
+/*
+ * Copyright (c) 2011-2021, baomidou (jobob@qq.com).
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.github.mybatisplus.wrapper.interfaces;
 
-import com.github.mybatisplus.func.MySFunction;
+import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 
 import java.io.Serializable;
+import java.util.Map;
+import java.util.function.BiPredicate;
 
 /**
- * copy {@link com.baomidou.mybatisplus.core.conditions.interfaces.Compare}
+ * 查询条件封装
+ * <p>比较值</p>
+ *
+ * @author hubin miemie HCL
+ * @since 2017-05-26
  */
 public interface MyCompare<Children> extends Serializable {
 
-    /* 遗弃allEq */
-
-    /* ***************************************** eq start ********************************************* */
-
-    <E, F> Children eq(boolean condition, String alias, MySFunction<E, F> column, Object val);
-
-    default <E, F> Children eq(boolean condition, MySFunction<E, F> column, Object val) {
-        return eq(condition, null, column, val);
-    }
-
-    default <E, F> Children eq(String alias, MySFunction<E, F> column, Object val) {
-        return eq(true, alias, column, val);
-    }
-
-    default <E, F> Children eq(MySFunction<E, F> column, Object val) {
-        return eq(true, null, column, val);
-    }
-
-    <E, F, X, Y> Children eq(boolean condition, String alias, MySFunction<E, F> column, String as, MySFunction<X, Y> val);
-
-    default <E, F, X, Y> Children eq(MySFunction<E, F> column, MySFunction<X, Y> val) {
-        return eq(true, null, column, null, val);
-    }
-
-    default <E, F, X, Y> Children eq(Boolean condition, MySFunction<E, F> column, MySFunction<X, Y> val) {
-        return eq(condition, null, column, null, val);
-    }
-
-    default <E, F, X, Y> Children eq(String alias, MySFunction<E, F> column, MySFunction<X, Y> val) {
-        return eq(true, alias, column, null, val);
-    }
-
-    default <E, F, X, Y> Children eq(MySFunction<E, F> column, String as, MySFunction<X, Y> val) {
-        return eq(true, null, column, as, val);
-    }
-
-    default <E, F, X, Y> Children eq(Boolean condition, String alias, MySFunction<E, F> column, MySFunction<X, Y> val) {
-        return eq(condition, alias, column, null, val);
-    }
-
-    default <E, F, X, Y> Children eq(Boolean condition, MySFunction<E, F> column, String as, MySFunction<X, Y> val) {
-        return eq(condition, null, column, as, val);
-    }
-
-    default <E, F, X, Y> Children eq(String alias, MySFunction<E, F> column, String as, MySFunction<X, Y> val) {
-        return eq(true, alias, column, as, val);
-    }
-
-    /* ***************************************** eq end ********************************************* */
-
-
-    /* ***************************************** ne start ********************************************* */
-
-    default <E, F> Children ne(MySFunction<E, F> column, Object val) {
-        return ne(true, null, column, val);
-    }
-
-    default <E, F> Children ne(boolean condition, MySFunction<E, F> column, Object val) {
-        return ne(condition, null, column, val);
-    }
-
-    default <E, F> Children ne(String alias, MySFunction<E, F> column, Object val) {
-        return ne(true, alias, column, val);
-    }
-
-    <E, F> Children ne(boolean condition, String alias, MySFunction<E, F> column, Object val);
-
-    default <E, F, X, Y> Children ne(MySFunction<E, F> column, MySFunction<X, Y> val) {
-        return ne(true, null, column, null, val);
-    }
-
-    default <E, F, X, Y> Children ne(boolean condition, MySFunction<E, F> column, MySFunction<X, Y> val) {
-        return ne(condition, null, column, null, val);
-    }
-
-    default <E, F, X, Y> Children ne(String alias, MySFunction<E, F> column, MySFunction<X, Y> val) {
-        return ne(true, alias, column, null, val);
-    }
-
-    default <E, F, X, Y> Children ne(MySFunction<E, F> column, String as, MySFunction<X, Y> val) {
-        return ne(true, null, column, as, val);
-    }
-
-    default <E, F, X, Y> Children ne(boolean condition, String alias, MySFunction<E, F> column, MySFunction<X, Y> val) {
-        return ne(condition, alias, column, null, val);
-    }
-
-    default <E, F, X, Y> Children ne(String alias, MySFunction<E, F> column, String as, MySFunction<X, Y> val) {
-        return ne(true, alias, column, as, val);
-    }
-
-    default <E, F, X, Y> Children ne(boolean condition, MySFunction<E, F> column, String as, MySFunction<X, Y> val) {
-        return ne(condition, null, column, as, val);
-    }
-
-    <E, F, X, Y> Children ne(boolean condition, String alias, MySFunction<E, F> column, String as, MySFunction<X, Y> val);
-
-    /* ***************************************** ne end ********************************************* */
-
-
-    /* ***************************************** gt start ********************************************* */
-
-    default <E, F> Children gt(MySFunction<E, F> column, Object val) {
-        return gt(true, null, column, val);
-    }
-
-    default <E, F> Children gt(boolean condition, MySFunction<E, F> column, Object val) {
-        return gt(condition, null, column, val);
-    }
-
-    default <E, F> Children gt(String alias, MySFunction<E, F> column, Object val) {
-        return gt(true, alias, column, val);
-    }
-
-    <E, F> Children gt(boolean condition, String alias, MySFunction<E, F> column, Object val);
-
-    default <E, F, X, Y> Children gt(MySFunction<E, F> column, MySFunction<X, Y> val) {
-        return gt(true, null, column, null, val);
-    }
-
-    default <E, F, X, Y> Children gt(boolean condition, MySFunction<E, F> column, MySFunction<X, Y> val) {
-        return gt(condition, null, column, null, val);
-    }
-
-    default <E, F, X, Y> Children gt(String alias, MySFunction<E, F> column, MySFunction<X, Y> val) {
-        return gt(true, alias, column, null, val);
-    }
-
-    default <E, F, X, Y> Children gt(MySFunction<E, F> column, String as, MySFunction<X, Y> val) {
-        return gt(true, null, column, as, val);
-    }
-
-    default <E, F, X, Y> Children gt(boolean condition, String alias, MySFunction<E, F> column, MySFunction<X, Y> val) {
-        return gt(condition, alias, column, null, val);
-    }
-
-    default <E, F, X, Y> Children gt(String alias, MySFunction<E, F> column, String as, MySFunction<X, Y> val) {
-        return gt(true, alias, column, as, val);
-    }
-
-    default <E, F, X, Y> Children gt(boolean condition, MySFunction<E, F> column, String as, MySFunction<X, Y> val) {
-        return gt(condition, null, column, as, val);
-    }
-
-    <E, F, X, Y> Children gt(boolean condition, String alias, MySFunction<E, F> column, String as, MySFunction<X, Y> val);
-
-
-    /* ***************************************** gt end ********************************************* */
-
-
-    /* ***************************************** ge start ********************************************* */
-
-    default <E, F> Children ge(MySFunction<E, F> column, Object val) {
-        return ge(true, null, column, val);
-    }
-
-    default <E, F> Children ge(boolean condition, MySFunction<E, F> column, Object val) {
-        return ge(condition, null, column, val);
-    }
-
-    default <E, F> Children ge(String alias, MySFunction<E, F> column, Object val) {
-        return ge(true, alias, column, val);
-    }
-
-    <E, F> Children ge(boolean condition, String alias, MySFunction<E, F> column, Object val);
-
-    default <E, F, X, Y> Children ge(MySFunction<E, F> column, MySFunction<X, Y> val) {
-        return ge(true, null, column, null, val);
-    }
-
-    default <E, F, X, Y> Children ge(boolean condition, MySFunction<E, F> column, MySFunction<X, Y> val) {
-        return ge(condition, null, column, null, val);
-    }
-
-    default <E, F, X, Y> Children ge(String alias, MySFunction<E, F> column, MySFunction<X, Y> val) {
-        return ge(true, alias, column, null, val);
-    }
-
-    default <E, F, X, Y> Children ge(MySFunction<E, F> column, String as, MySFunction<X, Y> val) {
-        return ge(true, null, column, as, val);
-    }
-
-    default <E, F, X, Y> Children ge(boolean condition, String alias, MySFunction<E, F> column, MySFunction<X, Y> val) {
-        return ge(condition, alias, column, null, val);
-    }
-
-    default <E, F, X, Y> Children ge(String alias, MySFunction<E, F> column, String as, MySFunction<X, Y> val) {
-        return ge(true, alias, column, as, val);
-    }
-
-    default <E, F, X, Y> Children ge(boolean condition, MySFunction<E, F> column, String as, MySFunction<X, Y> val) {
-        return ge(condition, null, column, as, val);
-    }
-
-    <E, F, X, Y> Children ge(boolean condition, String alias, MySFunction<E, F> column, String as, MySFunction<X, Y> val);
-
-    /* ***************************************** ge end ********************************************* */
-
-
-    /* ***************************************** lt start ********************************************* */
-
-    default <E, F> Children lt(MySFunction<E, F> column, Object val) {
-        return lt(true, null, column, val);
-    }
-
-    default <E, F> Children lt(boolean condition, MySFunction<E, F> column, Object val) {
-        return lt(condition, null, column, val);
-    }
-
-    default <E, F> Children lt(String alias, MySFunction<E, F> column, Object val) {
-        return lt(true, alias, column, val);
-    }
-
-    <E, F> Children lt(boolean condition, String alias, MySFunction<E, F> column, Object val);
-
-    default <E, F, X, Y> Children lt(MySFunction<E, F> column, MySFunction<X, Y> val) {
-        return lt(true, null, column, null, val);
-    }
-
-    default <E, F, X, Y> Children lt(boolean condition, MySFunction<E, F> column, MySFunction<X, Y> val) {
-        return lt(condition, null, column, null, val);
-    }
-
-    default <E, F, X, Y> Children lt(String alias, MySFunction<E, F> column, MySFunction<X, Y> val) {
-        return lt(true, alias, column, null, val);
-    }
-
-    default <E, F, X, Y> Children lt(MySFunction<E, F> column, String as, MySFunction<X, Y> val) {
-        return lt(true, null, column, as, val);
-    }
-
-    default <E, F, X, Y> Children lt(boolean condition, String alias, MySFunction<E, F> column, MySFunction<X, Y> val) {
-        return lt(condition, alias, column, null, val);
-    }
-
-    default <E, F, X, Y> Children lt(String alias, MySFunction<E, F> column, String as, MySFunction<X, Y> val) {
-        return lt(true, alias, column, as, val);
-    }
-
-    default <E, F, X, Y> Children lt(boolean condition, MySFunction<E, F> column, String as, MySFunction<X, Y> val) {
-        return lt(condition, null, column, as, val);
-    }
-
-    <E, F, X, Y> Children lt(boolean condition, String alias, MySFunction<E, F> column, String as, MySFunction<X, Y> val);
-
-    /* ***************************************** lt end ********************************************* */
-
-
-    /* ***************************************** lt start ********************************************* */
-
-    default <E, F> Children le(MySFunction<E, F> column, Object val) {
-        return le(true, null, column, val);
-    }
-
-    default <E, F> Children le(boolean condition, MySFunction<E, F> column, Object val) {
-        return le(condition, null, column, val);
-    }
-
-    default <E, F> Children le(String alias, MySFunction<E, F> column, Object val) {
-        return le(true, alias, column, val);
-    }
-
-    <E, F> Children le(boolean condition, String alias, MySFunction<E, F> column, Object val);
-
-    default <E, F, X, Y> Children le(MySFunction<E, F> column, MySFunction<X, Y> val) {
-        return le(true, null, column, null, val);
-    }
-
-    default <E, F, X, Y> Children le(boolean condition, MySFunction<E, F> column, MySFunction<X, Y> val) {
-        return le(condition, null, column, null, val);
-    }
-
-    default <E, F, X, Y> Children le(String alias, MySFunction<E, F> column, MySFunction<X, Y> val) {
-        return le(true, alias, column, null, val);
-    }
-
-    default <E, F, X, Y> Children le(MySFunction<E, F> column, String as, MySFunction<X, Y> val) {
-        return le(true, null, column, as, val);
-    }
-
-    default <E, F, X, Y> Children le(boolean condition, String alias, MySFunction<E, F> column, MySFunction<X, Y> val) {
-        return le(condition, alias, column, null, val);
-    }
-
-    default <E, F, X, Y> Children le(String alias, MySFunction<E, F> column, String as, MySFunction<X, Y> val) {
-        return le(true, alias, column, as, val);
-    }
-
-    default <E, F, X, Y> Children le(boolean condition, MySFunction<E, F> column, String as, MySFunction<X, Y> val) {
-        return le(condition, null, column, as, val);
-    }
-
-    <E, F, X, Y> Children le(boolean condition, String alias, MySFunction<E, F> column, String as, MySFunction<X, Y> val);
-
-    /* ***************************************** le end ********************************************* */
-
-    /* ***************************************** between start ********************************************* */
-
-    default <E, F> Children between(MySFunction<E, F> column, Object val1, Object val2) {
-        return between(true, null, column, val1, val2);
-    }
-
-    default <E, F> Children between(boolean condition, MySFunction<E, F> column, Object val1, Object val2) {
-        return between(condition, null, column, val1, val2);
-    }
-
-    default <E, F> Children between(String alias, MySFunction<E, F> column, Object val1, Object val2) {
-        return between(true, alias, column, val1, val2);
-    }
-
-    <E, F> Children between(boolean condition, String alias, MySFunction<E, F> column, Object val1, Object val2);
-
-    /* ***************************************** between end ********************************************* */
-
-
-    /* ***************************************** notBetween start ********************************************* */
-
-    default <E, F> Children notBetween(MySFunction<E, F> column, Object val1, Object val2) {
-        return notBetween(true, null, column, val1, val2);
-    }
-
-    default <E, F> Children notBetween(boolean condition, MySFunction<E, F> column, Object val1, Object val2) {
-        return notBetween(condition, null, column, val1, val2);
-    }
-
-    default <E, F> Children notBetween(String alias, MySFunction<E, F> column, Object val1, Object val2) {
-        return notBetween(true, alias, column, val1, val2);
-    }
-
-    <E, F> Children notBetween(boolean condition, String alias, MySFunction<E, F> column, Object val1, Object val2);
-
-    /* ***************************************** notBetween end ********************************************* */
-
-
-    /* ***************************************** like start ********************************************* */
-
-    default <E, F> Children like(MySFunction<E, F> column, Object val) {
-        return like(true, null, column, val);
-    }
-
-    default <E, F> Children like(boolean condition, MySFunction<E, F> column, Object val) {
-        return like(condition, null, column, val);
-    }
-
-    default <E, F> Children like(String alias, MySFunction<E, F> column, Object val) {
-        return like(true, alias, column, val);
-    }
-
-    <E, F> Children like(boolean condition, String alias, MySFunction<E, F> column, Object val);
-
-    /* ***************************************** like end ********************************************* */
-
-
-    /* ***************************************** notLike start ********************************************* */
-
-    default <E, F> Children notLike(MySFunction<E, F> column, Object val) {
-        return notLike(true, null, column, val);
-    }
-
-    default <E, F> Children notLike(boolean condition, MySFunction<E, F> column, Object val) {
-        return notLike(condition, null, column, val);
-    }
-
-    default <E, F> Children notLike(String alias, MySFunction<E, F> column, Object val) {
-        return notLike(true, alias, column, val);
-    }
-
-    <E, F> Children notLike(boolean condition, String alias, MySFunction<E, F> column, Object val);
-
-    /* ***************************************** notLike end ********************************************* */
-
-
-    /* ***************************************** likeLeft start ********************************************* */
-
-    default <E, F> Children likeLeft(MySFunction<E, F> column, Object val) {
-        return likeLeft(true, null, column, val);
-    }
-
-    default <E, F> Children likeLeft(boolean condition, MySFunction<E, F> column, Object val) {
-        return likeLeft(condition, null, column, val);
-    }
-
-    default <E, F> Children likeLeft(String alias, MySFunction<E, F> column, Object val) {
-        return likeLeft(true, alias, column, val);
-    }
-
-    <E, F> Children likeLeft(boolean condition, String alias, MySFunction<E, F> column, Object val);
-
-    /* ***************************************** likeLeft end ********************************************* */
-
-
-
-    /* ***************************************** likeRight start ********************************************* */
-
-    default <E, F> Children likeRight(MySFunction<E, F> column, Object val) {
-        return likeRight(true, null, column, val);
-    }
-
-    default <E, F> Children likeRight(boolean condition, MySFunction<E, F> column, Object val) {
-        return likeRight(condition, null, column, val);
-    }
-
-    default <E, F> Children likeRight(String alias, MySFunction<E, F> column, Object val) {
-        return likeRight(true, alias, column, val);
-    }
-
-    <E, F> Children likeRight(boolean condition, String alias, MySFunction<E, F> column, Object val);
-
-    /* ***************************************** likeRight end ********************************************* */
-
+    /**
+     * ignore
+     */
+    default <R, V> Children allEq(Map<SFunction<R,?>, V> params) {
+        return allEq(params, true);
+    }
+
+    /**
+     * ignore
+     */
+    default <R, V> Children allEq(Map<SFunction<R,?>, V> params, boolean null2IsNull) {
+        return allEq(true, params, null2IsNull);
+    }
+
+    /**
+     * map 所有非空属性等于 =
+     *
+     * @param condition   执行条件
+     * @param params      map 类型的参数, key 是字段名, value 是字段值
+     * @param null2IsNull 是否参数为 null 自动执行 isNull 方法, false 则忽略这个字段\
+     * @return children
+     */
+    <R, V> Children allEq(boolean condition, Map<SFunction<R,?>, V> params, boolean null2IsNull);
+
+    /**
+     * ignore
+     */
+    default <R, V> Children allEq(BiPredicate<SFunction<R,?>, V> filter, Map<SFunction<R,?>, V> params) {
+        return allEq(filter, params, true);
+    }
+
+    /**
+     * ignore
+     */
+    default <R, V> Children allEq(BiPredicate<SFunction<R,?>, V> filter, Map<SFunction<R,?>, V> params, boolean null2IsNull) {
+        return allEq(true, filter, params, null2IsNull);
+    }
+
+    /**
+     * 字段过滤接口，传入多参数时允许对参数进行过滤
+     *
+     * @param condition   执行条件
+     * @param filter      返回 true 来允许字段传入比对条件中
+     * @param params      map 类型的参数, key 是字段名, value 是字段值
+     * @param null2IsNull 是否参数为 null 自动执行 isNull 方法, false 则忽略这个字段
+     * @return children
+     */
+    <R, V> Children allEq(boolean condition, BiPredicate<SFunction<R,?>, V> filter, Map<SFunction<R,?>, V> params, boolean null2IsNull);
+
+    /**
+     * ignore
+     */
+    default <R> Children eq(SFunction<R,?> column, Object val) {
+        return eq(true, column, val);
+    }
+
+    /**
+     * 等于 =
+     *
+     * @param condition 执行条件
+     * @param column    字段
+     * @param val       值
+     * @return children
+     */
+    <R> Children eq(boolean condition, SFunction<R,?> column, Object val);
+
+    /**
+     * ignore
+     */
+    default <R> Children ne(SFunction<R,?> column, Object val) {
+        return ne(true, column, val);
+    }
+
+    /**
+     * 不等于 &lt;&gt;
+     *
+     * @param condition 执行条件
+     * @param column    字段
+     * @param val       值
+     * @return children
+     */
+    <R> Children ne(boolean condition, SFunction<R,?> column, Object val);
+
+    /**
+     * ignore
+     */
+    default <R> Children gt(SFunction<R,?> column, Object val) {
+        return gt(true, column, val);
+    }
+
+    /**
+     * 大于 &gt;
+     *
+     * @param condition 执行条件
+     * @param column    字段
+     * @param val       值
+     * @return children
+     */
+    <R> Children gt(boolean condition, SFunction<R,?> column, Object val);
+
+    /**
+     * ignore
+     */
+    default <R> Children ge(SFunction<R,?> column, Object val) {
+        return ge(true, column, val);
+    }
+
+    /**
+     * 大于等于 &gt;=
+     *
+     * @param condition 执行条件
+     * @param column    字段
+     * @param val       值
+     * @return children
+     */
+    <R> Children ge(boolean condition, SFunction<R,?> column, Object val);
+
+    /**
+     * ignore
+     */
+    default <R> Children lt(SFunction<R,?> column, Object val) {
+        return lt(true, column, val);
+    }
+
+    /**
+     * 小于 &lt;
+     *
+     * @param condition 执行条件
+     * @param column    字段
+     * @param val       值
+     * @return children
+     */
+    <R> Children lt(boolean condition, SFunction<R,?> column, Object val);
+
+    /**
+     * ignore
+     */
+    default <R> Children le(SFunction<R,?> column, Object val) {
+        return le(true, column, val);
+    }
+
+    /**
+     * 小于等于 &lt;=
+     *
+     * @param condition 执行条件
+     * @param column    字段
+     * @param val       值
+     * @return children
+     */
+    <R> Children le(boolean condition, SFunction<R,?> column, Object val);
+
+    /**
+     * ignore
+     */
+    default <R> Children between(SFunction<R,?> column, Object val1, Object val2) {
+        return between(true, column, val1, val2);
+    }
+
+    /**
+     * BETWEEN 值1 AND 值2
+     *
+     * @param condition 执行条件
+     * @param column    字段
+     * @param val1      值1
+     * @param val2      值2
+     * @return children
+     */
+    <R> Children between(boolean condition, SFunction<R,?> column, Object val1, Object val2);
+
+    /**
+     * ignore
+     */
+    default <R> Children notBetween(SFunction<R,?> column, Object val1, Object val2) {
+        return notBetween(true, column, val1, val2);
+    }
+
+    /**
+     * NOT BETWEEN 值1 AND 值2
+     *
+     * @param condition 执行条件
+     * @param column    字段
+     * @param val1      值1
+     * @param val2      值2
+     * @return children
+     */
+    <R> Children notBetween(boolean condition, SFunction<R,?> column, Object val1, Object val2);
+
+    /**
+     * ignore
+     */
+    default <R> Children like(SFunction<R,?> column, Object val) {
+        return like(true, column, val);
+    }
+
+    /**
+     * LIKE '%值%'
+     *
+     * @param condition 执行条件
+     * @param column    字段
+     * @param val       值
+     * @return children
+     */
+    <R> Children like(boolean condition, SFunction<R,?> column, Object val);
+
+    /**
+     * ignore
+     */
+    default <R> Children notLike(SFunction<R,?> column, Object val) {
+        return notLike(true, column, val);
+    }
+
+    /**
+     * NOT LIKE '%值%'
+     *
+     * @param condition 执行条件
+     * @param column    字段
+     * @param val       值
+     * @return children
+     */
+    <R> Children notLike(boolean condition, SFunction<R,?> column, Object val);
+
+    /**
+     * ignore
+     */
+    default <R> Children likeLeft(SFunction<R,?> column, Object val) {
+        return likeLeft(true, column, val);
+    }
+
+    /**
+     * LIKE '%值'
+     *
+     * @param condition 执行条件
+     * @param column    字段
+     * @param val       值
+     * @return children
+     */
+    <R> Children likeLeft(boolean condition, SFunction<R,?> column, Object val);
+
+    /**
+     * ignore
+     */
+    default <R> Children likeRight(SFunction<R,?> column, Object val) {
+        return likeRight(true, column, val);
+    }
+
+    /**
+     * LIKE '值%'
+     *
+     * @param condition 执行条件
+     * @param column    字段
+     * @param val       值
+     * @return children
+     */
+    <R> Children likeRight(boolean condition, SFunction<R,?> column, Object val);
 }

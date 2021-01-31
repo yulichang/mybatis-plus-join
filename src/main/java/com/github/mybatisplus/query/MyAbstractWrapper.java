@@ -16,6 +16,7 @@ import com.baomidou.mybatisplus.core.toolkit.sql.SqlUtils;
 import com.baomidou.mybatisplus.core.toolkit.sql.StringEscape;
 import com.github.mybatisplus.query.interfaces.MyJoin;
 import com.github.mybatisplus.toolkit.Constant;
+import com.github.mybatisplus.wrapper.MyWrapper;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -33,8 +34,8 @@ import static java.util.stream.Collectors.joining;
  * copy {@link com.baomidou.mybatisplus.core.conditions.AbstractWrapper}
  */
 @SuppressWarnings({"serial", "unchecked"})
-public abstract class MyAbstractWrapper<T, R, Children extends MyAbstractWrapper<T, R, Children>> extends Wrapper<T>
-        implements Compare<Children, R>, Nested<Children, Children>, Join<Children>, Func<Children, R>, MyJoin<Children> {
+public abstract class MyAbstractWrapper<T, R, Children extends MyAbstractWrapper<T, R, Children>> extends MyWrapper<T>
+        implements Compare<Children, R>, Nested<Children, Children>, Join<Children>, Func<Children, R> {
 
     /**
      * 占位符
@@ -90,31 +91,6 @@ public abstract class MyAbstractWrapper<T, R, Children extends MyAbstractWrapper
     public Children setEntityClass(Class<T> entityClass) {
         if (entityClass != null) {
             this.entityClass = entityClass;
-        }
-        return typedThis;
-    }
-
-    @Override
-    public Children leftJoin(boolean condition, String joinSql) {
-        if (condition) {
-            from.setStringValue(from.getStringValue() + Constant.LEFT_JOIN + joinSql);
-        }
-        return typedThis;
-    }
-
-    @Override
-    public Children rightJoin(boolean condition, String joinSql) {
-        if (condition) {
-            from.setStringValue(from.getStringValue() + Constant.RIGHT_JOIN + joinSql);
-        }
-        return typedThis;
-    }
-
-
-    @Override
-    public Children innerJoin(boolean condition, String joinSql) {
-        if (condition) {
-            from.setStringValue(from.getStringValue() + Constant.INNER_JOIN + joinSql);
         }
         return typedThis;
     }

@@ -11,8 +11,6 @@ public interface Constant {
      */
     String TABLE_ALIAS = "t";
 
-    String AS = " AS ";
-
     String ON = " ON ";
 
     String EQUALS = " = ";

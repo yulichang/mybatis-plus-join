@@ -15,22 +15,22 @@ public enum SqlMethod {
      * 连表查询
      */
     SELECT_JOIN_ONE("selectJoinOne", "返回一条记录",
-            "<script>\nSELECT %s FROM %s %s <if test=\"ew.from != null and ew.from != ''\">${ew.from}</if> %s %s\n</script>"),
+            "<script>\nSELECT %s FROM %s <if test=\"ew.alias != null and ew.alias != ''\">${ew.alias}</if> <if test=\"ew.from != null and ew.from != ''\">${ew.from}</if> %s %s\n</script>"),
 
     SELECT_JOIN_LIST("selectJoinList", "返回List集合",
-            "<script>\nSELECT %s FROM %s %s <if test=\"ew.from != null and ew.from != ''\">${ew.from}</if> %s %s\n</script>"),
+            "<script>\nSELECT %s FROM %s <if test=\"ew.alias != null and ew.alias != ''\">${ew.alias}</if> <if test=\"ew.from != null and ew.from != ''\">${ew.from}</if> %s %s\n</script>"),
 
     SELECT_JOIN_MAP("selectJoinMap", "返回一个Map",
-            "<script>\nSELECT %s FROM %s %s <if test=\"ew.from != null and ew.from != ''\">${ew.from}</if> %s %s\n</script>"),
+            "<script>\nSELECT %s FROM %s <if test=\"ew.alias != null and ew.alias != ''\">${ew.alias}</if> <if test=\"ew.from != null and ew.from != ''\">${ew.from}</if> %s %s\n</script>"),
 
     SELECT_JOIN_MAPS("selectJoinMaps", "返回Map集合",
-            "<script>\nSELECT %s FROM %s %s <if test=\"ew.from != null and ew.from != ''\">${ew.from}</if> %s %s\n</script>"),
+            "<script>\nSELECT %s FROM %s <if test=\"ew.alias != null and ew.alias != ''\">${ew.alias}</if> <if test=\"ew.from != null and ew.from != ''\">${ew.from}</if> %s %s\n</script>"),
 
     SELECT_JOIN_PAGE("selectJoinPage", "连表查询并分页",
-            "<script>\nSELECT %s FROM %s %s <if test=\"ew.from != null and ew.from != ''\">${ew.from}</if> %s %s\n</script>"),
+            "<script>\nSELECT %s FROM %s <if test=\"ew.alias != null and ew.alias != ''\">${ew.alias}</if> <if test=\"ew.from != null and ew.from != ''\">${ew.from}</if> %s %s\n</script>"),
 
     SELECT_JOIN_MAPS_PAGE("selectJoinMapsPage", "返回Map集合并分页",
-            "<script>\nSELECT %s FROM %s %s <if test=\"ew.from != null and ew.from != ''\">${ew.from}</if> %s %s\n</script>");
+            "<script>\nSELECT %s FROM %s <if test=\"ew.from != null and ew.from != ''\">${ew.from}</if> %s %s\n</script>");
 
     private final String method;
     private final String desc;

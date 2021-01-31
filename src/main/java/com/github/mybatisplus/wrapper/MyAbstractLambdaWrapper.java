@@ -1,39 +1,80 @@
+/*
+ * Copyright (c) 2011-2021, baomidou (jobob@qq.com).
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.github.mybatisplus.wrapper;
 
+import com.baomidou.mybatisplus.core.metadata.TableInfo;
+import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
 import com.baomidou.mybatisplus.core.toolkit.Assert;
 import com.baomidou.mybatisplus.core.toolkit.LambdaUtils;
 import com.baomidou.mybatisplus.core.toolkit.StringPool;
 import com.baomidou.mybatisplus.core.toolkit.support.ColumnCache;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.baomidou.mybatisplus.core.toolkit.support.SerializedLambda;
+import com.github.mybatisplus.toolkit.MyLambdaUtils;
 import org.apache.ibatis.reflection.property.PropertyNamer;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Map;
 
 import static java.util.stream.Collectors.joining;
 
 /**
- * copy {@link com.baomidou.mybatisplus.core.conditions.AbstractLambdaWrapper}
+ * Lambda 语法使用 Wrapper
+ * <p>统一处理解析 lambda 获取 column</p>
+ *
+ * @author hubin miemie HCL
+ * @since 2017-05-26
  */
 @SuppressWarnings("serial")
 public abstract class MyAbstractLambdaWrapper<T, Children extends MyAbstractLambdaWrapper<T, Children>>
-        extends MyAbstractWrapper<T, SFunction<T, ?>, Children> {
+        extends MyAbstractWrapper<T, Children> {
 
     private Map<String, ColumnCache> columnMap = null;
+    private boolean initColumnMap = false;
 
+    /**
+     * 参与连接的表<class,别名>
+     */
+    protected Map<Class<?>, SubClass<?, ?>> subTable = new HashMap<>();
+
+    @SuppressWarnings("unchecked")
+    protected <X> String columnsToString(SFunction<X, ?>... columns) {
+        return columnsToString(true, columns);
+    }
 
     @Override
-    protected String columnToString(SFunction<T, ?> column) {
-        return columnToString(column, true);
+    protected <X> String columnToString(X column) {
+        return columnToString((SFunction<?, ?>) column, true);
     }
 
-    protected String columnToString(SFunction<T, ?> column, boolean onlyColumn) {
-        return getColumn(LambdaUtils.resolve(column), onlyColumn);
+    @SuppressWarnings("unchecked")
+    protected <X> String columnsToString(boolean onlyColumn, SFunction<X, ?>... columns) {
+        return Arrays.stream(columns).map(i -> columnToString(i, onlyColumn)).collect(joining(StringPool.COMMA));
     }
 
-    protected String column2String(SFunction<?, ?> column, boolean onlyColumn) {
-        return getColumn(LambdaUtils.resolve(column), onlyColumn);
+    @Override
+    protected <X> String columnsToString(X... columns) {
+        return Arrays.stream(columns).map(i -> columnToString((SFunction<?, ?>) i, true)).collect(joining(StringPool.COMMA));
+    }
+
+    protected String columnToString(SFunction<?, ?> column, boolean onlyColumn) {
+        TableInfo info = TableInfoHelper.getTableInfo(MyLambdaUtils.getEntityClass(column));
+        Assert.notNull(info, "can not find table for lambda");
+        return info.getTableName() + StringPool.DOT + getColumn(LambdaUtils.resolve(column), onlyColumn);
     }
 
 
@@ -58,7 +99,14 @@ public abstract class MyAbstractLambdaWrapper<T, Children extends MyAbstractLamb
     }
 
     private void tryInitCache(Class<?> lambdaClass) {
-        columnMap = LambdaUtils.getColumnMap(lambdaClass);
+        if (!initColumnMap) {
+            final Class<T> entityClass = getEntityClass();
+            if (entityClass != null) {
+                lambdaClass = entityClass;
+            }
+            columnMap = LambdaUtils.getColumnMap(lambdaClass);
+            initColumnMap = true;
+        }
         Assert.notNull(columnMap, "can not find lambda cache for this entity [%s]", lambdaClass.getName());
     }
 
@@ -67,5 +115,45 @@ public abstract class MyAbstractLambdaWrapper<T, Children extends MyAbstractLamb
         Assert.notNull(columnCache, "can not find lambda cache for this property [%s] of entity [%s]",
                 fieldName, lambdaClass.getName());
         return columnCache;
+    }
+
+    public static class SubClass<L, R> {
+
+        private String tableAlias;
+
+        private SFunction<L, ?> left;
+
+        private SFunction<R, ?> right;
+
+
+        public SubClass(String tableAlias, SFunction<L, ?> left, SFunction<R, ?> right) {
+            this.tableAlias = tableAlias;
+            this.left = left;
+            this.right = right;
+        }
+
+        public String getTableAlias() {
+            return tableAlias;
+        }
+
+        public void setTableAlias(String tableAlias) {
+            this.tableAlias = tableAlias;
+        }
+
+        public SFunction<L, ?> getLeft() {
+            return left;
+        }
+
+        public void setLeft(SFunction<L, ?> left) {
+            this.left = left;
+        }
+
+        public SFunction<R, ?> getRight() {
+            return right;
+        }
+
+        public void setRight(SFunction<R, ?> right) {
+            this.right = right;
+        }
     }
 }

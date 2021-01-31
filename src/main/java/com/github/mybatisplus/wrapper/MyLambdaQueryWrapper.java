@@ -1,18 +1,3 @@
-/*
- * Copyright (c) 2011-2021, baomidou (jobob@qq.com).
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package com.github.mybatisplus.wrapper;
 
 import com.baomidou.mybatisplus.core.conditions.SharedString;
@@ -25,10 +10,10 @@ import com.baomidou.mybatisplus.core.toolkit.Assert;
 import com.baomidou.mybatisplus.core.toolkit.StringPool;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
-import com.github.mybatisplus.wrapper.interfaces.MyLambdaJoin;
-import com.github.mybatisplus.wrapper.interfaces.MySFunctionQuery;
 import com.github.mybatisplus.toolkit.Constant;
 import com.github.mybatisplus.toolkit.MyLambdaUtils;
+import com.github.mybatisplus.wrapper.interfaces.MyLambdaJoin;
+import com.github.mybatisplus.wrapper.interfaces.MySFunctionQuery;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,10 +23,7 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 /**
- * Lambda 语法使用 Wrapper
- *
- * @author hubin miemie HCL
- * @since 2017-05-26
+ * copy {@link com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper}
  */
 @SuppressWarnings("serial")
 public class MyLambdaQueryWrapper<T> extends MyAbstractLambdaWrapper<T, MyLambdaQueryWrapper<T>>
@@ -56,7 +38,6 @@ public class MyLambdaQueryWrapper<T> extends MyAbstractLambdaWrapper<T, MyLambda
      * 查询表
      */
     private SharedString from = new SharedString();
-
 
     /**
      * 主表别名
@@ -118,7 +99,7 @@ public class MyLambdaQueryWrapper<T> extends MyAbstractLambdaWrapper<T, MyLambda
             for (SFunction<S, ?> s : columns) {
                 Class<S> clazz = MyLambdaUtils.getEntityClass(s);
                 TableInfo info = TableInfoHelper.getTableInfo(clazz);
-                selectColumns.add(new SelectColumn(clazz, info.getTableName(), MyLambdaUtils.getColumn(s)));
+                selectColumns.add(new SelectColumn(clazz, info.getTableName(), MyLambdaUtils.getColumn(s), null));
             }
         }
         return typedThis;
@@ -129,15 +110,25 @@ public class MyLambdaQueryWrapper<T> extends MyAbstractLambdaWrapper<T, MyLambda
         TableInfo info = TableInfoHelper.getTableInfo(entityClass);
         Assert.notNull(info, "table can not be find");
         info.getFieldList().stream().filter(predicate).collect(Collectors.toList()).forEach(
-                i -> selectColumns.add(new SelectColumn(entityClass, info.getTableName(), i.getColumn())));
+                i -> selectColumns.add(new SelectColumn(entityClass, info.getTableName(), i.getColumn(), null)));
         return typedThis;
     }
 
 
+    public final <S, X> MyLambdaQueryWrapper<T> selectAs(SFunction<S, ?> columns, SFunction<X, ?> alias) {
+        Class<S> clazz = MyLambdaUtils.getEntityClass(columns);
+        TableInfo info = TableInfoHelper.getTableInfo(clazz);
+        selectColumns.add(new SelectColumn(clazz, info.getTableName(), MyLambdaUtils.getColumn(columns), MyLambdaUtils.getName(alias)));
+        return typedThis;
+    }
+
     @Override
     public String getSqlSelect() {
         if (StringUtils.isBlank(sqlSelect.getStringValue())) {
-            String s = selectColumns.stream().map(i -> i.getTableName() + StringPool.DOT + i.getColumnName()).collect(Collectors.joining(StringPool.COMMA));
+            String s = selectColumns.stream().map(i ->
+                    i.getTableName() + StringPool.DOT + i.getColumnName() +
+                            (StringUtils.isBlank(i.getAlias()) ? StringPool.EMPTY : (Constant.AS + i.getAlias())))
+                    .collect(Collectors.joining(StringPool.COMMA));
             sqlSelect.setStringValue(s);
         }
         return sqlSelect.getStringValue();
@@ -198,13 +189,14 @@ public class MyLambdaQueryWrapper<T> extends MyAbstractLambdaWrapper<T, MyLambda
 
         private String columnName;
 
+        private String alias;
 
-        public SelectColumn(Class<?> clazz, String tableName, String columnName) {
+        public SelectColumn(Class<?> clazz, String tableName, String columnName, String alias) {
             this.clazz = clazz;
             this.tableName = tableName;
             this.columnName = columnName;
+            this.alias = alias;
         }
-
 
         public Class<?> getClazz() {
             return clazz;
@@ -228,6 +220,14 @@ public class MyLambdaQueryWrapper<T> extends MyAbstractLambdaWrapper<T, MyLambda
 
         public void setColumnName(String columnName) {
             this.columnName = columnName;
+        }
+
+        public String getAlias() {
+            return alias;
+        }
+
+        public void setAlias(String alias) {
+            this.alias = alias;
         }
     }
 }

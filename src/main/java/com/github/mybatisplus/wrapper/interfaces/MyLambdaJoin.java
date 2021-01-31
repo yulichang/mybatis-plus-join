@@ -3,6 +3,9 @@ package com.github.mybatisplus.wrapper.interfaces;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.github.mybatisplus.toolkit.Constant;
 
+/**
+ * @author yulichang
+ */
 public interface MyLambdaJoin<Children> {
 
     default <T, X> Children leftJoin(Class<T> clazz, SFunction<T, ?> left, SFunction<X, ?> right) {

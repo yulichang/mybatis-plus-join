@@ -2,6 +2,9 @@ package com.github.mybatisplus.query.interfaces;
 
 import com.github.mybatisplus.toolkit.Constant;
 
+/**
+ * @author yulichang
+ */
 public interface MyJoin<Children> {
 
     default Children leftJoin(String joinSql) {
@@ -16,7 +19,7 @@ public interface MyJoin<Children> {
         return rightJoin(true, joinSql);
     }
 
-    default Children rightJoin(boolean condition, String joinSql){
+    default Children rightJoin(boolean condition, String joinSql) {
         return join(Constant.RIGHT_JOIN, condition, joinSql);
     }
 
@@ -24,7 +27,7 @@ public interface MyJoin<Children> {
         return innerJoin(true, joinSql);
     }
 
-    default Children innerJoin(boolean condition, String joinSql){
+    default Children innerJoin(boolean condition, String joinSql) {
         return join(Constant.INNER_JOIN, condition, joinSql);
     }
 

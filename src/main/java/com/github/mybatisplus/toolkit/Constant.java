@@ -11,6 +11,8 @@ public interface Constant {
      */
     String TABLE_ALIAS = "t";
 
+    String AS = " AS ";
+
     String ON = " ON ";
 
     String EQUALS = " = ";
@@ -39,4 +41,5 @@ public interface Constant {
      * " INNER JOIN "
      */
     String INNER_JOIN = StringPool.SPACE + INNER + StringPool.SPACE + JOIN + StringPool.SPACE;
+
 }

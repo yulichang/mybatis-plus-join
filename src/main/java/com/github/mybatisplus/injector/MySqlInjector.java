@@ -9,6 +9,7 @@ import java.util.List;
 /**
  * SQL 注入器
  *
+ * @author yulichang
  * @see DefaultSqlInjector
  */
 public class MySqlInjector extends DefaultSqlInjector {

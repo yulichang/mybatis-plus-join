@@ -2,7 +2,6 @@ package com.github.mybatisplus.base;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.github.mybatisplus.wrapper.MyLambdaQueryWrapper;
 import com.github.mybatisplus.wrapper.MyWrapper;
 
 import java.util.List;

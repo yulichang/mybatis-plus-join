@@ -1,18 +1,3 @@
-/*
- * Copyright (c) 2011-2021, baomidou (jobob@qq.com).
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package com.github.mybatisplus.wrapper.interfaces;
 
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
@@ -22,25 +7,21 @@ import java.util.Map;
 import java.util.function.BiPredicate;
 
 /**
- * 查询条件封装
- * <p>比较值</p>
- *
- * @author hubin miemie HCL
- * @since 2017-05-26
+ * {@link com.baomidou.mybatisplus.core.conditions.interfaces.Compare}
  */
 public interface MyCompare<Children> extends Serializable {
 
     /**
      * ignore
      */
-    default <R, V> Children allEq(Map<SFunction<R,?>, V> params) {
+    default <R, V> Children allEq(Map<SFunction<R, ?>, V> params) {
         return allEq(params, true);
     }
 
     /**
      * ignore
      */
-    default <R, V> Children allEq(Map<SFunction<R,?>, V> params, boolean null2IsNull) {
+    default <R, V> Children allEq(Map<SFunction<R, ?>, V> params, boolean null2IsNull) {
         return allEq(true, params, null2IsNull);
     }
 
@@ -52,19 +33,19 @@ public interface MyCompare<Children> extends Serializable {
      * @param null2IsNull 是否参数为 null 自动执行 isNull 方法, false 则忽略这个字段\
      * @return children
      */
-    <R, V> Children allEq(boolean condition, Map<SFunction<R,?>, V> params, boolean null2IsNull);
+    <R, V> Children allEq(boolean condition, Map<SFunction<R, ?>, V> params, boolean null2IsNull);
 
     /**
      * ignore
      */
-    default <R, V> Children allEq(BiPredicate<SFunction<R,?>, V> filter, Map<SFunction<R,?>, V> params) {
+    default <R, V> Children allEq(BiPredicate<SFunction<R, ?>, V> filter, Map<SFunction<R, ?>, V> params) {
         return allEq(filter, params, true);
     }
 
     /**
      * ignore
      */
-    default <R, V> Children allEq(BiPredicate<SFunction<R,?>, V> filter, Map<SFunction<R,?>, V> params, boolean null2IsNull) {
+    default <R, V> Children allEq(BiPredicate<SFunction<R, ?>, V> filter, Map<SFunction<R, ?>, V> params, boolean null2IsNull) {
         return allEq(true, filter, params, null2IsNull);
     }
 
@@ -77,12 +58,12 @@ public interface MyCompare<Children> extends Serializable {
      * @param null2IsNull 是否参数为 null 自动执行 isNull 方法, false 则忽略这个字段
      * @return children
      */
-    <R, V> Children allEq(boolean condition, BiPredicate<SFunction<R,?>, V> filter, Map<SFunction<R,?>, V> params, boolean null2IsNull);
+    <R, V> Children allEq(boolean condition, BiPredicate<SFunction<R, ?>, V> filter, Map<SFunction<R, ?>, V> params, boolean null2IsNull);
 
     /**
      * ignore
      */
-    default <R> Children eq(SFunction<R,?> column, Object val) {
+    default <R> Children eq(SFunction<R, ?> column, Object val) {
         return eq(true, column, val);
     }
 
@@ -94,12 +75,12 @@ public interface MyCompare<Children> extends Serializable {
      * @param val       值
      * @return children
      */
-    <R> Children eq(boolean condition, SFunction<R,?> column, Object val);
+    <R> Children eq(boolean condition, SFunction<R, ?> column, Object val);
 
     /**
      * ignore
      */
-    default <R> Children ne(SFunction<R,?> column, Object val) {
+    default <R> Children ne(SFunction<R, ?> column, Object val) {
         return ne(true, column, val);
     }
 
@@ -111,12 +92,12 @@ public interface MyCompare<Children> extends Serializable {
      * @param val       值
      * @return children
      */
-    <R> Children ne(boolean condition, SFunction<R,?> column, Object val);
+    <R> Children ne(boolean condition, SFunction<R, ?> column, Object val);
 
     /**
      * ignore
      */
-    default <R> Children gt(SFunction<R,?> column, Object val) {
+    default <R> Children gt(SFunction<R, ?> column, Object val) {
         return gt(true, column, val);
     }
 
@@ -128,12 +109,12 @@ public interface MyCompare<Children> extends Serializable {
      * @param val       值
      * @return children
      */
-    <R> Children gt(boolean condition, SFunction<R,?> column, Object val);
+    <R> Children gt(boolean condition, SFunction<R, ?> column, Object val);
 
     /**
      * ignore
      */
-    default <R> Children ge(SFunction<R,?> column, Object val) {
+    default <R> Children ge(SFunction<R, ?> column, Object val) {
         return ge(true, column, val);
     }
 
@@ -145,12 +126,12 @@ public interface MyCompare<Children> extends Serializable {
      * @param val       值
      * @return children
      */
-    <R> Children ge(boolean condition, SFunction<R,?> column, Object val);
+    <R> Children ge(boolean condition, SFunction<R, ?> column, Object val);
 
     /**
      * ignore
      */
-    default <R> Children lt(SFunction<R,?> column, Object val) {
+    default <R> Children lt(SFunction<R, ?> column, Object val) {
         return lt(true, column, val);
     }
 
@@ -162,12 +143,12 @@ public interface MyCompare<Children> extends Serializable {
      * @param val       值
      * @return children
      */
-    <R> Children lt(boolean condition, SFunction<R,?> column, Object val);
+    <R> Children lt(boolean condition, SFunction<R, ?> column, Object val);
 
     /**
      * ignore
      */
-    default <R> Children le(SFunction<R,?> column, Object val) {
+    default <R> Children le(SFunction<R, ?> column, Object val) {
         return le(true, column, val);
     }
 
@@ -179,12 +160,12 @@ public interface MyCompare<Children> extends Serializable {
      * @param val       值
      * @return children
      */
-    <R> Children le(boolean condition, SFunction<R,?> column, Object val);
+    <R> Children le(boolean condition, SFunction<R, ?> column, Object val);
 
     /**
      * ignore
      */
-    default <R> Children between(SFunction<R,?> column, Object val1, Object val2) {
+    default <R> Children between(SFunction<R, ?> column, Object val1, Object val2) {
         return between(true, column, val1, val2);
     }
 
@@ -197,12 +178,12 @@ public interface MyCompare<Children> extends Serializable {
      * @param val2      值2
      * @return children
      */
-    <R> Children between(boolean condition, SFunction<R,?> column, Object val1, Object val2);
+    <R> Children between(boolean condition, SFunction<R, ?> column, Object val1, Object val2);
 
     /**
      * ignore
      */
-    default <R> Children notBetween(SFunction<R,?> column, Object val1, Object val2) {
+    default <R> Children notBetween(SFunction<R, ?> column, Object val1, Object val2) {
         return notBetween(true, column, val1, val2);
     }
 
@@ -215,12 +196,12 @@ public interface MyCompare<Children> extends Serializable {
      * @param val2      值2
      * @return children
      */
-    <R> Children notBetween(boolean condition, SFunction<R,?> column, Object val1, Object val2);
+    <R> Children notBetween(boolean condition, SFunction<R, ?> column, Object val1, Object val2);
 
     /**
      * ignore
      */
-    default <R> Children like(SFunction<R,?> column, Object val) {
+    default <R> Children like(SFunction<R, ?> column, Object val) {
         return like(true, column, val);
     }
 
@@ -232,12 +213,12 @@ public interface MyCompare<Children> extends Serializable {
      * @param val       值
      * @return children
      */
-    <R> Children like(boolean condition, SFunction<R,?> column, Object val);
+    <R> Children like(boolean condition, SFunction<R, ?> column, Object val);
 
     /**
      * ignore
      */
-    default <R> Children notLike(SFunction<R,?> column, Object val) {
+    default <R> Children notLike(SFunction<R, ?> column, Object val) {
         return notLike(true, column, val);
     }
 
@@ -249,12 +230,12 @@ public interface MyCompare<Children> extends Serializable {
      * @param val       值
      * @return children
      */
-    <R> Children notLike(boolean condition, SFunction<R,?> column, Object val);
+    <R> Children notLike(boolean condition, SFunction<R, ?> column, Object val);
 
     /**
      * ignore
      */
-    default <R> Children likeLeft(SFunction<R,?> column, Object val) {
+    default <R> Children likeLeft(SFunction<R, ?> column, Object val) {
         return likeLeft(true, column, val);
     }
 
@@ -266,12 +247,12 @@ public interface MyCompare<Children> extends Serializable {
      * @param val       值
      * @return children
      */
-    <R> Children likeLeft(boolean condition, SFunction<R,?> column, Object val);
+    <R> Children likeLeft(boolean condition, SFunction<R, ?> column, Object val);
 
     /**
      * ignore
      */
-    default <R> Children likeRight(SFunction<R,?> column, Object val) {
+    default <R> Children likeRight(SFunction<R, ?> column, Object val) {
         return likeRight(true, column, val);
     }
 
@@ -283,5 +264,5 @@ public interface MyCompare<Children> extends Serializable {
      * @param val       值
      * @return children
      */
-    <R> Children likeRight(boolean condition, SFunction<R,?> column, Object val);
+    <R> Children likeRight(boolean condition, SFunction<R, ?> column, Object val);
 }

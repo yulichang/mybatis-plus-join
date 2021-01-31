@@ -30,7 +30,7 @@ public enum SqlMethod {
             "<script>\nSELECT %s FROM %s <if test=\"ew.alias != null and ew.alias != ''\">${ew.alias}</if> <if test=\"ew.from != null and ew.from != ''\">${ew.from}</if> %s %s\n</script>"),
 
     SELECT_JOIN_MAPS_PAGE("selectJoinMapsPage", "返回Map集合并分页",
-            "<script>\nSELECT %s FROM %s <if test=\"ew.from != null and ew.from != ''\">${ew.from}</if> %s %s\n</script>");
+            "<script>\nSELECT %s FROM %s <if test=\"ew.alias != null and ew.alias != ''\">${ew.alias}</if> <if test=\"ew.from != null and ew.from != ''\">${ew.from}</if> %s %s\n</script>");
 
     private final String method;
     private final String desc;

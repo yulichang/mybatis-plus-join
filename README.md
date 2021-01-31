@@ -60,7 +60,8 @@ class test {
                                 .select("a.province")
                                 .leftJoin("user_address addr on t.id = addr.user_id")
                                 .rightJoin("area a on addr.area_id = a.id")
-                                .eq(true, UserDO::getId, 1)
+                                .gt(true, UserDO::getId, 1)
+                                .eq(true, UserDO::getSex, "男")
                                 .stringQuery()
                                 .like(true, "addr.tel", "1")
                                 .le(true, "a.province", "1"));
@@ -80,11 +81,12 @@ SELECT
     addr.address,
     a.province 
 FROM 
-user t 
-LEFT JOIN user_address addr on t.id = addr.user_id 
-RIGHT JOIN area a on addr.area_id = a.id 
+    user t 
+    LEFT JOIN user_address addr on t.id = addr.user_id 
+    RIGHT JOIN area a on addr.area_id = a.id 
 WHERE (
-    t.id = ? 
+    t.id > ?
+    AND t.sex = ? 
     AND addr.tel LIKE ? 
     AND a.province <= ?)
 ```
@@ -92,7 +94,7 @@ WHERE (
 说明:
 * UserDTO.class 查询结果类(resultType)
 * selectAll(UserDO.class) 查询主表全部字段(主表实体类)
-* select() mp的select策略是覆盖,这里的策略是追加,可以一直select  
+* select() mp的select策略是覆盖,以最后一次为准,这里的策略是追加,可以一直select  
 主表字段可以用lambda,会自动添加表别名,主表别名默认是 t ,非主表字段必须带别名查询
 * leftJoin() rightJoin() innerJoin() 传sql片段 格式 (表 + 别名 + 关联条件)
 * stringQuery() lambda查询转string查询

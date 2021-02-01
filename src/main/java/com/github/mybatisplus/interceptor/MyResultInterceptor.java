@@ -1,5 +1,6 @@
 package com.github.mybatisplus.interceptor;
 
+import com.baomidou.mybatisplus.core.MybatisParameterHandler;
 import com.baomidou.mybatisplus.core.toolkit.ClassUtils;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.github.mybatisplus.toolkit.Constant;

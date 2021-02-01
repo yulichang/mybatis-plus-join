@@ -40,7 +40,9 @@
 * service继承MyBaseService (可选)
 * serviceImpl继承MyBaseServiceImpl (可选)
 
-# 核心类 MyLambdaQuery 和 MyLambdaQueryWrapper
+## 核心类 MyLambdaQuery 和 MyLambdaQueryWrapper
+
+[->区别](https://gitee.com/best_handsome/mybatis-plus-join/wikis/%E8%AF%B4%E6%98%8E)
 
 ## MyLambdaQuery用法
 

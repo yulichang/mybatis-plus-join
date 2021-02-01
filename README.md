@@ -57,8 +57,7 @@ class test {
         List<UserDTO> list = userMapper.selectJoinList(UserDTO.class,
                 new MyLambdaQuery<UserDO>()
                         .selectAll(UserDO.class)
-                        .select("addr.tel", "addr.address")
-                        .select("a.province")
+                        .select("addr.tel", "addr.address","a.province")
                         .leftJoin("user_address addr on t.id = addr.user_id")
                         .rightJoin("area a on addr.area_id = a.id")
                         .gt(true, UserDO::getId, 1)

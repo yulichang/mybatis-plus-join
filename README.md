@@ -38,6 +38,8 @@
 * service继承MyBaseService (可选)
 * serviceImpl继承MyBaseServiceImpl (可选)
 
+# 核心类 MyLambdaQuery 和 MyLambdaQueryWrapper
+
 ## MyLambdaQuery用法
 
 ### 简单的3表查询

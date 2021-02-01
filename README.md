@@ -4,6 +4,8 @@
 
 ## 使用方法
 
+[goto wiki](https://gitee.com/best_handsome/mybatis-plus-join/wikis)
+
 ### 方法一
 
 1. 将代码down到本地，使用maven install

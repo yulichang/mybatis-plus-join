@@ -38,7 +38,7 @@
 * service继承MyBaseService (可选)
 * serviceImpl继承MyBaseServiceImpl (可选)
 
-## MyQuery用法
+## MyLambdaQuery用法
 
 ### 简单的3表查询
 
@@ -93,7 +93,7 @@ WHERE (
 * leftJoin() rightJoin() innerJoin() 传sql片段 格式 (表 + 别名 + 关联条件)
 * stringQuery() lambda查询转string查询
 * lambda() string查询转lambda查询
-* sql组装由mp完成,正常使用没有sql注入风险
+* 条件查询,可以查询主表以及参与连接的所有表的字段,全部调用mp原生的方法,正常使用没有sql注入风险
 
 ### 分页查询
 
@@ -229,13 +229,13 @@ WHERE (
 
 * UserDTO.class 查询结果返回类(resultType)
 * selectAll() 查询指定实体类的全部字段
-* select() 查询指定的字段,支持可变参数,同意个select只能查询相同表的字段  
-  故将UserAddressDO和AreaDO分开为连个select
+* select() 查询指定的字段,支持可变参数,同一个select只能查询相同表的字段  
+  故将UserAddressDO和AreaDO分开为两个select()
 * selectAs() 字段别名查询,用于数据库字段与业务实体类属性名不一致时使用
 * leftJoin() 参数说明  
-  第一个参数:参与连表的实体类class  
-  第二个参数数:连表的ON字段,这个属性必须是第一个参数实体类的属性  
-  第三个参数:参与连表的另一个实体类属性
+  第一个参数:  参与连表的实体类class  
+  第二个参数:  连表的ON字段,这个属性必须是第一个参数实体类的属性  
+  第三个参数:  参与连表的ON的另一个实体类属性
 * 条件查询,可以查询主表以及参与连接的所有表的字段,全部调用mp原生的方法,正常使用没有sql注入风险
 
 #### 分页查询

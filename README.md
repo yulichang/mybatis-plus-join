@@ -40,6 +40,18 @@
 * service继承MyBaseService (可选)
 * serviceImpl继承MyBaseServiceImpl (可选)
 
+MyBaseMapper继承BaseMapper,在原有的方法基础上又添加了以下方法:  
+SelectJoinOne 连表查询一条记录对象  
+SelectJoinList 连表查询返回命中记录对象集合  
+SelectJoinPage 连表分页查询对象集合  
+SelectJoinMap 连表查询一条记录返回Map  
+SelectJoinMaps 连表查询返回命中记录Map集合  
+SelectJoinMapsPage 连表分页查询返回Map集合
+
+MyBaseService 继承了IService,同样添加以上方法
+
+MyBaseServiceImpl 继承了ServiceImpl,同样添加了以上方法
+
 ## 核心类 MyLambdaQuery 和 MyLambdaQueryWrapper
 
 [->区别](https://gitee.com/best_handsome/mybatis-plus-join/wikis/%E8%AF%B4%E6%98%8E)
@@ -178,7 +190,7 @@ FROM
     user t
     LEFT JOIN (select * from user_address) addr on t.id = addr.user_id
     RIGHT JOIN area a on addr.area_id = a.id
-WHERE (
+WHERE
     t.id = ?
     AND addr.tel LIKE ?
     AND a.province <= ?)

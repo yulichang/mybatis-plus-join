@@ -277,4 +277,6 @@ FROM user
 LIMIT ?,?
 ```
 
+# [wiki](https://gitee.com/best_handsome/mybatis-plus-join/wikis)
+
 

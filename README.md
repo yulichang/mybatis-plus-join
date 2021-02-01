@@ -57,7 +57,7 @@ class test {
         List<UserDTO> list = userMapper.selectJoinList(UserDTO.class,
                 new MyLambdaQuery<UserDO>()
                         .selectAll(UserDO.class)
-                        .select("addr.tel", "addr.address","a.province")
+                        .select("addr.tel", "addr.address", "a.province")
                         .leftJoin("user_address addr on t.id = addr.user_id")
                         .rightJoin("area a on addr.area_id = a.id")
                         .gt(true, UserDO::getId, 1)
@@ -164,23 +164,26 @@ class test {
 
 对应sql
 
-```sql
-SELECT t.id,
-       t.name,
-       t.sex,
-       t.head_img,
-       addr.tel,
-       addr.address,
-       CASE t.sex WHEN '男' THEN '1' ELSE '0' END AS sex,
-       sum(a.province)                           as province
-FROM user t
-         LEFT JOIN (select * from user_address) addr on t.id = addr.user_id
-         RIGHT JOIN area a on addr.area_id = a.id
+```mysql
+SELECT 
+    t.id,
+    t.name,
+    t.sex,
+    t.head_img,
+    addr.tel,
+    addr.address,
+    CASE t.sex WHEN '男' THEN '1' ELSE '0' END AS sex,
+    sum(a.province) as province
+FROM 
+    user t
+    LEFT JOIN (select * from user_address) addr on t.id = addr.user_id
+    RIGHT JOIN area a on addr.area_id = a.id
 WHERE (
-              t.id = ?
-              AND addr.tel LIKE ?
-              AND a.province <= ?)
-ORDER BY addr.id DESC
+    t.id = ?
+    AND addr.tel LIKE ?
+    AND a.province <= ?)
+ORDER BY 
+    addr.id DESC
 ```
 
 ## MyLambdaQueryWrapper用法

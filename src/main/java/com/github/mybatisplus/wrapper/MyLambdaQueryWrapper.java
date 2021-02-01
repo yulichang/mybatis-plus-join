@@ -118,7 +118,17 @@ public class MyLambdaQueryWrapper<T> extends MyAbstractLambdaWrapper<T, MyLambda
     public final <S, X> MyLambdaQueryWrapper<T> selectAs(SFunction<S, ?> columns, SFunction<X, ?> alias) {
         Class<S> clazz = MyLambdaUtils.getEntityClass(columns);
         TableInfo info = TableInfoHelper.getTableInfo(clazz);
+        Assert.notNull(info, "table can not be find for lambda");
         selectColumns.add(new SelectColumn(clazz, info.getTableName(), MyLambdaUtils.getColumn(columns), MyLambdaUtils.getName(alias)));
+        return typedThis;
+    }
+
+    public final MyLambdaQueryWrapper<T> selectAll(Class<?> clazz) {
+        TableInfo info = TableInfoHelper.getTableInfo(clazz);
+        Assert.notNull(info, "table can not be find -> %s", clazz);
+        selectColumns.add(new SelectColumn(clazz, info.getTableName(), info.getKeyColumn(), null));
+        info.getFieldList().forEach(c ->
+                selectColumns.add(new SelectColumn(clazz, info.getTableName(), c.getColumn(), null)));
         return typedThis;
     }
 

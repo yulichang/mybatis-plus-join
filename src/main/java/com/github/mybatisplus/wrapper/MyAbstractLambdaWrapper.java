@@ -14,6 +14,7 @@ import org.apache.ibatis.reflection.property.PropertyNamer;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 import static java.util.stream.Collectors.joining;
 
@@ -93,8 +94,9 @@ public abstract class MyAbstractLambdaWrapper<T, Children extends MyAbstractLamb
 
     private ColumnCache getColumnCache(String fieldName, Class<?> lambdaClass) {
         ColumnCache columnCache = columnMap.get(LambdaUtils.formatKey(fieldName));
-        Assert.notNull(columnCache, "can not find lambda cache for this property [%s] of entity [%s]",
-                fieldName, lambdaClass.getName());
+        if (Objects.isNull(columnCache)) {
+            columnCache = new ColumnCache(fieldName, null);
+        }
         return columnCache;
     }
 

@@ -83,14 +83,10 @@ public class MyResultInterceptor implements Interceptor {
                 return null;
             }
             if (object instanceof Map) {
-                Map<?, ?> args = (Map<?, ?>) object;
-                if (!args.containsValue(Constant.CLAZZ)) {
-                    return null;
-                }
-                return (Class<?>) args.get(Constant.CLAZZ);
+                return (Class<?>) ((Map<?, ?>) object).get(Constant.CLAZZ);
             }
             return null;
-        } catch (IllegalAccessException e) {
+        } catch (Exception e) {
             return null;
         }
     }

@@ -41,12 +41,12 @@
 * serviceImpl继承MyBaseServiceImpl (可选)
 
 1. MyBaseMapper继承BaseMapper,在原有的方法基础上又添加了以下方法:  
-    * SelectJoinOne 连表查询一条记录对象  
-    * SelectJoinList 连表查询返回命中记录对象集合  
-    * SelectJoinPage 连表分页查询对象集合  
-    * SelectJoinMap 连表查询一条记录返回Map  
-    * SelectJoinMaps 连表查询返回命中记录Map集合  
-    * SelectJoinMapsPage 连表分页查询返回Map集合
+    * selectJoinOne 连表查询一条记录对象  
+    * selectJoinList 连表查询返回命中记录对象集合  
+    * selectJoinPage 连表分页查询对象集合  
+    * selectJoinMap 连表查询一条记录返回Map  
+    * selectJoinMaps 连表查询返回命中记录Map集合  
+    * selectJoinMapsPage 连表分页查询返回Map集合
 
 2. MyBaseService 继承了IService,同样添加以上方法
 

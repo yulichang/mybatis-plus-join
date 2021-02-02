@@ -2,6 +2,7 @@ package com.github.mybatisplus.base;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.github.mybatisplus.interfaces.BaseJoin;
 
 import java.util.List;
 import java.util.Map;

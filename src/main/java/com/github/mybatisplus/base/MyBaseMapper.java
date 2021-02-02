@@ -3,6 +3,7 @@ package com.github.mybatisplus.base;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Constants;
+import com.github.mybatisplus.interfaces.BaseJoin;
 import com.github.mybatisplus.toolkit.Constant;
 import org.apache.ibatis.annotations.Param;
 

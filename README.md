@@ -54,16 +54,21 @@ MyBaseServiceImpl 继承了ServiceImpl,同样添加了以上方法
 
 ## 核心类 MyQueryWrapper, MyLambdaQueryWrapper和MyJoinLambdaQueryWrapper
 
-[->区别](https://gitee.com/best_handsome/mybatis-plus-join/wikis/%E8%AF%B4%E6%98%8E)
+|-|MyQueryWrapper|MyLambdaQueryWrapper|MyJoinLambdaQueryWrapper|
+|---|---|---|---|
+|select(String)|支持|支持|不支持|
+|select(lambda)|不支持|仅支持主表lambda|所有表lambda|
+|条件String|支持|不支持|不支持|
+|条件lambda|不支持|仅支持主表lambda|所有表lambda|
 
-## MyQueryWrapper和MyLambdaQueryWrapper
-
-MyQueryWrapper相当于mp的QueryWrapper
+MyQueryWrapper相当于mp的QueryWrapper  
 MyLambdaQueryWrapper相当于mp的LambdaQueryWrapper
 
 两者可以无缝切换  
 MyQueryWrapper.lambda() -> MyLambdaQueryWrapper  
-MyLambdaQueryWrapper.stringQuery() -> MyQueryWrapper  
+MyLambdaQueryWrapper.stringQuery() -> MyQueryWrapper
+
+## MyQueryWrapper和MyLambdaQueryWrapper
 
 ### 简单的3表查询
 

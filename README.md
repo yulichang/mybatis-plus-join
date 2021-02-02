@@ -52,11 +52,18 @@ MyBaseService 继承了IService,同样添加以上方法
 
 MyBaseServiceImpl 继承了ServiceImpl,同样添加了以上方法
 
-## 核心类 MyLambdaQuery 和 MyLambdaQueryWrapper
+## 核心类 MyQueryWrapper, MyLambdaQueryWrapper和MyJoinLambdaQueryWrapper
 
 [->区别](https://gitee.com/best_handsome/mybatis-plus-join/wikis/%E8%AF%B4%E6%98%8E)
 
-## MyLambdaQuery用法
+## MyQueryWrapper和MyLambdaQueryWrapper
+
+MyQueryWrapper相当于mp的QueryWrapper
+MyLambdaQueryWrapper相当于mp的LambdaQueryWrapper
+
+两者可以无缝切换  
+MyQueryWrapper.lambda() -> MyLambdaQueryWrapper  
+MyLambdaQueryWrapper.stringQuery() -> MyQueryWrapper  
 
 ### 简单的3表查询
 
@@ -67,7 +74,7 @@ class test {
 
     void testJoin() {
         List<UserDTO> list = userMapper.selectJoinList(UserDTO.class,
-                new MyLambdaQuery<UserDO>()
+                new MyLambdaQueryWrapper<UserDO>()
                         .selectAll(UserDO.class)
                         .select("addr.tel", "addr.address", "a.province")
                         .leftJoin("user_address addr on t.id = addr.user_id")
@@ -121,7 +128,7 @@ class test {
 
     void testJoin() {
         IPage<UserDTO> page = userMapper.selectJoinPage(new Page<>(1, 10), UserDTO.class,
-                new MyLambdaQuery<UserDO>()
+                new MyLambdaQueryWrapper<UserDO>()
                         .selectAll(UserDO.class)
                         .select("addr.tel", "addr.address")
                         .select("a.province")
@@ -155,7 +162,7 @@ class test {
 
     void testJoin() {
         List<UserDTO> list = userMapper.selectJoinList(UserDTO.class,
-                new MyLambdaQuery<UserDO>()
+                new MyLambdaQueryWrapper<UserDO>()
                         .selectAll(UserDO.class)
                         .select("addr.tel", "addr.address")
                         //行列转换
@@ -198,9 +205,13 @@ ORDER BY
     addr.id DESC
 ```
 
-## MyLambdaQueryWrapper用法
+## MyJoinLambdaQueryWrapper用法
 
-#### MyLambdaQueryWrapper更符合面向对象(OOP),没有魔术值,全部基于lambda,但灵活性不如上面的
+MyJoinLambdaQueryWrapper与MyLambdaQueryWrapper不同,是一套新的支持多表的wrapper
+MyLambdaQueryWrapper是基于LambdaQueryWrapper扩展的
+而LambdaQueryWrapper由于泛型约束,不支持扩展成多表的lambdaWrapper
+
+#### MyJoinLambdaQueryWrapper更符合面向对象(OOP),没有魔术值,全部基于lambda,但灵活性不如上面的
 
 #### 简单的3表查询
 
@@ -211,7 +222,7 @@ class test {
 
     void testJoin() {
         List<UserDTO> list = userMapper.selectJoinList(UserDTO.class,
-                new MyLambdaQueryWrapper<UserDO>()
+                new MyJoinLambdaQueryWrapper<UserDO>()
                         .selectAll(UserDO.class)
                         .select(UserAddressDO::getTel)
                         .selectAs(UserAddressDO::getAddress, UserDTO::getUserAddress)
@@ -267,7 +278,7 @@ class test {
 
     void testJoin() {
         IPage<UserDTO> iPage = userMapper.selectJoinPage(new Page<>(2, 10), UserDTO.class,
-                new MyLambdaQueryWrapper<UserDO>()
+                new MyJoinLambdaQueryWrapper<UserDO>()
                         .selectAll(UserDO.class)
                         .select(UserAddressDO::getTel)
                         .selectAs(UserAddressDO::getAddress, UserDTO::getUserAddress)

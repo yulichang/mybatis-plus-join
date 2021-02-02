@@ -4,14 +4,19 @@ import com.baomidou.mybatisplus.core.conditions.SharedString;
 import com.baomidou.mybatisplus.core.conditions.query.Query;
 import com.baomidou.mybatisplus.core.conditions.segments.MergeSegments;
 import com.baomidou.mybatisplus.core.metadata.TableFieldInfo;
+import com.baomidou.mybatisplus.core.metadata.TableInfo;
 import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
 import com.baomidou.mybatisplus.core.toolkit.ArrayUtils;
 import com.baomidou.mybatisplus.core.toolkit.StringPool;
+import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.github.mybatisplus.toolkit.Constant;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 /**
  * copy {@link com.baomidou.mybatisplus.core.conditions.query.QueryWrapper}
@@ -77,6 +82,21 @@ public class MyQueryWrapper<T> extends MyAbstractWrapper<T, String, MyQueryWrapp
     public MyQueryWrapper<T> select(Class<T> entityClass, Predicate<TableFieldInfo> predicate) {
         super.setEntityClass(entityClass);
         this.sqlSelect.setStringValue(TableInfoHelper.getTableInfo(getEntityClass()).chooseSelect(predicate));
+        return typedThis;
+    }
+
+
+    public final MyQueryWrapper<T> selectAll(Class<T> clazz) {
+        TableInfo info = TableInfoHelper.getTableInfo(clazz);
+        List<String> list = new ArrayList<>();
+        list.add(Constant.TABLE_ALIAS + StringPool.DOT + info.getKeyColumn());
+        list.addAll(info.getFieldList().stream().map(i -> Constant.TABLE_ALIAS + StringPool.DOT + i.getColumn()).collect(Collectors.toList()));
+        String join = String.join(StringPool.COMMA, list);
+        if (StringUtils.isBlank(sqlSelect.getStringValue())) {
+            this.sqlSelect.setStringValue(join);
+        } else {
+            this.sqlSelect.setStringValue(this.getSqlSelect() + StringPool.COMMA + join);
+        }
         return typedThis;
     }
 

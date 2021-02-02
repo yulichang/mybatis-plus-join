@@ -35,7 +35,8 @@ import static java.util.stream.Collectors.joining;
  */
 @SuppressWarnings({"serial", "unchecked"})
 public abstract class MyAbstractWrapper<T, R, Children extends MyAbstractWrapper<T, R, Children>> extends MyWrapper<T>
-        implements Compare<Children, R>, Nested<Children, Children>, Join<Children>, Func<Children, R> {
+        implements Compare<Children, R>, Nested<Children, Children>, Join<Children>, Func<Children, R>,
+        MyJoin<Children> {
 
     /**
      * 占位符
@@ -515,5 +516,13 @@ public abstract class MyAbstractWrapper<T, R, Children extends MyAbstractWrapper
     @SuppressWarnings("all")
     public Children clone() {
         return SerializationUtils.clone(typedThis);
+    }
+
+    @Override
+    public Children join(String keyWord, boolean condition, String joinSql) {
+        if (condition) {
+            from.setStringValue(from.getStringValue() + keyWord + joinSql);
+        }
+        return typedThis;
     }
 }

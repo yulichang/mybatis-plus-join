@@ -26,11 +26,11 @@ import java.util.stream.Collectors;
  * copy {@link com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper}
  */
 @SuppressWarnings("serial")
-public class MyLambdaQueryWrapper<T> extends MyAbstractLambdaWrapper<T, MyLambdaQueryWrapper<T>>
-        implements MySFunctionQuery<MyLambdaQueryWrapper<T>>, MyLambdaJoin<MyLambdaQueryWrapper<T>> {
+public class MyJoinLambdaQueryWrapper<T> extends MyAbstractLambdaWrapper<T, MyJoinLambdaQueryWrapper<T>>
+        implements MySFunctionQuery<MyJoinLambdaQueryWrapper<T>>, MyLambdaJoin<MyJoinLambdaQueryWrapper<T>> {
 
     /**
-     * 查询字段
+     * 查询字段 sql
      */
     private SharedString sqlSelect = new SharedString();
 
@@ -44,21 +44,23 @@ public class MyLambdaQueryWrapper<T> extends MyAbstractLambdaWrapper<T, MyLambda
      */
     private SharedString alias = new SharedString();
 
-
+    /**
+     * 查询的字段
+     */
     private List<SelectColumn> selectColumns = new ArrayList<>();
 
 
     /**
      * 不建议直接 new 该实例，使用 Wrappers.lambdaQuery(entity)
      */
-    public MyLambdaQueryWrapper() {
+    public MyJoinLambdaQueryWrapper() {
         this((T) null);
     }
 
     /**
      * 不建议直接 new 该实例，使用 Wrappers.lambdaQuery(entity)
      */
-    public MyLambdaQueryWrapper(T entity) {
+    public MyJoinLambdaQueryWrapper(T entity) {
         super.setEntity(entity);
         super.initNeed();
     }
@@ -66,7 +68,7 @@ public class MyLambdaQueryWrapper<T> extends MyAbstractLambdaWrapper<T, MyLambda
     /**
      * 不建议直接 new 该实例，使用 Wrappers.lambdaQuery(entity)
      */
-    public MyLambdaQueryWrapper(Class<T> entityClass) {
+    public MyJoinLambdaQueryWrapper(Class<T> entityClass) {
         super.setEntityClass(entityClass);
         super.initNeed();
     }
@@ -74,9 +76,9 @@ public class MyLambdaQueryWrapper<T> extends MyAbstractLambdaWrapper<T, MyLambda
     /**
      * 不建议直接 new 该实例，使用 Wrappers.lambdaQuery(...)
      */
-    MyLambdaQueryWrapper(T entity, Class<T> entityClass, SharedString sqlSelect, AtomicInteger paramNameSeq,
-                         Map<String, Object> paramNameValuePairs, MergeSegments mergeSegments,
-                         SharedString lastSql, SharedString sqlComment, SharedString sqlFirst) {
+    MyJoinLambdaQueryWrapper(T entity, Class<T> entityClass, SharedString sqlSelect, AtomicInteger paramNameSeq,
+                             Map<String, Object> paramNameValuePairs, MergeSegments mergeSegments,
+                             SharedString lastSql, SharedString sqlComment, SharedString sqlFirst) {
         super.setEntity(entity);
         super.setEntityClass(entityClass);
         this.paramNameSeq = paramNameSeq;
@@ -94,7 +96,7 @@ public class MyLambdaQueryWrapper<T> extends MyAbstractLambdaWrapper<T, MyLambda
      * @param columns 查询字段
      */
     @SafeVarargs
-    public final <S> MyLambdaQueryWrapper<T> select(SFunction<S, ?>... columns) {
+    public final <S> MyJoinLambdaQueryWrapper<T> select(SFunction<S, ?>... columns) {
         if (ArrayUtils.isNotEmpty(columns)) {
             for (SFunction<S, ?> s : columns) {
                 Class<S> clazz = MyLambdaUtils.getEntityClass(s);
@@ -106,7 +108,7 @@ public class MyLambdaQueryWrapper<T> extends MyAbstractLambdaWrapper<T, MyLambda
     }
 
     @Override
-    public <E> MyLambdaQueryWrapper<T> select(Class<E> entityClass, Predicate<TableFieldInfo> predicate) {
+    public <E> MyJoinLambdaQueryWrapper<T> select(Class<E> entityClass, Predicate<TableFieldInfo> predicate) {
         TableInfo info = TableInfoHelper.getTableInfo(entityClass);
         Assert.notNull(info, "table can not be find");
         info.getFieldList().stream().filter(predicate).collect(Collectors.toList()).forEach(
@@ -115,7 +117,7 @@ public class MyLambdaQueryWrapper<T> extends MyAbstractLambdaWrapper<T, MyLambda
     }
 
 
-    public final <S, X> MyLambdaQueryWrapper<T> selectAs(SFunction<S, ?> columns, SFunction<X, ?> alias) {
+    public final <S, X> MyJoinLambdaQueryWrapper<T> selectAs(SFunction<S, ?> columns, SFunction<X, ?> alias) {
         Class<S> clazz = MyLambdaUtils.getEntityClass(columns);
         TableInfo info = TableInfoHelper.getTableInfo(clazz);
         Assert.notNull(info, "table can not be find for lambda");
@@ -123,7 +125,7 @@ public class MyLambdaQueryWrapper<T> extends MyAbstractLambdaWrapper<T, MyLambda
         return typedThis;
     }
 
-    public final MyLambdaQueryWrapper<T> selectAll(Class<?> clazz) {
+    public final MyJoinLambdaQueryWrapper<T> selectAll(Class<?> clazz) {
         TableInfo info = TableInfoHelper.getTableInfo(clazz);
         Assert.notNull(info, "table can not be find -> %s", clazz);
         selectColumns.add(new SelectColumn(clazz, info.getTableName(), info.getKeyColumn(), null));
@@ -158,8 +160,8 @@ public class MyLambdaQueryWrapper<T> extends MyAbstractLambdaWrapper<T, MyLambda
      * <p>故 sqlSelect 不向下传递</p>
      */
     @Override
-    protected MyLambdaQueryWrapper<T> instance() {
-        return new MyLambdaQueryWrapper<>(getEntity(), getEntityClass(), null, paramNameSeq, paramNameValuePairs,
+    protected MyJoinLambdaQueryWrapper<T> instance() {
+        return new MyJoinLambdaQueryWrapper<>(getEntity(), getEntityClass(), null, paramNameSeq, paramNameValuePairs,
                 new MergeSegments(), SharedString.emptyString(), SharedString.emptyString(), SharedString.emptyString());
     }
 
@@ -170,7 +172,7 @@ public class MyLambdaQueryWrapper<T> extends MyAbstractLambdaWrapper<T, MyLambda
     }
 
     @Override
-    public <L, X> MyLambdaQueryWrapper<T> join(String keyWord, boolean condition, Class<L> clazz, SFunction<L, ?> left, SFunction<X, ?> right) {
+    public <L, X> MyJoinLambdaQueryWrapper<T> join(String keyWord, boolean condition, Class<L> clazz, SFunction<L, ?> left, SFunction<X, ?> right) {
         if (condition) {
             TableInfo leftInfo = TableInfoHelper.getTableInfo(clazz);
             TableInfo rightInfo = TableInfoHelper.getTableInfo(MyLambdaUtils.getEntityClass(right));

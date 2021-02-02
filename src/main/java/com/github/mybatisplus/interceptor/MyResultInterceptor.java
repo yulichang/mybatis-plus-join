@@ -24,6 +24,16 @@ import java.util.Objects;
 @Intercepts({@Signature(type = ResultSetHandler.class, method = "handleResultSets", args = {Statement.class})})
 public class MyResultInterceptor implements Interceptor {
 
+    private static Field parameterHandler = null;
+
+    static {
+        try {
+            parameterHandler = DefaultResultSetHandler.class.getDeclaredField("parameterHandler");
+            parameterHandler.setAccessible(true);
+        } catch (NoSuchFieldException e) {
+            e.printStackTrace();
+        }
+    }
 
     @Override
     public Object intercept(Invocation invocation) throws Throwable {
@@ -66,23 +76,20 @@ public class MyResultInterceptor implements Interceptor {
      * @see MybatisParameterHandler
      */
     public static Class<?> getFieldVal(DefaultResultSetHandler handler) {
-        Field[] fieldList = handler.getClass().getDeclaredFields();
-        for (Field f : fieldList) {
-            if (f.getName().equals("parameterHandler")) {
-                f.setAccessible(true);
-                try {
-                    MybatisParameterHandler mybatisParameterHandler = (MybatisParameterHandler) f.get(handler);
-                    Object object = mybatisParameterHandler.getParameterObject();
-                    if (object instanceof Map) {
-                        Map<?, ?> args = (Map<?, ?>) object;
-                        return (Class<?>) args.get(Constant.CLAZZ);
-                    }
-                } catch (Exception e) {
-                    return null;
-                }
+        try {
+            MybatisParameterHandler mybatisParameterHandler = (MybatisParameterHandler) parameterHandler.get(handler);
+            Object object = mybatisParameterHandler.getParameterObject();
+            if (Objects.isNull(object)) {
+                return null;
             }
+            if (object instanceof Map) {
+                Map<?, ?> args = (Map<?, ?>) object;
+                return (Class<?>) args.get(Constant.CLAZZ);
+            }
+            return null;
+        } catch (IllegalAccessException e) {
+            return null;
         }
-        return null;
     }
 
     @Override

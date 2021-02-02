@@ -28,8 +28,8 @@ import java.util.stream.Collectors;
  * sqlSelect 由覆盖改为追加
  */
 @SuppressWarnings("serial")
-public class MyLambdaQuery<T> extends MyAbstractLambda<T, MyLambdaQuery<T>>
-        implements Query<MyLambdaQuery<T>, T, SFunction<T, ?>>, MyJoin<MyLambdaQuery<T>> {
+public class MyLambdaQueryWrapper<T> extends MyAbstractLambdaWrapper<T, MyLambdaQueryWrapper<T>>
+        implements Query<MyLambdaQueryWrapper<T>, T, SFunction<T, ?>>, MyJoin<MyLambdaQueryWrapper<T>> {
 
     /**
      * 查询字段
@@ -45,14 +45,14 @@ public class MyLambdaQuery<T> extends MyAbstractLambda<T, MyLambdaQuery<T>>
     /**
      * 不建议直接 new 该实例，使用 Wrappers.lambdaQuery(entity)
      */
-    public MyLambdaQuery() {
+    public MyLambdaQueryWrapper() {
         this((T) null);
     }
 
     /**
      * 不建议直接 new 该实例，使用 Wrappers.lambdaQuery(entity)
      */
-    public MyLambdaQuery(T entity) {
+    public MyLambdaQueryWrapper(T entity) {
         super.setEntity(entity);
         super.initNeed();
     }
@@ -60,7 +60,7 @@ public class MyLambdaQuery<T> extends MyAbstractLambda<T, MyLambdaQuery<T>>
     /**
      * 不建议直接 new 该实例，使用 Wrappers.lambdaQuery(entity)
      */
-    public MyLambdaQuery(Class<T> entityClass) {
+    public MyLambdaQueryWrapper(Class<T> entityClass) {
         super.setEntityClass(entityClass);
         super.initNeed();
     }
@@ -68,9 +68,9 @@ public class MyLambdaQuery<T> extends MyAbstractLambda<T, MyLambdaQuery<T>>
     /**
      * 不建议直接 new 该实例，使用 Wrappers.lambdaQuery(...)
      */
-    MyLambdaQuery(T entity, Class<T> entityClass, SharedString from, SharedString sqlSelect, AtomicInteger paramNameSeq,
-                  Map<String, Object> paramNameValuePairs, MergeSegments mergeSegments,
-                  SharedString lastSql, SharedString sqlComment, SharedString sqlFirst) {
+    MyLambdaQueryWrapper(T entity, Class<T> entityClass, SharedString from, SharedString sqlSelect, AtomicInteger paramNameSeq,
+                         Map<String, Object> paramNameValuePairs, MergeSegments mergeSegments,
+                         SharedString lastSql, SharedString sqlComment, SharedString sqlFirst) {
         super.setEntity(entity);
         super.setEntityClass(entityClass);
         this.paramNameSeq = paramNameSeq;
@@ -90,7 +90,7 @@ public class MyLambdaQuery<T> extends MyAbstractLambda<T, MyLambdaQuery<T>>
      */
     @SafeVarargs
     @Override
-    public final MyLambdaQuery<T> select(SFunction<T, ?>... columns) {
+    public final MyLambdaQueryWrapper<T> select(SFunction<T, ?>... columns) {
         if (ArrayUtils.isNotEmpty(columns)) {
             String s = columnsToString(false, columns);
             if (StringUtils.isBlank(sqlSelect.getStringValue())) {
@@ -103,7 +103,7 @@ public class MyLambdaQuery<T> extends MyAbstractLambda<T, MyLambdaQuery<T>>
     }
 
     @SafeVarargs
-    public final MyLambdaQuery<T> select(String... columns) {
+    public final MyLambdaQueryWrapper<T> select(String... columns) {
         if (ArrayUtils.isNotEmpty(columns)) {
             String s = String.join(StringPool.COMMA, columns);
             if (StringUtils.isBlank(sqlSelect.getStringValue())) {
@@ -127,7 +127,7 @@ public class MyLambdaQuery<T> extends MyAbstractLambda<T, MyLambdaQuery<T>>
      * @return this
      */
     @Override
-    public MyLambdaQuery<T> select(Class<T> entityClass, Predicate<TableFieldInfo> predicate) {
+    public MyLambdaQueryWrapper<T> select(Class<T> entityClass, Predicate<TableFieldInfo> predicate) {
         if (entityClass == null) {
             entityClass = getEntityClass();
         } else {
@@ -145,7 +145,7 @@ public class MyLambdaQuery<T> extends MyAbstractLambda<T, MyLambdaQuery<T>>
         return typedThis;
     }
 
-    public final MyLambdaQuery<T> selectAll(Class<T> clazz) {
+    public final MyLambdaQueryWrapper<T> selectAll(Class<T> clazz) {
         TableInfo info = TableInfoHelper.getTableInfo(clazz);
         List<String> list = new ArrayList<>();
         list.add(Constant.TABLE_ALIAS + StringPool.DOT + info.getKeyColumn());
@@ -162,8 +162,8 @@ public class MyLambdaQuery<T> extends MyAbstractLambda<T, MyLambdaQuery<T>>
     /**
      * 返回一个支持 lambda 函数写法的 wrapper
      */
-    public MyQuery<T> stringQuery() {
-        return new MyQuery<>(getEntity(), getEntityClass(), paramNameSeq, paramNameValuePairs,
+    public MyQueryWrapper<T> stringQuery() {
+        return new MyQueryWrapper<>(getEntity(), getEntityClass(), paramNameSeq, paramNameValuePairs,
                 expression, sqlSelect, from, lastSql, sqlComment, sqlFirst);
     }
 
@@ -186,8 +186,8 @@ public class MyLambdaQuery<T> extends MyAbstractLambda<T, MyLambdaQuery<T>>
      * <p>故 sqlSelect from不向下传递</p>
      */
     @Override
-    protected MyLambdaQuery<T> instance() {
-        return new MyLambdaQuery<>(getEntity(), getEntityClass(), null, null, paramNameSeq, paramNameValuePairs,
+    protected MyLambdaQueryWrapper<T> instance() {
+        return new MyLambdaQueryWrapper<>(getEntity(), getEntityClass(), null, null, paramNameSeq, paramNameValuePairs,
                 new MergeSegments(), SharedString.emptyString(), SharedString.emptyString(), SharedString.emptyString());
     }
 
@@ -195,14 +195,6 @@ public class MyLambdaQuery<T> extends MyAbstractLambda<T, MyLambdaQuery<T>>
     public void clear() {
         super.clear();
         sqlSelect.toNull();
-    }
-
-    @Override
-    public MyLambdaQuery<T> join(String keyWord, boolean condition, String joinSql) {
-        if (condition) {
-            from.setStringValue(from.getStringValue() + keyWord + joinSql);
-        }
-        return typedThis;
     }
 
 }

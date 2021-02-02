@@ -1,12 +1,13 @@
 package com.github.mybatisplus.wrapper.interfaces;
 
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
+import com.github.mybatisplus.interfaces.BaseJoin;
 import com.github.mybatisplus.toolkit.Constant;
 
 /**
  * @author yulichang
  */
-public interface MyLambdaJoin<Children> {
+public interface MyLambdaJoin<Children> extends BaseJoin {
 
     default <T, X> Children leftJoin(Class<T> clazz, SFunction<T, ?> left, SFunction<X, ?> right) {
         return leftJoin(true, clazz, left, right);

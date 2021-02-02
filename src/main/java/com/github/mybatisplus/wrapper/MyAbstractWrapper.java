@@ -31,7 +31,7 @@ import static java.util.stream.Collectors.joining;
  * copy {@link com.baomidou.mybatisplus.core.conditions.AbstractWrapper}
  */
 @SuppressWarnings({"serial", "unchecked"})
-public abstract class MyAbstractWrapper<T, Children extends MyAbstractWrapper<T, Children>> extends MyWrapper<T>
+public abstract class MyAbstractWrapper<T, Children extends MyAbstractWrapper<T, Children>> extends Wrapper<T>
         implements MyCompare<Children>, Nested<Children, Children>, Join<Children>, MyFunc<Children> {
 
     /**

@@ -37,17 +37,17 @@ public class MyJoinLambdaQueryWrapper<T> extends MyAbstractLambdaWrapper<T, MyJo
     /**
      * 查询表
      */
-    private SharedString from = new SharedString();
+    private final SharedString from = new SharedString();
 
     /**
      * 主表别名
      */
-    private SharedString alias = new SharedString();
+    private final SharedString alias = new SharedString();
 
     /**
      * 查询的字段
      */
-    private List<SelectColumn> selectColumns = new ArrayList<>();
+    private final List<SelectColumn> selectColumns = new ArrayList<>();
 
 
     /**

@@ -1,11 +1,12 @@
 package com.github.mybatisplus.query.interfaces;
 
+import com.github.mybatisplus.interfaces.BaseJoin;
 import com.github.mybatisplus.toolkit.Constant;
 
 /**
  * @author yulichang
  */
-public interface MyJoin<Children> {
+public interface MyJoin<Children> extends BaseJoin {
 
     default Children leftJoin(String joinSql) {
         return leftJoin(true, joinSql);

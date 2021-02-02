@@ -1,5 +1,6 @@
 package com.github.mybatisplus.query;
 
+import com.baomidou.mybatisplus.core.conditions.AbstractWrapper;
 import com.baomidou.mybatisplus.core.conditions.SharedString;
 import com.baomidou.mybatisplus.core.conditions.query.Query;
 import com.baomidou.mybatisplus.core.conditions.segments.MergeSegments;
@@ -9,6 +10,7 @@ import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
 import com.baomidou.mybatisplus.core.toolkit.ArrayUtils;
 import com.baomidou.mybatisplus.core.toolkit.StringPool;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
+import com.github.mybatisplus.query.interfaces.MyJoin;
 import com.github.mybatisplus.toolkit.Constant;
 
 import java.util.ArrayList;
@@ -22,8 +24,8 @@ import java.util.stream.Collectors;
  * copy {@link com.baomidou.mybatisplus.core.conditions.query.QueryWrapper}
  */
 @SuppressWarnings("serial")
-public class MyQueryWrapper<T> extends MyAbstractWrapper<T, String, MyQueryWrapper<T>>
-        implements Query<MyQueryWrapper<T>, T, String> {
+public class MyQueryWrapper<T> extends AbstractWrapper<T, String, MyQueryWrapper<T>>
+        implements Query<MyQueryWrapper<T>, T, String>, MyJoin<MyQueryWrapper<T>> {
 
     /**
      * 查询字段
@@ -31,9 +33,15 @@ public class MyQueryWrapper<T> extends MyAbstractWrapper<T, String, MyQueryWrapp
     private SharedString sqlSelect = new SharedString();
 
     /**
+     * 连表字段
+     */
+    private SharedString from = SharedString.emptyString();
+
+    /**
      * 主表别名
      */
-    private SharedString alias = new SharedString(Constant.TABLE_ALIAS);
+    private final SharedString alias = new SharedString(Constant.TABLE_ALIAS);
+
 
     public MyQueryWrapper() {
         this(null);
@@ -119,7 +127,7 @@ public class MyQueryWrapper<T> extends MyAbstractWrapper<T, String, MyQueryWrapp
      */
     public MyLambdaQueryWrapper<T> lambda() {
         return new MyLambdaQueryWrapper<>(getEntity(), getEntityClass(), from, sqlSelect, paramNameSeq, paramNameValuePairs,
-                 expression, lastSql, sqlComment, sqlFirst);
+                expression, lastSql, sqlComment, sqlFirst);
     }
 
     /**
@@ -138,5 +146,13 @@ public class MyQueryWrapper<T> extends MyAbstractWrapper<T, String, MyQueryWrapp
     public void clear() {
         super.clear();
         sqlSelect.toNull();
+    }
+
+    @Override
+    public MyQueryWrapper<T> join(String keyWord, boolean condition, String joinSql) {
+        if (condition) {
+            from.setStringValue(from.getStringValue() + keyWord + joinSql);
+        }
+        return typedThis;
     }
 }

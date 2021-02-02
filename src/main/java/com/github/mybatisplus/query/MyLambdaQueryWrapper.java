@@ -37,9 +37,14 @@ public class MyLambdaQueryWrapper<T> extends MyAbstractLambdaWrapper<T, MyLambda
     private SharedString sqlSelect = new SharedString();
 
     /**
+     * 连表字段
+     */
+    private SharedString from = SharedString.emptyString();
+
+    /**
      * 主表别名
      */
-    private SharedString alias = new SharedString(Constant.TABLE_ALIAS);
+    private final SharedString alias = new SharedString(Constant.TABLE_ALIAS);
 
 
     /**
@@ -197,4 +202,11 @@ public class MyLambdaQueryWrapper<T> extends MyAbstractLambdaWrapper<T, MyLambda
         sqlSelect.toNull();
     }
 
+    @Override
+    public MyLambdaQueryWrapper<T> join(String keyWord, boolean condition, String joinSql) {
+        if (condition) {
+            from.setStringValue(from.getStringValue() + keyWord + joinSql);
+        }
+        return typedThis;
+    }
 }

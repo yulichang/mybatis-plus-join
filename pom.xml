@@ -103,7 +103,8 @@
                 <configuration>
                     <serverId>ossrh</serverId>
                     <nexusUrl>https://oss.sonatype.org/</nexusUrl>
-                    <autoReleaseAfterClose>true</autoReleaseAfterClose>
+<!--                    <autoReleaseAfterClose>true</autoReleaseAfterClose>-->
+                    <stagingProgressTimeoutMinutes>30</stagingProgressTimeoutMinutes>
                 </configuration>
             </plugin>
         </plugins>
@@ -173,7 +174,8 @@
                         <configuration>
                             <serverId>ossrh</serverId>
                             <nexusUrl>https://oss.sonatype.org/</nexusUrl>
-                            <autoReleaseAfterClose>true</autoReleaseAfterClose>
+<!--                            <autoReleaseAfterClose>true</autoReleaseAfterClose>-->
+                            <stagingProgressTimeoutMinutes>30</stagingProgressTimeoutMinutes>
                         </configuration>
                     </plugin>
                 </plugins>

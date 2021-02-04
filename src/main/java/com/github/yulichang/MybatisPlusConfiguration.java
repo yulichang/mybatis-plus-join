@@ -17,9 +17,4 @@ public class MybatisPlusConfiguration {
         return new MySqlInjector();
     }
 
-//    @Bean
-//    @ConditionalOnMissingBean(MyResultInterceptor.class)
-//    public MyResultInterceptor myResultInterceptor() {
-//        return new MyResultInterceptor();
-//    }
 }

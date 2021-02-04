@@ -15,9 +15,7 @@ import com.github.yulichang.toolkit.MyLambdaUtils;
 import com.github.yulichang.wrapper.interfaces.MyLambdaJoin;
 import com.github.yulichang.wrapper.interfaces.MySFunctionQuery;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -42,13 +40,17 @@ public class MyJoinLambdaQueryWrapper<T> extends MyAbstractLambdaWrapper<T, MyJo
     /**
      * 主表别名
      */
-    private final SharedString alias = new SharedString();
+    private final SharedString alias = new SharedString(Constant.TABLE_ALIAS);
 
     /**
      * 查询的字段
      */
     private final List<SelectColumn> selectColumns = new ArrayList<>();
 
+    /**
+     * 表序号
+     */
+    private int tableIndex = 1;
 
     /**
      * 不建议直接 new 该实例，使用 Wrappers.lambdaQuery(entity)
@@ -99,9 +101,7 @@ public class MyJoinLambdaQueryWrapper<T> extends MyAbstractLambdaWrapper<T, MyJo
     public final <S> MyJoinLambdaQueryWrapper<T> select(SFunction<S, ?>... columns) {
         if (ArrayUtils.isNotEmpty(columns)) {
             for (SFunction<S, ?> s : columns) {
-                Class<S> clazz = MyLambdaUtils.getEntityClass(s);
-                TableInfo info = TableInfoHelper.getTableInfo(clazz);
-                selectColumns.add(new SelectColumn(clazz, info.getTableName(), MyLambdaUtils.getColumn(s), null));
+                selectColumns.add(new SelectColumn(MyLambdaUtils.getEntityClass(s), MyLambdaUtils.getColumn(s), null));
             }
         }
         return typedThis;
@@ -112,25 +112,24 @@ public class MyJoinLambdaQueryWrapper<T> extends MyAbstractLambdaWrapper<T, MyJo
         TableInfo info = TableInfoHelper.getTableInfo(entityClass);
         Assert.notNull(info, "table can not be find");
         info.getFieldList().stream().filter(predicate).collect(Collectors.toList()).forEach(
-                i -> selectColumns.add(new SelectColumn(entityClass, info.getTableName(), i.getColumn(), null)));
+                i -> selectColumns.add(new SelectColumn(entityClass, i.getColumn(), null)));
         return typedThis;
     }
 
 
     public final <S, X> MyJoinLambdaQueryWrapper<T> selectAs(SFunction<S, ?> columns, SFunction<X, ?> alias) {
-        Class<S> clazz = MyLambdaUtils.getEntityClass(columns);
-        TableInfo info = TableInfoHelper.getTableInfo(clazz);
-        Assert.notNull(info, "table can not be find for lambda");
-        selectColumns.add(new SelectColumn(clazz, info.getTableName(), MyLambdaUtils.getColumn(columns), MyLambdaUtils.getName(alias)));
+        selectColumns.add(new SelectColumn(MyLambdaUtils.getEntityClass(columns), MyLambdaUtils.getColumn(columns), MyLambdaUtils.getName(alias)));
         return typedThis;
     }
 
     public final MyJoinLambdaQueryWrapper<T> selectAll(Class<?> clazz) {
         TableInfo info = TableInfoHelper.getTableInfo(clazz);
         Assert.notNull(info, "table can not be find -> %s", clazz);
-        selectColumns.add(new SelectColumn(clazz, info.getTableName(), info.getKeyColumn(), null));
+        if (info.havePK()) {
+            selectColumns.add(new SelectColumn(clazz, info.getKeyColumn(), null));
+        }
         info.getFieldList().forEach(c ->
-                selectColumns.add(new SelectColumn(clazz, info.getTableName(), c.getColumn(), null)));
+                selectColumns.add(new SelectColumn(clazz, c.getColumn(), null)));
         return typedThis;
     }
 
@@ -138,7 +137,7 @@ public class MyJoinLambdaQueryWrapper<T> extends MyAbstractLambdaWrapper<T, MyJo
     public String getSqlSelect() {
         if (StringUtils.isBlank(sqlSelect.getStringValue())) {
             String s = selectColumns.stream().map(i ->
-                    i.getTableName() + StringPool.DOT + i.getColumnName() +
+                    Constant.TABLE_ALIAS + getDefault(subTable.get(i.getClazz())) + StringPool.DOT + i.getColumnName() +
                             (StringUtils.isBlank(i.getAlias()) ? StringPool.EMPTY : (Constant.AS + i.getAlias())))
                     .collect(Collectors.joining(StringPool.COMMA));
             sqlSelect.setStringValue(s);
@@ -174,21 +173,36 @@ public class MyJoinLambdaQueryWrapper<T> extends MyAbstractLambdaWrapper<T, MyJo
     @Override
     public <L, X> MyJoinLambdaQueryWrapper<T> join(String keyWord, boolean condition, Class<L> clazz, SFunction<L, ?> left, SFunction<X, ?> right) {
         if (condition) {
+            subTable.put(clazz, tableIndex);
             TableInfo leftInfo = TableInfoHelper.getTableInfo(clazz);
-            TableInfo rightInfo = TableInfoHelper.getTableInfo(MyLambdaUtils.getEntityClass(right));
 
-            String s = keyWord + leftInfo.getTableName() + Constant.ON + leftInfo.getTableName() + StringPool.DOT
-                    + MyLambdaUtils.getColumn(left) + Constant.EQUALS + rightInfo.getTableName() + StringPool.DOT
-                    + MyLambdaUtils.getColumn(right);
+            StringBuilder sb = new StringBuilder(keyWord)
+                    .append(leftInfo.getTableName())
+                    .append(StringPool.SPACE)
+                    .append(Constant.TABLE_ALIAS)
+                    .append(tableIndex)
+                    .append(StringPool.SPACE)
+                    .append(Constant.ON)
+                    .append(Constant.TABLE_ALIAS)
+                    .append(tableIndex)
+                    .append(StringPool.DOT)
+                    .append(MyLambdaUtils.getColumn(left))
+                    .append(Constant.EQUALS)
+                    .append(Constant.TABLE_ALIAS)
+                    .append(getDefault(subTable.get(MyLambdaUtils.getEntityClass(right))))
+                    .append(StringPool.DOT)
+                    .append(MyLambdaUtils.getColumn(right));
 
+            tableIndex++;
             if (StringUtils.isBlank(from.getStringValue())) {
-                from.setStringValue(s);
+                from.setStringValue(sb.toString());
             } else {
-                from.setStringValue(from.getStringValue() + s);
+                from.setStringValue(from.getStringValue() + sb.toString());
             }
         }
         return typedThis;
     }
+
 
     /**
      * select字段
@@ -197,15 +211,12 @@ public class MyJoinLambdaQueryWrapper<T> extends MyAbstractLambdaWrapper<T, MyJo
 
         private Class<?> clazz;
 
-        private String tableName;
-
         private String columnName;
 
         private String alias;
 
-        public SelectColumn(Class<?> clazz, String tableName, String columnName, String alias) {
+        public SelectColumn(Class<?> clazz, String columnName, String alias) {
             this.clazz = clazz;
-            this.tableName = tableName;
             this.columnName = columnName;
             this.alias = alias;
         }
@@ -216,14 +227,6 @@ public class MyJoinLambdaQueryWrapper<T> extends MyAbstractLambdaWrapper<T, MyJo
 
         public void setClazz(Class<?> clazz) {
             this.clazz = clazz;
-        }
-
-        public String getTableName() {
-            return tableName;
-        }
-
-        public void setTableName(String tableName) {
-            this.tableName = tableName;
         }
 
         public String getColumnName() {

@@ -1,15 +1,10 @@
 package com.github.yulichang.wrapper;
 
-import com.baomidou.mybatisplus.core.metadata.TableInfo;
-import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
-import com.baomidou.mybatisplus.core.toolkit.Assert;
-import com.baomidou.mybatisplus.core.toolkit.LambdaUtils;
 import com.baomidou.mybatisplus.core.toolkit.StringPool;
 import com.baomidou.mybatisplus.core.toolkit.support.ColumnCache;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
-import com.baomidou.mybatisplus.core.toolkit.support.SerializedLambda;
+import com.github.yulichang.toolkit.Constant;
 import com.github.yulichang.toolkit.MyLambdaUtils;
-import org.apache.ibatis.reflection.property.PropertyNamer;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -29,9 +24,9 @@ public abstract class MyAbstractLambdaWrapper<T, Children extends MyAbstractLamb
     private boolean initColumnMap = false;
 
     /**
-     * 参与连接的表<class,别名>
+     * 关联的表
      */
-    protected Map<Class<?>, SubClass<?, ?>> subTable = new HashMap<>();
+    protected final Map<Class<?>, Integer> subTable = new HashMap<>();
 
     @SuppressWarnings("unchecked")
     protected <X> String columnsToString(SFunction<X, ?>... columns) {
@@ -54,89 +49,15 @@ public abstract class MyAbstractLambdaWrapper<T, Children extends MyAbstractLamb
     }
 
     protected String columnToString(SFunction<?, ?> column, boolean onlyColumn) {
-        TableInfo info = TableInfoHelper.getTableInfo(MyLambdaUtils.getEntityClass(column));
-        Assert.notNull(info, "can not find table for lambda");
-        return info.getTableName() + StringPool.DOT + getColumn(LambdaUtils.resolve(column), onlyColumn);
+        return Constant.TABLE_ALIAS + getDefault(subTable.get(MyLambdaUtils.getEntityClass(column))) + StringPool.DOT +
+                MyLambdaUtils.getColumn(column);
     }
 
-
-    /**
-     * 获取 SerializedLambda 对应的列信息，从 lambda 表达式中推测实体类
-     * <p>
-     * 如果获取不到列信息，那么本次条件组装将会失败
-     *
-     * @param lambda     lambda 表达式
-     * @param onlyColumn 如果是，结果: "name", 如果否： "name" as "name"
-     * @return 列
-     * @throws com.baomidou.mybatisplus.core.exceptions.MybatisPlusException 获取不到列信息时抛出异常
-     * @see SerializedLambda#getImplClass()
-     * @see SerializedLambda#getImplMethodName()
-     */
-    private String getColumn(SerializedLambda lambda, boolean onlyColumn) {
-        Class<?> aClass = lambda.getInstantiatedType();
-        tryInitCache(aClass);
-        String fieldName = PropertyNamer.methodToProperty(lambda.getImplMethodName());
-        ColumnCache columnCache = getColumnCache(fieldName, aClass);
-        return onlyColumn ? columnCache.getColumn() : columnCache.getColumnSelect();
+    protected String getDefault(Integer i) {
+        if (Objects.nonNull(i)) {
+            return i.toString();
+        }
+        return StringPool.SPACE;
     }
 
-    private void tryInitCache(Class<?> lambdaClass) {
-        if (!initColumnMap) {
-            final Class<T> entityClass = getEntityClass();
-            if (entityClass != null) {
-                lambdaClass = entityClass;
-            }
-            columnMap = LambdaUtils.getColumnMap(lambdaClass);
-            initColumnMap = true;
-        }
-        Assert.notNull(columnMap, "can not find lambda cache for this entity [%s]", lambdaClass.getName());
-    }
-
-    private ColumnCache getColumnCache(String fieldName, Class<?> lambdaClass) {
-        ColumnCache columnCache = columnMap.get(LambdaUtils.formatKey(fieldName));
-        if (Objects.isNull(columnCache)) {
-            columnCache = new ColumnCache(fieldName, null);
-        }
-        return columnCache;
-    }
-
-    public static class SubClass<L, R> {
-
-        private String tableAlias;
-
-        private SFunction<L, ?> left;
-
-        private SFunction<R, ?> right;
-
-
-        public SubClass(String tableAlias, SFunction<L, ?> left, SFunction<R, ?> right) {
-            this.tableAlias = tableAlias;
-            this.left = left;
-            this.right = right;
-        }
-
-        public String getTableAlias() {
-            return tableAlias;
-        }
-
-        public void setTableAlias(String tableAlias) {
-            this.tableAlias = tableAlias;
-        }
-
-        public SFunction<L, ?> getLeft() {
-            return left;
-        }
-
-        public void setLeft(SFunction<L, ?> left) {
-            this.left = left;
-        }
-
-        public SFunction<R, ?> getRight() {
-            return right;
-        }
-
-        public void setRight(SFunction<R, ?> right) {
-            this.right = right;
-        }
-    }
 }

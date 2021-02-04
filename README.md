@@ -8,31 +8,38 @@
 
 ### 方法一
 
-1. 将代码down到本地，使用maven install
-
-2. 在自己的项目中添加依赖
+1. 在项目中添加依赖,依赖已经包含了mybatis-plus3.4.2,依赖后无需再次引入mybatis-plus
 
    ```xml
    <dependency>
        <groupId>com.github.yulichang</groupId>
        <artifactId>mybatis-plus-join</artifactId>
-       <version>1.0.0-SNAPSHOT</version>
+       <version>1.0.5</version>
    </dependency>
    ```
 
-### 方法二
+2. 配置插件,添加MyJoinInterceptor
 
-1. 将mybatisplus目录复制到你的工程中的springboot扫描路径下
+```java
 
-2. 添加cglib依赖
+@Configuration
+public class MybatisPlusConfig {
 
-   ```xml
-   <dependency>
-       <groupId>cglib</groupId>
-       <artifactId>cglib</artifactId>
-       <version>3.3.0</version>
-   </dependency>
-   ```
+    /**
+     * 启用连表拦截器
+     */
+    @Bean
+    public MybatisPlusInterceptor paginationInterceptor() {
+        MybatisPlusInterceptor mybatisPlusInterceptor = new MybatisPlusInterceptor();
+        //分页插件
+        mybatisPlusInterceptor.addInnerInterceptor(new PaginationInnerInterceptor());
+        //连表插件
+        mybatisPlusInterceptor.addInnerInterceptor(new MyJoinInterceptor());
+        //可以添加多租户或其他插件
+        return mybatisPlusInterceptor;
+    }
+}
+```
 
 ### 使用
 
@@ -40,12 +47,12 @@
 * service继承MyBaseService (可选)
 * serviceImpl继承MyBaseServiceImpl (可选)
 
-1. MyBaseMapper继承BaseMapper,在原有的方法基础上又添加了以下方法:  
-    * selectJoinOne 连表查询一条记录对象  
-    * selectJoinList 连表查询返回命中记录对象集合  
-    * selectJoinPage 连表分页查询对象集合  
-    * selectJoinMap 连表查询一条记录返回Map  
-    * selectJoinMaps 连表查询返回命中记录Map集合  
+1. MyBaseMapper继承BaseMapper,在原有的方法基础上又添加了以下方法:
+    * selectJoinOne 连表查询一条记录对象
+    * selectJoinList 连表查询返回命中记录对象集合
+    * selectJoinPage 连表分页查询对象集合
+    * selectJoinMap 连表查询一条记录返回Map
+    * selectJoinMaps 连表查询返回命中记录Map集合
     * selectJoinMapsPage 连表分页查询返回Map集合
 
 2. MyBaseService 继承了IService,同样添加以上方法
@@ -189,34 +196,33 @@ class test {
 对应sql
 
 ```mysql
-SELECT 
-    t.id,
-    t.name,
-    t.sex,
-    t.head_img,
-    addr.tel,
-    addr.address,
-    CASE t.sex WHEN '男' THEN '1' ELSE '0' END AS sex,
-    sum(a.province) as province
-FROM 
-    user t
-    LEFT JOIN (select * from user_address) addr on t.id = addr.user_id
-    RIGHT JOIN area a on addr.area_id = a.id
-WHERE
-    t.id = ?
-    AND addr.tel LIKE ?
-    AND a.province <= ?)
-ORDER BY 
-    addr.id DESC
+SELECT t.id,
+       t.name,
+       t.sex,
+       t.head_img,
+       addr.tel,
+       addr.address,
+       CASE t.sex WHEN '男' THEN '1' ELSE '0' END AS sex,
+       sum(a.province)                           as province
+FROM user t
+         LEFT JOIN (select * from user_address) addr on t.id = addr.user_id
+         RIGHT JOIN area a on addr.area_id = a.id
+WHERE t.id = ?
+  AND addr.tel LIKE ?
+  AND a.province <= ?)
+ORDER BY
+    addr.id
+DESC
 ```
 
 ## MyJoinLambdaQueryWrapper用法
 
-MyJoinLambdaQueryWrapper与MyLambdaQueryWrapper不同,是一套新的支持多表的wrapper
+MyJoinLambdaQueryWrapper与上面连个Wrapper不同,是一套新的支持多表的wrapper   
+MyQueryWrapper是基于QueryWrapper扩展的
 MyLambdaQueryWrapper是基于LambdaQueryWrapper扩展的
 而LambdaQueryWrapper由于泛型约束,不支持扩展成多表的lambdaWrapper
 
-#### MyJoinLambdaQueryWrapper更符合面向对象(OOP),没有魔术值,全部基于lambda,但灵活性不如上面的
+#### MyJoinLambdaQueryWrapper示例
 
 #### 简单的3表查询
 

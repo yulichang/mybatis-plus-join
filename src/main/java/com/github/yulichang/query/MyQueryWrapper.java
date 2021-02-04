@@ -97,7 +97,9 @@ public class MyQueryWrapper<T> extends AbstractWrapper<T, String, MyQueryWrapper
     public final MyQueryWrapper<T> selectAll(Class<T> clazz) {
         TableInfo info = TableInfoHelper.getTableInfo(clazz);
         List<String> list = new ArrayList<>();
-        list.add(Constant.TABLE_ALIAS + StringPool.DOT + info.getKeyColumn());
+        if (info.havePK()) {
+            list.add(Constant.TABLE_ALIAS + StringPool.DOT + info.getKeyColumn());
+        }
         list.addAll(info.getFieldList().stream().map(i -> Constant.TABLE_ALIAS + StringPool.DOT + i.getColumn()).collect(Collectors.toList()));
         String join = String.join(StringPool.COMMA, list);
         if (StringUtils.isBlank(sqlSelect.getStringValue())) {

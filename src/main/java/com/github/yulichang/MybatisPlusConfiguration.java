@@ -1,7 +1,6 @@
 package com.github.yulichang;
 
 import com.github.yulichang.injector.MySqlInjector;
-import com.github.yulichang.interceptor.MyResultInterceptor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -18,9 +17,9 @@ public class MybatisPlusConfiguration {
         return new MySqlInjector();
     }
 
-    @Bean
-    @ConditionalOnMissingBean(MyResultInterceptor.class)
-    public MyResultInterceptor myResultInterceptor() {
-        return new MyResultInterceptor();
-    }
+//    @Bean
+//    @ConditionalOnMissingBean(MyResultInterceptor.class)
+//    public MyResultInterceptor myResultInterceptor() {
+//        return new MyResultInterceptor();
+//    }
 }

@@ -33,7 +33,7 @@
         <jdkVersion>1.8</jdkVersion>
         <jdkVersion.test>1.8</jdkVersion.test>
     </properties>
-
+    <!--  only dependency mybatis-plus-boot-starter -->
     <dependencies>
         <dependency>
             <groupId>com.baomidou</groupId>
@@ -41,15 +41,7 @@
             <version>3.4.2</version>
             <scope>compile</scope>
         </dependency>
-
-        <dependency>
-            <groupId>cglib</groupId>
-            <artifactId>cglib</artifactId>
-            <version>3.3.0</version>
-            <scope>compile</scope>
-        </dependency>
     </dependencies>
-
 
     <build>
         <plugins>
@@ -103,7 +95,7 @@
                 <configuration>
                     <serverId>ossrh</serverId>
                     <nexusUrl>https://oss.sonatype.org/</nexusUrl>
-<!--                    <autoReleaseAfterClose>true</autoReleaseAfterClose>-->
+                    <!--                    <autoReleaseAfterClose>true</autoReleaseAfterClose>-->
                     <stagingProgressTimeoutMinutes>30</stagingProgressTimeoutMinutes>
                 </configuration>
             </plugin>
@@ -174,7 +166,7 @@
                         <configuration>
                             <serverId>ossrh</serverId>
                             <nexusUrl>https://oss.sonatype.org/</nexusUrl>
-<!--                            <autoReleaseAfterClose>true</autoReleaseAfterClose>-->
+                            <!--                            <autoReleaseAfterClose>true</autoReleaseAfterClose>-->
                             <stagingProgressTimeoutMinutes>30</stagingProgressTimeoutMinutes>
                         </configuration>
                     </plugin>

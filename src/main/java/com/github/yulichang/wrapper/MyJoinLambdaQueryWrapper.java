@@ -15,7 +15,9 @@ import com.github.yulichang.toolkit.MyLambdaUtils;
 import com.github.yulichang.wrapper.interfaces.MyLambdaJoin;
 import com.github.yulichang.wrapper.interfaces.MySFunctionQuery;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -23,7 +25,7 @@ import java.util.stream.Collectors;
 /**
  * copy {@link com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper}
  */
-@SuppressWarnings("serial")
+@SuppressWarnings("all")
 public class MyJoinLambdaQueryWrapper<T> extends MyAbstractLambdaWrapper<T, MyJoinLambdaQueryWrapper<T>>
         implements MySFunctionQuery<MyJoinLambdaQueryWrapper<T>>, MyLambdaJoin<MyJoinLambdaQueryWrapper<T>> {
 
@@ -99,7 +101,12 @@ public class MyJoinLambdaQueryWrapper<T> extends MyAbstractLambdaWrapper<T, MyJo
      */
     @SafeVarargs
     public final <S> MyJoinLambdaQueryWrapper<T> select(SFunction<S, ?>... columns) {
-        if (ArrayUtils.isNotEmpty(columns)) {
+        return select(true, columns);
+    }
+
+    @SafeVarargs
+    public final <S> MyJoinLambdaQueryWrapper<T> select(boolean condition, SFunction<S, ?>... columns) {
+        if (condition && ArrayUtils.isNotEmpty(columns)) {
             for (SFunction<S, ?> s : columns) {
                 selectColumns.add(new SelectColumn(MyLambdaUtils.getEntityClass(s), MyLambdaUtils.getColumn(s), null));
             }
@@ -109,29 +116,48 @@ public class MyJoinLambdaQueryWrapper<T> extends MyAbstractLambdaWrapper<T, MyJo
 
     @Override
     public <E> MyJoinLambdaQueryWrapper<T> select(Class<E> entityClass, Predicate<TableFieldInfo> predicate) {
-        TableInfo info = TableInfoHelper.getTableInfo(entityClass);
-        Assert.notNull(info, "table can not be find");
-        info.getFieldList().stream().filter(predicate).collect(Collectors.toList()).forEach(
-                i -> selectColumns.add(new SelectColumn(entityClass, i.getColumn(), null)));
+        return select(true, entityClass, predicate);
+    }
+
+    public <E> MyJoinLambdaQueryWrapper<T> select(boolean condition, Class<E> entityClass, Predicate<TableFieldInfo> predicate) {
+        if (condition) {
+            TableInfo info = TableInfoHelper.getTableInfo(entityClass);
+            Assert.notNull(info, "table can not be find");
+            info.getFieldList().stream().filter(predicate).collect(Collectors.toList()).forEach(
+                    i -> selectColumns.add(new SelectColumn(entityClass, i.getColumn(), null)));
+        }
         return typedThis;
     }
 
 
     public final <S, X> MyJoinLambdaQueryWrapper<T> selectAs(SFunction<S, ?> columns, SFunction<X, ?> alias) {
-        selectColumns.add(new SelectColumn(MyLambdaUtils.getEntityClass(columns), MyLambdaUtils.getColumn(columns), MyLambdaUtils.getName(alias)));
+        return selectAs(true, columns, alias);
+    }
+
+    public final <S, X> MyJoinLambdaQueryWrapper<T> selectAs(boolean condition, SFunction<S, ?> columns, SFunction<X, ?> alias) {
+        if (condition) {
+            selectColumns.add(new SelectColumn(MyLambdaUtils.getEntityClass(columns), MyLambdaUtils.getColumn(columns), MyLambdaUtils.getName(alias)));
+        }
         return typedThis;
     }
 
     public final MyJoinLambdaQueryWrapper<T> selectAll(Class<?> clazz) {
-        TableInfo info = TableInfoHelper.getTableInfo(clazz);
-        Assert.notNull(info, "table can not be find -> %s", clazz);
-        if (info.havePK()) {
-            selectColumns.add(new SelectColumn(clazz, info.getKeyColumn(), null));
+        return selectAll(clazz);
+    }
+
+    public final MyJoinLambdaQueryWrapper<T> selectAll(boolean condition, Class<?> clazz) {
+        if (condition) {
+            TableInfo info = TableInfoHelper.getTableInfo(clazz);
+            Assert.notNull(info, "table can not be find -> %s", clazz);
+            if (info.havePK()) {
+                selectColumns.add(new SelectColumn(clazz, info.getKeyColumn(), null));
+            }
+            info.getFieldList().forEach(c ->
+                    selectColumns.add(new SelectColumn(clazz, c.getColumn(), null)));
         }
-        info.getFieldList().forEach(c ->
-                selectColumns.add(new SelectColumn(clazz, c.getColumn(), null)));
         return typedThis;
     }
+
 
     @Override
     public String getSqlSelect() {

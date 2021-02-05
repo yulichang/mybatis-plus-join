@@ -27,7 +27,7 @@ import java.util.stream.Collectors;
  * <p>
  * sqlSelect 由覆盖改为追加
  */
-@SuppressWarnings("serial")
+@SuppressWarnings("all")
 public class MyLambdaQueryWrapper<T> extends MyAbstractLambdaWrapper<T, MyLambdaQueryWrapper<T>>
         implements Query<MyLambdaQueryWrapper<T>, T, SFunction<T, ?>>, MyJoin<MyLambdaQueryWrapper<T>> {
 
@@ -96,7 +96,12 @@ public class MyLambdaQueryWrapper<T> extends MyAbstractLambdaWrapper<T, MyLambda
     @SafeVarargs
     @Override
     public final MyLambdaQueryWrapper<T> select(SFunction<T, ?>... columns) {
-        if (ArrayUtils.isNotEmpty(columns)) {
+        return select(true, columns);
+    }
+
+    @SafeVarargs
+    public final MyLambdaQueryWrapper<T> select(boolean condition, SFunction<T, ?>... columns) {
+        if (condition && ArrayUtils.isNotEmpty(columns)) {
             String s = columnsToString(false, columns);
             if (StringUtils.isBlank(sqlSelect.getStringValue())) {
                 this.sqlSelect.setStringValue(s);
@@ -109,7 +114,12 @@ public class MyLambdaQueryWrapper<T> extends MyAbstractLambdaWrapper<T, MyLambda
 
     @SafeVarargs
     public final MyLambdaQueryWrapper<T> select(String... columns) {
-        if (ArrayUtils.isNotEmpty(columns)) {
+        return select(true, columns);
+    }
+
+    @SafeVarargs
+    public final MyLambdaQueryWrapper<T> select(boolean condition, String... columns) {
+        if (condition && ArrayUtils.isNotEmpty(columns)) {
             String s = String.join(StringPool.COMMA, columns);
             if (StringUtils.isBlank(sqlSelect.getStringValue())) {
                 this.sqlSelect.setStringValue(s);
@@ -133,35 +143,47 @@ public class MyLambdaQueryWrapper<T> extends MyAbstractLambdaWrapper<T, MyLambda
      */
     @Override
     public MyLambdaQueryWrapper<T> select(Class<T> entityClass, Predicate<TableFieldInfo> predicate) {
-        if (entityClass == null) {
-            entityClass = getEntityClass();
-        } else {
-            setEntityClass(entityClass);
-        }
-        Assert.notNull(entityClass, "entityClass can not be null");
-        String s = TableInfoHelper.getTableInfo(entityClass).chooseSelect(predicate);
-        List<String> list = Arrays.stream(s.split(StringPool.COMMA)).map(i -> Constant.TABLE_ALIAS + StringPool.DOT + i).collect(Collectors.toList());
-        String join = String.join(StringPool.COMMA, list);
-        if (StringUtils.isBlank(sqlSelect.getStringValue())) {
-            this.sqlSelect.setStringValue(join);
-        } else {
-            this.sqlSelect.setStringValue(this.getSqlSelect() + StringPool.COMMA + join);
+        return select(true, entityClass, predicate);
+    }
+
+    public MyLambdaQueryWrapper<T> select(boolean condition, Class<T> entityClass, Predicate<TableFieldInfo> predicate) {
+        if (condition) {
+            if (entityClass == null) {
+                entityClass = getEntityClass();
+            } else {
+                setEntityClass(entityClass);
+            }
+            Assert.notNull(entityClass, "entityClass can not be null");
+            String s = TableInfoHelper.getTableInfo(entityClass).chooseSelect(predicate);
+            List<String> list = Arrays.stream(s.split(StringPool.COMMA)).map(i -> Constant.TABLE_ALIAS + StringPool.DOT + i).collect(Collectors.toList());
+            String join = String.join(StringPool.COMMA, list);
+            if (StringUtils.isBlank(sqlSelect.getStringValue())) {
+                this.sqlSelect.setStringValue(join);
+            } else {
+                this.sqlSelect.setStringValue(this.getSqlSelect() + StringPool.COMMA + join);
+            }
         }
         return typedThis;
     }
 
     public final MyLambdaQueryWrapper<T> selectAll(Class<T> clazz) {
-        TableInfo info = TableInfoHelper.getTableInfo(clazz);
-        List<String> list = new ArrayList<>();
-        if (info.havePK()) {
-            list.add(Constant.TABLE_ALIAS + StringPool.DOT + info.getKeyColumn());
-        }
-        list.addAll(info.getFieldList().stream().map(i -> Constant.TABLE_ALIAS + StringPool.DOT + i.getColumn()).collect(Collectors.toList()));
-        String join = String.join(StringPool.COMMA, list);
-        if (StringUtils.isBlank(sqlSelect.getStringValue())) {
-            this.sqlSelect.setStringValue(join);
-        } else {
-            this.sqlSelect.setStringValue(this.getSqlSelect() + StringPool.COMMA + join);
+        return selectAll(true, clazz);
+    }
+
+    public final MyLambdaQueryWrapper<T> selectAll(boolean condition, Class<T> clazz) {
+        if (condition) {
+            TableInfo info = TableInfoHelper.getTableInfo(clazz);
+            List<String> list = new ArrayList<>();
+            if (info.havePK()) {
+                list.add(Constant.TABLE_ALIAS + StringPool.DOT + info.getKeyColumn());
+            }
+            list.addAll(info.getFieldList().stream().map(i -> Constant.TABLE_ALIAS + StringPool.DOT + i.getColumn()).collect(Collectors.toList()));
+            String join = String.join(StringPool.COMMA, list);
+            if (StringUtils.isBlank(sqlSelect.getStringValue())) {
+                this.sqlSelect.setStringValue(join);
+            } else {
+                this.sqlSelect.setStringValue(this.getSqlSelect() + StringPool.COMMA + join);
+            }
         }
         return typedThis;
     }

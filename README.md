@@ -1,6 +1,7 @@
 # mybatis-plus-join
 
-支持连表查询的[mybatis-plus](https://gitee.com/baomidou/mybatis-plus)
+支持连表查询的[mybatis-plus](https://gitee.com/baomidou/mybatis-plus)  
+只做增强,不做修改,可以使用原生mybatis-plus全部的功能
 
 ## 使用方法
 
@@ -8,7 +9,8 @@
 
 ### 方法一
 
-1. 在项目中添加依赖,依赖已经包含了mybatis-plus3.4.2,依赖后无需再次引入mybatis-plus
+1. 在项目中添加依赖,依赖已经包含了mybatis-plus-boot-starter<3.4.2><br>
+   依赖后无需再次引入mybatis-plus
 
    ```xml
    <dependency>
@@ -20,26 +22,24 @@
 
 2. 配置插件,添加MyJoinInterceptor
 
-```java
-
-@Configuration
-public class MybatisPlusConfig {
-
-    /**
-     * 启用连表拦截器
-     */
-    @Bean
-    public MybatisPlusInterceptor paginationInterceptor() {
-        MybatisPlusInterceptor mybatisPlusInterceptor = new MybatisPlusInterceptor();
-        //分页插件
-        mybatisPlusInterceptor.addInnerInterceptor(new PaginationInnerInterceptor());
-        //连表插件
-        mybatisPlusInterceptor.addInnerInterceptor(new MyJoinInterceptor());
-        //可以添加多租户或其他插件
-        return mybatisPlusInterceptor;
+    ```java
+    @Configuration
+    public class MybatisPlusConfig {
+        /**
+         * 启用连表拦截器
+         */
+        @Bean
+        public MybatisPlusInterceptor paginationInterceptor() {
+            MybatisPlusInterceptor interceptor = new MybatisPlusInterceptor();
+            //分页插件
+            interceptor.addInnerInterceptor(new PaginationInnerInterceptor());
+            //连表插件
+            interceptor.addInnerInterceptor(new MyJoinInterceptor());
+            //可以添加多租户或其他插件
+            return mybatisPlusInterceptor;
+        }
     }
-}
-```
+    ```
 
 ### 使用
 
@@ -65,6 +65,8 @@ public class MybatisPlusConfig {
 |---|---|---|---|
 |select(String)|支持|<font color=red>**支持**|不支持|
 |select(lambda)|不支持|仅支持主表lambda|所有表lambda|
+|join(String)|支持|支持|不支持|
+|join(lambda)|不支持|不支持|支持|
 |条件String|支持|不支持|不支持|
 |条件lambda|不支持|仅支持主表lambda|所有表lambda|
 
@@ -72,8 +74,8 @@ MyQueryWrapper相当于mp的QueryWrapper
 MyLambdaQueryWrapper相当于mp的LambdaQueryWrapper
 
 两者可以无缝切换  
-MyQueryWrapper.lambda() -> MyLambdaQueryWrapper  
-MyLambdaQueryWrapper.stringQuery() -> MyQueryWrapper
+MyQueryWrapper.lambda() ===> MyLambdaQueryWrapper  
+MyLambdaQueryWrapper.stringQuery() ===> MyQueryWrapper
 
 ## MyQueryWrapper和MyLambdaQueryWrapper
 
@@ -102,22 +104,24 @@ class test {
 
 对应sql
 
-```sql
-SELECT t.id,
-       t.name,
-       t.sex,
-       t.head_img,
-       addr.tel,
-       addr.address,
-       a.province
-FROM user t
-         LEFT JOIN user_address addr on t.id = addr.user_id
-         RIGHT JOIN area a on addr.area_id = a.id
+```
+SELECT 
+    t.id,
+    t.name,
+    t.sex,
+    t.head_img,
+    addr.tel,
+    addr.address,
+    a.province
+FROM 
+    user t
+    LEFT JOIN user_address addr on t.id = addr.user_id
+    RIGHT JOIN area a on addr.area_id = a.id
 WHERE (
-              t.id > ?
-              AND t.sex = ?
-              AND addr.tel LIKE ?
-              AND a.province <= ?)
+    t.id > ?
+    AND t.sex = ?
+    AND addr.tel LIKE ?
+    AND a.province <= ?)
 ```
 
 说明:
@@ -152,17 +156,20 @@ class test {
 
 对应sql
 
-```sql
-SELECT t.id,
-       t.name,
-       t.sex,
-       t.head_img,
-       addr.tel,
-       addr.address,
-       a.province
-FROM user t
-         LEFT JOIN user_address addr on t.id = addr.user_id
-         RIGHT JOIN area a on addr.area_id = a.id LIMIT ?,?
+```
+SELECT 
+    t.id,
+    t.name,
+    t.sex,
+    t.head_img,
+    addr.tel,
+    addr.address,
+    a.province
+FROM 
+    user t
+    LEFT JOIN user_address addr on t.id = addr.user_id
+    RIGHT JOIN area a on addr.area_id = a.id 
+LIMIT ?,?
 ```
 
 ### 还可以这么操作,但不建议
@@ -180,7 +187,7 @@ class test {
                         //行列转换
                         .select("CASE t.sex WHEN '男' THEN '1' ELSE '0' END AS sex")
                         //求和函数
-                        .select("sum(a.province) as province")
+                        .select("sum(a.province) AS province")
                         //自定义数据集
                         .leftJoin("(select * from user_address) addr on t.id = addr.user_id")
                         .rightJoin("area a on addr.area_id = a.id")
@@ -195,31 +202,32 @@ class test {
 
 对应sql
 
-```mysql
-SELECT t.id,
-       t.name,
-       t.sex,
-       t.head_img,
-       addr.tel,
-       addr.address,
-       CASE t.sex WHEN '男' THEN '1' ELSE '0' END AS sex,
-       sum(a.province)                           as province
-FROM user t
-         LEFT JOIN (select * from user_address) addr on t.id = addr.user_id
-         RIGHT JOIN area a on addr.area_id = a.id
-WHERE t.id = ?
-  AND addr.tel LIKE ?
-  AND a.province <= ?)
+```
+SELECT 
+    t.id,
+    t.name,
+    t.sex,
+    t.head_img,
+    addr.tel,
+    addr.address,
+    CASE t.sex WHEN '男' THEN '1' ELSE '0' END AS sex,
+    sum(a.province) AS province
+FROM 
+    user t
+    LEFT JOIN (select * from user_address) addr on t.id = addr.user_id
+    RIGHT JOIN area a on addr.area_id = a.id
+WHERE (
+    t.id = ?
+    AND addr.tel LIKE ?
+    AND a.province <= ?)
 ORDER BY
-    addr.id
-DESC
+    addr.id DESC
 ```
 
 ## MyJoinLambdaQueryWrapper用法
 
 MyJoinLambdaQueryWrapper与上面连个Wrapper不同,是一套新的支持多表的wrapper   
-MyQueryWrapper是基于QueryWrapper扩展的
-MyLambdaQueryWrapper是基于LambdaQueryWrapper扩展的
+MyQueryWrapper是基于QueryWrapper扩展的 MyLambdaQueryWrapper是基于LambdaQueryWrapper扩展的
 而LambdaQueryWrapper由于泛型约束,不支持扩展成多表的lambdaWrapper
 
 #### MyJoinLambdaQueryWrapper示例
@@ -249,22 +257,24 @@ class test {
 
 对应sql
 
-```sql
-SELECT user.id,
-       user.name,
-       user.sex,
-       user.head_img,
-       user_address.tel,
-       user_address.address AS userAddress,
-       area.province,
-       area.city
-FROM user
-         LEFT JOIN user_address ON user_address.user_id = user.id
-         LEFT JOIN area ON area.id = user_address.area_id
+```
+SELECT 
+    user.id,
+    user.name,
+    user.sex,
+    user.head_img,
+    user_address.tel,
+    user_address.address AS userAddress,
+    area.province,
+    area.city
+FROM 
+    user
+    LEFT JOIN user_address ON user_address.user_id = user.id
+    LEFT JOIN area ON area.id = user_address.area_id
 WHERE (
-              user.id = ?
-              AND user_address.tel LIKE ?
-              AND user.id > ?)
+    user.id = ?
+    AND user_address.tel LIKE ?
+    AND user.id > ?)
 ```
 
 说明:
@@ -302,18 +312,20 @@ class test {
 
 对应sql
 
-```mysql
-SELECT user.id,
-       user.name,
-       user.sex,
-       user.head_img,
-       user_address.tel,
-       user_address.address AS userAddress,
-       area.province,
-       area.city
-FROM user
-         LEFT JOIN user_address ON user_address.user_id = user.id
-         LEFT JOIN area ON area.id = user_address.area_id
+```
+SELECT 
+    t.id,
+    t.name,
+    t.sex,
+    t.head_img,
+    t1.tel,
+    t1.address AS userAddress,
+    t2.province,
+    t2.city
+FROM 
+    user t
+    LEFT JOIN user_address t1 ON t1.user_id = t.id
+    LEFT JOIN area t2 ON t2.id = t1.area_id
 LIMIT ?,?
 ```
 

@@ -80,32 +80,50 @@ public class MyQueryWrapper<T> extends AbstractWrapper<T, String, MyQueryWrapper
 
     @Override
     public MyQueryWrapper<T> select(String... columns) {
-        if (ArrayUtils.isNotEmpty(columns)) {
-            this.sqlSelect.setStringValue(String.join(StringPool.COMMA, columns));
+        return select(true, columns);
+    }
+
+    public MyQueryWrapper<T> select(boolean condition, String... columns) {
+        if (condition) {
+            if (ArrayUtils.isNotEmpty(columns)) {
+                this.sqlSelect.setStringValue(String.join(StringPool.COMMA, columns));
+            }
         }
         return typedThis;
     }
 
     @Override
     public MyQueryWrapper<T> select(Class<T> entityClass, Predicate<TableFieldInfo> predicate) {
-        super.setEntityClass(entityClass);
-        this.sqlSelect.setStringValue(TableInfoHelper.getTableInfo(getEntityClass()).chooseSelect(predicate));
+        return select(true, entityClass, predicate);
+    }
+
+    public MyQueryWrapper<T> select(boolean condition, Class<T> entityClass, Predicate<TableFieldInfo> predicate) {
+        if (condition) {
+            super.setEntityClass(entityClass);
+            this.sqlSelect.setStringValue(TableInfoHelper.getTableInfo(getEntityClass()).chooseSelect(predicate));
+        }
         return typedThis;
     }
 
 
     public final MyQueryWrapper<T> selectAll(Class<T> clazz) {
-        TableInfo info = TableInfoHelper.getTableInfo(clazz);
-        List<String> list = new ArrayList<>();
-        if (info.havePK()) {
-            list.add(Constant.TABLE_ALIAS + StringPool.DOT + info.getKeyColumn());
-        }
-        list.addAll(info.getFieldList().stream().map(i -> Constant.TABLE_ALIAS + StringPool.DOT + i.getColumn()).collect(Collectors.toList()));
-        String join = String.join(StringPool.COMMA, list);
-        if (StringUtils.isBlank(sqlSelect.getStringValue())) {
-            this.sqlSelect.setStringValue(join);
-        } else {
-            this.sqlSelect.setStringValue(this.getSqlSelect() + StringPool.COMMA + join);
+        return selectAll(true, clazz);
+    }
+
+    public final MyQueryWrapper<T> selectAll(boolean condition, Class<T> clazz) {
+        if (condition) {
+            TableInfo info = TableInfoHelper.getTableInfo(clazz);
+            List<String> list = new ArrayList<>();
+            if (info.havePK()) {
+                list.add(Constant.TABLE_ALIAS + StringPool.DOT + info.getKeyColumn());
+            }
+            list.addAll(info.getFieldList().stream().map(i -> Constant.TABLE_ALIAS + StringPool.DOT + i.getColumn()).collect(Collectors.toList()));
+            String join = String.join(StringPool.COMMA, list);
+            if (StringUtils.isBlank(sqlSelect.getStringValue())) {
+                this.sqlSelect.setStringValue(join);
+            } else {
+                this.sqlSelect.setStringValue(this.getSqlSelect() + StringPool.COMMA + join);
+            }
         }
         return typedThis;
     }

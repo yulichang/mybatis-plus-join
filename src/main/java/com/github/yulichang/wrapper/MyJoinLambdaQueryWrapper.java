@@ -142,7 +142,7 @@ public class MyJoinLambdaQueryWrapper<T> extends MyAbstractLambdaWrapper<T, MyJo
     }
 
     public final MyJoinLambdaQueryWrapper<T> selectAll(Class<?> clazz) {
-        return selectAll(clazz);
+        return selectAll(true, clazz);
     }
 
     public final MyJoinLambdaQueryWrapper<T> selectAll(boolean condition, Class<?> clazz) {

@@ -19,6 +19,8 @@
        <version>1.0.7</version>
    </dependency>
    ```
+   或者clone代码到本地,执行mvn install,再引入以上依赖
+   <br><br>
 
 2. 配置插件,添加MPJInterceptor
 
@@ -35,6 +37,7 @@
             interceptor.addInnerInterceptor(new PaginationInnerInterceptor());
             //连表插件
             interceptor.addInnerInterceptor(new MPJInterceptor());
+            //多租户,垃圾sql拦截插件......
             return interceptor;
         }
     }

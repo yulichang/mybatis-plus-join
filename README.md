@@ -1,13 +1,14 @@
 # mybatis-plus-join
 
-支持连表查询的[mybatis-plus](https://gitee.com/baomidou/mybatis-plus)  
-只做增强,不做修改,可以使用原生mybatis-plus全部的功能
+* 支持连表查询的[mybatis-plus](https://gitee.com/baomidou/mybatis-plus)  
+  只做增强,不做修改,可以使用原生mybatis-plus全部的功能
+* [演示示例](https://gitee.com/best_handsome/mybatis-plus-join-demo)
 
 ## 使用方法
 
 [goto wiki](https://gitee.com/best_handsome/mybatis-plus-join/wikis)
 
-### 方法一
+### 安装
 
 1. 在项目中添加依赖,依赖已经包含了mybatis-plus-boot-starter<3.4.2><br>
    依赖后无需再次引入mybatis-plus

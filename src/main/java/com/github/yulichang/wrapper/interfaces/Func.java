@@ -14,7 +14,7 @@ import static java.util.stream.Collectors.toList;
  * copy {@link com.baomidou.mybatisplus.core.conditions.interfaces.Func}
  */
 @SuppressWarnings("unchecked")
-public interface MyFunc<Children> extends Serializable {
+public interface Func<Children> extends Serializable {
 
     /**
      * ignore

@@ -12,8 +12,8 @@ import com.baomidou.mybatisplus.core.toolkit.*;
 import com.baomidou.mybatisplus.core.toolkit.sql.SqlUtils;
 import com.baomidou.mybatisplus.core.toolkit.sql.StringEscape;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
-import com.github.yulichang.wrapper.interfaces.MyCompare;
-import com.github.yulichang.wrapper.interfaces.MyFunc;
+import com.github.yulichang.wrapper.interfaces.Compare;
+import com.github.yulichang.wrapper.interfaces.Func;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -31,8 +31,8 @@ import static java.util.stream.Collectors.joining;
  * copy {@link com.baomidou.mybatisplus.core.conditions.AbstractWrapper}
  */
 @SuppressWarnings({"serial", "unchecked"})
-public abstract class MyAbstractWrapper<T, Children extends MyAbstractWrapper<T, Children>> extends Wrapper<T>
-        implements MyCompare<Children>, Nested<Children, Children>, Join<Children>, MyFunc<Children> {
+public abstract class MPJAbstractWrapper<T, Children extends MPJAbstractWrapper<T, Children>> extends Wrapper<T>
+        implements Compare<Children>, Nested<Children, Children>, Join<Children>, Func<Children> {
 
     /**
      * 占位符

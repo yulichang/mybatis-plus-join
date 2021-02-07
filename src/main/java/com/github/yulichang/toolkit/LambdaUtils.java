@@ -1,7 +1,6 @@
 package com.github.yulichang.toolkit;
 
 import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.core.toolkit.LambdaUtils;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.baomidou.mybatisplus.core.toolkit.support.SerializedLambda;
@@ -12,17 +11,17 @@ import java.util.Objects;
 
 /**
  * @author yulichang
- * @see LambdaUtils
+ * @see com.baomidou.mybatisplus.core.toolkit.LambdaUtils
  * @see PropertyNamer
  */
 
-public final class MyLambdaUtils {
+public final class LambdaUtils {
 
     /**
-     * 获取lambda属性名 UserDO::getId -> id
+     * 获取lambda属性名
      */
     public static <T> String getName(SFunction<T, ?> fn) {
-        return PropertyNamer.methodToProperty(LambdaUtils.resolve(fn).getImplMethodName());
+        return PropertyNamer.methodToProperty(com.baomidou.mybatisplus.core.toolkit.LambdaUtils.resolve(fn).getImplMethodName());
     }
 
     /**
@@ -31,7 +30,7 @@ public final class MyLambdaUtils {
      */
     public static <T> String getColumn(SFunction<T, ?> fn) {
 
-        SerializedLambda lambda = LambdaUtils.resolve(fn);
+        SerializedLambda lambda = com.baomidou.mybatisplus.core.toolkit.LambdaUtils.resolve(fn);
         String fieldName = PropertyNamer.methodToProperty(lambda.getImplMethodName());
         try {
             Field field = lambda.getImplClass().getDeclaredField(fieldName);
@@ -46,6 +45,6 @@ public final class MyLambdaUtils {
 
     @SuppressWarnings("unchecked")
     public static <T> Class<T> getEntityClass(SFunction<T, ?> fn) {
-        return (Class<T>) LambdaUtils.resolve(fn).getInstantiatedType();
+        return (Class<T>) com.baomidou.mybatisplus.core.toolkit.LambdaUtils.resolve(fn).getInstantiatedType();
     }
 }

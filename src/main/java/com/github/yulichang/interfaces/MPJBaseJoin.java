@@ -3,5 +3,5 @@ package com.github.yulichang.interfaces;
 /**
  * @author yulichang
  */
-public interface BaseJoin {
+public interface MPJBaseJoin {
 }

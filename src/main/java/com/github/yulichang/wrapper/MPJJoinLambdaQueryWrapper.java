@@ -11,9 +11,9 @@ import com.baomidou.mybatisplus.core.toolkit.StringPool;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.github.yulichang.toolkit.Constant;
-import com.github.yulichang.toolkit.MyLambdaUtils;
-import com.github.yulichang.wrapper.interfaces.MyLambdaJoin;
-import com.github.yulichang.wrapper.interfaces.MySFunctionQuery;
+import com.github.yulichang.toolkit.LambdaUtils;
+import com.github.yulichang.wrapper.interfaces.LambdaJoin;
+import com.github.yulichang.wrapper.interfaces.SFunctionQuery;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,8 +26,8 @@ import java.util.stream.Collectors;
  * copy {@link com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper}
  */
 @SuppressWarnings("all")
-public class MyJoinLambdaQueryWrapper<T> extends MyAbstractLambdaWrapper<T, MyJoinLambdaQueryWrapper<T>>
-        implements MySFunctionQuery<MyJoinLambdaQueryWrapper<T>>, MyLambdaJoin<MyJoinLambdaQueryWrapper<T>> {
+public class MPJJoinLambdaQueryWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJJoinLambdaQueryWrapper<T>>
+        implements SFunctionQuery<MPJJoinLambdaQueryWrapper<T>>, LambdaJoin<MPJJoinLambdaQueryWrapper<T>> {
 
     /**
      * 查询字段 sql
@@ -57,14 +57,14 @@ public class MyJoinLambdaQueryWrapper<T> extends MyAbstractLambdaWrapper<T, MyJo
     /**
      * 不建议直接 new 该实例，使用 Wrappers.lambdaQuery(entity)
      */
-    public MyJoinLambdaQueryWrapper() {
+    public MPJJoinLambdaQueryWrapper() {
         this((T) null);
     }
 
     /**
      * 不建议直接 new 该实例，使用 Wrappers.lambdaQuery(entity)
      */
-    public MyJoinLambdaQueryWrapper(T entity) {
+    public MPJJoinLambdaQueryWrapper(T entity) {
         super.setEntity(entity);
         super.initNeed();
     }
@@ -72,7 +72,7 @@ public class MyJoinLambdaQueryWrapper<T> extends MyAbstractLambdaWrapper<T, MyJo
     /**
      * 不建议直接 new 该实例，使用 Wrappers.lambdaQuery(entity)
      */
-    public MyJoinLambdaQueryWrapper(Class<T> entityClass) {
+    public MPJJoinLambdaQueryWrapper(Class<T> entityClass) {
         super.setEntityClass(entityClass);
         super.initNeed();
     }
@@ -80,9 +80,9 @@ public class MyJoinLambdaQueryWrapper<T> extends MyAbstractLambdaWrapper<T, MyJo
     /**
      * 不建议直接 new 该实例，使用 Wrappers.lambdaQuery(...)
      */
-    MyJoinLambdaQueryWrapper(T entity, Class<T> entityClass, SharedString sqlSelect, AtomicInteger paramNameSeq,
-                             Map<String, Object> paramNameValuePairs, MergeSegments mergeSegments,
-                             SharedString lastSql, SharedString sqlComment, SharedString sqlFirst) {
+    MPJJoinLambdaQueryWrapper(T entity, Class<T> entityClass, SharedString sqlSelect, AtomicInteger paramNameSeq,
+                              Map<String, Object> paramNameValuePairs, MergeSegments mergeSegments,
+                              SharedString lastSql, SharedString sqlComment, SharedString sqlFirst) {
         super.setEntity(entity);
         super.setEntityClass(entityClass);
         this.paramNameSeq = paramNameSeq;
@@ -100,26 +100,26 @@ public class MyJoinLambdaQueryWrapper<T> extends MyAbstractLambdaWrapper<T, MyJo
      * @param columns 查询字段
      */
     @SafeVarargs
-    public final <S> MyJoinLambdaQueryWrapper<T> select(SFunction<S, ?>... columns) {
+    public final <S> MPJJoinLambdaQueryWrapper<T> select(SFunction<S, ?>... columns) {
         return select(true, columns);
     }
 
     @SafeVarargs
-    public final <S> MyJoinLambdaQueryWrapper<T> select(boolean condition, SFunction<S, ?>... columns) {
+    public final <S> MPJJoinLambdaQueryWrapper<T> select(boolean condition, SFunction<S, ?>... columns) {
         if (condition && ArrayUtils.isNotEmpty(columns)) {
             for (SFunction<S, ?> s : columns) {
-                selectColumns.add(new SelectColumn(MyLambdaUtils.getEntityClass(s), MyLambdaUtils.getColumn(s), null));
+                selectColumns.add(new SelectColumn(LambdaUtils.getEntityClass(s), LambdaUtils.getColumn(s), null));
             }
         }
         return typedThis;
     }
 
     @Override
-    public <E> MyJoinLambdaQueryWrapper<T> select(Class<E> entityClass, Predicate<TableFieldInfo> predicate) {
+    public <E> MPJJoinLambdaQueryWrapper<T> select(Class<E> entityClass, Predicate<TableFieldInfo> predicate) {
         return select(true, entityClass, predicate);
     }
 
-    public <E> MyJoinLambdaQueryWrapper<T> select(boolean condition, Class<E> entityClass, Predicate<TableFieldInfo> predicate) {
+    public <E> MPJJoinLambdaQueryWrapper<T> select(boolean condition, Class<E> entityClass, Predicate<TableFieldInfo> predicate) {
         if (condition) {
             TableInfo info = TableInfoHelper.getTableInfo(entityClass);
             Assert.notNull(info, "table can not be find");
@@ -130,22 +130,22 @@ public class MyJoinLambdaQueryWrapper<T> extends MyAbstractLambdaWrapper<T, MyJo
     }
 
 
-    public final <S, X> MyJoinLambdaQueryWrapper<T> selectAs(SFunction<S, ?> columns, SFunction<X, ?> alias) {
+    public final <S, X> MPJJoinLambdaQueryWrapper<T> selectAs(SFunction<S, ?> columns, SFunction<X, ?> alias) {
         return selectAs(true, columns, alias);
     }
 
-    public final <S, X> MyJoinLambdaQueryWrapper<T> selectAs(boolean condition, SFunction<S, ?> columns, SFunction<X, ?> alias) {
+    public final <S, X> MPJJoinLambdaQueryWrapper<T> selectAs(boolean condition, SFunction<S, ?> columns, SFunction<X, ?> alias) {
         if (condition) {
-            selectColumns.add(new SelectColumn(MyLambdaUtils.getEntityClass(columns), MyLambdaUtils.getColumn(columns), MyLambdaUtils.getName(alias)));
+            selectColumns.add(new SelectColumn(LambdaUtils.getEntityClass(columns), LambdaUtils.getColumn(columns), LambdaUtils.getName(alias)));
         }
         return typedThis;
     }
 
-    public final MyJoinLambdaQueryWrapper<T> selectAll(Class<?> clazz) {
+    public final MPJJoinLambdaQueryWrapper<T> selectAll(Class<?> clazz) {
         return selectAll(true, clazz);
     }
 
-    public final MyJoinLambdaQueryWrapper<T> selectAll(boolean condition, Class<?> clazz) {
+    public final MPJJoinLambdaQueryWrapper<T> selectAll(boolean condition, Class<?> clazz) {
         if (condition) {
             TableInfo info = TableInfoHelper.getTableInfo(clazz);
             Assert.notNull(info, "table can not be find -> %s", clazz);
@@ -185,8 +185,8 @@ public class MyJoinLambdaQueryWrapper<T> extends MyAbstractLambdaWrapper<T, MyJo
      * <p>故 sqlSelect 不向下传递</p>
      */
     @Override
-    protected MyJoinLambdaQueryWrapper<T> instance() {
-        return new MyJoinLambdaQueryWrapper<>(getEntity(), getEntityClass(), null, paramNameSeq, paramNameValuePairs,
+    protected MPJJoinLambdaQueryWrapper<T> instance() {
+        return new MPJJoinLambdaQueryWrapper<>(getEntity(), getEntityClass(), null, paramNameSeq, paramNameValuePairs,
                 new MergeSegments(), SharedString.emptyString(), SharedString.emptyString(), SharedString.emptyString());
     }
 
@@ -197,7 +197,7 @@ public class MyJoinLambdaQueryWrapper<T> extends MyAbstractLambdaWrapper<T, MyJo
     }
 
     @Override
-    public <L, X> MyJoinLambdaQueryWrapper<T> join(String keyWord, boolean condition, Class<L> clazz, SFunction<L, ?> left, SFunction<X, ?> right) {
+    public <L, X> MPJJoinLambdaQueryWrapper<T> join(String keyWord, boolean condition, Class<L> clazz, SFunction<L, ?> left, SFunction<X, ?> right) {
         if (condition) {
             subTable.put(clazz, tableIndex);
             TableInfo leftInfo = TableInfoHelper.getTableInfo(clazz);
@@ -212,12 +212,12 @@ public class MyJoinLambdaQueryWrapper<T> extends MyAbstractLambdaWrapper<T, MyJo
                     .append(Constant.TABLE_ALIAS)
                     .append(tableIndex)
                     .append(StringPool.DOT)
-                    .append(MyLambdaUtils.getColumn(left))
+                    .append(LambdaUtils.getColumn(left))
                     .append(Constant.EQUALS)
                     .append(Constant.TABLE_ALIAS)
-                    .append(getDefault(subTable.get(MyLambdaUtils.getEntityClass(right))))
+                    .append(getDefault(subTable.get(LambdaUtils.getEntityClass(right))))
                     .append(StringPool.DOT)
-                    .append(MyLambdaUtils.getColumn(right));
+                    .append(LambdaUtils.getColumn(right));
 
             tableIndex++;
             if (StringUtils.isBlank(from.getStringValue())) {

@@ -13,7 +13,7 @@ import java.util.List;
  * @author yulichang
  * @see AbstractMethod
  */
-public abstract class MyAbstractMethod extends AbstractMethod {
+public abstract class MPJAbstractMethod extends AbstractMethod {
 
     @Override
     protected String sqlSelectColumns(TableInfo table, boolean queryWrapper) {

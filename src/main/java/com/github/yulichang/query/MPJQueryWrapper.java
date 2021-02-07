@@ -10,7 +10,7 @@ import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
 import com.baomidou.mybatisplus.core.toolkit.ArrayUtils;
 import com.baomidou.mybatisplus.core.toolkit.StringPool;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
-import com.github.yulichang.query.interfaces.MyJoin;
+import com.github.yulichang.query.interfaces.MPJJoin;
 import com.github.yulichang.toolkit.Constant;
 
 import java.util.ArrayList;
@@ -24,8 +24,8 @@ import java.util.stream.Collectors;
  * copy {@link com.baomidou.mybatisplus.core.conditions.query.QueryWrapper}
  */
 @SuppressWarnings("serial")
-public class MyQueryWrapper<T> extends AbstractWrapper<T, String, MyQueryWrapper<T>>
-        implements Query<MyQueryWrapper<T>, T, String>, MyJoin<MyQueryWrapper<T>> {
+public class MPJQueryWrapper<T> extends AbstractWrapper<T, String, MPJQueryWrapper<T>>
+        implements Query<MPJQueryWrapper<T>, T, String>, MPJJoin<MPJQueryWrapper<T>> {
 
     /**
      * 查询字段
@@ -43,16 +43,16 @@ public class MyQueryWrapper<T> extends AbstractWrapper<T, String, MyQueryWrapper
     private final SharedString alias = new SharedString(Constant.TABLE_ALIAS);
 
 
-    public MyQueryWrapper() {
+    public MPJQueryWrapper() {
         this(null);
     }
 
-    public MyQueryWrapper(T entity) {
+    public MPJQueryWrapper(T entity) {
         super.setEntity(entity);
         super.initNeed();
     }
 
-    public MyQueryWrapper(T entity, String... columns) {
+    public MPJQueryWrapper(T entity, String... columns) {
         super.setEntity(entity);
         super.initNeed();
         this.select(columns);
@@ -63,9 +63,9 @@ public class MyQueryWrapper<T> extends AbstractWrapper<T, String, MyQueryWrapper
      *
      * @param entityClass 本不应该需要的
      */
-    public MyQueryWrapper(T entity, Class<T> entityClass, AtomicInteger paramNameSeq,
-                          Map<String, Object> paramNameValuePairs, MergeSegments mergeSegments,
-                          SharedString sqlSelect, SharedString from, SharedString lastSql, SharedString sqlComment, SharedString sqlFirst) {
+    public MPJQueryWrapper(T entity, Class<T> entityClass, AtomicInteger paramNameSeq,
+                           Map<String, Object> paramNameValuePairs, MergeSegments mergeSegments,
+                           SharedString sqlSelect, SharedString from, SharedString lastSql, SharedString sqlComment, SharedString sqlFirst) {
         super.setEntity(entity);
         super.setEntityClass(entityClass);
         this.paramNameSeq = paramNameSeq;
@@ -79,11 +79,11 @@ public class MyQueryWrapper<T> extends AbstractWrapper<T, String, MyQueryWrapper
     }
 
     @Override
-    public MyQueryWrapper<T> select(String... columns) {
+    public MPJQueryWrapper<T> select(String... columns) {
         return select(true, columns);
     }
 
-    public MyQueryWrapper<T> select(boolean condition, String... columns) {
+    public MPJQueryWrapper<T> select(boolean condition, String... columns) {
         if (condition) {
             if (ArrayUtils.isNotEmpty(columns)) {
                 this.sqlSelect.setStringValue(String.join(StringPool.COMMA, columns));
@@ -93,11 +93,11 @@ public class MyQueryWrapper<T> extends AbstractWrapper<T, String, MyQueryWrapper
     }
 
     @Override
-    public MyQueryWrapper<T> select(Class<T> entityClass, Predicate<TableFieldInfo> predicate) {
+    public MPJQueryWrapper<T> select(Class<T> entityClass, Predicate<TableFieldInfo> predicate) {
         return select(true, entityClass, predicate);
     }
 
-    public MyQueryWrapper<T> select(boolean condition, Class<T> entityClass, Predicate<TableFieldInfo> predicate) {
+    public MPJQueryWrapper<T> select(boolean condition, Class<T> entityClass, Predicate<TableFieldInfo> predicate) {
         if (condition) {
             super.setEntityClass(entityClass);
             this.sqlSelect.setStringValue(TableInfoHelper.getTableInfo(getEntityClass()).chooseSelect(predicate));
@@ -106,11 +106,11 @@ public class MyQueryWrapper<T> extends AbstractWrapper<T, String, MyQueryWrapper
     }
 
 
-    public final MyQueryWrapper<T> selectAll(Class<T> clazz) {
+    public final MPJQueryWrapper<T> selectAll(Class<T> clazz) {
         return selectAll(true, clazz);
     }
 
-    public final MyQueryWrapper<T> selectAll(boolean condition, Class<T> clazz) {
+    public final MPJQueryWrapper<T> selectAll(boolean condition, Class<T> clazz) {
         if (condition) {
             TableInfo info = TableInfoHelper.getTableInfo(clazz);
             List<String> list = new ArrayList<>();
@@ -145,8 +145,8 @@ public class MyQueryWrapper<T> extends AbstractWrapper<T, String, MyQueryWrapper
     /**
      * 返回一个支持 lambda 函数写法的 wrapper
      */
-    public MyLambdaQueryWrapper<T> lambda() {
-        return new MyLambdaQueryWrapper<>(getEntity(), getEntityClass(), from, sqlSelect, paramNameSeq, paramNameValuePairs,
+    public MPJLambdaQueryWrapper<T> lambda() {
+        return new MPJLambdaQueryWrapper<>(getEntity(), getEntityClass(), from, sqlSelect, paramNameSeq, paramNameValuePairs,
                 expression, lastSql, sqlComment, sqlFirst);
     }
 
@@ -157,8 +157,8 @@ public class MyQueryWrapper<T> extends AbstractWrapper<T, String, MyQueryWrapper
      * </p>
      */
     @Override
-    protected MyQueryWrapper<T> instance() {
-        return new MyQueryWrapper<>(getEntity(), getEntityClass(), paramNameSeq, paramNameValuePairs, new MergeSegments(),
+    protected MPJQueryWrapper<T> instance() {
+        return new MPJQueryWrapper<>(getEntity(), getEntityClass(), paramNameSeq, paramNameValuePairs, new MergeSegments(),
                 null, null, SharedString.emptyString(), SharedString.emptyString(), SharedString.emptyString());
     }
 
@@ -169,7 +169,7 @@ public class MyQueryWrapper<T> extends AbstractWrapper<T, String, MyQueryWrapper
     }
 
     @Override
-    public MyQueryWrapper<T> join(String keyWord, boolean condition, String joinSql) {
+    public MPJQueryWrapper<T> join(String keyWord, boolean condition, String joinSql) {
         if (condition) {
             from.setStringValue(from.getStringValue() + keyWord + joinSql);
         }

@@ -1,6 +1,6 @@
 package com.github.yulichang;
 
-import com.github.yulichang.injector.MySqlInjector;
+import com.github.yulichang.injector.MPJSqlInjector;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -12,9 +12,9 @@ import org.springframework.context.annotation.Configuration;
 public class MybatisPlusConfiguration {
 
     @Bean
-    @ConditionalOnMissingBean(MySqlInjector.class)
-    public MySqlInjector mySqlInjector() {
-        return new MySqlInjector();
+    @ConditionalOnMissingBean(MPJSqlInjector.class)
+    public MPJSqlInjector mySqlInjector() {
+        return new MPJSqlInjector();
     }
 
 }

@@ -11,7 +11,7 @@ import com.baomidou.mybatisplus.core.toolkit.Assert;
 import com.baomidou.mybatisplus.core.toolkit.StringPool;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
-import com.github.yulichang.query.interfaces.MyJoin;
+import com.github.yulichang.query.interfaces.MPJJoin;
 import com.github.yulichang.toolkit.Constant;
 
 import java.util.ArrayList;
@@ -28,8 +28,8 @@ import java.util.stream.Collectors;
  * sqlSelect 由覆盖改为追加
  */
 @SuppressWarnings("all")
-public class MyLambdaQueryWrapper<T> extends MyAbstractLambdaWrapper<T, MyLambdaQueryWrapper<T>>
-        implements Query<MyLambdaQueryWrapper<T>, T, SFunction<T, ?>>, MyJoin<MyLambdaQueryWrapper<T>> {
+public class MPJLambdaQueryWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaQueryWrapper<T>>
+        implements Query<MPJLambdaQueryWrapper<T>, T, SFunction<T, ?>>, MPJJoin<MPJLambdaQueryWrapper<T>> {
 
     /**
      * 查询字段
@@ -50,14 +50,14 @@ public class MyLambdaQueryWrapper<T> extends MyAbstractLambdaWrapper<T, MyLambda
     /**
      * 不建议直接 new 该实例，使用 Wrappers.lambdaQuery(entity)
      */
-    public MyLambdaQueryWrapper() {
+    public MPJLambdaQueryWrapper() {
         this((T) null);
     }
 
     /**
      * 不建议直接 new 该实例，使用 Wrappers.lambdaQuery(entity)
      */
-    public MyLambdaQueryWrapper(T entity) {
+    public MPJLambdaQueryWrapper(T entity) {
         super.setEntity(entity);
         super.initNeed();
     }
@@ -65,7 +65,7 @@ public class MyLambdaQueryWrapper<T> extends MyAbstractLambdaWrapper<T, MyLambda
     /**
      * 不建议直接 new 该实例，使用 Wrappers.lambdaQuery(entity)
      */
-    public MyLambdaQueryWrapper(Class<T> entityClass) {
+    public MPJLambdaQueryWrapper(Class<T> entityClass) {
         super.setEntityClass(entityClass);
         super.initNeed();
     }
@@ -73,9 +73,9 @@ public class MyLambdaQueryWrapper<T> extends MyAbstractLambdaWrapper<T, MyLambda
     /**
      * 不建议直接 new 该实例，使用 Wrappers.lambdaQuery(...)
      */
-    MyLambdaQueryWrapper(T entity, Class<T> entityClass, SharedString from, SharedString sqlSelect, AtomicInteger paramNameSeq,
-                         Map<String, Object> paramNameValuePairs, MergeSegments mergeSegments,
-                         SharedString lastSql, SharedString sqlComment, SharedString sqlFirst) {
+    MPJLambdaQueryWrapper(T entity, Class<T> entityClass, SharedString from, SharedString sqlSelect, AtomicInteger paramNameSeq,
+                          Map<String, Object> paramNameValuePairs, MergeSegments mergeSegments,
+                          SharedString lastSql, SharedString sqlComment, SharedString sqlFirst) {
         super.setEntity(entity);
         super.setEntityClass(entityClass);
         this.paramNameSeq = paramNameSeq;
@@ -95,12 +95,12 @@ public class MyLambdaQueryWrapper<T> extends MyAbstractLambdaWrapper<T, MyLambda
      */
     @SafeVarargs
     @Override
-    public final MyLambdaQueryWrapper<T> select(SFunction<T, ?>... columns) {
+    public final MPJLambdaQueryWrapper<T> select(SFunction<T, ?>... columns) {
         return select(true, columns);
     }
 
     @SafeVarargs
-    public final MyLambdaQueryWrapper<T> select(boolean condition, SFunction<T, ?>... columns) {
+    public final MPJLambdaQueryWrapper<T> select(boolean condition, SFunction<T, ?>... columns) {
         if (condition && ArrayUtils.isNotEmpty(columns)) {
             String s = columnsToString(false, columns);
             if (StringUtils.isBlank(sqlSelect.getStringValue())) {
@@ -113,12 +113,12 @@ public class MyLambdaQueryWrapper<T> extends MyAbstractLambdaWrapper<T, MyLambda
     }
 
     @SafeVarargs
-    public final MyLambdaQueryWrapper<T> select(String... columns) {
+    public final MPJLambdaQueryWrapper<T> select(String... columns) {
         return select(true, columns);
     }
 
     @SafeVarargs
-    public final MyLambdaQueryWrapper<T> select(boolean condition, String... columns) {
+    public final MPJLambdaQueryWrapper<T> select(boolean condition, String... columns) {
         if (condition && ArrayUtils.isNotEmpty(columns)) {
             String s = String.join(StringPool.COMMA, columns);
             if (StringUtils.isBlank(sqlSelect.getStringValue())) {
@@ -142,11 +142,11 @@ public class MyLambdaQueryWrapper<T> extends MyAbstractLambdaWrapper<T, MyLambda
      * @return this
      */
     @Override
-    public MyLambdaQueryWrapper<T> select(Class<T> entityClass, Predicate<TableFieldInfo> predicate) {
+    public MPJLambdaQueryWrapper<T> select(Class<T> entityClass, Predicate<TableFieldInfo> predicate) {
         return select(true, entityClass, predicate);
     }
 
-    public MyLambdaQueryWrapper<T> select(boolean condition, Class<T> entityClass, Predicate<TableFieldInfo> predicate) {
+    public MPJLambdaQueryWrapper<T> select(boolean condition, Class<T> entityClass, Predicate<TableFieldInfo> predicate) {
         if (condition) {
             if (entityClass == null) {
                 entityClass = getEntityClass();
@@ -166,11 +166,11 @@ public class MyLambdaQueryWrapper<T> extends MyAbstractLambdaWrapper<T, MyLambda
         return typedThis;
     }
 
-    public final MyLambdaQueryWrapper<T> selectAll(Class<T> clazz) {
+    public final MPJLambdaQueryWrapper<T> selectAll(Class<T> clazz) {
         return selectAll(true, clazz);
     }
 
-    public final MyLambdaQueryWrapper<T> selectAll(boolean condition, Class<T> clazz) {
+    public final MPJLambdaQueryWrapper<T> selectAll(boolean condition, Class<T> clazz) {
         if (condition) {
             TableInfo info = TableInfoHelper.getTableInfo(clazz);
             List<String> list = new ArrayList<>();
@@ -191,8 +191,8 @@ public class MyLambdaQueryWrapper<T> extends MyAbstractLambdaWrapper<T, MyLambda
     /**
      * 返回一个支持 lambda 函数写法的 wrapper
      */
-    public MyQueryWrapper<T> stringQuery() {
-        return new MyQueryWrapper<>(getEntity(), getEntityClass(), paramNameSeq, paramNameValuePairs,
+    public MPJQueryWrapper<T> stringQuery() {
+        return new MPJQueryWrapper<>(getEntity(), getEntityClass(), paramNameSeq, paramNameValuePairs,
                 expression, sqlSelect, from, lastSql, sqlComment, sqlFirst);
     }
 
@@ -215,8 +215,8 @@ public class MyLambdaQueryWrapper<T> extends MyAbstractLambdaWrapper<T, MyLambda
      * <p>故 sqlSelect from不向下传递</p>
      */
     @Override
-    protected MyLambdaQueryWrapper<T> instance() {
-        return new MyLambdaQueryWrapper<>(getEntity(), getEntityClass(), null, null, paramNameSeq, paramNameValuePairs,
+    protected MPJLambdaQueryWrapper<T> instance() {
+        return new MPJLambdaQueryWrapper<>(getEntity(), getEntityClass(), null, null, paramNameSeq, paramNameValuePairs,
                 new MergeSegments(), SharedString.emptyString(), SharedString.emptyString(), SharedString.emptyString());
     }
 
@@ -227,7 +227,7 @@ public class MyLambdaQueryWrapper<T> extends MyAbstractLambdaWrapper<T, MyLambda
     }
 
     @Override
-    public MyLambdaQueryWrapper<T> join(String keyWord, boolean condition, String joinSql) {
+    public MPJLambdaQueryWrapper<T> join(String keyWord, boolean condition, String joinSql) {
         if (condition) {
             from.setStringValue(from.getStringValue() + keyWord + joinSql);
         }

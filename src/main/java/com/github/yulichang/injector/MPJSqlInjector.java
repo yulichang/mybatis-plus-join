@@ -12,7 +12,7 @@ import java.util.List;
  * @author yulichang
  * @see DefaultSqlInjector
  */
-public class MySqlInjector extends DefaultSqlInjector {
+public class MPJSqlInjector extends DefaultSqlInjector {
 
     @Override
     public List<AbstractMethod> getMethodList(Class<?> mapperClass) {

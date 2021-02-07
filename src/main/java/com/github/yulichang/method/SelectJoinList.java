@@ -7,7 +7,7 @@ import org.apache.ibatis.mapping.SqlSource;
 /**
  * copy {@link com.baomidou.mybatisplus.core.injector.methods.SelectMaps}
  */
-public class SelectJoinList extends MyAbstractMethod {
+public class SelectJoinList extends MPJAbstractMethod {
 
     @Override
     public MappedStatement injectMappedStatement(Class<?> mapperClass, Class<?> modelClass, TableInfo tableInfo) {

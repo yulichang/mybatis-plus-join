@@ -4,7 +4,7 @@ import com.baomidou.mybatisplus.core.toolkit.StringPool;
 import com.baomidou.mybatisplus.core.toolkit.support.ColumnCache;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.github.yulichang.toolkit.Constant;
-import com.github.yulichang.toolkit.MyLambdaUtils;
+import com.github.yulichang.toolkit.LambdaUtils;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -17,8 +17,8 @@ import static java.util.stream.Collectors.joining;
  * copy {@link com.baomidou.mybatisplus.core.conditions.AbstractLambdaWrapper}
  */
 @SuppressWarnings("serial")
-public abstract class MyAbstractLambdaWrapper<T, Children extends MyAbstractLambdaWrapper<T, Children>>
-        extends MyAbstractWrapper<T, Children> {
+public abstract class MPJAbstractLambdaWrapper<T, Children extends MPJAbstractLambdaWrapper<T, Children>>
+        extends MPJAbstractWrapper<T, Children> {
 
     private Map<String, ColumnCache> columnMap = null;
     private boolean initColumnMap = false;
@@ -49,8 +49,8 @@ public abstract class MyAbstractLambdaWrapper<T, Children extends MyAbstractLamb
     }
 
     protected String columnToString(SFunction<?, ?> column, boolean onlyColumn) {
-        return Constant.TABLE_ALIAS + getDefault(subTable.get(MyLambdaUtils.getEntityClass(column))) + StringPool.DOT +
-                MyLambdaUtils.getColumn(column);
+        return Constant.TABLE_ALIAS + getDefault(subTable.get(LambdaUtils.getEntityClass(column))) + StringPool.DOT +
+                LambdaUtils.getColumn(column);
     }
 
     protected String getDefault(Integer i) {

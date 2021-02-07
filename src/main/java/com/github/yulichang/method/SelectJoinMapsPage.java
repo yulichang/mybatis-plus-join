@@ -9,7 +9,7 @@ import java.util.Map;
 /**
  * copy {@link com.baomidou.mybatisplus.core.injector.methods.SelectMaps}
  */
-public class SelectJoinMapsPage extends MyAbstractMethod {
+public class SelectJoinMapsPage extends MPJAbstractMethod {
 
     @Override
     public MappedStatement injectMappedStatement(Class<?> mapperClass, Class<?> modelClass, TableInfo tableInfo) {

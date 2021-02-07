@@ -16,11 +16,11 @@
    <dependency>
        <groupId>com.github.yulichang</groupId>
        <artifactId>mybatis-plus-join</artifactId>
-       <version>1.0.6</version>
+       <version>1.0.7</version>
    </dependency>
    ```
 
-2. 配置插件,添加MyJoinInterceptor
+2. 配置插件,添加MPJInterceptor
 
     ```java
     @Configuration
@@ -34,20 +34,19 @@
             //分页插件
             interceptor.addInnerInterceptor(new PaginationInnerInterceptor());
             //连表插件
-            interceptor.addInnerInterceptor(new MyJoinInterceptor());
-            //可以添加多租户或其他插件
-            return mybatisPlusInterceptor;
+            interceptor.addInnerInterceptor(new MPJInterceptor());
+            return interceptor;
         }
     }
     ```
 
 ### 使用
 
-* mapper继承MyBaseMapper (必选)
-* service继承MyBaseService (可选)
-* serviceImpl继承MyBaseServiceImpl (可选)
+* mapper继承MPJBaseMapper (必选)
+* service继承MPJBaseService (可选)
+* serviceImpl继承MPJBaseServiceImpl (可选)
 
-1. MyBaseMapper继承BaseMapper,在原有的方法基础上又添加了以下方法:
+1. MPJBaseMapper继承BaseMapper,在原有的方法基础上又添加了以下方法:
     * selectJoinOne 连表查询一条记录对象
     * selectJoinList 连表查询返回命中记录对象集合
     * selectJoinPage 连表分页查询对象集合
@@ -55,13 +54,13 @@
     * selectJoinMaps 连表查询返回命中记录Map集合
     * selectJoinMapsPage 连表分页查询返回Map集合
 
-2. MyBaseService 继承了IService,同样添加以上方法
+2. MPJBaseService 继承了IService,同样添加以上方法
 
-3. MyBaseServiceImpl 继承了ServiceImpl,同样添加了以上方法
+3. MPJBaseServiceImpl 继承了ServiceImpl,同样添加了以上方法
 
-## 核心类 MyQueryWrapper, MyLambdaQueryWrapper和MyJoinLambdaQueryWrapper
+## 核心类 MPJQueryWrapper,MPJLambdaQueryWrapper和MPJJoinLambdaQueryWrapper
 
-|-|MyQueryWrapper|MyLambdaQueryWrapper|MyJoinLambdaQueryWrapper|
+|-|MPJQueryWrapper|MPJLambdaQueryWrapper|MPJJoinLambdaQueryWrapper|
 |---|---|---|---|
 |select(String)|支持|<font color=red>**支持**|不支持|
 |select(lambda)|不支持|仅支持主表lambda|所有表lambda|
@@ -70,14 +69,14 @@
 |条件String|支持|不支持|不支持|
 |条件lambda|不支持|仅支持主表lambda|所有表lambda|
 
-MyQueryWrapper相当于mp的QueryWrapper  
-MyLambdaQueryWrapper相当于mp的LambdaQueryWrapper
+MPJQueryWrapper相当于mp的QueryWrapper  
+MPJLambdaQueryWrapper相当于mp的LambdaQueryWrapper
 
 两者可以无缝切换  
-MyQueryWrapper.lambda() ===> MyLambdaQueryWrapper  
-MyLambdaQueryWrapper.stringQuery() ===> MyQueryWrapper
+MPJQueryWrapper.lambda() ===> MPJLambdaQueryWrapper  
+MPJLambdaQueryWrapper.stringQuery() ===> MPJQueryWrapper
 
-## MyQueryWrapper和MyLambdaQueryWrapper
+## MPJQueryWrapper和MPJLambdaQueryWrapper
 
 ### 简单的3表查询
 
@@ -88,7 +87,7 @@ class test {
 
     void testJoin() {
         List<UserDTO> list = userMapper.selectJoinList(UserDTO.class,
-                new MyLambdaQueryWrapper<UserDO>()
+                new MPJLambdaQueryWrapper<UserDO>()
                         .selectAll(UserDO.class)
                         .select("addr.tel", "addr.address", "a.province")
                         .leftJoin("user_address addr on t.id = addr.user_id")
@@ -144,7 +143,7 @@ class test {
 
     void testJoin() {
         IPage<UserDTO> page = userMapper.selectJoinPage(new Page<>(1, 10), UserDTO.class,
-                new MyLambdaQueryWrapper<UserDO>()
+                new MPJLambdaQueryWrapper<UserDO>()
                         .selectAll(UserDO.class)
                         .select("addr.tel", "addr.address")
                         .select("a.province")
@@ -181,7 +180,7 @@ class test {
 
     void testJoin() {
         List<UserDTO> list = userMapper.selectJoinList(UserDTO.class,
-                new MyLambdaQueryWrapper<UserDO>()
+                new MPJLambdaQueryWrapper<UserDO>()
                         .selectAll(UserDO.class)
                         .select("addr.tel", "addr.address")
                         //行列转换
@@ -224,13 +223,13 @@ ORDER BY
     addr.id DESC
 ```
 
-## MyJoinLambdaQueryWrapper用法
+## MPJJoinLambdaQueryWrapper用法
 
-MyJoinLambdaQueryWrapper与上面连个Wrapper不同,是一套新的支持多表的wrapper   
-MyQueryWrapper是基于QueryWrapper扩展的 MyLambdaQueryWrapper是基于LambdaQueryWrapper扩展的
+MPJJoinLambdaQueryWrapper与上面连个Wrapper不同,是一套新的支持多表的wrapper   
+MPJQueryWrapper是基于QueryWrapper扩展的MPJLambdaQueryWrapper是基于LambdaQueryWrapper扩展的
 而LambdaQueryWrapper由于泛型约束,不支持扩展成多表的lambdaWrapper
 
-#### MyJoinLambdaQueryWrapper示例
+#### MPJJoinLambdaQueryWrapper示例
 
 #### 简单的3表查询
 
@@ -241,7 +240,7 @@ class test {
 
     void testJoin() {
         List<UserDTO> list = userMapper.selectJoinList(UserDTO.class,
-                new MyJoinLambdaQueryWrapper<UserDO>()
+                new MPJJoinLambdaQueryWrapper<UserDO>()
                         .selectAll(UserDO.class)
                         .select(UserAddressDO::getTel)
                         .selectAs(UserAddressDO::getAddress, UserDTO::getUserAddress)
@@ -299,7 +298,7 @@ class test {
 
     void testJoin() {
         IPage<UserDTO> iPage = userMapper.selectJoinPage(new Page<>(2, 10), UserDTO.class,
-                new MyJoinLambdaQueryWrapper<UserDO>()
+                new MPJJoinLambdaQueryWrapper<UserDO>()
                         .selectAll(UserDO.class)
                         .select(UserAddressDO::getTel)
                         .selectAs(UserAddressDO::getAddress, UserDTO::getUserAddress)

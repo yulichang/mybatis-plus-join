@@ -20,7 +20,7 @@ import java.util.Map;
  *
  * @author yulichang
  */
-public class MyJoinInterceptor implements InnerInterceptor {
+public class MPJInterceptor implements InnerInterceptor {
 
     private static Field type = null;
 

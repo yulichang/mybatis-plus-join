@@ -1,12 +1,12 @@
 package com.github.yulichang.query.interfaces;
 
-import com.github.yulichang.interfaces.BaseJoin;
+import com.github.yulichang.interfaces.MPJBaseJoin;
 import com.github.yulichang.toolkit.Constant;
 
 /**
  * @author yulichang
  */
-public interface MyJoin<Children> extends BaseJoin {
+public interface MPJJoin<Children> extends MPJBaseJoin {
 
     default Children leftJoin(String joinSql) {
         return leftJoin(true, joinSql);

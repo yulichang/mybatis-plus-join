@@ -9,7 +9,7 @@ import java.util.function.BiPredicate;
 /**
  * {@link com.baomidou.mybatisplus.core.conditions.interfaces.Compare}
  */
-public interface MyCompare<Children> extends Serializable {
+public interface Compare<Children> extends Serializable {
 
     /**
      * ignore

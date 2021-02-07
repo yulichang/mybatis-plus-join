@@ -1,13 +1,13 @@
 package com.github.yulichang.wrapper.interfaces;
 
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
-import com.github.yulichang.interfaces.BaseJoin;
+import com.github.yulichang.interfaces.MPJBaseJoin;
 import com.github.yulichang.toolkit.Constant;
 
 /**
  * @author yulichang
  */
-public interface MyLambdaJoin<Children> extends BaseJoin {
+public interface LambdaJoin<Children> extends MPJBaseJoin {
 
     default <T, X> Children leftJoin(Class<T> clazz, SFunction<T, ?> left, SFunction<X, ?> right) {
         return leftJoin(true, clazz, left, right);

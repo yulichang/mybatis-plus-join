@@ -9,7 +9,7 @@ import java.util.function.Predicate;
 /**
  * copy {@link com.baomidou.mybatisplus.core.conditions.query.Query}
  */
-public interface MySFunctionQuery<Children> extends Serializable {
+public interface SFunctionQuery<Children> extends Serializable {
 
     /**
      * 设置查询字段

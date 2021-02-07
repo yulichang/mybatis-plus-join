@@ -19,7 +19,7 @@ import static java.util.stream.Collectors.joining;
  * copy {@link com.baomidou.mybatisplus.core.conditions.AbstractLambdaWrapper}
  */
 @SuppressWarnings("serial")
-public abstract class MyAbstractLambdaWrapper<T, Children extends MyAbstractLambdaWrapper<T, Children>>
+public abstract class MPJAbstractLambdaWrapper<T, Children extends MPJAbstractLambdaWrapper<T, Children>>
         extends AbstractWrapper<T, SFunction<T, ?>, Children> {
 
     private Map<String, ColumnCache> columnMap = null;

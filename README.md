@@ -262,22 +262,22 @@ class test {
 
 ```
 SELECT 
-    user.id,
-    user.name,
-    user.sex,
-    user.head_img,
-    user_address.tel,
-    user_address.address AS userAddress,
-    area.province,
-    area.city
+    t.id,
+    t.name,
+    t.sex,
+    t.head_img,
+    t1.tel,
+    t1.address AS userAddress,
+    t2.province,
+    t2.city 
 FROM 
-    user
-    LEFT JOIN user_address ON user_address.user_id = user.id
-    LEFT JOIN area ON area.id = user_address.area_id
+    user t 
+    LEFT JOIN user_address t1 ON t1.user_id = t.id 
+    LEFT JOIN area t2 ON t2.id = t1.area_id 
 WHERE (
-    user.id = ?
-    AND user_address.tel LIKE ?
-    AND user.id > ?)
+    t.id = ? 
+    AND t1.tel LIKE ? 
+    AND t.id > ?)
 ```
 
 说明:
@@ -291,6 +291,7 @@ WHERE (
   第一个参数:  参与连表的实体类class  
   第二个参数:  连表的ON字段,这个属性必须是第一个参数实体类的属性  
   第三个参数:  参与连表的ON的另一个实体类属性
+* 默认主表别名是t,其他的表别名以先后调用的顺序使用t1,t2,t3....
 * 条件查询,可以查询主表以及参与连接的所有表的字段,全部调用mp原生的方法,正常使用没有sql注入风险
 
 #### 分页查询

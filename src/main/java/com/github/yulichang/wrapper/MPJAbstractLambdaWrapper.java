@@ -57,7 +57,7 @@ public abstract class MPJAbstractLambdaWrapper<T, Children extends MPJAbstractLa
         if (Objects.nonNull(i)) {
             return i.toString();
         }
-        return StringPool.SPACE;
+        return StringPool.EMPTY;
     }
 
 }

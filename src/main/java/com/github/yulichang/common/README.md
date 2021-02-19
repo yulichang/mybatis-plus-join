@@ -2,6 +2,14 @@
 
 ### 使用方法
 
+#### 如需单独使用 请拷贝以下5个类
+
+[com.github.yulichang.common.JoinLambdaWrapper](https://gitee.com/best_handsome/mybatis-plus-join/blob/master/src/main/java/com/github/yulichang/common/JoinLambdaWrapper.java)
+[com.github.yulichang.common.JoinAbstractWrapper](https://gitee.com/best_handsome/mybatis-plus-join/blob/master/src/main/java/com/github/yulichang/common/JoinAbstractLambdaWrapper.java)
+[com.github.yulichang.common.JoinAbstractLambdaWrapper](https://gitee.com/best_handsome/mybatis-plus-join/blob/master/src/main/java/com/github/yulichang/common/JoinAbstractLambdaWrapper.java)
+[com.github.yulichang.wrapper.interfaces.Compare](https://gitee.com/best_handsome/mybatis-plus-join/blob/master/src/main/java/com/github/yulichang/wrapper/interfaces/Compare.java)
+[com.github.yulichang.wrapper.interfaces.Func](https://gitee.com/best_handsome/mybatis-plus-join/blob/master/src/main/java/com/github/yulichang/wrapper/interfaces/Func.java)
+
 #### 不使用表别名
 
 注解:

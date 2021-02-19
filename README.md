@@ -8,6 +8,10 @@
 
 [goto wiki](https://gitee.com/best_handsome/mybatis-plus-join/wikis)
 
+## 通用连表wrapper
+
+[点击跳转至使用方法](https://gitee.com/best_handsome/mybatis-plus-join/tree/master/src/main/java/com/github/yulichang/common)
+
 ### 安装
 
 1. 在项目中添加依赖,依赖已经包含了mybatis-plus-boot-starter<3.4.2><br>
@@ -79,6 +83,108 @@ MPJLambdaQueryWrapper相当于mp的LambdaQueryWrapper
 两者可以无缝切换  
 MPJQueryWrapper.lambda() ===> MPJLambdaQueryWrapper  
 MPJLambdaQueryWrapper.stringQuery() ===> MPJQueryWrapper
+
+## MPJJoinLambdaQueryWrapper用法
+
+#### MPJJoinLambdaQueryWrapper示例
+
+#### 简单的3表查询
+
+```java
+class test {
+    @Resource
+    private UserMapper userMapper;
+
+    void testJoin() {
+        List<UserDTO> list = userMapper.selectJoinList(UserDTO.class,
+                new MPJJoinLambdaQueryWrapper<UserDO>()
+                        .selectAll(UserDO.class)
+                        .select(UserAddressDO::getTel)
+                        .selectAs(UserAddressDO::getAddress, UserDTO::getUserAddress)
+                        .select(AreaDO::getProvince, AreaDO::getCity)
+                        .leftJoin(UserAddressDO.class, UserAddressDO::getUserId, UserDO::getId)
+                        .leftJoin(AreaDO.class, AreaDO::getId, UserAddressDO::getAreaId)
+                        .eq(true, UserDO::getId, 1)
+                        .like(true, UserAddressDO::getTel, "1")
+                        .gt(true, UserDO::getId, 5));
+    }
+}
+```
+
+对应sql
+
+```
+SELECT 
+    t.id,
+    t.name,
+    t.sex,
+    t.head_img,
+    t1.tel,
+    t1.address AS userAddress,
+    t2.province,
+    t2.city 
+FROM 
+    user t 
+    LEFT JOIN user_address t1 ON t1.user_id = t.id 
+    LEFT JOIN area t2 ON t2.id = t1.area_id 
+WHERE (
+    t.id = ? 
+    AND t1.tel LIKE ? 
+    AND t.id > ?)
+```
+
+说明:
+
+* UserDTO.class 查询结果返回类(resultType)
+* selectAll() 查询指定实体类的全部字段
+* select() 查询指定的字段,支持可变参数,同一个select只能查询相同表的字段  
+  故将UserAddressDO和AreaDO分开为两个select()
+* selectAs() 字段别名查询,用于数据库字段与业务实体类属性名不一致时使用
+* leftJoin() 参数说明  
+  第一个参数:  参与连表的实体类class  
+  第二个参数:  连表的ON字段,这个属性必须是第一个参数实体类的属性  
+  第三个参数:  参与连表的ON的另一个实体类属性
+* 默认主表别名是t,其他的表别名以先后调用的顺序使用t1,t2,t3....
+* 条件查询,可以查询主表以及参与连接的所有表的字段,全部调用mp原生的方法,正常使用没有sql注入风险
+
+#### 分页查询
+
+```java
+class test {
+    @Resource
+    private UserMapper userMapper;
+
+    void testJoin() {
+        IPage<UserDTO> iPage = userMapper.selectJoinPage(new Page<>(2, 10), UserDTO.class,
+                new MPJJoinLambdaQueryWrapper<UserDO>()
+                        .selectAll(UserDO.class)
+                        .select(UserAddressDO::getTel)
+                        .selectAs(UserAddressDO::getAddress, UserDTO::getUserAddress)
+                        .select(AreaDO::getProvince, AreaDO::getCity)
+                        .leftJoin(UserAddressDO.class, UserAddressDO::getUserId, UserDO::getId)
+                        .leftJoin(AreaDO.class, AreaDO::getId, UserAddressDO::getAreaId));
+    }
+}
+```
+
+对应sql
+
+```
+SELECT 
+    t.id,
+    t.name,
+    t.sex,
+    t.head_img,
+    t1.tel,
+    t1.address AS userAddress,
+    t2.province,
+    t2.city
+FROM 
+    user t
+    LEFT JOIN user_address t1 ON t1.user_id = t.id
+    LEFT JOIN area t2 ON t2.id = t1.area_id
+LIMIT ?,?
+```
 
 ## MPJQueryWrapper和MPJLambdaQueryWrapper
 
@@ -225,112 +331,6 @@ WHERE (
     AND a.province <= ?)
 ORDER BY
     addr.id DESC
-```
-
-## MPJJoinLambdaQueryWrapper用法
-
-MPJJoinLambdaQueryWrapper与上面连个Wrapper不同,是一套新的支持多表的wrapper   
-MPJQueryWrapper是基于QueryWrapper扩展的MPJLambdaQueryWrapper是基于LambdaQueryWrapper扩展的
-而LambdaQueryWrapper由于泛型约束,不支持扩展成多表的lambdaWrapper
-
-#### MPJJoinLambdaQueryWrapper示例
-
-#### 简单的3表查询
-
-```java
-class test {
-    @Resource
-    private UserMapper userMapper;
-
-    void testJoin() {
-        List<UserDTO> list = userMapper.selectJoinList(UserDTO.class,
-                new MPJJoinLambdaQueryWrapper<UserDO>()
-                        .selectAll(UserDO.class)
-                        .select(UserAddressDO::getTel)
-                        .selectAs(UserAddressDO::getAddress, UserDTO::getUserAddress)
-                        .select(AreaDO::getProvince, AreaDO::getCity)
-                        .leftJoin(UserAddressDO.class, UserAddressDO::getUserId, UserDO::getId)
-                        .leftJoin(AreaDO.class, AreaDO::getId, UserAddressDO::getAreaId)
-                        .eq(true, UserDO::getId, 1)
-                        .like(true, UserAddressDO::getTel, "1")
-                        .gt(true, UserDO::getId, 5));
-    }
-}
-```
-
-对应sql
-
-```
-SELECT 
-    t.id,
-    t.name,
-    t.sex,
-    t.head_img,
-    t1.tel,
-    t1.address AS userAddress,
-    t2.province,
-    t2.city 
-FROM 
-    user t 
-    LEFT JOIN user_address t1 ON t1.user_id = t.id 
-    LEFT JOIN area t2 ON t2.id = t1.area_id 
-WHERE (
-    t.id = ? 
-    AND t1.tel LIKE ? 
-    AND t.id > ?)
-```
-
-说明:
-
-* UserDTO.class 查询结果返回类(resultType)
-* selectAll() 查询指定实体类的全部字段
-* select() 查询指定的字段,支持可变参数,同一个select只能查询相同表的字段  
-  故将UserAddressDO和AreaDO分开为两个select()
-* selectAs() 字段别名查询,用于数据库字段与业务实体类属性名不一致时使用
-* leftJoin() 参数说明  
-  第一个参数:  参与连表的实体类class  
-  第二个参数:  连表的ON字段,这个属性必须是第一个参数实体类的属性  
-  第三个参数:  参与连表的ON的另一个实体类属性
-* 默认主表别名是t,其他的表别名以先后调用的顺序使用t1,t2,t3....
-* 条件查询,可以查询主表以及参与连接的所有表的字段,全部调用mp原生的方法,正常使用没有sql注入风险
-
-#### 分页查询
-
-```java
-class test {
-    @Resource
-    private UserMapper userMapper;
-
-    void testJoin() {
-        IPage<UserDTO> iPage = userMapper.selectJoinPage(new Page<>(2, 10), UserDTO.class,
-                new MPJJoinLambdaQueryWrapper<UserDO>()
-                        .selectAll(UserDO.class)
-                        .select(UserAddressDO::getTel)
-                        .selectAs(UserAddressDO::getAddress, UserDTO::getUserAddress)
-                        .select(AreaDO::getProvince, AreaDO::getCity)
-                        .leftJoin(UserAddressDO.class, UserAddressDO::getUserId, UserDO::getId)
-                        .leftJoin(AreaDO.class, AreaDO::getId, UserAddressDO::getAreaId));
-    }
-}
-```
-
-对应sql
-
-```
-SELECT 
-    t.id,
-    t.name,
-    t.sex,
-    t.head_img,
-    t1.tel,
-    t1.address AS userAddress,
-    t2.province,
-    t2.city
-FROM 
-    user t
-    LEFT JOIN user_address t1 ON t1.user_id = t.id
-    LEFT JOIN area t2 ON t2.id = t1.area_id
-LIMIT ?,?
 ```
 
 # [wiki](https://gitee.com/best_handsome/mybatis-plus-join/wikis)

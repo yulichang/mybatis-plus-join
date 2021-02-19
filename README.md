@@ -21,7 +21,7 @@
    <dependency>
        <groupId>com.github.yulichang</groupId>
        <artifactId>mybatis-plus-join</artifactId>
-       <version>1.0.8</version>
+       <version>1.0.9</version>
    </dependency>
    ```
    或者clone代码到本地,执行mvn install,再引入以上依赖

@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.github.yulichang</groupId>
     <artifactId>mybatis-plus-join</artifactId>
-    <version>1.0.8</version>
+    <version>1.0.9</version>
     <name>mybatis-plus-join</name>
     <description>An enhanced toolkit of Mybatis-Plus to simplify development.</description>
     <url>https://github.com/yulichang/mybatis-plus-join</url>

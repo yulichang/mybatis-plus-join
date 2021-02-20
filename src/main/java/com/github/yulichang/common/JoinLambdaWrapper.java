@@ -74,6 +74,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * {@link com.github.yulichang.common.JoinAbstractLambdaWrapper}
  * {@link com.github.yulichang.wrapper.interfaces.Compare}
  * {@link com.github.yulichang.wrapper.interfaces.Func}
+ * {@link com.github.yulichang.toolkit.LambdaUtils}
  * <p>
  *
  * @author yulichang

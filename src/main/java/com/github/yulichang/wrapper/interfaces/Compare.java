@@ -7,6 +7,8 @@ import java.util.Map;
 import java.util.function.BiPredicate;
 
 /**
+ * 将原来的泛型R改成SFunction<R, ?>
+ * <p>
  * {@link com.baomidou.mybatisplus.core.conditions.interfaces.Compare}
  */
 public interface Compare<Children> extends Serializable {

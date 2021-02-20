@@ -11,6 +11,8 @@ import java.util.function.Consumer;
 import static java.util.stream.Collectors.toList;
 
 /**
+ * 将原来的泛型R改成SFunction<R, ?>
+ * <p>
  * copy {@link com.baomidou.mybatisplus.core.conditions.interfaces.Func}
  */
 @SuppressWarnings("unchecked")
@@ -19,7 +21,7 @@ public interface Func<Children> extends Serializable {
     /**
      * ignore
      */
-    default <R> Children isNull(SFunction<R,?> column) {
+    default <R> Children isNull(SFunction<R, ?> column) {
         return isNull(true, column);
     }
 
@@ -31,12 +33,12 @@ public interface Func<Children> extends Serializable {
      * @param column    字段
      * @return children
      */
-    <R> Children isNull(boolean condition, SFunction<R,?> column);
+    <R> Children isNull(boolean condition, SFunction<R, ?> column);
 
     /**
      * ignore
      */
-    default <R> Children isNotNull(SFunction<R,?> column) {
+    default <R> Children isNotNull(SFunction<R, ?> column) {
         return isNotNull(true, column);
     }
 
@@ -48,12 +50,12 @@ public interface Func<Children> extends Serializable {
      * @param column    字段
      * @return children
      */
-    <R> Children isNotNull(boolean condition, SFunction<R,?> column);
+    <R> Children isNotNull(boolean condition, SFunction<R, ?> column);
 
     /**
      * ignore
      */
-    default <R> Children in(SFunction<R,?> column, Collection<?> coll) {
+    default <R> Children in(SFunction<R, ?> column, Collection<?> coll) {
         return in(true, column, coll);
     }
 
@@ -68,12 +70,12 @@ public interface Func<Children> extends Serializable {
      * @param coll      数据集合
      * @return children
      */
-    <R> Children in(boolean condition, SFunction<R,?> column, Collection<?> coll);
+    <R> Children in(boolean condition, SFunction<R, ?> column, Collection<?> coll);
 
     /**
      * ignore
      */
-    default <R> Children in(SFunction<R,?> column, Object... values) {
+    default <R> Children in(SFunction<R, ?> column, Object... values) {
         return in(true, column, values);
     }
 
@@ -88,7 +90,7 @@ public interface Func<Children> extends Serializable {
      * @param values    数据数组
      * @return children
      */
-    default <R> Children in(boolean condition, SFunction<R,?> column, Object... values) {
+    default <R> Children in(boolean condition, SFunction<R, ?> column, Object... values) {
         return in(condition, column, Arrays.stream(Optional.ofNullable(values).orElseGet(() -> new Object[]{}))
                 .collect(toList()));
     }
@@ -96,7 +98,7 @@ public interface Func<Children> extends Serializable {
     /**
      * ignore
      */
-    default <R> Children notIn(SFunction<R,?> column, Collection<?> coll) {
+    default <R> Children notIn(SFunction<R, ?> column, Collection<?> coll) {
         return notIn(true, column, coll);
     }
 
@@ -109,12 +111,12 @@ public interface Func<Children> extends Serializable {
      * @param coll      数据集合
      * @return children
      */
-    <R> Children notIn(boolean condition, SFunction<R,?> column, Collection<?> coll);
+    <R> Children notIn(boolean condition, SFunction<R, ?> column, Collection<?> coll);
 
     /**
      * ignore
      */
-    default <R> Children notIn(SFunction<R,?> column, Object... value) {
+    default <R> Children notIn(SFunction<R, ?> column, Object... value) {
         return notIn(true, column, value);
     }
 
@@ -127,7 +129,7 @@ public interface Func<Children> extends Serializable {
      * @param values    数据数组
      * @return children
      */
-    default <R> Children notIn(boolean condition, SFunction<R,?> column, Object... values) {
+    default <R> Children notIn(boolean condition, SFunction<R, ?> column, Object... values) {
         return notIn(condition, column, Arrays.stream(Optional.ofNullable(values).orElseGet(() -> new Object[]{}))
                 .collect(toList()));
     }
@@ -135,7 +137,7 @@ public interface Func<Children> extends Serializable {
     /**
      * ignore
      */
-    default <R> Children inSql(SFunction<R,?> column, String inValue) {
+    default <R> Children inSql(SFunction<R, ?> column, String inValue) {
         return inSql(true, column, inValue);
     }
 
@@ -150,12 +152,12 @@ public interface Func<Children> extends Serializable {
      * @param inValue   sql语句
      * @return children
      */
-    <R> Children inSql(boolean condition, SFunction<R,?> column, String inValue);
+    <R> Children inSql(boolean condition, SFunction<R, ?> column, String inValue);
 
     /**
      * ignore
      */
-    default <R> Children notInSql(SFunction<R,?> column, String inValue) {
+    default <R> Children notInSql(SFunction<R, ?> column, String inValue) {
         return notInSql(true, column, inValue);
     }
 
@@ -170,19 +172,19 @@ public interface Func<Children> extends Serializable {
      * @param inValue   sql语句 ---&gt; 1,2,3,4,5,6 或者 select id from table where id &lt; 3
      * @return children
      */
-    <R> Children notInSql(boolean condition, SFunction<R,?> column, String inValue);
+    <R> Children notInSql(boolean condition, SFunction<R, ?> column, String inValue);
 
     /**
      * ignore
      */
-    default <R> Children groupBy(SFunction<R,?> column) {
+    default <R> Children groupBy(SFunction<R, ?> column) {
         return groupBy(true, column);
     }
 
     /**
      * ignore
      */
-    default <R> Children groupBy(SFunction<R,?>... columns) {
+    default <R> Children groupBy(SFunction<R, ?>... columns) {
         return groupBy(true, columns);
     }
 
@@ -194,19 +196,19 @@ public interface Func<Children> extends Serializable {
      * @param columns   字段数组
      * @return children
      */
-    <R> Children groupBy(boolean condition, SFunction<R,?>... columns);
+    <R> Children groupBy(boolean condition, SFunction<R, ?>... columns);
 
     /**
      * ignore
      */
-    default <R> Children orderByAsc(SFunction<R,?> column) {
+    default <R> Children orderByAsc(SFunction<R, ?> column) {
         return orderByAsc(true, column);
     }
 
     /**
      * ignore
      */
-    default <R> Children orderByAsc(SFunction<R,?>... columns) {
+    default <R> Children orderByAsc(SFunction<R, ?>... columns) {
         return orderByAsc(true, columns);
     }
 
@@ -218,21 +220,21 @@ public interface Func<Children> extends Serializable {
      * @param columns   字段数组
      * @return children
      */
-    default <R> Children orderByAsc(boolean condition, SFunction<R,?>... columns) {
+    default <R> Children orderByAsc(boolean condition, SFunction<R, ?>... columns) {
         return orderBy(condition, true, columns);
     }
 
     /**
      * ignore
      */
-    default <R> Children orderByDesc(SFunction<R,?> column) {
+    default <R> Children orderByDesc(SFunction<R, ?> column) {
         return orderByDesc(true, column);
     }
 
     /**
      * ignore
      */
-    default <R> Children orderByDesc(SFunction<R,?>... columns) {
+    default <R> Children orderByDesc(SFunction<R, ?>... columns) {
         return orderByDesc(true, columns);
     }
 
@@ -244,7 +246,7 @@ public interface Func<Children> extends Serializable {
      * @param columns   字段数组
      * @return children
      */
-    default <R> Children orderByDesc(boolean condition, SFunction<R,?>... columns) {
+    default <R> Children orderByDesc(boolean condition, SFunction<R, ?>... columns) {
         return orderBy(condition, false, columns);
     }
 
@@ -257,7 +259,7 @@ public interface Func<Children> extends Serializable {
      * @param columns   字段数组
      * @return children
      */
-    <R> Children orderBy(boolean condition, boolean isAsc, SFunction<R,?>... columns);
+    <R> Children orderBy(boolean condition, boolean isAsc, SFunction<R, ?>... columns);
 
     /**
      * ignore

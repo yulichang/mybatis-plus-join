@@ -11,21 +11,20 @@ import java.util.Objects;
 /**
  * @author yulichang
  * @see com.baomidou.mybatisplus.core.toolkit.LambdaUtils
- * @see PropertyNamer
+ * @see org.apache.ibatis.reflection.property.PropertyNamer
  */
 
 public final class LambdaUtils {
 
     /**
-     * 获取lambda属性名
+     * 获取属性名
      */
     public static <T> String getName(SFunction<T, ?> fn) {
         return PropertyNamer.methodToProperty(com.baomidou.mybatisplus.core.toolkit.LambdaUtils.resolve(fn).getImplMethodName());
     }
 
     /**
-     * 获取列明
-     * 优先获取tableField中的值
+     * 获取列名
      */
     public static <T> String getColumn(SFunction<T, ?> fn) {
         SerializedLambda lambda = com.baomidou.mybatisplus.core.toolkit.LambdaUtils.resolve(fn);

@@ -335,4 +335,6 @@ ORDER BY
 
 # [wiki](https://gitee.com/best_handsome/mybatis-plus-join/wikis)
 
+QQ群:1022221898
+
 

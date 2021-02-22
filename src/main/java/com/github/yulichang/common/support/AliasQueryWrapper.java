@@ -25,6 +25,10 @@ public class AliasQueryWrapper<T> extends QueryWrapper<T> {
      */
     @Override
     protected String columnToString(String column) {
-        return StringUtils.isBlank(alias) ? column : (alias + StringPool.DOT + column);
+        if (column.lastIndexOf(StringPool.DOT) < 0) {
+            return StringUtils.isBlank(alias) ? column : (alias + StringPool.DOT + column);
+        } else {
+            return column;
+        }
     }
 }

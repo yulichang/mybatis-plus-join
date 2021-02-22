@@ -98,7 +98,7 @@ public class JoinLambdaWrapper<T> extends JoinAbstractLambdaWrapper<T, JoinLambd
     /**
      * 不建议直接 new 该实例，使用 Wrappers.lambdaQuery(...)
      */
-    JoinLambdaWrapper(T entity, Class<T> entityClass, SharedString sqlSelect, AtomicInteger paramNameSeq,
+    JoinLambdaWrapper(T entity, Class<T> entityClass, AtomicInteger paramNameSeq,
                       Map<String, Object> paramNameValuePairs, MergeSegments mergeSegments,
                       SharedString lastSql, SharedString sqlComment, SharedString sqlFirst) {
         super.setEntity(entity);
@@ -112,14 +112,9 @@ public class JoinLambdaWrapper<T> extends JoinAbstractLambdaWrapper<T, JoinLambd
         this.sqlFirst = sqlFirst;
     }
 
-
-    /**
-     * 用于生成嵌套 sql
-     * <p>故 sqlSelect 不向下传递</p>
-     */
     @Override
     protected JoinLambdaWrapper<T> instance() {
-        return new JoinLambdaWrapper<>(getEntity(), getEntityClass(), null, paramNameSeq, paramNameValuePairs,
+        return new JoinLambdaWrapper<>(getEntity(), getEntityClass(), paramNameSeq, paramNameValuePairs,
                 new MergeSegments(), SharedString.emptyString(), SharedString.emptyString(), SharedString.emptyString());
     }
 

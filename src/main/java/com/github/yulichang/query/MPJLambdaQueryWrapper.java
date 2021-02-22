@@ -1,5 +1,6 @@
 package com.github.yulichang.query;
 
+import com.baomidou.mybatisplus.core.conditions.AbstractLambdaWrapper;
 import com.baomidou.mybatisplus.core.conditions.SharedString;
 import com.baomidou.mybatisplus.core.conditions.query.Query;
 import com.baomidou.mybatisplus.core.conditions.segments.MergeSegments;
@@ -28,7 +29,7 @@ import java.util.stream.Collectors;
  * sqlSelect 由覆盖改为追加
  */
 @SuppressWarnings("all")
-public class MPJLambdaQueryWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaQueryWrapper<T>>
+public class MPJLambdaQueryWrapper<T> extends AbstractLambdaWrapper<T, MPJLambdaQueryWrapper<T>>
         implements Query<MPJLambdaQueryWrapper<T>, T, SFunction<T, ?>>, MPJJoin<MPJLambdaQueryWrapper<T>> {
 
     /**
@@ -110,6 +111,11 @@ public class MPJLambdaQueryWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLam
             }
         }
         return typedThis;
+    }
+
+    @Override
+    protected String columnToString(SFunction<T, ?> column, boolean onlyColumn) {
+        return Constant.TABLE_ALIAS + StringPool.DOT + super.columnToString(column, onlyColumn);
     }
 
     @SafeVarargs

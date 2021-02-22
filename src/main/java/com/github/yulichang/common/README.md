@@ -2,6 +2,8 @@
 
 [官方自定义sql](https://mp.baomidou.com/guide/wrapper.html#%E4%BD%BF%E7%94%A8-wrapper-%E8%87%AA%E5%AE%9A%E4%B9%89sql)
 
+官方提供的自定义sql不支持表别名和多实体泛型,扩展能力有限,对此就行了优化
+
 ### 使用方法
 
 #### 如需单独使用 请拷贝以下6个类

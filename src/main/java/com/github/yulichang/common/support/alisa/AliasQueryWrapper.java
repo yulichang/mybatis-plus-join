@@ -1,4 +1,4 @@
-package com.github.yulichang.common.support;
+package com.github.yulichang.common.support.alisa;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.StringPool;
@@ -22,6 +22,11 @@ public class AliasQueryWrapper<T> extends QueryWrapper<T> {
 
     /**
      * 重写字段序列化方法
+     * 可以自定义过滤策略可以是空格或其他(以下方法是只为查询字段没有带点 . 的加别名,带点的则不会加)
+     * setAlias("u")
+     * <p>
+     * .eq("id")     --> u.id
+     * .eq("ee.id")  --> ee.id
      */
     @Override
     protected String columnToString(String column) {

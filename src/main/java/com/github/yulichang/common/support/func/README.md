@@ -7,8 +7,8 @@
 ### 使用方法
 
 拷贝以下类即可  
-[com.github.yulichang.common.support.func.F]()  
-[com.github.yulichang.common.support.func.S]()
+[com.github.yulichang.common.support.func.F](https://gitee.com/best_handsome/mybatis-plus-join/blob/master/src/main/java/com/github/yulichang/common/support/func/F.java)  
+[com.github.yulichang.common.support.func.S](https://gitee.com/best_handsome/mybatis-plus-join/blob/master/src/main/java/com/github/yulichang/common/support/func/S.java)
 
 原理:  
 F类以表名+列明的形式序列化 (@TableName与@TableField注解是有效的,会优先使用注解的值)

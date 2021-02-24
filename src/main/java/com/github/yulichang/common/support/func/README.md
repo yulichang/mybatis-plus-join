@@ -1,6 +1,8 @@
 ## 支持lambda的QueryWrapper
 
-让QueryWrapper也能使用lambda
+让QueryWrapper也能使用lambda  
+单表lambda请使用mybatis-plus提供的LambdaQueryWrapper  
+本示例主要在连表的情况下使用!
 
 ### 使用方法
 
@@ -132,3 +134,5 @@ WHERE (
     AND user_address.tel = ? 
     AND user_address.address LIKE ?)
 ```
+
+QQ群:1022221898

@@ -55,7 +55,7 @@ public class S {
     }
 
     /**
-     * 与F的getColumn一致,连个都用,保留一个就行了
+     * 与F的getColumn一致,两个都用,保留一个就行了
      */
     public static <T> String getColumn(SFunction<T, ?> fn) {
         SerializedLambda lambda = LambdaUtils.resolve(fn);

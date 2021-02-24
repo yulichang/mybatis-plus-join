@@ -1,5 +1,5 @@
 ## 支持lambda的QueryWrapper
-
+[官方自定义sql](https://mp.baomidou.com/guide/wrapper.html#%E4%BD%BF%E7%94%A8-wrapper-%E8%87%AA%E5%AE%9A%E4%B9%89sql)  
 让QueryWrapper也能使用lambda  
 单表lambda请使用mybatis-plus提供的LambdaQueryWrapper  
 本示例主要在连表的情况下使用!

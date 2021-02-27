@@ -45,6 +45,6 @@ public class F {
 
     @SuppressWarnings("unchecked")
     public static <T> Class<T> getEntityClass(SFunction<T, ?> fn) {
-        return (Class<T>) com.baomidou.mybatisplus.core.toolkit.LambdaUtils.resolve(fn).getInstantiatedType();
+        return (Class<T>) LambdaUtils.resolve(fn).getInstantiatedType();
     }
 }

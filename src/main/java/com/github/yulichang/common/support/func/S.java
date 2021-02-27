@@ -25,33 +25,32 @@ import java.util.Objects;
 public class S {
 
     public static <T, R> String a(SFunction<T, R> sFunction) {
-        Assert.notNull(sFunction, "function is null");
-        return "a" + StringPool.DOT + getColumn(sFunction);
+        return getStrByAlias("a", sFunction);
     }
 
     public static <T, R> String b(SFunction<T, R> sFunction) {
-        Assert.notNull(sFunction, "function is null");
-        return "b" + StringPool.DOT + getColumn(sFunction);
+        return getStrByAlias("b", sFunction);
     }
 
     public static <T, R> String c(SFunction<T, R> sFunction) {
-        Assert.notNull(sFunction, "function is null");
-        return "c" + StringPool.DOT + getColumn(sFunction);
+        return getStrByAlias("c", sFunction);
     }
 
     public static <T, R> String d(SFunction<T, R> sFunction) {
-        Assert.notNull(sFunction, "function is null");
-        return "d" + StringPool.DOT + getColumn(sFunction);
+        return getStrByAlias("d", sFunction);
     }
 
     public static <T, R> String e(SFunction<T, R> sFunction) {
-        Assert.notNull(sFunction, "function is null");
-        return "e" + StringPool.DOT + getColumn(sFunction);
+        return getStrByAlias("e", sFunction);
     }
 
     public static <T, R> String f(SFunction<T, R> sFunction) {
+        return getStrByAlias("f", sFunction);
+    }
+
+    private static <T, R> String getStrByAlias(String alias, SFunction<T, R> sFunction) {
         Assert.notNull(sFunction, "function is null");
-        return "f" + StringPool.DOT + getColumn(sFunction);
+        return alias + StringPool.DOT + getColumn(sFunction);
     }
 
     /**

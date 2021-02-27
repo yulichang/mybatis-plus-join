@@ -1,4 +1,4 @@
-package com.github.yulichang.common.support.alisa;
+package com.github.yulichang.common.support.alias;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.StringPool;

@@ -1,7 +1,7 @@
 # mybatis-plus-join
 
 * 支持连表查询的[mybatis-plus](https://gitee.com/baomidou/mybatis-plus)  
-  只做增强,不做修改,可以使用原生mybatis-plus全部的功能
+
 * [演示示例](https://gitee.com/best_handsome/mybatis-plus-join-demo)
 
 ## 使用方法
@@ -14,39 +14,44 @@
 
 ### 安装
 
-1. 在项目中添加依赖,依赖已经包含了mybatis-plus-boot-starter<3.4.2><br>
-   依赖后无需再次引入mybatis-plus
+1. 在项目中添加依赖
 
    ```xml
    <dependency>
        <groupId>com.github.yulichang</groupId>
        <artifactId>mybatis-plus-join</artifactId>
-       <version>1.0.9</version>
+       <version>1.1.0</version>
    </dependency>
    ```
    或者clone代码到本地,执行mvn install,再引入以上依赖
    <br><br>
 
-2. 配置插件,添加MPJInterceptor
+2. 添加配置文件
 
-    ```java
-    @Configuration
-    public class MybatisPlusConfig {
-        /**
-         * 启用连表拦截器
-         */
-        @Bean
-        public MybatisPlusInterceptor paginationInterceptor() {
-            MybatisPlusInterceptor interceptor = new MybatisPlusInterceptor();
-            //分页插件
-            interceptor.addInnerInterceptor(new PaginationInnerInterceptor());
-            //连表插件
-            interceptor.addInnerInterceptor(new MPJInterceptor());
-            //多租户,垃圾sql拦截插件......
-            return interceptor;
-        }
+```java
+
+@Configuration
+public class MybatisPlusConfig {
+    /**
+     * 启用连表拦截器
+     */
+    @Bean
+    public MybatisPlusInterceptor paginationInterceptor() {
+        MybatisPlusInterceptor interceptor = new MybatisPlusInterceptor();
+        //连表插件
+        interceptor.addInnerInterceptor(new MPJInterceptor());
+        return interceptor;
     }
-    ```
+
+    /**
+     * sql注入器
+     */
+    @Bean
+    public MPJSqlInjector mySqlInjector() {
+        return new MPJSqlInjector();
+    }
+}
+```
 
 ### 使用
 

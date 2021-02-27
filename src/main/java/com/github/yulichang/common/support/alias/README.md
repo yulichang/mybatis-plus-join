@@ -12,8 +12,8 @@ AliasLambdaQueryWrapper继承LambdaQueryWrapper
 ### 使用方法
 
 根据你的需要拷贝以下类  
-[com.github.yulichang.common.support.AliasLambdaQueryWrapper](https://gitee.com/best_handsome/mybatis-plus-join/blob/master/src/main/java/com/github/yulichang/common/support/alias/AliasLambdaQueryWrapper.java)  
-[com.github.yulichang.common.support.AliasQueryWrapper](https://gitee.com/best_handsome/mybatis-plus-join/blob/master/src/main/java/com/github/yulichang/common/support/alias/AliasQueryWrapper.java)
+[com.github.yulichang.common.support.alias.AliasLambdaQueryWrapper](https://gitee.com/best_handsome/mybatis-plus-join/blob/master/src/main/java/com/github/yulichang/common/support/alias/AliasLambdaQueryWrapper.java)  
+[com.github.yulichang.common.support.alias.AliasQueryWrapper](https://gitee.com/best_handsome/mybatis-plus-join/blob/master/src/main/java/com/github/yulichang/common/support/alias/AliasQueryWrapper.java)
 
 #### AliasLambdaQueryWrapper
 

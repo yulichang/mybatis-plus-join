@@ -27,6 +27,8 @@ import java.util.stream.Collectors;
  * copy {@link com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper}
  * <p>
  * sqlSelect 由覆盖改为追加
+ *
+ * @author yulichang
  */
 @SuppressWarnings("all")
 public class MPJLambdaQueryWrapper<T> extends AbstractLambdaWrapper<T, MPJLambdaQueryWrapper<T>>

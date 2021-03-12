@@ -22,6 +22,8 @@ import java.util.stream.Collectors;
 
 /**
  * copy {@link com.baomidou.mybatisplus.core.conditions.query.QueryWrapper}
+ *
+ * @author yulichang
  */
 @SuppressWarnings("serial")
 public class MPJQueryWrapper<T> extends AbstractWrapper<T, String, MPJQueryWrapper<T>>

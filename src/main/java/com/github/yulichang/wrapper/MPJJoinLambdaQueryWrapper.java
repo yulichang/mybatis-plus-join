@@ -24,6 +24,8 @@ import java.util.stream.Collectors;
 
 /**
  * copy {@link com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper}
+ *
+ * @author yulichang
  */
 @SuppressWarnings("all")
 public class MPJJoinLambdaQueryWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJJoinLambdaQueryWrapper<T>>

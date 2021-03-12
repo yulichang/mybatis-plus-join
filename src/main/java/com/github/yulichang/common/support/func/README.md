@@ -87,10 +87,10 @@ class MpJoinTest {
     @Test
     void testS() {
         UserDTO dto = userMapper.userLeftJoin(new QueryWrapper<UserDO>()
-                .eq(S.a(UserDO::getId), "1")
-                .gt(S.a(UserDO::getSex), "3")
-                .eq(S.b(UserAddressDO::getTel), "10086")
-                .like(S.b(UserAddressDO::getAddress), "北京"));
+                .eq(S.a(UserDO::getId), "1")//a.id
+                .gt(S.a(UserDO::getSex), "3")//a.sex
+                .eq(S.b(UserAddressDO::getTel), "10086")//b.tel
+                .like(S.b(UserAddressDO::getAddress), "北京"));//b.address
     }
 
     /**
@@ -99,10 +99,10 @@ class MpJoinTest {
     @Test
     void testF() {
         UserDTO dto = userMapper.userLeftJoin(new QueryWrapper<UserDO>()
-                .eq(F.s(UserDO::getId), "1")
-                .gt(F.s(UserDO::getSex), "3")
-                .eq(F.s(UserAddressDO::getTel), "10086")
-                .like(F.s(UserAddressDO::getAddress), "北京"));
+                .eq(F.s(UserDO::getId), "1")//user.id
+                .gt(F.s(UserDO::getSex), "3")//user.sex
+                .eq(F.s(UserAddressDO::getTel), "10086")//user_address.tel
+                .like(F.s(UserAddressDO::getAddress), "北京"));//user_address.address
     }
 }
 ```

@@ -13,11 +13,9 @@ import java.util.Map;
  */
 public class MPJBaseServiceImpl<M extends MPJBaseMapper<T>, T> extends ServiceImpl<M, T> implements MPJBaseService<T> {
 
-
     @Override
     public <DTO> DTO selectJoinOne(Class<DTO> clazz, MPJBaseJoin wrapper) {
         return baseMapper.selectJoinOne(clazz, wrapper);
-
     }
 
     @Override
@@ -41,9 +39,7 @@ public class MPJBaseServiceImpl<M extends MPJBaseMapper<T>, T> extends ServiceIm
     }
 
     @Override
-    public IPage<Map<String, Object>> selectJoinMapsPage(IPage<Map<String, Object>> page, MPJBaseJoin wrapper) {
+    public <P extends IPage<Map<String, Object>>> IPage<Map<String, Object>> selectJoinMapsPage(P page, MPJBaseJoin wrapper) {
         return baseMapper.selectJoinMapsPage(page, wrapper);
     }
-
-
 }

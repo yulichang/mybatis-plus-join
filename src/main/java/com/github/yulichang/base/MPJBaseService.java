@@ -42,5 +42,5 @@ public interface MPJBaseService<T> extends IService<T> {
     /**
      * 连接查询返回Map集合并分页
      */
-    IPage<Map<String, Object>> selectJoinMapsPage(IPage<Map<String, Object>> page, MPJBaseJoin wrapper);
+    <P extends IPage<Map<String, Object>>> IPage<Map<String, Object>> selectJoinMapsPage(P page, MPJBaseJoin wrapper);
 }

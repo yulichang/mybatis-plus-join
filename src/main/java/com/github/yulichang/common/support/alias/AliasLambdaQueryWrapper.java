@@ -12,8 +12,8 @@ import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
  * select t.* from table t ${ew.customSqlSegment("t")}
  * <p>
  * 注意:
- * 官方的自定义sql是ew.customSqlSegment,不带括号,是属性
- * 带别名的是 ew.customSqlSegment("t") 带括号,是方法
+ * 官方的自定义sql是ew.customSqlSegment,不带括号,会调用getCustomSqlSegment方法
+ * 带别名的是 ew.customSqlSegment("t") 带括号
  * 括号中的别名必须带双引号
  *
  * @author yulichang

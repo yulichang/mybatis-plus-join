@@ -23,8 +23,10 @@
        <version>1.1.1</version>
    </dependency>
    ```
-   或者clone代码到本地,执行mvn install,再引入以上依赖
-   <br><br>
+   或者clone代码到本地,执行mvn install,再引入以上依赖  
+   <br>
+   注:需要mybatis-plus版本号大于等于 3.4.0  
+   <br>
 
 2. 添加配置文件
 
@@ -38,8 +40,11 @@ public class MybatisPlusConfig {
     @Bean
     public MybatisPlusInterceptor paginationInterceptor() {
         MybatisPlusInterceptor interceptor = new MybatisPlusInterceptor();
+        //分页插件
+        interceptor.addInnerInterceptor(new PaginationInnerInterceptor());
         //连表插件
         interceptor.addInnerInterceptor(new MPJInterceptor());
+        //其他mp插件......
         return interceptor;
     }
 

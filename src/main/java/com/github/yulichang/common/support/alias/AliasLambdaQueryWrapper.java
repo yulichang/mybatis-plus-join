@@ -9,7 +9,7 @@ import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
  * 字段添加别名
  * 使用方法:
  * <p>
- * select t.* from table t ${ew.customSqlSegmentAlias("t")}
+ * select t.* from table t ${ew.customSqlSegment("t")}
  * <p>
  * 注意:
  * 官方的自定义sql是ew.customSqlSegment,不带括号,是属性

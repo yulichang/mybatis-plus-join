@@ -17,6 +17,8 @@ AliasLambdaQueryWrapper继承LambdaQueryWrapper
 
 #### AliasLambdaQueryWrapper
 
+[感谢mybatis-plus PR 中的一位老哥的想法,以及实现](https://gitee.com/baomidou/mybatis-plus/pulls/137)
+
 注解:
 
 ```java
@@ -24,7 +26,7 @@ AliasLambdaQueryWrapper继承LambdaQueryWrapper
 @Mapper
 public interface UserMapper extends BaseMapper<UserDO> {
 
-    @Select("select u.*,ua.tel from user u left join user_address ua on u.id = ua.user_id ${ew.customSqlSegment}")
+    @Select("select u.*,ua.tel from user u left join user_address ua on u.id = ua.user_id ${ew.customSqlSegment(\"u\")}")
     UserDTO userLeftJoin(@Param(Constants.WRAPPER) Wrapper<?> queryWrapper);
 }
 ```
@@ -39,9 +41,14 @@ public interface UserMapper extends BaseMapper<UserDO> {
     from 
         user u
         left join user_address ua on u.id = ua.user_id
-    ${ew.customSqlSegment}
+    ${ew.customSqlSegment("u")}
 </select>
 ```
+
+注意:  
+官方的自定义sql是ew.customSqlSegment,不带括号,是属性  
+带别名的是 ew.customSqlSegment("t"),带括号,是方法  
+括号中的别名必须带双引号  
 
 使用wrapper:
 
@@ -53,7 +60,6 @@ class MpJoinTest {
     @Test
     void test() {
         UserDTO userDTO = userMapper.userLeftJoin(new AliasLambdaQueryWrapper<UserDO>()
-                .setAlias("u")                //指定别名,要与注解或xml中的别名保持一致
                 .eq(UserDO::getId, "1")
                 .like(UserDO::getSex, "3"));
     }
@@ -102,7 +108,9 @@ class MpJoinTest {
     }
 }
 ```
+
 对应sql:
+
 ```
 select 
     u.*,
@@ -118,11 +126,11 @@ WHERE (
 
 注意:如果你喜欢骚操作,请使用原生QueryWrapper  
 举例:
+
 * .eq("(select sex from user where id = u.id)", "男")
 * .eq("count(u.id)", 1)
 
 不建议在QueryWrapper中使用sql或函数  
 除非你不考虑后续的维护和sql调优
-
 
 QQ群:1022221898

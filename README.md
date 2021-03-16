@@ -20,12 +20,11 @@
    <dependency>
        <groupId>com.github.yulichang</groupId>
        <artifactId>mybatis-plus-join</artifactId>
-       <version>1.1.1</version>
+       <version>1.1.2</version>
    </dependency>
    ```
    或者clone代码到本地,执行mvn install,再引入以上依赖  
    <br>
-   注:需要mybatis-plus版本号大于等于 3.4.0  
    <br>
 
 2. 添加配置文件

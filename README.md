@@ -4,6 +4,9 @@
 
 * [演示示例](https://gitee.com/best_handsome/mybatis-plus-join-demo)
 
+QQ群:1022221898  
+[扫描加微信群](https://gitee.com/best_handsome/mybatis-plus-join/blob/master/wx.png)
+
 ## 使用方法
 
 [goto wiki](https://gitee.com/best_handsome/mybatis-plus-join/wikis)
@@ -344,6 +347,6 @@ ORDER BY
 
 # [wiki](https://gitee.com/best_handsome/mybatis-plus-join/wikis)
 
-QQ群:1022221898
+
 
 

@@ -5,7 +5,7 @@
 * [演示示例](https://gitee.com/best_handsome/mybatis-plus-join-demo)
 
 QQ群:1022221898  
-[扫码加微信群](https://gitee.com/best_handsome/mybatis-plus-join/blob/master/wx.png)
+[扫码进微信群](https://gitee.com/best_handsome/mybatis-plus-join/blob/master/wx.png)
 
 ## 使用方法
 
@@ -27,7 +27,6 @@ QQ群:1022221898
    </dependency>
    ```
    或者clone代码到本地,执行mvn install,再引入以上依赖  
-   <br>
    <br>
 
 2. 添加配置文件

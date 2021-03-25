@@ -8,12 +8,15 @@ import com.baomidou.mybatisplus.core.metadata.TableFieldInfo;
 import com.baomidou.mybatisplus.core.metadata.TableInfo;
 import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
 import com.baomidou.mybatisplus.core.toolkit.ArrayUtils;
+import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.core.toolkit.StringPool;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.github.yulichang.query.interfaces.MPJJoin;
 import com.github.yulichang.toolkit.Constant;
+import org.springframework.util.Assert;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -25,7 +28,6 @@ import java.util.stream.Collectors;
  *
  * @author yulichang
  */
-@SuppressWarnings("serial")
 public class MPJQueryWrapper<T> extends AbstractWrapper<T, String, MPJQueryWrapper<T>>
         implements Query<MPJQueryWrapper<T>, T, String>, MPJJoin<MPJQueryWrapper<T>> {
 
@@ -44,20 +46,19 @@ public class MPJQueryWrapper<T> extends AbstractWrapper<T, String, MPJQueryWrapp
      */
     private final SharedString alias = new SharedString(Constant.TABLE_ALIAS);
 
+    /**
+     * 查询的列
+     */
+    private List<String> selectColumns = new ArrayList<>();
+
+    /**
+     * 排除的字段
+     */
+    private List<String> ignoreColumns = new ArrayList<>();
+
 
     public MPJQueryWrapper() {
-        this(null);
-    }
-
-    public MPJQueryWrapper(T entity) {
-        super.setEntity(entity);
         super.initNeed();
-    }
-
-    public MPJQueryWrapper(T entity, String... columns) {
-        super.setEntity(entity);
-        super.initNeed();
-        this.select(columns);
     }
 
     /**
@@ -67,7 +68,9 @@ public class MPJQueryWrapper<T> extends AbstractWrapper<T, String, MPJQueryWrapp
      */
     public MPJQueryWrapper(T entity, Class<T> entityClass, AtomicInteger paramNameSeq,
                            Map<String, Object> paramNameValuePairs, MergeSegments mergeSegments,
-                           SharedString sqlSelect, SharedString from, SharedString lastSql, SharedString sqlComment, SharedString sqlFirst) {
+                           SharedString sqlSelect, SharedString from, SharedString lastSql,
+                           SharedString sqlComment, SharedString sqlFirst,
+                           List<String> selectColumns, List<String> ignoreColumns) {
         super.setEntity(entity);
         super.setEntityClass(entityClass);
         this.paramNameSeq = paramNameSeq;
@@ -78,60 +81,83 @@ public class MPJQueryWrapper<T> extends AbstractWrapper<T, String, MPJQueryWrapp
         this.from = from;
         this.sqlComment = sqlComment;
         this.sqlFirst = sqlFirst;
+        this.selectColumns = selectColumns;
+        this.ignoreColumns = ignoreColumns;
     }
 
     @Override
     public MPJQueryWrapper<T> select(String... columns) {
-        return select(true, columns);
-    }
-
-    public MPJQueryWrapper<T> select(boolean condition, String... columns) {
-        if (condition) {
-            if (ArrayUtils.isNotEmpty(columns)) {
-                this.sqlSelect.setStringValue(String.join(StringPool.COMMA, columns));
-            }
+        if (ArrayUtils.isNotEmpty(columns)) {
+            selectColumns.addAll(Arrays.asList(columns));
         }
         return typedThis;
     }
 
+    /**
+     * 忽略查询字段
+     * <p>
+     * 用法: selectIgnore("t.id","t.sex","a.area")
+     *
+     * @since 1.1.3
+     */
+    public MPJQueryWrapper<T> selectIgnore(String... columns) {
+        if (ArrayUtils.isNotEmpty(columns)) {
+            ignoreColumns.addAll(Arrays.asList(columns));
+        }
+        return typedThis;
+    }
+
+    /**
+     * 此方法只能用于主表
+     * 不好含主键
+     *
+     * @param entityClass 主表class
+     * @param predicate   条件lambda
+     */
     @Override
     public MPJQueryWrapper<T> select(Class<T> entityClass, Predicate<TableFieldInfo> predicate) {
-        return select(true, entityClass, predicate);
-    }
-
-    public MPJQueryWrapper<T> select(boolean condition, Class<T> entityClass, Predicate<TableFieldInfo> predicate) {
-        if (condition) {
-            super.setEntityClass(entityClass);
-            this.sqlSelect.setStringValue(TableInfoHelper.getTableInfo(getEntityClass()).chooseSelect(predicate));
-        }
+        TableInfo info = TableInfoHelper.getTableInfo(entityClass);
+        Assert.notNull(info, "can not find table info");
+        selectColumns.addAll(info.getFieldList().stream().filter(predicate).map(c ->
+                Constant.TABLE_ALIAS + StringPool.DOT + c.getColumn()).collect(Collectors.toList()));
         return typedThis;
     }
 
 
+    /**
+     * 查询主表全部字段
+     *
+     * @param clazz 主表class
+     */
     public final MPJQueryWrapper<T> selectAll(Class<T> clazz) {
-        return selectAll(true, clazz);
+        selectAll(clazz, Constant.TABLE_ALIAS);
+        return typedThis;
     }
 
-    public final MPJQueryWrapper<T> selectAll(boolean condition, Class<T> clazz) {
-        if (condition) {
-            TableInfo info = TableInfoHelper.getTableInfo(clazz);
-            List<String> list = new ArrayList<>();
-            if (info.havePK()) {
-                list.add(Constant.TABLE_ALIAS + StringPool.DOT + info.getKeyColumn());
-            }
-            list.addAll(info.getFieldList().stream().map(i -> Constant.TABLE_ALIAS + StringPool.DOT + i.getColumn()).collect(Collectors.toList()));
-            String join = String.join(StringPool.COMMA, list);
-            if (StringUtils.isBlank(sqlSelect.getStringValue())) {
-                this.sqlSelect.setStringValue(join);
-            } else {
-                this.sqlSelect.setStringValue(this.getSqlSelect() + StringPool.COMMA + join);
-            }
+    /**
+     * 查询指定实体全部字段
+     *
+     * @param as 实体对应的别名
+     */
+    public final MPJQueryWrapper<T> selectAll(Class<?> clazz, String as) {
+        TableInfo info = TableInfoHelper.getTableInfo(clazz);
+        Assert.notNull(info, "can not find table info");
+        if (info.havePK()) {
+            selectColumns.add(as + StringPool.DOT + info.getKeyColumn());
         }
+        selectColumns.addAll(info.getFieldList().stream().map(i ->
+                as + StringPool.DOT + i.getColumn()).collect(Collectors.toList()));
         return typedThis;
     }
 
     @Override
     public String getSqlSelect() {
+        if (StringUtils.isBlank(sqlSelect.getStringValue())) {
+            if (CollectionUtils.isNotEmpty(ignoreColumns)) {
+                selectColumns.removeIf(ignoreColumns::contains);
+            }
+            sqlSelect.setStringValue(String.join(StringPool.COMMA, selectColumns));
+        }
         return sqlSelect.getStringValue();
     }
 
@@ -149,19 +175,17 @@ public class MPJQueryWrapper<T> extends AbstractWrapper<T, String, MPJQueryWrapp
      */
     public MPJLambdaQueryWrapper<T> lambda() {
         return new MPJLambdaQueryWrapper<>(getEntity(), getEntityClass(), from, sqlSelect, paramNameSeq, paramNameValuePairs,
-                expression, lastSql, sqlComment, sqlFirst);
+                expression, lastSql, sqlComment, sqlFirst, selectColumns, ignoreColumns);
     }
 
     /**
      * 用于生成嵌套 sql
-     * <p>
-     * 故 sqlSelect from 不向下传递
-     * </p>
+     * <p>故 sqlSelect selectColumn ignoreColumns from不向下传递</p>
      */
     @Override
     protected MPJQueryWrapper<T> instance() {
         return new MPJQueryWrapper<>(getEntity(), getEntityClass(), paramNameSeq, paramNameValuePairs, new MergeSegments(),
-                null, null, SharedString.emptyString(), SharedString.emptyString(), SharedString.emptyString());
+                null, null, SharedString.emptyString(), SharedString.emptyString(), SharedString.emptyString(), null, null);
     }
 
     @Override

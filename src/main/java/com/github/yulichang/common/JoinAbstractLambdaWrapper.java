@@ -17,29 +17,18 @@ import static java.util.stream.Collectors.joining;
 
 /**
  * copy {@link com.baomidou.mybatisplus.core.conditions.AbstractLambdaWrapper}
+ *
+ * @author yulichang
  */
 @SuppressWarnings("serial")
 public abstract class JoinAbstractLambdaWrapper<T, Children extends JoinAbstractLambdaWrapper<T, Children>>
         extends JoinAbstractWrapper<T, Children> {
 
-    private Map<String, ColumnCache> columnMap = null;
-    private boolean initColumnMap = false;
-
     protected final Map<Class<?>, String> subTable = new HashMap<>();
-
-    @SuppressWarnings("unchecked")
-    protected <X> String columnsToString(SFunction<X, ?>... columns) {
-        return columnsToString(true, columns);
-    }
 
     @Override
     protected <X> String columnToString(X column) {
         return columnToString((SFunction<?, ?>) column, true);
-    }
-
-    @SuppressWarnings("unchecked")
-    protected <X> String columnsToString(boolean onlyColumn, SFunction<X, ?>... columns) {
-        return Arrays.stream(columns).map(i -> columnToString(i, onlyColumn)).collect(joining(StringPool.COMMA));
     }
 
     @Override

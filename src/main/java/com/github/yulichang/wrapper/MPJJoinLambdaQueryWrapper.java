@@ -5,10 +5,7 @@ import com.baomidou.mybatisplus.core.conditions.segments.MergeSegments;
 import com.baomidou.mybatisplus.core.metadata.TableFieldInfo;
 import com.baomidou.mybatisplus.core.metadata.TableInfo;
 import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
-import com.baomidou.mybatisplus.core.toolkit.ArrayUtils;
-import com.baomidou.mybatisplus.core.toolkit.Assert;
-import com.baomidou.mybatisplus.core.toolkit.StringPool;
-import com.baomidou.mybatisplus.core.toolkit.StringUtils;
+import com.baomidou.mybatisplus.core.toolkit.*;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.github.yulichang.toolkit.Constant;
 import com.github.yulichang.toolkit.LambdaUtils;
@@ -18,6 +15,7 @@ import com.github.yulichang.wrapper.interfaces.SFunctionQuery;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -52,30 +50,19 @@ public class MPJJoinLambdaQueryWrapper<T> extends MPJAbstractLambdaWrapper<T, MP
     private final List<SelectColumn> selectColumns = new ArrayList<>();
 
     /**
+     * 忽略查询的字段
+     */
+    private final List<SelectColumn> ignoreColumns = new ArrayList<>();
+
+    /**
      * 表序号
      */
     private int tableIndex = 1;
 
     /**
-     * 不建议直接 new 该实例，使用 Wrappers.lambdaQuery(entity)
+     * 不建议直接 new 该实例，使用 Wrappers.lambdaQuery()
      */
     public MPJJoinLambdaQueryWrapper() {
-        this((T) null);
-    }
-
-    /**
-     * 不建议直接 new 该实例，使用 Wrappers.lambdaQuery(entity)
-     */
-    public MPJJoinLambdaQueryWrapper(T entity) {
-        super.setEntity(entity);
-        super.initNeed();
-    }
-
-    /**
-     * 不建议直接 new 该实例，使用 Wrappers.lambdaQuery(entity)
-     */
-    public MPJJoinLambdaQueryWrapper(Class<T> entityClass) {
-        super.setEntityClass(entityClass);
         super.initNeed();
     }
 
@@ -103,12 +90,7 @@ public class MPJJoinLambdaQueryWrapper<T> extends MPJAbstractLambdaWrapper<T, MP
      */
     @SafeVarargs
     public final <S> MPJJoinLambdaQueryWrapper<T> select(SFunction<S, ?>... columns) {
-        return select(true, columns);
-    }
-
-    @SafeVarargs
-    public final <S> MPJJoinLambdaQueryWrapper<T> select(boolean condition, SFunction<S, ?>... columns) {
-        if (condition && ArrayUtils.isNotEmpty(columns)) {
+        if (ArrayUtils.isNotEmpty(columns)) {
             for (SFunction<S, ?> s : columns) {
                 selectColumns.add(new SelectColumn(LambdaUtils.getEntityClass(s), LambdaUtils.getColumn(s), null));
             }
@@ -116,60 +98,54 @@ public class MPJJoinLambdaQueryWrapper<T> extends MPJAbstractLambdaWrapper<T, MP
         return typedThis;
     }
 
-    @Override
     public <E> MPJJoinLambdaQueryWrapper<T> select(Class<E> entityClass, Predicate<TableFieldInfo> predicate) {
-        return select(true, entityClass, predicate);
-    }
-
-    public <E> MPJJoinLambdaQueryWrapper<T> select(boolean condition, Class<E> entityClass, Predicate<TableFieldInfo> predicate) {
-        if (condition) {
-            TableInfo info = TableInfoHelper.getTableInfo(entityClass);
-            Assert.notNull(info, "table can not be find");
-            info.getFieldList().stream().filter(predicate).collect(Collectors.toList()).forEach(
-                    i -> selectColumns.add(new SelectColumn(entityClass, i.getColumn(), null)));
-        }
+        TableInfo info = TableInfoHelper.getTableInfo(entityClass);
+        Assert.notNull(info, "table can not be find");
+        info.getFieldList().stream().filter(predicate).collect(Collectors.toList()).forEach(
+                i -> selectColumns.add(new SelectColumn(entityClass, i.getColumn(), null)));
         return typedThis;
     }
 
-
     public final <S, X> MPJJoinLambdaQueryWrapper<T> selectAs(SFunction<S, ?> columns, SFunction<X, ?> alias) {
-        return selectAs(true, columns, LambdaUtils.getName(alias));
+        return selectAs(columns, LambdaUtils.getName(alias));
     }
 
     /**
      * @since 1.1.3
      */
-    public final <S> MPJJoinLambdaQueryWrapper<T> selectAs(SFunction<S, ?> columns, String alias) {
-        return selectAs(true, columns, alias);
-    }
-
-    public final <S, X> MPJJoinLambdaQueryWrapper<T> selectAs(boolean condition, SFunction<S, ?> columns, SFunction alias) {
-        return selectAs(condition, columns, LambdaUtils.getName(alias));
-    }
-
-    /**
-     * @since 1.1.3
-     */
-    public final <S, X> MPJJoinLambdaQueryWrapper<T> selectAs(boolean condition, SFunction<S, ?> columns, String alias) {
-        if (condition) {
-            selectColumns.add(new SelectColumn(LambdaUtils.getEntityClass(columns), LambdaUtils.getColumn(columns), alias));
-        }
+    public final <S, X> MPJJoinLambdaQueryWrapper<T> selectAs(SFunction<S, ?> columns, String alias) {
+        selectColumns.add(new SelectColumn(LambdaUtils.getEntityClass(columns), LambdaUtils.getColumn(columns), alias));
         return typedThis;
     }
 
     public final MPJJoinLambdaQueryWrapper<T> selectAll(Class<?> clazz) {
-        return selectAll(true, clazz);
+        TableInfo info = TableInfoHelper.getTableInfo(clazz);
+        Assert.notNull(info, "table can not be find -> %s", clazz);
+        if (info.havePK()) {
+            selectColumns.add(new SelectColumn(clazz, info.getKeyColumn(), null));
+        }
+        info.getFieldList().forEach(c ->
+                selectColumns.add(new SelectColumn(clazz, c.getColumn(), null)));
+        return typedThis;
     }
 
-    public final MPJJoinLambdaQueryWrapper<T> selectAll(boolean condition, Class<?> clazz) {
-        if (condition) {
-            TableInfo info = TableInfoHelper.getTableInfo(clazz);
-            Assert.notNull(info, "table can not be find -> %s", clazz);
-            if (info.havePK()) {
-                selectColumns.add(new SelectColumn(clazz, info.getKeyColumn(), null));
+    /**
+     * 忽略查询字段
+     * <p>
+     * 用法: selectIgnore(UserDO::getId,UserDO::getSex)
+     * 注意: 一个selectIgnore只支持一个对象 如果要忽略多个实体的字段,请调用多次
+     * <p>
+     * .selectIgnore(UserDO::getId,UserDO::getSex)
+     * .selectIgnore(UserAddressDO::getArea,UserAddressDO::getCity)
+     *
+     * @since 1.1.3
+     */
+    @SafeVarargs
+    public final <S> MPJJoinLambdaQueryWrapper<T> selectIgnore(SFunction<S, ?>... columns) {
+        if (ArrayUtils.isNotEmpty(columns)) {
+            for (SFunction<S, ?> s : columns) {
+                ignoreColumns.add(new SelectColumn(LambdaUtils.getEntityClass(s), LambdaUtils.getColumn(s), null));
             }
-            info.getFieldList().forEach(c ->
-                    selectColumns.add(new SelectColumn(clazz, c.getColumn(), null)));
         }
         return typedThis;
     }
@@ -177,6 +153,10 @@ public class MPJJoinLambdaQueryWrapper<T> extends MPJAbstractLambdaWrapper<T, MP
     @Override
     public String getSqlSelect() {
         if (StringUtils.isBlank(sqlSelect.getStringValue())) {
+            if (CollectionUtils.isNotEmpty(ignoreColumns)) {
+                selectColumns.removeIf(c -> ignoreColumns.stream().anyMatch(i ->
+                        i.getClazz() == c.getClazz() && Objects.equals(c.getColumnName(), i.getColumnName())));
+            }
             String s = selectColumns.stream().map(i ->
                     Constant.TABLE_ALIAS + getDefault(subTable.get(i.getClazz())) + StringPool.DOT + i.getColumnName() +
                             (StringUtils.isBlank(i.getAlias()) ? StringPool.EMPTY : (Constant.AS + i.getAlias())))

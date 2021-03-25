@@ -29,6 +29,8 @@ import static java.util.stream.Collectors.joining;
 
 /**
  * copy {@link com.baomidou.mybatisplus.core.conditions.AbstractWrapper}
+ *
+ * @author yulichang
  */
 @SuppressWarnings({"serial", "unchecked"})
 public abstract class JoinAbstractWrapper<T, Children extends JoinAbstractWrapper<T, Children>> extends Wrapper<T>

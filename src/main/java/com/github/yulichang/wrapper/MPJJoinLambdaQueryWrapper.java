@@ -133,12 +133,26 @@ public class MPJJoinLambdaQueryWrapper<T> extends MPJAbstractLambdaWrapper<T, MP
 
 
     public final <S, X> MPJJoinLambdaQueryWrapper<T> selectAs(SFunction<S, ?> columns, SFunction<X, ?> alias) {
+        return selectAs(true, columns, LambdaUtils.getName(alias));
+    }
+
+    /**
+     * @since 1.1.3
+     */
+    public final <S> MPJJoinLambdaQueryWrapper<T> selectAs(SFunction<S, ?> columns, String alias) {
         return selectAs(true, columns, alias);
     }
 
-    public final <S, X> MPJJoinLambdaQueryWrapper<T> selectAs(boolean condition, SFunction<S, ?> columns, SFunction<X, ?> alias) {
+    public final <S, X> MPJJoinLambdaQueryWrapper<T> selectAs(boolean condition, SFunction<S, ?> columns, SFunction alias) {
+        return selectAs(condition, columns, LambdaUtils.getName(alias));
+    }
+
+    /**
+     * @since 1.1.3
+     */
+    public final <S, X> MPJJoinLambdaQueryWrapper<T> selectAs(boolean condition, SFunction<S, ?> columns, String alias) {
         if (condition) {
-            selectColumns.add(new SelectColumn(LambdaUtils.getEntityClass(columns), LambdaUtils.getColumn(columns), LambdaUtils.getName(alias)));
+            selectColumns.add(new SelectColumn(LambdaUtils.getEntityClass(columns), LambdaUtils.getColumn(columns), alias));
         }
         return typedThis;
     }
@@ -159,7 +173,6 @@ public class MPJJoinLambdaQueryWrapper<T> extends MPJAbstractLambdaWrapper<T, MP
         }
         return typedThis;
     }
-
 
     @Override
     public String getSqlSelect() {
@@ -203,24 +216,18 @@ public class MPJJoinLambdaQueryWrapper<T> extends MPJAbstractLambdaWrapper<T, MP
         if (condition) {
             subTable.put(clazz, tableIndex);
             TableInfo leftInfo = TableInfoHelper.getTableInfo(clazz);
-
             StringBuilder sb = new StringBuilder(keyWord)
                     .append(leftInfo.getTableName())
-                    .append(StringPool.SPACE)
-                    .append(Constant.TABLE_ALIAS)
+                    .append(Constant.SPACE_TABLE_ALIAS)
                     .append(tableIndex)
-                    .append(StringPool.SPACE)
-                    .append(Constant.ON)
-                    .append(Constant.TABLE_ALIAS)
+                    .append(Constant.ON_TABLE_ALIAS)
                     .append(tableIndex)
                     .append(StringPool.DOT)
                     .append(LambdaUtils.getColumn(left))
-                    .append(Constant.EQUALS)
-                    .append(Constant.TABLE_ALIAS)
+                    .append(Constant.EQUALS_TABLE_ALIAS)
                     .append(getDefault(subTable.get(LambdaUtils.getEntityClass(right))))
                     .append(StringPool.DOT)
                     .append(LambdaUtils.getColumn(right));
-
             tableIndex++;
             if (StringUtils.isBlank(from.getStringValue())) {
                 from.setStringValue(sb.toString());
@@ -230,7 +237,6 @@ public class MPJJoinLambdaQueryWrapper<T> extends MPJAbstractLambdaWrapper<T, MP
         }
         return typedThis;
     }
-
 
     /**
      * select字段

@@ -25,7 +25,7 @@ public interface Constant {
 
     String INNER = "INNER";
 
-    String CLAZZ = "clazz";
+    String CLAZZ = "resultTypeClass_Eg1sG";
 
     /**
      * " LEFT JOIN "

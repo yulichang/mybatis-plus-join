@@ -18,6 +18,7 @@ public class Wrappers {
         return new MPJQueryWrapper<>();
     }
 
+    @Deprecated
     public static <T> MPJLambdaQueryWrapper<T> lambdaJoin() {
         return new MPJLambdaQueryWrapper<>();
     }

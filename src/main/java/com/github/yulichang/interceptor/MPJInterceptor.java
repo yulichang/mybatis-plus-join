@@ -2,6 +2,7 @@ package com.github.yulichang.interceptor;
 
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.extension.plugins.inner.InnerInterceptor;
+import com.github.yulichang.method.MPJResultType;
 import com.github.yulichang.toolkit.Constant;
 import org.apache.ibatis.executor.Executor;
 import org.apache.ibatis.mapping.BoundSql;
@@ -14,6 +15,7 @@ import java.lang.reflect.Field;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * 结果封装拦截器
@@ -41,10 +43,14 @@ public class MPJInterceptor implements InnerInterceptor {
             if (CollectionUtils.isNotEmpty(map)) {
                 try {
                     Class<?> clazz = (Class<?>) map.get(Constant.CLAZZ);
-                    List<ResultMap> list = ms.getResultMaps();
-                    if (CollectionUtils.isNotEmpty(list)) {
-                        ResultMap resultMap = list.get(0);
-                        type.set(resultMap, clazz);
+                    if (Objects.nonNull(clazz)) {
+                        List<ResultMap> list = ms.getResultMaps();
+                        if (CollectionUtils.isNotEmpty(list)) {
+                            ResultMap resultMap = list.get(0);
+                            if (resultMap.getType() == MPJResultType.class) {
+                                type.set(resultMap, clazz);
+                            }
+                        }
                     }
                 } catch (Exception ignored) {
                     //通常是MapperMethod内部类HashMap的子类ParamMap重写了了get方法抛出的BindingException

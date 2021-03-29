@@ -2,7 +2,6 @@ package com.github.yulichang.interceptor;
 
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.extension.plugins.inner.InnerInterceptor;
-import com.github.yulichang.method.MPJResultType;
 import com.github.yulichang.toolkit.Constant;
 import org.apache.ibatis.executor.Executor;
 import org.apache.ibatis.mapping.BoundSql;
@@ -47,9 +46,7 @@ public class MPJInterceptor implements InnerInterceptor {
                         List<ResultMap> list = ms.getResultMaps();
                         if (CollectionUtils.isNotEmpty(list)) {
                             ResultMap resultMap = list.get(0);
-                            if (resultMap.getType() == MPJResultType.class) {
-                                type.set(resultMap, clazz);
-                            }
+                            type.set(resultMap, clazz);
                         }
                     }
                 } catch (Exception ignored) {

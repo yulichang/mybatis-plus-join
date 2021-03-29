@@ -1,6 +1,6 @@
 # mybatis-plus-join
 
-* 支持连表查询的[mybatis-plus](https://gitee.com/baomidou/mybatis-plus)  
+* 支持连表查询的[mybatis-plus](https://gitee.com/baomidou/mybatis-plus)
 
 * [演示示例](https://gitee.com/best_handsome/mybatis-plus-join-demo)
 
@@ -23,12 +23,12 @@ QQ群:1022221898
    <dependency>
        <groupId>com.github.yulichang</groupId>
        <artifactId>mybatis-plus-join</artifactId>
-       <version>1.1.2</version>
+       <version>1.1.3</version>
    </dependency>
    ```
    或者clone代码到本地,执行mvn install,再引入以上依赖  
    <br>
-   注意: mybatis plus version >= 3.4.0 
+   注意: mybatis plus version >= 3.4.0
    <br><br>
 2. 添加配置文件
 
@@ -40,7 +40,7 @@ public class MybatisPlusConfig {
      * 启用连表拦截器
      */
     @Bean
-    public MybatisPlusInterceptor paginationInterceptor() {
+    public MybatisPlusInterceptor mybatisPlusInterceptor() {
         MybatisPlusInterceptor interceptor = new MybatisPlusInterceptor();
         //分页插件
         interceptor.addInnerInterceptor(new PaginationInnerInterceptor());
@@ -54,7 +54,7 @@ public class MybatisPlusConfig {
      * sql注入器
      */
     @Bean
-    public MPJSqlInjector mySqlInjector() {
+    public MPJSqlInjector sqlInjector() {
         return new MPJSqlInjector();
     }
 }
@@ -78,25 +78,9 @@ public class MybatisPlusConfig {
 
 3. MPJBaseServiceImpl 继承了ServiceImpl,同样添加了以上方法
 
-## 核心类 MPJQueryWrapper,MPJLambdaQueryWrapper和MPJJoinLambdaQueryWrapper
+## 核心类 MPJQueryWrapper和MPJJoinLambdaQueryWrapper
 
-|-|MPJQueryWrapper|MPJLambdaQueryWrapper|MPJJoinLambdaQueryWrapper|
-|---|---|---|---|
-|select(String)|支持|<font color=red>**支持**|不支持|
-|select(lambda)|不支持|仅支持主表lambda|所有表lambda|
-|join(String)|支持|支持|不支持|
-|join(lambda)|不支持|不支持|支持|
-|条件String|支持|不支持|不支持|
-|条件lambda|不支持|仅支持主表lambda|所有表lambda|
-
-MPJQueryWrapper相当于mp的QueryWrapper  
-MPJLambdaQueryWrapper相当于mp的LambdaQueryWrapper
-
-两者可以无缝切换  
-MPJQueryWrapper.lambda() ===> MPJLambdaQueryWrapper  
-MPJLambdaQueryWrapper.stringQuery() ===> MPJQueryWrapper
-
-## MPJJoinLambdaQueryWrapper用法
+### MPJJoinLambdaQueryWrapper用法
 
 #### MPJJoinLambdaQueryWrapper示例
 
@@ -116,9 +100,9 @@ class test {
                         .select(AreaDO::getProvince, AreaDO::getCity)
                         .leftJoin(UserAddressDO.class, UserAddressDO::getUserId, UserDO::getId)
                         .leftJoin(AreaDO.class, AreaDO::getId, UserAddressDO::getAreaId)
-                        .eq(true, UserDO::getId, 1)
-                        .like(true, UserAddressDO::getTel, "1")
-                        .gt(true, UserDO::getId, 5));
+                        .eq(UserDO::getId, 1)
+                        .like(UserAddressDO::getTel, "1")
+                        .gt(UserDO::getId, 5));
     }
 }
 ```
@@ -198,9 +182,9 @@ FROM
 LIMIT ?,?
 ```
 
-## MPJQueryWrapper和MPJLambdaQueryWrapper
+### MPJQueryWrapper
 
-### 简单的3表查询
+#### 简单的3表查询
 
 ```java
 class test {
@@ -209,16 +193,13 @@ class test {
 
     void testJoin() {
         List<UserDTO> list = userMapper.selectJoinList(UserDTO.class,
-                new MPJLambdaQueryWrapper<UserDO>()
+                new MPJQueryWrapper<UserDO>()
                         .selectAll(UserDO.class)
                         .select("addr.tel", "addr.address", "a.province")
                         .leftJoin("user_address addr on t.id = addr.user_id")
                         .rightJoin("area a on addr.area_id = a.id")
-                        .gt(true, UserDO::getId, 1)
-                        .eq(true, UserDO::getSex, "男")
-                        .stringQuery()
-                        .like(true, "addr.tel", "1")
-                        .le(true, "a.province", "1"));
+                        .like("addr.tel", "1")
+                        .le("a.province", "1"));
     }
 }
 ```
@@ -239,21 +220,17 @@ FROM
     LEFT JOIN user_address addr on t.id = addr.user_id
     RIGHT JOIN area a on addr.area_id = a.id
 WHERE (
-    t.id > ?
-    AND t.sex = ?
-    AND addr.tel LIKE ?
+    addr.tel LIKE ?
     AND a.province <= ?)
 ```
 
 说明:
 
 * UserDTO.class 查询结果类(resultType)
-* selectAll(UserDO.class) 查询主表全部字段(主表实体类)
+* selectAll(UserDO.class) 查询主表全部字段(主表实体类)默认主表别名 "t"
 * select() mp的select策略是覆盖,以最后一次为准,这里的策略是追加,可以一直select  
   主表字段可以用lambda,会自动添加表别名,主表别名默认是 t ,非主表字段必须带别名查询
 * leftJoin() rightJoin() innerJoin() 传sql片段 格式 (表 + 别名 + 关联条件)
-* stringQuery() lambda查询转string查询
-* lambda() string查询转lambda查询
 * 条件查询,可以查询主表以及参与连接的所有表的字段,全部调用mp原生的方法,正常使用没有sql注入风险
 
 ### 分页查询
@@ -312,10 +289,8 @@ class test {
                         //自定义数据集
                         .leftJoin("(select * from user_address) addr on t.id = addr.user_id")
                         .rightJoin("area a on addr.area_id = a.id")
-                        .eq(true, UserDO::getId, 1)
-                        .stringQuery()
-                        .like(true, "addr.tel", "1")
-                        .le(true, "a.province", "1")
+                        .like("addr.tel", "1")
+                        .le("a.province", "1")
                         .orderByDesc("addr.id"));
     }
 }
@@ -338,8 +313,7 @@ FROM
     LEFT JOIN (select * from user_address) addr on t.id = addr.user_id
     RIGHT JOIN area a on addr.area_id = a.id
 WHERE (
-    t.id = ?
-    AND addr.tel LIKE ?
+    addr.tel LIKE ?
     AND a.province <= ?)
 ORDER BY
     addr.id DESC

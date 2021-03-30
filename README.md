@@ -23,7 +23,7 @@ QQ群:1022221898
    <dependency>
        <groupId>com.github.yulichang</groupId>
        <artifactId>mybatis-plus-join</artifactId>
-       <version>1.1.2</version>
+       <version>1.1.4</version>
    </dependency>
    ```
    或者clone代码到本地,执行mvn install,再引入以上依赖  
@@ -37,21 +37,15 @@ QQ群:1022221898
 @Configuration
 public class MybatisPlusConfig {
     /**
-     * 启用连表拦截器
+     * 连表拦截器
      */
     @Bean
-    public MybatisPlusInterceptor mybatisPlusInterceptor() {
-        MybatisPlusInterceptor interceptor = new MybatisPlusInterceptor();
-        //分页插件
-        interceptor.addInnerInterceptor(new PaginationInnerInterceptor());
-        //连表插件
-        interceptor.addInnerInterceptor(new MPJInterceptor());
-        //其他mp插件......
-        return interceptor;
+    public MPJInterceptor mpjInterceptor() {
+        return new MPJInterceptor();
     }
 
     /**
-     * sql注入器
+     * 连表sql注入器
      */
     @Bean
     public MPJSqlInjector sqlInjector() {

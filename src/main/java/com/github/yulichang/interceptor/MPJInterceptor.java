@@ -85,15 +85,12 @@ public class MPJInterceptor implements Interceptor {
                 .cache(ms.getCache())
                 .flushCacheRequired(ms.isFlushCacheRequired())
                 .useCache(ms.isUseCache());
-
         if (ms.getKeyProperties() != null && ms.getKeyProperties().length != 0) {
             builder.keyProperty(String.join(StringPool.COMMA, ms.getKeyProperties()));
         }
-
         List<ResultMap> resultMaps = new ArrayList<>();
         resultMaps.add(new ResultMap.Builder(ms.getConfiguration(), ms.getId(), resultType, EMPTY_RESULT_MAPPING).build());
         builder.resultMaps(resultMaps);
-
         MappedStatement mappedStatement = builder.build();
         MS_CACHE.put(id, mappedStatement);
         return mappedStatement;

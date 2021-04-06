@@ -22,7 +22,7 @@ QQ群:1022221898
    或者clone代码到本地,执行mvn install,再引入以上依赖  
    <br>
    注意: mybatis plus version >= 3.4.0
-   <br><br>
+   <br>
 
 ### 使用
 

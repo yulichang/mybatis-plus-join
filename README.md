@@ -5,7 +5,6 @@
 * [演示示例](https://gitee.com/best_handsome/mybatis-plus-join-demo)
 
 QQ群:1022221898  
-[扫码进微信群](https://gitee.com/best_handsome/mybatis-plus-join/blob/master/wx.png)
 
 ## 使用方法
 
@@ -23,36 +22,13 @@ QQ群:1022221898
    <dependency>
        <groupId>com.github.yulichang</groupId>
        <artifactId>mybatis-plus-join</artifactId>
-       <version>1.1.4</version>
+       <version>1.1.5</version>
    </dependency>
    ```
    或者clone代码到本地,执行mvn install,再引入以上依赖  
    <br>
    注意: mybatis plus version >= 3.4.0
    <br><br>
-2. 添加配置文件
-
-```java
-
-@Configuration
-public class MybatisPlusConfig {
-    /**
-     * 连表拦截器
-     */
-    @Bean
-    public MPJInterceptor mpjInterceptor() {
-        return new MPJInterceptor();
-    }
-
-    /**
-     * 连表sql注入器
-     */
-    @Bean
-    public MPJSqlInjector sqlInjector() {
-        return new MPJSqlInjector();
-    }
-}
-```
 
 ### 使用
 

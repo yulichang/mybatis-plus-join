@@ -8,12 +8,6 @@ QQ群:1022221898
 
 ## 使用方法
 
-[goto wiki](https://gitee.com/best_handsome/mybatis-plus-join/wikis)
-
-## 通用连表wrapper
-
-[点击跳转至使用方法](https://gitee.com/best_handsome/mybatis-plus-join/tree/master/src/main/java/com/github/yulichang/common)
-
 ### 安装
 
 1. 在项目中添加依赖

@@ -22,7 +22,7 @@ public abstract class MPJAbstractLambdaWrapper<T, Children extends MPJAbstractLa
     /**
      * 关联的表
      */
-    protected final Map<Class<?>, Integer> subTable = new HashMap<>();
+    protected Map<Class<?>, Integer> subTable = new HashMap<>();
 
     @Override
     protected <X> String columnToString(X column) {

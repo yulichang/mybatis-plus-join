@@ -71,7 +71,8 @@ public class MPJJoinLambdaQueryWrapper<T> extends MPJAbstractLambdaWrapper<T, MP
      */
     MPJJoinLambdaQueryWrapper(T entity, Class<T> entityClass, SharedString sqlSelect, AtomicInteger paramNameSeq,
                               Map<String, Object> paramNameValuePairs, MergeSegments mergeSegments,
-                              SharedString lastSql, SharedString sqlComment, SharedString sqlFirst) {
+                              SharedString lastSql, SharedString sqlComment, SharedString sqlFirst,
+                              Map<Class<?>, Integer> subTable) {
         super.setEntity(entity);
         super.setEntityClass(entityClass);
         this.paramNameSeq = paramNameSeq;
@@ -81,6 +82,7 @@ public class MPJJoinLambdaQueryWrapper<T> extends MPJAbstractLambdaWrapper<T, MP
         this.lastSql = lastSql;
         this.sqlComment = sqlComment;
         this.sqlFirst = sqlFirst;
+        this.subTable = subTable;
     }
 
     /**
@@ -182,7 +184,8 @@ public class MPJJoinLambdaQueryWrapper<T> extends MPJAbstractLambdaWrapper<T, MP
     @Override
     protected MPJJoinLambdaQueryWrapper<T> instance() {
         return new MPJJoinLambdaQueryWrapper<>(getEntity(), getEntityClass(), null, paramNameSeq, paramNameValuePairs,
-                new MergeSegments(), SharedString.emptyString(), SharedString.emptyString(), SharedString.emptyString());
+                new MergeSegments(), SharedString.emptyString(), SharedString.emptyString(), SharedString.emptyString(),
+                this.subTable);
     }
 
     @Override

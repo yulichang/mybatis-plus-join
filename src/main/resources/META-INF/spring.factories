@@ -1,3 +1,4 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
   com.github.yulichang.interceptor.MPJInterceptor,\
-  com.github.yulichang.injector.MPJSqlInjector
+  com.github.yulichang.injector.MPJSqlInjector,\
+  com.github.yulichang.config.InterceptorConfig

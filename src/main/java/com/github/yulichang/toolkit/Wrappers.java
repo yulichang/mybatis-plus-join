@@ -1,8 +1,7 @@
 package com.github.yulichang.toolkit;
 
-import com.github.yulichang.query.MPJLambdaQueryWrapper;
 import com.github.yulichang.query.MPJQueryWrapper;
-import com.github.yulichang.wrapper.MPJJoinLambdaQueryWrapper;
+import com.github.yulichang.wrapper.MPJLambdaWrapper;
 
 /**
  * Wrapper 条件构造
@@ -15,12 +14,7 @@ public class Wrappers {
         return new MPJQueryWrapper<>();
     }
 
-    @Deprecated
-    public static <T> MPJLambdaQueryWrapper<T> lambdaJoin() {
-        return new MPJLambdaQueryWrapper<>();
-    }
-
-    public static <T> MPJJoinLambdaQueryWrapper<T> lambdaJoinWrapper() {
-        return new MPJJoinLambdaQueryWrapper<>();
+    public static <T> MPJLambdaWrapper<T> lambdaJoin() {
+        return new MPJLambdaWrapper<>();
     }
 }

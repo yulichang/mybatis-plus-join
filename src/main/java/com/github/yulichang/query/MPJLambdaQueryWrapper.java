@@ -28,12 +28,13 @@ import java.util.stream.Collectors;
  * <p>
  * 推荐使用以下两个类 :
  * String -> {@link MPJQueryWrapper<T>}
- * lambda -> {@link com.github.yulichang.wrapper.MPJJoinLambdaQueryWrapper<T>}
+ * lambda -> {@link com.github.yulichang.wrapper.MPJLambdaWrapper<T>}
  * <p>
  *
  * @author yulichang
  */
 @Deprecated
+@SuppressWarnings("DeprecatedIsStillUsed")
 public class MPJLambdaQueryWrapper<T> extends AbstractLambdaWrapper<T, MPJLambdaQueryWrapper<T>>
         implements Query<MPJLambdaQueryWrapper<T>, T, SFunction<T, ?>>, MPJJoin<MPJLambdaQueryWrapper<T>> {
 

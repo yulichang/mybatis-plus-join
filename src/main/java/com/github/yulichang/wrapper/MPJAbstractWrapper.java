@@ -28,7 +28,10 @@ import static com.baomidou.mybatisplus.core.enums.WrapperKeyword.APPLY;
 import static java.util.stream.Collectors.joining;
 
 /**
+ * 查询条件封装
  * copy {@link com.baomidou.mybatisplus.core.conditions.AbstractWrapper}
+ *
+ * @author yulichang
  */
 @SuppressWarnings({"serial", "unchecked"})
 public abstract class MPJAbstractWrapper<T, Children extends MPJAbstractWrapper<T, Children>> extends Wrapper<T>

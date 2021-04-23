@@ -16,7 +16,7 @@ QQ群:1022221898
    <dependency>
        <groupId>com.github.yulichang</groupId>
        <artifactId>mybatis-plus-join</artifactId>
-       <version>1.1.5</version>
+       <version>1.1.6</version>
    </dependency>
    ```
    或者clone代码到本地,执行mvn install,再引入以上依赖  
@@ -42,11 +42,11 @@ QQ群:1022221898
 
 3. MPJBaseServiceImpl 继承了ServiceImpl,同样添加了以上方法
 
-## 核心类 MPJQueryWrapper和MPJJoinLambdaQueryWrapper
+## 核心类 MPJLambdaWrapper和MPJQueryWrapper
 
-### MPJJoinLambdaQueryWrapper用法
+### MPJLambdaWrapper用法
 
-#### MPJJoinLambdaQueryWrapper示例
+#### MPJLambdaWrapper示例
 
 #### 简单的3表查询
 
@@ -57,7 +57,7 @@ class test {
 
     void testJoin() {
         List<UserDTO> list = userMapper.selectJoinList(UserDTO.class,
-                new MPJJoinLambdaQueryWrapper<UserDO>()
+                Wrappers.<UserDO>lambdaJoin()
                         .selectAll(UserDO.class)
                         .select(UserAddressDO::getTel)
                         .selectAs(UserAddressDO::getAddress, UserDTO::getUserAddress)
@@ -116,7 +116,7 @@ class test {
 
     void testJoin() {
         IPage<UserDTO> iPage = userMapper.selectJoinPage(new Page<>(2, 10), UserDTO.class,
-                new MPJJoinLambdaQueryWrapper<UserDO>()
+                Wrappers.<UserDO>lambdaJoin()
                         .selectAll(UserDO.class)
                         .select(UserAddressDO::getTel)
                         .selectAs(UserAddressDO::getAddress, UserDTO::getUserAddress)
@@ -157,7 +157,7 @@ class test {
 
     void testJoin() {
         List<UserDTO> list = userMapper.selectJoinList(UserDTO.class,
-                new MPJQueryWrapper<UserDO>()
+                Wrappers.<UserDO>queryJoin()
                         .selectAll(UserDO.class)
                         .select("addr.tel", "addr.address", "a.province")
                         .leftJoin("user_address addr on t.id = addr.user_id")
@@ -206,7 +206,7 @@ class test {
 
     void testJoin() {
         IPage<UserDTO> page = userMapper.selectJoinPage(new Page<>(1, 10), UserDTO.class,
-                new MPJLambdaQueryWrapper<UserDO>()
+                Wrappers.<UserDO>queryJoin()
                         .selectAll(UserDO.class)
                         .select("addr.tel", "addr.address")
                         .select("a.province")
@@ -243,7 +243,7 @@ class test {
 
     void testJoin() {
         List<UserDTO> list = userMapper.selectJoinList(UserDTO.class,
-                new MPJLambdaQueryWrapper<UserDO>()
+                Wrappers.<UserDO>queryJoin()
                         .selectAll(UserDO.class)
                         .select("addr.tel", "addr.address")
                         //行列转换

@@ -25,8 +25,10 @@ import java.util.stream.Collectors;
 
 /**
  * copy {@link com.baomidou.mybatisplus.core.conditions.query.QueryWrapper}
+ * 推荐使用 Wrappers.<>MPJQueryWrapper();构造
  *
  * @author yulichang
+ * @see com.github.yulichang.toolkit.Wrappers
  */
 public class MPJQueryWrapper<T> extends AbstractWrapper<T, String, MPJQueryWrapper<T>>
         implements Query<MPJQueryWrapper<T>, T, String>, MPJJoin<MPJQueryWrapper<T>> {

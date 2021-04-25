@@ -10,10 +10,16 @@ import com.github.yulichang.wrapper.MPJLambdaWrapper;
  */
 public class Wrappers {
 
+    /**
+     * Wrappers.<UserDO>queryJoin()
+     */
     public static <T> MPJQueryWrapper<T> queryJoin() {
         return new MPJQueryWrapper<>();
     }
 
+    /**
+     * Wrappers.<UserDO>lambdaJoin()
+     */
     public static <T> MPJLambdaWrapper<T> lambdaJoin() {
         return new MPJLambdaWrapper<>();
     }

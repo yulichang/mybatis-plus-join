@@ -57,7 +57,7 @@ class test {
 
     void testJoin() {
         List<UserDTO> list = userMapper.selectJoinList(UserDTO.class,
-                Wrappers.<UserDO>lambdaJoin()
+                new MPJLambdaWrapper<UserDO>()
                         .selectAll(UserDO.class)
                         .select(UserAddressDO::getTel)
                         .selectAs(UserAddressDO::getAddress, UserDTO::getUserAddress)
@@ -157,7 +157,7 @@ class test {
 
     void testJoin() {
         List<UserDTO> list = userMapper.selectJoinList(UserDTO.class,
-                new MPJLambdaWrapper<UserDO>()
+                new MPJQueryWrapper<UserDO>()
                         .selectAll(UserDO.class)
                         .select("addr.tel", "addr.address", "a.province")
                         .leftJoin("user_address addr on t.id = addr.user_id")

@@ -4,7 +4,7 @@
 
 * [演示示例](https://gitee.com/best_handsome/mybatis-plus-join-demo)
 
-QQ群:1022221898  
+QQ群:1022221898
 
 ## 使用方法
 
@@ -116,7 +116,7 @@ class test {
 
     void testJoin() {
         IPage<UserDTO> iPage = userMapper.selectJoinPage(new Page<>(2, 10), UserDTO.class,
-                Wrappers.<UserDO>lambdaJoin()
+                new MPJLambdaWrapper<UserDO>()
                         .selectAll(UserDO.class)
                         .select(UserAddressDO::getTel)
                         .selectAs(UserAddressDO::getAddress, UserDTO::getUserAddress)
@@ -157,7 +157,7 @@ class test {
 
     void testJoin() {
         List<UserDTO> list = userMapper.selectJoinList(UserDTO.class,
-                Wrappers.<UserDO>queryJoin()
+                new MPJLambdaWrapper<UserDO>()
                         .selectAll(UserDO.class)
                         .select("addr.tel", "addr.address", "a.province")
                         .leftJoin("user_address addr on t.id = addr.user_id")
@@ -197,16 +197,17 @@ WHERE (
 * leftJoin() rightJoin() innerJoin() 传sql片段 格式 (表 + 别名 + 关联条件)
 * 条件查询,可以查询主表以及参与连接的所有表的字段,全部调用mp原生的方法,正常使用没有sql注入风险
 
-### 分页查询
+#### 分页查询
 
 ```java
+
 class test {
     @Resource
     private UserMapper userMapper;
 
     void testJoin() {
         IPage<UserDTO> page = userMapper.selectJoinPage(new Page<>(1, 10), UserDTO.class,
-                Wrappers.<UserDO>queryJoin()
+                new MPJQueryWrapper<UserDO>()
                         .selectAll(UserDO.class)
                         .select("addr.tel", "addr.address")
                         .select("a.province")
@@ -234,7 +235,7 @@ FROM
 LIMIT ?,?
 ```
 
-### 还可以这么操作,但不建议
+#### 还可以这么操作,但不建议
 
 ```java
 class test {
@@ -243,7 +244,7 @@ class test {
 
     void testJoin() {
         List<UserDTO> list = userMapper.selectJoinList(UserDTO.class,
-                Wrappers.<UserDO>queryJoin()
+                new MPJQueryWrapper<UserDO>()
                         .selectAll(UserDO.class)
                         .select("addr.tel", "addr.address")
                         //行列转换

@@ -3,6 +3,8 @@ package com.github.yulichang.injector;
 import com.baomidou.mybatisplus.core.injector.AbstractMethod;
 import com.baomidou.mybatisplus.core.injector.DefaultSqlInjector;
 import com.github.yulichang.method.*;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 
 import java.util.List;
 
@@ -12,6 +14,7 @@ import java.util.List;
  * @author yulichang
  * @see DefaultSqlInjector
  */
+@ConditionalOnMissingBean(DefaultSqlInjector.class)
 public class MPJSqlInjector extends DefaultSqlInjector {
 
     @Override

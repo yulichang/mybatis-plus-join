@@ -4,7 +4,7 @@
 
 * [演示示例](https://gitee.com/best_handsome/mybatis-plus-join-demo)
 
-* 点个Star支持以下吧 :)
+* 点个Star支持一下吧 :)
 
 QQ群:1022221898
 

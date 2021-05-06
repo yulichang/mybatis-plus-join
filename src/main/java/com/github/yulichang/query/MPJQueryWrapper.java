@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
 
 /**
  * copy {@link com.baomidou.mybatisplus.core.conditions.query.QueryWrapper}
- * 推荐使用 Wrappers.<>MPJQueryWrapper();构造
+ * 推荐使用 Wrappers.<UserDO>queryJoin();构造
  *
  * @author yulichang
  * @see com.github.yulichang.toolkit.Wrappers

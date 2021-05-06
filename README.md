@@ -14,17 +14,22 @@ QQ群:1022221898
 
 1. 在项目中添加依赖
 
-   ```xml
-   <dependency>
-       <groupId>com.github.yulichang</groupId>
-       <artifactId>mybatis-plus-join</artifactId>
-       <version>1.1.6</version>
-   </dependency>
-   ```
-   或者clone代码到本地,执行mvn install,再引入以上依赖  
-   <br>
-   注意: mybatis plus version >= 3.4.0
-   <br>
+- Maven
+  ```xml
+  <dependency>
+      <groupId>com.github.yulichang</groupId>
+      <artifactId>mybatis-plus-join</artifactId>
+      <version>1.1.6</version>
+  </dependency>
+  ```
+- Gradle
+  ```
+   implementation group: 'com.github.yulichang', name: 'mybatis-plus-join', version: '1.1.6'
+  ```
+  或者clone代码到本地自行安装,再引入以上依赖  
+  <br>
+  注意: mybatis plus version >= 3.4.0
+  <br>
 
 ### 使用
 

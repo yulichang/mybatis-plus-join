@@ -31,13 +31,9 @@ public class InterceptorConfig implements ApplicationListener<ApplicationReadyEv
     @Override
     @SuppressWarnings("unchecked")
     public void onApplicationEvent(ApplicationReadyEvent event) {
-        System.out.println("werwerewqrweqtwtrwqt\n\newqwerw\n\n");
         if (CollectionUtils.isNotEmpty(sqlSessionFactoryList)) {
             try {
                 for (SqlSessionFactory factory : sqlSessionFactoryList) {
-                    System.out.println("WWwwwwwwwwwwwwwwwwwwww");
-                    System.out.println("\n\n\n\n\n");
-                    System.out.println("wwwwwwwwwwwwwwwwwwwwwwwwwwwww");
                     Field interceptorChain = Configuration.class.getDeclaredField("interceptorChain");
                     interceptorChain.setAccessible(true);
                     InterceptorChain chain = (InterceptorChain) interceptorChain.get(factory.getConfiguration());

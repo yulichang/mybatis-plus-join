@@ -8,6 +8,7 @@ import org.apache.ibatis.plugin.InterceptorChain;
 import org.apache.ibatis.session.Configuration;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.boot.context.event.ApplicationStartedEvent;
 import org.springframework.context.ApplicationListener;
 
@@ -20,7 +21,7 @@ import java.util.List;
  *
  * @author yulichang
  */
-public class InterceptorConfig implements ApplicationListener<ApplicationStartedEvent> {
+public class InterceptorConfig implements ApplicationListener<ApplicationReadyEvent> {
 
     @Autowired
     private List<SqlSessionFactory> sqlSessionFactoryList;
@@ -29,10 +30,14 @@ public class InterceptorConfig implements ApplicationListener<ApplicationStarted
 
     @Override
     @SuppressWarnings("unchecked")
-    public void onApplicationEvent(ApplicationStartedEvent event) {
+    public void onApplicationEvent(ApplicationReadyEvent event) {
+        System.out.println("werwerewqrweqtwtrwqt\n\newqwerw\n\n");
         if (CollectionUtils.isNotEmpty(sqlSessionFactoryList)) {
             try {
                 for (SqlSessionFactory factory : sqlSessionFactoryList) {
+                    System.out.println("WWwwwwwwwwwwwwwwwwwwww");
+                    System.out.println("\n\n\n\n\n");
+                    System.out.println("wwwwwwwwwwwwwwwwwwwwwwwwwwwww");
                     Field interceptorChain = Configuration.class.getDeclaredField("interceptorChain");
                     interceptorChain.setAccessible(true);
                     InterceptorChain chain = (InterceptorChain) interceptorChain.get(factory.getConfiguration());

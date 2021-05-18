@@ -1,6 +1,7 @@
 package com.github.yulichang.wrapper;
 
 import com.baomidou.mybatisplus.core.toolkit.StringPool;
+import com.baomidou.mybatisplus.core.toolkit.support.ColumnCache;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.github.yulichang.toolkit.Constant;
 import com.github.yulichang.toolkit.LambdaUtils;
@@ -24,6 +25,9 @@ public abstract class MPJAbstractLambdaWrapper<T, Children extends MPJAbstractLa
      */
     protected Map<Class<?>, Integer> subTable = new HashMap<>();
 
+    private Map<String, ColumnCache> columnMap = null;
+    private boolean initColumnMap = false;
+
     @Override
     protected <X> String columnToString(X column) {
         return columnToString((SFunction<?, ?>) column, true);
@@ -35,8 +39,12 @@ public abstract class MPJAbstractLambdaWrapper<T, Children extends MPJAbstractLa
     }
 
     protected String columnToString(SFunction<?, ?> column, boolean onlyColumn) {
+        if (!initColumnMap) {
+            columnMap = com.baomidou.mybatisplus.core.toolkit.LambdaUtils.getColumnMap(LambdaUtils.getEntityClass(column));
+            initColumnMap = true;
+        }
         return Constant.TABLE_ALIAS + getDefault(subTable.get(LambdaUtils.getEntityClass(column))) + StringPool.DOT +
-                LambdaUtils.getColumn(column);
+                columnMap.get(LambdaUtils.getName(column)).getColumn();
     }
 
     protected String getDefault(Integer i) {

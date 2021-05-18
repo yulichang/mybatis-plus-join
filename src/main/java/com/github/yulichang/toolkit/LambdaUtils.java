@@ -1,12 +1,11 @@
 package com.github.yulichang.toolkit;
 
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.core.toolkit.StringUtils;
+import com.baomidou.mybatisplus.core.toolkit.support.ColumnCache;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
-import com.baomidou.mybatisplus.core.toolkit.support.SerializedLambda;
+import com.github.yulichang.exception.MPJException;
 import org.apache.ibatis.reflection.property.PropertyNamer;
 
-import java.util.Objects;
+import java.util.Map;
 
 /**
  * @author yulichang
@@ -22,21 +21,6 @@ public final class LambdaUtils {
         return PropertyNamer.methodToProperty(com.baomidou.mybatisplus.core.toolkit.LambdaUtils.resolve(fn).getImplMethodName());
     }
 
-    /**
-     * 获取列名
-     */
-    public static <T> String getColumn(SFunction<T, ?> fn) {
-        SerializedLambda lambda = com.baomidou.mybatisplus.core.toolkit.LambdaUtils.resolve(fn);
-        String fieldName = PropertyNamer.methodToProperty(lambda.getImplMethodName());
-        try {
-            TableField annotation = lambda.getImplClass().getDeclaredField(fieldName).getAnnotation(TableField.class);
-            if (Objects.nonNull(annotation) && StringUtils.isNotBlank(annotation.value())) {
-                return annotation.value();
-            }
-        } catch (NoSuchFieldException ignored) {
-        }
-        return StringUtils.camelToUnderline(fieldName);
-    }
 
     @SuppressWarnings("unchecked")
     public static <T> Class<T> getEntityClass(SFunction<T, ?> fn) {

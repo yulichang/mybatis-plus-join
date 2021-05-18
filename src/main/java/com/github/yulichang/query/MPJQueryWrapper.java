@@ -172,13 +172,6 @@ public class MPJQueryWrapper<T> extends AbstractWrapper<T, String, MPJQueryWrapp
         return alias.getStringValue();
     }
 
-    /**
-     * 返回一个支持 lambda 函数写法的 wrapper
-     */
-    public MPJLambdaQueryWrapper<T> lambda() {
-        return new MPJLambdaQueryWrapper<>(getEntity(), getEntityClass(), from, sqlSelect, paramNameSeq, paramNameValuePairs,
-                expression, lastSql, sqlComment, sqlFirst, selectColumns, ignoreColumns);
-    }
 
     /**
      * 用于生成嵌套 sql

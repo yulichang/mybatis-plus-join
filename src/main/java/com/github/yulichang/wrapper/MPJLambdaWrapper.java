@@ -98,7 +98,7 @@ public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWr
     public final <S> MPJLambdaWrapper<T> select(SFunction<S, ?>... columns) {
         if (ArrayUtils.isNotEmpty(columns)) {
             for (SFunction<S, ?> s : columns) {
-                selectColumns.add(new SelectColumn(LambdaUtils.getEntityClass(s), LambdaUtils.getColumn(s), null));
+                selectColumns.add(new SelectColumn(LambdaUtils.getEntityClass(s), getCache(s).getColumn(), null));
             }
         }
         return typedThis;
@@ -120,7 +120,7 @@ public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWr
      * @since 1.1.3
      */
     public final <S, X> MPJLambdaWrapper<T> selectAs(SFunction<S, ?> columns, String alias) {
-        selectColumns.add(new SelectColumn(LambdaUtils.getEntityClass(columns), LambdaUtils.getColumn(columns), alias));
+        selectColumns.add(new SelectColumn(LambdaUtils.getEntityClass(columns), getCache(columns).getColumn(), alias));
         return typedThis;
     }
 
@@ -150,7 +150,7 @@ public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWr
     public final <S> MPJLambdaWrapper<T> selectIgnore(SFunction<S, ?>... columns) {
         if (ArrayUtils.isNotEmpty(columns)) {
             for (SFunction<S, ?> s : columns) {
-                ignoreColumns.add(new SelectColumn(LambdaUtils.getEntityClass(s), LambdaUtils.getColumn(s), null));
+                ignoreColumns.add(new SelectColumn(LambdaUtils.getEntityClass(s), getCache(s).getColumn(), null));
             }
         }
         return typedThis;
@@ -210,11 +210,11 @@ public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWr
                     .append(Constant.ON_TABLE_ALIAS)
                     .append(tableIndex)
                     .append(StringPool.DOT)
-                    .append(LambdaUtils.getColumn(left))
+                    .append(getCache(left).getColumn())
                     .append(Constant.EQUALS_TABLE_ALIAS)
                     .append(getDefault(subTable.get(LambdaUtils.getEntityClass(right))))
                     .append(StringPool.DOT)
-                    .append(LambdaUtils.getColumn(right));
+                    .append(getCache(right).getColumn());
             tableIndex++;
             if (StringUtils.isBlank(from.getStringValue())) {
                 from.setStringValue(sb.toString());

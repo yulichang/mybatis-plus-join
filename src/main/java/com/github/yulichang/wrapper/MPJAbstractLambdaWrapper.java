@@ -25,8 +25,10 @@ public abstract class MPJAbstractLambdaWrapper<T, Children extends MPJAbstractLa
      */
     protected Map<Class<?>, Integer> subTable = new HashMap<>();
 
-    private Map<String, ColumnCache> columnMap = null;
-    private boolean initColumnMap = false;
+    /**
+     * 缓存字段
+     */
+    protected Map<Class<?>, Map<String, ColumnCache>> columnMap = new HashMap<>();
 
     @Override
     protected <X> String columnToString(X column) {
@@ -39,12 +41,18 @@ public abstract class MPJAbstractLambdaWrapper<T, Children extends MPJAbstractLa
     }
 
     protected String columnToString(SFunction<?, ?> column, boolean onlyColumn) {
-        if (!initColumnMap) {
-            columnMap = com.baomidou.mybatisplus.core.toolkit.LambdaUtils.getColumnMap(LambdaUtils.getEntityClass(column));
-            initColumnMap = true;
-        }
         return Constant.TABLE_ALIAS + getDefault(subTable.get(LambdaUtils.getEntityClass(column))) + StringPool.DOT +
-                columnMap.get(LambdaUtils.getName(column)).getColumn();
+                getCache(column).getColumn();
+    }
+
+    protected ColumnCache getCache(SFunction<?, ?> fn) {
+        Class<?> aClass = LambdaUtils.getEntityClass(fn);
+        Map<String, ColumnCache> cacheMap = columnMap.get(aClass);
+        if (cacheMap == null) {
+            cacheMap = com.baomidou.mybatisplus.core.toolkit.LambdaUtils.getColumnMap(aClass);
+            columnMap.put(aClass, cacheMap);
+        }
+        return cacheMap.get(com.baomidou.mybatisplus.core.toolkit.LambdaUtils.formatKey(LambdaUtils.getName(fn)));
     }
 
     protected String getDefault(Integer i) {

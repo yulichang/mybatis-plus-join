@@ -8,7 +8,6 @@ package com.github.yulichang.wrapper;
  * @author yulichang
  */
 @Deprecated
-@SuppressWarnings("DeprecatedIsStillUsed")
 public class MPJJoinLambdaQueryWrapper<T> extends MPJLambdaWrapper<T> {
 
 

@@ -2,10 +2,13 @@ package com.github.yulichang.interceptor;
 
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.core.toolkit.StringPool;
+import com.github.yulichang.metadata.TableInfo;
+import com.github.yulichang.metadata.TableInfoHelper;
 import com.github.yulichang.method.MPJResultType;
 import com.github.yulichang.toolkit.Constant;
 import org.apache.ibatis.executor.Executor;
 import org.apache.ibatis.mapping.MappedStatement;
+import org.apache.ibatis.mapping.ResultFlag;
 import org.apache.ibatis.mapping.ResultMap;
 import org.apache.ibatis.mapping.ResultMapping;
 import org.apache.ibatis.plugin.Interceptor;
@@ -15,10 +18,7 @@ import org.apache.ibatis.plugin.Signature;
 import org.apache.ibatis.session.ResultHandler;
 import org.apache.ibatis.session.RowBounds;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -38,6 +38,11 @@ public class MPJInterceptor implements Interceptor {
      * 缓存MappedStatement,不需要每次都去重写构建MappedStatement
      */
     private static final Map<String, MappedStatement> MS_CACHE = new ConcurrentHashMap<>();
+
+    /**
+     * 缓存ResultMap
+     */
+    private static final Map<Class<?>, ResultMap> RM_CACHE = new ConcurrentHashMap<>();
 
     @Override
     public Object intercept(Invocation invocation) throws Throwable {
@@ -89,10 +94,44 @@ public class MPJInterceptor implements Interceptor {
             builder.keyProperty(String.join(StringPool.COMMA, ms.getKeyProperties()));
         }
         List<ResultMap> resultMaps = new ArrayList<>();
-        resultMaps.add(new ResultMap.Builder(ms.getConfiguration(), ms.getId(), resultType, EMPTY_RESULT_MAPPING).build());
+        resultMaps.add(newResultMap(ms, resultType));
         builder.resultMaps(resultMaps);
         MappedStatement mappedStatement = builder.build();
         MS_CACHE.put(id, mappedStatement);
         return mappedStatement;
+    }
+
+    /**
+     * 构建resultMap
+     */
+    private ResultMap newResultMap(MappedStatement ms, Class<?> resultType) {
+        com.baomidou.mybatisplus.core.metadata.TableInfo tableInfo = com.baomidou.mybatisplus.core.metadata.TableInfoHelper.getTableInfo(resultType);
+        if (tableInfo != null && tableInfo.isAutoInitResultMap()) {
+            ResultMap resultMap = RM_CACHE.get(resultType);
+            if (resultMap == null) {
+                TableInfo info = TableInfoHelper.initTableInfo(ms.getConfiguration(), ms.getId().substring(0, ms.getId().lastIndexOf(".")), resultType);
+                resultMap = initResultMapIfNeed(info, resultType);
+                RM_CACHE.put(resultType, resultMap);
+            }
+            return resultMap;
+        }
+        return new ResultMap.Builder(ms.getConfiguration(), ms.getId(), resultType, EMPTY_RESULT_MAPPING).build();
+    }
+
+    /**
+     * 构建resultMap
+     */
+    private ResultMap initResultMapIfNeed(TableInfo info, Class<?> resultType) {
+        String id = info.getCurrentNamespace() + ".mybatis-plus-join_" + resultType.getSimpleName();
+        List<ResultMapping> resultMappings = new ArrayList<>();
+        if (info.havePK()) {
+            ResultMapping idMapping = new ResultMapping.Builder(info.getConfiguration(), info.getKeyProperty(), info.getKeyColumn(), info.getKeyType())
+                    .flags(Collections.singletonList(ResultFlag.ID)).build();
+            resultMappings.add(idMapping);
+        }
+        if (CollectionUtils.isNotEmpty(info.getFieldList())) {
+            info.getFieldList().forEach(i -> resultMappings.add(i.getResultMapping(info.getConfiguration())));
+        }
+        return new ResultMap.Builder(info.getConfiguration(), id, resultType, resultMappings).build();
     }
 }

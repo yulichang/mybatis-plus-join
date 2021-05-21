@@ -48,11 +48,6 @@ public class MPJInterceptor implements Interceptor {
      */
     private static final Map<String, MappedStatement> MS_CACHE = new ConcurrentHashMap<>();
 
-    /**
-     * 缓存ResultMap
-     */
-    private static final Map<Class<?>, ResultMap> RM_CACHE = new ConcurrentHashMap<>();
-
     @Override
     public Object intercept(Invocation invocation) throws Throwable {
         Object[] args = invocation.getArgs();
@@ -116,23 +111,17 @@ public class MPJInterceptor implements Interceptor {
     private ResultMap newResultMap(MappedStatement ms, Class<?> resultType) {
         TableInfo tableInfo = TableInfoHelper.getTableInfo(resultType);
         if (tableInfo != null && tableInfo.isAutoInitResultMap()) {
-            ResultMap resultMap = RM_CACHE.get(resultType);
-            if (resultMap == null) {
-                if (tableInfo.getEntityType() != resultType) {
-                    try {
-                        Method info = TableInfoHelper.class.getDeclaredMethod("initTableInfo", Configuration.class, String.class, Class.class);
-                        info.setAccessible(true);
-                        Object invoke = info.invoke(TableInfoHelper.class, ms.getConfiguration(), ms.getId().substring(0, ms.getId().lastIndexOf(".")), resultType);
-                        tableInfo = (TableInfo) invoke;
-//                        tableInfo = TableInfoHelper.initTableInfo(ms.getConfiguration(), ms.getId().substring(0, ms.getId().lastIndexOf(".")), resultType);
-                    } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
-                        e.printStackTrace();
-                    }
+            if (tableInfo.getEntityType() != resultType) {
+                try {
+                    Method info = TableInfoHelper.class.getDeclaredMethod("initTableInfo", Configuration.class, String.class, Class.class);
+                    info.setAccessible(true);
+                    Object invoke = info.invoke(TableInfoHelper.class, ms.getConfiguration(), ms.getId().substring(0, ms.getId().lastIndexOf(".")), resultType);
+                    tableInfo = (TableInfo) invoke;
+                } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
+                    e.printStackTrace();
                 }
-                resultMap = initResultMapIfNeed(tableInfo, resultType);
-                RM_CACHE.put(resultType, resultMap);
             }
-            return resultMap;
+            return initResultMapIfNeed(tableInfo, resultType);
         }
         return new ResultMap.Builder(ms.getConfiguration(), ms.getId(), resultType, EMPTY_RESULT_MAPPING).build();
     }

@@ -434,7 +434,7 @@ public abstract class MPJAbstractWrapper<T, Children extends MPJAbstractWrapper<
      */
     protected final String formatParam(String mapping, Object param) {
         final String genParamName = Constants.WRAPPER_PARAM + paramNameSeq.incrementAndGet();
-        final String paramStr = getParamAlias() + Constants.WRAPPER_PARAM_MIDDLE + genParamName;
+        final String paramStr = getParamAlias() + ".paramNameValuePairs." + genParamName;
         paramNameValuePairs.put(genParamName, param);
         return SqlScriptUtils.safeParam(paramStr, mapping);
     }
@@ -553,7 +553,7 @@ public abstract class MPJAbstractWrapper<T, Children extends MPJAbstractWrapper<
      */
     public Children setParamAlias(String paramAlias) {
         Assert.notEmpty(paramAlias, "paramAlias can not be empty!");
-        Assert.isEmpty(paramNameValuePairs, "Please call this method before working!");
+        Assert.isTrue(CollectionUtils.isEmpty(paramNameValuePairs), "Please call this method before working!");
         Assert.isNull(this.paramAlias, "Please do not call the method repeatedly!");
         this.paramAlias = new SharedString(paramAlias);
         return typedThis;

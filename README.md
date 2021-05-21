@@ -19,7 +19,7 @@ QQ群:1022221898
   <dependency>
       <groupId>com.github.yulichang</groupId>
       <artifactId>mybatis-plus-join</artifactId>
-      <version>1.1.6</version>
+      <version>1.1.7</version>
   </dependency>
   ```
 - Gradle

@@ -96,7 +96,7 @@ public class TableInfoHelper {
         tableInfo.setTableName(targetTableName);
 
         /* 开启了自定义 KEY 生成器 */
-        if (null != dbConfig.getKeyGenerator()) {
+        if (CollectionUtils.isNotEmpty(dbConfig.getKeyGenerators())) {
             tableInfo.setKeySequence(clazz.getAnnotation(KeySequence.class));
         }
         return excludeProperty;
@@ -146,6 +146,8 @@ public class TableInfoHelper {
         boolean existTableId = isExistTableId(list);
         // 是否存在 @TableLogic 注解
         boolean existTableLogic = isExistTableLogic(list);
+        // 是否存在 @OrderBy 注解
+        boolean existOrderBy = isExistOrderBy(list);
 
         List<TableFieldInfo> fieldList = new ArrayList<>(list.size());
         for (Field field : list) {
@@ -175,12 +177,12 @@ public class TableInfoHelper {
 
             /* 有 @TableField 注解的字段初始化 */
             if (tableField != null) {
-                fieldList.add(new TableFieldInfo(dbConfig, tableInfo, field, tableField, reflector, existTableLogic));
+                fieldList.add(new TableFieldInfo(dbConfig, tableInfo, field, tableField, reflector, existTableLogic, existOrderBy));
                 continue;
             }
 
-            /* 无 @TableField 注解的字段初始化 */
-            fieldList.add(new TableFieldInfo(dbConfig, tableInfo, field, reflector, existTableLogic));
+            /* 无 @TableField  注解的字段初始化 */
+            fieldList.add(new TableFieldInfo(dbConfig, tableInfo, field, reflector, existTableLogic, existOrderBy));
         }
 
         /* 字段列表 */
@@ -218,6 +220,18 @@ public class TableInfoHelper {
 
     /**
      * <p>
+     * 判断排序注解是否存在
+     * </p>
+     *
+     * @param list 字段列表
+     * @return true 为存在 @TableId 注解;
+     */
+    public static boolean isExistOrderBy(List<Field> list) {
+        return list.stream().anyMatch(field -> field.isAnnotationPresent(OrderBy.class));
+    }
+
+    /**
+     * <p>
      * 主键属性初始化
      * </p>
      *
@@ -233,7 +247,7 @@ public class TableInfoHelper {
         final String property = field.getName();
         if (field.getAnnotation(TableField.class) != null) {
             logger.warn(String.format("This \"%s\" is the table primary key by @TableId annotation in Class: \"%s\",So @TableField annotation will not work!",
-                    property, tableInfo.getEntityType().getName()));
+                property, tableInfo.getEntityType().getName()));
         }
         /* 主键策略（ 注解 > 全局 ） */
         // 设置 Sequence 其他策略无效
@@ -260,12 +274,12 @@ public class TableInfoHelper {
         final Class<?> keyType = reflector.getGetterType(property);
         if (keyType.isPrimitive()) {
             logger.warn(String.format("This primary key of \"%s\" is primitive !不建议如此请使用包装类 in Class: \"%s\"",
-                    property, tableInfo.getEntityType().getName()));
+                property, tableInfo.getEntityType().getName()));
         }
         tableInfo.setKeyRelated(checkRelated(underCamel, property, column))
-                .setKeyColumn(column)
-                .setKeyProperty(property)
-                .setKeyType(keyType);
+            .setKeyColumn(column)
+            .setKeyProperty(property)
+            .setKeyType(keyType);
     }
 
     /**
@@ -284,7 +298,7 @@ public class TableInfoHelper {
         if (DEFAULT_ID_NAME.equalsIgnoreCase(property)) {
             if (field.getAnnotation(TableField.class) != null) {
                 logger.warn(String.format("This \"%s\" is the table primary key by default name for `id` in Class: \"%s\",So @TableField will not work!",
-                        property, tableInfo.getEntityType().getName()));
+                    property, tableInfo.getEntityType().getName()));
             }
             String column = property;
             if (dbConfig.isCapitalMode()) {
@@ -293,13 +307,13 @@ public class TableInfoHelper {
             final Class<?> keyType = reflector.getGetterType(property);
             if (keyType.isPrimitive()) {
                 logger.warn(String.format("This primary key of \"%s\" is primitive !不建议如此请使用包装类 in Class: \"%s\"",
-                        property, tableInfo.getEntityType().getName()));
+                    property, tableInfo.getEntityType().getName()));
             }
             tableInfo.setKeyRelated(checkRelated(tableInfo.isUnderCamel(), property, column))
-                    .setIdType(dbConfig.getIdType())
-                    .setKeyColumn(column)
-                    .setKeyProperty(property)
-                    .setKeyType(keyType);
+                .setIdType(dbConfig.getIdType())
+                .setKeyColumn(column)
+                .setKeyProperty(property)
+                .setKeyType(keyType);
             return true;
         }
         return false;
@@ -322,7 +336,7 @@ public class TableInfoHelper {
         if (underCamel) {
             // 开启了驼峰并且 column 包含下划线
             return !(propertyUpper.equals(columnUpper) ||
-                    propertyUpper.equals(columnUpper.replace(StringPool.UNDERSCORE, StringPool.EMPTY)));
+                propertyUpper.equals(columnUpper.replace(StringPool.UNDERSCORE, StringPool.EMPTY)));
         } else {
             // 未开启驼峰,直接判断 property 是否与 column 相同(全大写)
             return !propertyUpper.equals(columnUpper);
@@ -340,10 +354,10 @@ public class TableInfoHelper {
     public static List<Field> getAllFields(Class<?> clazz) {
         List<Field> fieldList = ReflectionKit.getFieldList(ClassUtils.getUserClass(clazz));
         return fieldList.stream()
-                .filter(field -> {
-                    /* 过滤注解非表字段属性 */
-                    TableField tableField = field.getAnnotation(TableField.class);
-                    return (tableField == null || tableField.exist());
-                }).collect(toList());
+            .filter(field -> {
+                /* 过滤注解非表字段属性 */
+                TableField tableField = field.getAnnotation(TableField.class);
+                return (tableField == null || tableField.exist());
+            }).collect(toList());
     }
 }

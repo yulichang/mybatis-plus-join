@@ -13,6 +13,7 @@ import lombok.experimental.Accessors;
 import org.apache.ibatis.session.Configuration;
 
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -148,6 +149,13 @@ public class TableInfo implements Constants {
     @Setter(AccessLevel.NONE)
     private TableFieldInfo versionFieldInfo;
 
+    /**
+     * 排序列表
+     */
+    @Getter
+    @Setter
+    public List<TableFieldInfo> orderByFields;
+
     public TableInfo(Class<?> entityType) {
         this.entityType = entityType;
     }
@@ -197,6 +205,12 @@ public class TableInfo implements Constants {
             }
             if (i.isWithUpdateFill()) {
                 this.withUpdateFill = true;
+            }
+            if (i.isOrderBy()) {
+                if (null == this.orderByFields) {
+                    this.orderByFields = new LinkedList<>();
+                }
+                this.orderByFields.add(i);
             }
             if (i.isVersion()) {
                 this.withVersion = true;

@@ -3,12 +3,8 @@ package com.github.yulichang.wrapper.interfaces;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 
 import java.io.Serializable;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.Optional;
 import java.util.function.Consumer;
-
-import static java.util.stream.Collectors.toList;
 
 /**
  * 将原来的泛型R改成SFunction<R, ?>
@@ -63,6 +59,7 @@ public interface Func<Children> extends Serializable {
      * 字段 IN (value.get(0), value.get(1), ...)
      * <p>例: in("id", Arrays.asList(1, 2, 3, 4, 5))</p>
      *
+     * <li> 注意！集合为空若存在逻辑错误，请在 condition 条件中判断 </li>
      * <li> 如果集合为 empty 则不会进行 sql 拼接 </li>
      *
      * @param condition 执行条件
@@ -83,6 +80,7 @@ public interface Func<Children> extends Serializable {
      * 字段 IN (v0, v1, ...)
      * <p>例: in("id", 1, 2, 3, 4, 5)</p>
      *
+     * <li> 注意！数组为空若存在逻辑错误，请在 condition 条件中判断 </li>
      * <li> 如果动态数组为 empty 则不会进行 sql 拼接 </li>
      *
      * @param condition 执行条件
@@ -90,10 +88,7 @@ public interface Func<Children> extends Serializable {
      * @param values    数据数组
      * @return children
      */
-    default <R> Children in(boolean condition, SFunction<R, ?> column, Object... values) {
-        return in(condition, column, Arrays.stream(Optional.ofNullable(values).orElseGet(() -> new Object[]{}))
-                .collect(toList()));
-    }
+    <R> Children in(boolean condition, SFunction<R, ?> column, Object... values);
 
     /**
      * ignore
@@ -129,10 +124,7 @@ public interface Func<Children> extends Serializable {
      * @param values    数据数组
      * @return children
      */
-    default <R> Children notIn(boolean condition, SFunction<R, ?> column, Object... values) {
-        return notIn(condition, column, Arrays.stream(Optional.ofNullable(values).orElseGet(() -> new Object[]{}))
-                .collect(toList()));
-    }
+    <R> Children notIn(boolean condition, SFunction<R, ?> column, Object... values);
 
     /**
      * ignore
@@ -177,15 +169,8 @@ public interface Func<Children> extends Serializable {
     /**
      * ignore
      */
-    default <R> Children groupBy(SFunction<R, ?> column) {
-        return groupBy(true, column);
-    }
-
-    /**
-     * ignore
-     */
-    default <R> Children groupBy(SFunction<R, ?>... columns) {
-        return groupBy(true, columns);
+    default <R> Children groupBy(SFunction<R, ?> column, SFunction<R, ?>... columns) {
+        return groupBy(true, column, columns);
     }
 
     /**
@@ -193,23 +178,17 @@ public interface Func<Children> extends Serializable {
      * <p>例: groupBy("id", "name")</p>
      *
      * @param condition 执行条件
+     * @param column    单个字段
      * @param columns   字段数组
      * @return children
      */
-    <R> Children groupBy(boolean condition, SFunction<R, ?>... columns);
+    <R> Children groupBy(boolean condition, SFunction<R, ?> column, SFunction<R, ?>... columns);
 
     /**
      * ignore
      */
-    default <R> Children orderByAsc(SFunction<R, ?> column) {
-        return orderByAsc(true, column);
-    }
-
-    /**
-     * ignore
-     */
-    default <R> Children orderByAsc(SFunction<R, ?>... columns) {
-        return orderByAsc(true, columns);
+    default <R> Children orderByAsc(SFunction<R, ?> column, SFunction<R, ?>... columns) {
+        return orderByAsc(true, column, columns);
     }
 
     /**
@@ -217,25 +196,19 @@ public interface Func<Children> extends Serializable {
      * <p>例: orderByAsc("id", "name")</p>
      *
      * @param condition 执行条件
+     * @param column    单个字段
      * @param columns   字段数组
      * @return children
      */
-    default <R> Children orderByAsc(boolean condition, SFunction<R, ?>... columns) {
-        return orderBy(condition, true, columns);
+    default <R> Children orderByAsc(boolean condition, SFunction<R, ?> column, SFunction<R, ?>... columns) {
+        return orderBy(condition, true, column, columns);
     }
 
     /**
      * ignore
      */
-    default <R> Children orderByDesc(SFunction<R, ?> column) {
-        return orderByDesc(true, column);
-    }
-
-    /**
-     * ignore
-     */
-    default <R> Children orderByDesc(SFunction<R, ?>... columns) {
-        return orderByDesc(true, columns);
+    default <R> Children orderByDesc(SFunction<R, ?> column, SFunction<R, ?>... columns) {
+        return orderByDesc(true, column, columns);
     }
 
     /**
@@ -243,11 +216,12 @@ public interface Func<Children> extends Serializable {
      * <p>例: orderByDesc("id", "name")</p>
      *
      * @param condition 执行条件
+     * @param column    单个字段
      * @param columns   字段数组
      * @return children
      */
-    default <R> Children orderByDesc(boolean condition, SFunction<R, ?>... columns) {
-        return orderBy(condition, false, columns);
+    default <R> Children orderByDesc(boolean condition, SFunction<R, ?> column, SFunction<R, ?>... columns) {
+        return orderBy(condition, false, column, columns);
     }
 
     /**
@@ -256,10 +230,11 @@ public interface Func<Children> extends Serializable {
      *
      * @param condition 执行条件
      * @param isAsc     是否是 ASC 排序
+     * @param column    单个字段
      * @param columns   字段数组
      * @return children
      */
-    <R> Children orderBy(boolean condition, boolean isAsc, SFunction<R, ?>... columns);
+    <R> Children orderBy(boolean condition, boolean isAsc, SFunction<R, ?> column, SFunction<R, ?>... columns);
 
     /**
      * ignore

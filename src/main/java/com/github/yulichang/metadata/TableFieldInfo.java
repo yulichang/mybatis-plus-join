@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.annotation.*;
 import com.baomidou.mybatisplus.core.config.GlobalConfig;
 import com.baomidou.mybatisplus.core.toolkit.Constants;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
+import com.baomidou.mybatisplus.core.toolkit.sql.SqlScriptUtils;
 import lombok.*;
 import org.apache.ibatis.mapping.ResultMapping;
 import org.apache.ibatis.reflection.Reflector;
@@ -42,6 +43,10 @@ public class TableFieldInfo implements Constants {
      * 属性表达式#{property}, 可以指定jdbcType, typeHandler等
      */
     private final String el;
+    /**
+     * jdbcType, typeHandler等部分
+     */
+    private final String mapping;
     /**
      * 属性类型
      */
@@ -141,6 +146,32 @@ public class TableFieldInfo implements Constants {
     private Class<? extends TypeHandler<?>> typeHandler;
 
     /**
+     *  是否存在OrderBy注解
+     */
+    private boolean isOrderBy;
+    /**
+     * 排序类型
+     */
+    private String orderByType;
+    /**
+     * 排序顺序
+     */
+    private short orderBySort;
+
+    /**
+     * 全新的 存在 TableField 注解时使用的构造函数
+     */
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    public TableFieldInfo(GlobalConfig.DbConfig dbConfig, TableInfo tableInfo, Field field, TableField tableField,
+                          Reflector reflector, boolean existTableLogic,boolean isOrderBy) {
+        this(dbConfig,tableInfo,field,tableField,reflector,existTableLogic);
+        this.isOrderBy = isOrderBy;
+        if(isOrderBy){
+            initOrderBy(field);
+        }
+    }
+
+    /**
      * 全新的 存在 TableField 注解时使用的构造函数
      */
     @SuppressWarnings({"unchecked", "rawtypes"})
@@ -163,7 +194,7 @@ public class TableFieldInfo implements Constants {
         String el = this.property;
         if (JdbcType.UNDEFINED != jdbcType) {
             this.jdbcType = jdbcType;
-            el += (COMMA + "jdbcType=" + jdbcType.name());
+            el += (COMMA + SqlScriptUtils.mappingJdbcType(jdbcType));
         }
         if (UnknownTypeHandler.class != typeHandler) {
             this.typeHandler = (Class<? extends TypeHandler<?>>) typeHandler;
@@ -183,12 +214,14 @@ public class TableFieldInfo implements Constants {
                 }
                 el += (COMMA + "javaType=" + javaType);
             }
-            el += (COMMA + "typeHandler=" + typeHandler.getName());
+            el += (COMMA + SqlScriptUtils.mappingTypeHandler(this.typeHandler));
         }
         if (StringUtils.isNotBlank(numericScale)) {
-            el += (COMMA + "numericScale=" + numericScale);
+            el += (COMMA + SqlScriptUtils.mappingNumericScale(Integer.valueOf(numericScale)));
         }
         this.el = el;
+        int index = el.indexOf(COMMA);
+        this.mapping = index > 0 ? el.substring(++index) : null;
         this.initLogicDelete(dbConfig, field, existTableLogic);
 
         String column = tableField.value();
@@ -211,7 +244,7 @@ public class TableFieldInfo implements Constants {
         this.column = column;
         this.sqlSelect = column;
         if (tableInfo.getResultMap() == null && !tableInfo.isAutoInitResultMap() &&
-                TableInfoHelper.checkRelated(tableInfo.isUnderCamel(), this.property, this.column)) {
+            TableInfoHelper.checkRelated(tableInfo.isUnderCamel(), this.property, this.column)) {
             /* 未设置 resultMap 也未开启自动构建 resultMap, 字段规则又不符合 mybatis 的自动封装规则 */
             String propertyFormat = dbConfig.getPropertyFormat();
             String asProperty = this.property;
@@ -245,6 +278,17 @@ public class TableFieldInfo implements Constants {
      * 不存在 TableField 注解时, 使用的构造函数
      */
     public TableFieldInfo(GlobalConfig.DbConfig dbConfig, TableInfo tableInfo, Field field, Reflector reflector,
+                          boolean existTableLogic,boolean isOrderBy) {
+        this(dbConfig,tableInfo,field,reflector,existTableLogic);
+        this.isOrderBy = isOrderBy;
+        if(isOrderBy){
+            initOrderBy(field);
+        }
+    }
+    /**
+     * 不存在 TableField 注解时, 使用的构造函数
+     */
+    public TableFieldInfo(GlobalConfig.DbConfig dbConfig, TableInfo tableInfo, Field field, Reflector reflector,
                           boolean existTableLogic) {
         field.setAccessible(true);
         this.field = field;
@@ -254,6 +298,7 @@ public class TableFieldInfo implements Constants {
         this.isPrimitive = this.propertyType.isPrimitive();
         this.isCharSequence = StringUtils.isCharSequence(this.propertyType);
         this.el = this.property;
+        this.mapping = null;
         this.insertStrategy = dbConfig.getInsertStrategy();
         this.updateStrategy = dbConfig.getUpdateStrategy();
         this.whereStrategy = dbConfig.getSelectStrategy();
@@ -277,7 +322,7 @@ public class TableFieldInfo implements Constants {
         this.column = column;
         this.sqlSelect = column;
         if (tableInfo.getResultMap() == null && !tableInfo.isAutoInitResultMap() &&
-                TableInfoHelper.checkRelated(tableInfo.isUnderCamel(), this.property, this.column)) {
+            TableInfoHelper.checkRelated(tableInfo.isUnderCamel(), this.property, this.column)) {
             /* 未设置 resultMap 也未开启自动构建 resultMap, 字段规则又不符合 mybatis 的自动封装规则 */
             String propertyFormat = dbConfig.getPropertyFormat();
             String asProperty = this.property;
@@ -285,6 +330,21 @@ public class TableFieldInfo implements Constants {
                 asProperty = String.format(propertyFormat, this.property);
             }
             this.sqlSelect += (AS + asProperty);
+        }
+    }
+
+    /**
+     * 排序初始化
+     * @param field 字段
+     */
+    private void initOrderBy(Field field){
+        OrderBy orderBy = field.getAnnotation(OrderBy.class);
+        if (null != orderBy) {
+            this.isOrderBy = true;
+            this.orderBySort = orderBy.sort();
+            this.orderByType = orderBy.isDesc()?"desc":"asc";
+        }else{
+            this.isOrderBy = false;
         }
     }
 

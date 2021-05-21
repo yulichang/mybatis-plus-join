@@ -3,17 +3,18 @@ package com.github.yulichang.wrapper;
 import com.baomidou.mybatisplus.core.conditions.ISqlSegment;
 import com.baomidou.mybatisplus.core.conditions.SharedString;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
-import com.baomidou.mybatisplus.core.conditions.interfaces.Join;
 import com.baomidou.mybatisplus.core.conditions.interfaces.Nested;
 import com.baomidou.mybatisplus.core.conditions.segments.MergeSegments;
 import com.baomidou.mybatisplus.core.enums.SqlKeyword;
 import com.baomidou.mybatisplus.core.enums.SqlLike;
 import com.baomidou.mybatisplus.core.toolkit.*;
+import com.baomidou.mybatisplus.core.toolkit.sql.SqlScriptUtils;
 import com.baomidou.mybatisplus.core.toolkit.sql.SqlUtils;
 import com.baomidou.mybatisplus.core.toolkit.sql.StringEscape;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.github.yulichang.wrapper.interfaces.Compare;
 import com.github.yulichang.wrapper.interfaces.Func;
+import com.github.yulichang.wrapper.interfaces.Join;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -46,6 +47,11 @@ public abstract class MPJAbstractWrapper<T, Children extends MPJAbstractWrapper<
      */
     protected AtomicInteger paramNameSeq;
     protected Map<String, Object> paramNameValuePairs;
+    /**
+     * 其他
+     */
+    /* mybatis plus 3.4.3新增 这个时wrapper的别名 不是MPJ的别名 */
+    protected SharedString paramAlias;
     protected SharedString lastSql;
     /**
      * SQL注释
@@ -176,14 +182,14 @@ public abstract class MPJAbstractWrapper<T, Children extends MPJAbstractWrapper<
 
     @Override
     public <X> Children between(boolean condition, SFunction<X, ?> column, Object val1, Object val2) {
-        return doIt(condition, () -> columnToString(column), BETWEEN, () -> formatSql("{0}", val1), AND,
-                () -> formatSql("{0}", val2));
+        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(column), BETWEEN,
+                () -> formatParam(null, val1), AND, () -> formatParam(null, val2)));
     }
 
     @Override
     public <X> Children notBetween(boolean condition, SFunction<X, ?> column, Object val1, Object val2) {
-        return doIt(condition, () -> columnToString(column), NOT_BETWEEN, () -> formatSql("{0}", val1), AND,
-                () -> formatSql("{0}", val2));
+        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(column), NOT_BETWEEN,
+                () -> formatParam(null, val1), AND, () -> formatParam(null, val2)));
     }
 
     @Override
@@ -208,12 +214,13 @@ public abstract class MPJAbstractWrapper<T, Children extends MPJAbstractWrapper<
 
     @Override
     public Children or(boolean condition) {
-        return doIt(condition, OR);
+        return maybeDo(condition, () -> appendSqlSegments(OR));
     }
 
     @Override
-    public Children apply(boolean condition, String applySql, Object... value) {
-        return doIt(condition, APPLY, () -> formatSql(applySql, value));
+    public Children apply(boolean condition, String applySql, Object... values) {
+        return maybeDo(condition, () -> appendSqlSegments(APPLY,
+                () -> formatSqlMaybeWithParam(applySql, null, values)));
     }
 
     @Override
@@ -241,77 +248,101 @@ public abstract class MPJAbstractWrapper<T, Children extends MPJAbstractWrapper<
     }
 
     @Override
-    public Children exists(boolean condition, String existsSql) {
-        return doIt(condition, EXISTS, () -> String.format("(%s)", existsSql));
+    public Children exists(boolean condition, String existsSql, Object... values) {
+        return maybeDo(condition, () -> appendSqlSegments(EXISTS,
+                () -> String.format("(%s)", formatSqlMaybeWithParam(existsSql, null, values))));
     }
 
     @Override
-    public Children notExists(boolean condition, String existsSql) {
-        return not(condition).exists(condition, existsSql);
+    public Children notExists(boolean condition, String existsSql, Object... values) {
+        return not(condition).exists(condition, existsSql, values);
     }
 
     @Override
     public <X> Children isNull(boolean condition, SFunction<X, ?> column) {
-        return doIt(condition, () -> columnToString(column), IS_NULL);
+        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(column), IS_NULL));
     }
 
     @Override
     public <X> Children isNotNull(boolean condition, SFunction<X, ?> column) {
-        return doIt(condition, () -> columnToString(column), IS_NOT_NULL);
+        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(column), IS_NOT_NULL));
     }
 
     @Override
     public <X> Children in(boolean condition, SFunction<X, ?> column, Collection<?> coll) {
-        return doIt(condition, () -> columnToString(column), IN, inExpression(coll));
+        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(column), IN, inExpression(coll)));
+    }
+
+    @Override
+    public <X> Children in(boolean condition, SFunction<X, ?> column, Object... values) {
+        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(column), IN, inExpression(values)));
     }
 
     @Override
     public <X> Children notIn(boolean condition, SFunction<X, ?> column, Collection<?> coll) {
-        return doIt(condition, () -> columnToString(column), NOT_IN, inExpression(coll));
+        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(column), NOT_IN, inExpression(coll)));
+    }
+
+    @Override
+    public <X> Children notIn(boolean condition, SFunction<X, ?> column, Object... values) {
+        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(column), NOT_IN, inExpression(values)));
     }
 
     @Override
     public <X> Children inSql(boolean condition, SFunction<X, ?> column, String inValue) {
-        return doIt(condition, () -> columnToString(column), IN, () -> String.format("(%s)", inValue));
+        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(column), IN,
+                () -> String.format("(%s)", inValue)));
     }
 
     @Override
     public <X> Children notInSql(boolean condition, SFunction<X, ?> column, String inValue) {
-        return doIt(condition, () -> columnToString(column), NOT_IN, () -> String.format("(%s)", inValue));
+        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(column), NOT_IN,
+                () -> String.format("(%s)", inValue)));
     }
 
     @Override
-    public <X> Children groupBy(boolean condition, SFunction<X, ?>... columns) {
-        if (ArrayUtils.isEmpty(columns)) {
-            return typedThis;
-        }
-        return doIt(condition, GROUP_BY,
-                () -> columns.length == 1 ? columnToString(columns[0]) : columnsToString(columns));
+    public <X> Children groupBy(boolean condition, SFunction<X, ?> column, SFunction<X, ?>... columns) {
+        return maybeDo(condition, () -> {
+            String one = columnToString(column);
+            if (ArrayUtils.isNotEmpty(columns)) {
+                one += (StringPool.COMMA + columnsToString(columns));
+            }
+            final String finalOne = one;
+            appendSqlSegments(GROUP_BY, () -> finalOne);
+        });
     }
 
     @Override
-    public <X> Children orderBy(boolean condition, boolean isAsc, SFunction<X, ?>... columns) {
-        if (ArrayUtils.isEmpty(columns)) {
-            return typedThis;
-        }
-        SqlKeyword mode = isAsc ? ASC : DESC;
-        for (SFunction<X, ?> column : columns) {
-            doIt(condition, ORDER_BY, () -> columnToString(column), mode);
-        }
-        return typedThis;
+    public <X> Children orderBy(boolean condition, boolean isAsc, SFunction<X, ?> column, SFunction<X, ?>... columns) {
+        return maybeDo(condition, () -> {
+            final SqlKeyword mode = isAsc ? ASC : DESC;
+            appendSqlSegments(ORDER_BY, columnToSqlSegment(column), mode);
+            if (ArrayUtils.isNotEmpty(columns)) {
+                Arrays.stream(columns).forEach(c -> appendSqlSegments(ORDER_BY,
+                        columnToSqlSegment(columnSqlInjectFilter(c)), mode));
+            }
+        });
+    }
+
+    /**
+     * 字段 SQL 注入过滤处理，子类重写实现过滤逻辑
+     *
+     * @param column 字段内容
+     * @return
+     */
+    protected <X> SFunction<X, ?> columnSqlInjectFilter(SFunction<X, ?> column) {
+        return column;
     }
 
     @Override
     public Children having(boolean condition, String sqlHaving, Object... params) {
-        return doIt(condition, HAVING, () -> formatSqlIfNeed(condition, sqlHaving, params));
+        return maybeDo(condition, () -> appendSqlSegments(HAVING,
+                () -> formatSqlMaybeWithParam(sqlHaving, null, params)));
     }
 
     @Override
     public Children func(boolean condition, Consumer<Children> consumer) {
-        if (condition) {
-            consumer.accept(typedThis);
-        }
-        return typedThis;
+        return maybeDo(condition, () -> consumer.accept(typedThis));
     }
 
     /**
@@ -319,7 +350,7 @@ public abstract class MPJAbstractWrapper<T, Children extends MPJAbstractWrapper<
      * <p>NOT 关键词</p>
      */
     protected Children not(boolean condition) {
-        return doIt(condition, NOT);
+        return maybeDo(condition, () -> appendSqlSegments(NOT));
     }
 
     /**
@@ -327,7 +358,7 @@ public abstract class MPJAbstractWrapper<T, Children extends MPJAbstractWrapper<
      * <p>拼接 AND</p>
      */
     protected Children and(boolean condition) {
-        return doIt(condition, AND);
+        return maybeDo(condition, () -> appendSqlSegments(AND));
     }
 
     /**
@@ -335,7 +366,8 @@ public abstract class MPJAbstractWrapper<T, Children extends MPJAbstractWrapper<
      * <p>拼接 LIKE 以及 值</p>
      */
     protected <X> Children likeValue(boolean condition, SqlKeyword keyword, SFunction<X, ?> column, Object val, SqlLike sqlLike) {
-        return doIt(condition, () -> columnToString(column), keyword, () -> formatSql("{0}", SqlUtils.concatLike(val, sqlLike)));
+        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(column), keyword,
+                () -> formatParam(null, SqlUtils.concatLike(val, sqlLike))));
     }
 
     /**
@@ -347,7 +379,8 @@ public abstract class MPJAbstractWrapper<T, Children extends MPJAbstractWrapper<
      * @param val        条件值
      */
     protected <X> Children addCondition(boolean condition, SFunction<X, ?> column, SqlKeyword sqlKeyword, Object val) {
-        return doIt(condition, () -> columnToString(column), sqlKeyword, () -> formatSql("{0}", val));
+        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(column), sqlKeyword,
+                () -> formatParam(null, val)));
     }
 
     /**
@@ -356,12 +389,11 @@ public abstract class MPJAbstractWrapper<T, Children extends MPJAbstractWrapper<
      * @param condition 查询条件值
      */
     protected Children addNestedCondition(boolean condition, Consumer<Children> consumer) {
-        if (condition) {
+        return maybeDo(condition, () -> {
             final Children instance = instance();
             consumer.accept(instance);
-            return doIt(true, APPLY, instance);
-        }
-        return typedThis;
+            appendSqlSegments(APPLY, instance);
+        });
     }
 
     /**
@@ -370,47 +402,55 @@ public abstract class MPJAbstractWrapper<T, Children extends MPJAbstractWrapper<
     protected abstract Children instance();
 
     /**
-     * 格式化SQL
-     *
-     * @param sqlStr SQL语句部分
-     * @param params 参数集
-     * @return sql
-     */
-    protected final String formatSql(String sqlStr, Object... params) {
-        return formatSqlIfNeed(true, sqlStr, params);
-    }
-
-    /**
+     * 格式化 sql
      * <p>
-     * 根据需要格式化SQL<br>
-     * <br>
-     * Format SQL for methods: EntityQ<T>.where/and/or...("name={0}", value);
-     * ALL the {<b>i</b>} will be replaced with #{MPGENVAL<b>i</b>}<br>
-     * <br>
-     * ew.where("sample_name=<b>{0}</b>", "haha").and("sample_age &gt;<b>{0}</b>
-     * and sample_age&lt;<b>{1}</b>", 18, 30) <b>TO</b>
-     * sample_name=<b>#{MPGENVAL1}</b> and sample_age&gt;#<b>{MPGENVAL2}</b> and
-     * sample_age&lt;<b>#{MPGENVAL3}</b><br>
-     * </p>
+     * 支持 "{0}" 这种,或者 "sql {0} sql" 这种
      *
-     * @param need   是否需要格式化
-     * @param sqlStr SQL语句部分
-     * @param params 参数集
-     * @return sql
+     * @param sqlStr  可能是sql片段
+     * @param mapping 例如: "javaType=int,jdbcType=NUMERIC,typeHandler=xxx.xxx.MyTypeHandler" 这种
+     * @param params  参数
+     * @return sql片段
      */
-    protected final String formatSqlIfNeed(boolean need, String sqlStr, Object... params) {
-        if (!need || StringUtils.isBlank(sqlStr)) {
+    protected final String formatSqlMaybeWithParam(String sqlStr, String mapping, Object... params) {
+        if (StringUtils.isBlank(sqlStr)) {
+            // todo 何时会这样?
             return null;
         }
         if (ArrayUtils.isNotEmpty(params)) {
             for (int i = 0; i < params.length; ++i) {
-                String genParamName = Constants.WRAPPER_PARAM + paramNameSeq.incrementAndGet();
-                sqlStr = sqlStr.replace(String.format("{%s}", i),
-                        String.format(Constants.WRAPPER_PARAM_FORMAT, Constants.WRAPPER, genParamName));
-                paramNameValuePairs.put(genParamName, params[i]);
+                final String target = Constants.LEFT_BRACE + i + Constants.RIGHT_BRACE;
+                sqlStr = sqlStr.replace(target, formatParam(mapping, params[i]));
             }
         }
         return sqlStr;
+    }
+
+    /**
+     * 处理入参
+     *
+     * @param mapping 例如: "javaType=int,jdbcType=NUMERIC,typeHandler=xxx.xxx.MyTypeHandler" 这种
+     * @param param   参数
+     * @return value
+     */
+    protected final String formatParam(String mapping, Object param) {
+        final String genParamName = Constants.WRAPPER_PARAM + paramNameSeq.incrementAndGet();
+        final String paramStr = getParamAlias() + Constants.WRAPPER_PARAM_MIDDLE + genParamName;
+        paramNameValuePairs.put(genParamName, param);
+        return SqlScriptUtils.safeParam(paramStr, mapping);
+    }
+
+    /**
+     * 函数化的做事
+     *
+     * @param condition 做不做
+     * @param something 做什么
+     * @return Children
+     */
+    protected final Children maybeDo(boolean condition, DoSomething something) {
+        if (condition) {
+            something.doIt();
+        }
+        return typedThis;
     }
 
     /**
@@ -418,8 +458,24 @@ public abstract class MPJAbstractWrapper<T, Children extends MPJAbstractWrapper<
      *
      * @param value 集合
      */
-    private ISqlSegment inExpression(Collection<?> value) {
-        return () -> value.stream().map(i -> formatSql("{0}", i))
+    protected ISqlSegment inExpression(Collection<?> value) {
+        if (CollectionUtils.isEmpty(value)) {
+            return () -> "()";
+        }
+        return () -> value.stream().map(i -> formatParam(null, i))
+                .collect(joining(StringPool.COMMA, StringPool.LEFT_BRACKET, StringPool.RIGHT_BRACKET));
+    }
+
+    /**
+     * 获取in表达式 包含括号
+     *
+     * @param values 数组
+     */
+    protected ISqlSegment inExpression(Object[] values) {
+        if (ArrayUtils.isEmpty(values)) {
+            return () -> "()";
+        }
+        return () -> Arrays.stream(values).map(i -> formatParam(null, i))
                 .collect(joining(StringPool.COMMA, StringPool.LEFT_BRACKET, StringPool.RIGHT_BRACKET));
     }
 
@@ -447,17 +503,12 @@ public abstract class MPJAbstractWrapper<T, Children extends MPJAbstractWrapper<
     }
 
     /**
-     * 对sql片段进行组装
+     * 添加 where 片段
      *
-     * @param condition   是否执行
-     * @param sqlSegments sql片段数组
-     * @return children
+     * @param sqlSegments ISqlSegment 数组
      */
-    protected Children doIt(boolean condition, ISqlSegment... sqlSegments) {
-        if (condition) {
-            expression.add(sqlSegments);
-        }
-        return typedThis;
+    protected void appendSqlSegments(ISqlSegment... sqlSegments) {
+        expression.add(sqlSegments);
     }
 
     @Override
@@ -490,6 +541,31 @@ public abstract class MPJAbstractWrapper<T, Children extends MPJAbstractWrapper<
         return paramNameValuePairs;
     }
 
+    public String getParamAlias() {
+        return paramAlias == null ? Constants.WRAPPER : paramAlias.getStringValue();
+    }
+
+    /**
+     * 参数别名设置，初始化时优先设置该值、重复设置异常
+     *
+     * @param paramAlias 参数别名
+     * @return Children
+     */
+    public Children setParamAlias(String paramAlias) {
+        Assert.notEmpty(paramAlias, "paramAlias can not be empty!");
+        Assert.isEmpty(paramNameValuePairs, "Please call this method before working!");
+        Assert.isNull(this.paramAlias, "Please do not call the method repeatedly!");
+        this.paramAlias = new SharedString(paramAlias);
+        return typedThis;
+    }
+
+    /**
+     * 获取 columnName
+     */
+    protected final <X> ISqlSegment columnToSqlSegment(SFunction<X, ?> column) {
+        return () -> columnToString(column);
+    }
+
     /**
      * 获取 columnName
      */
@@ -510,5 +586,14 @@ public abstract class MPJAbstractWrapper<T, Children extends MPJAbstractWrapper<
     @SuppressWarnings("all")
     public Children clone() {
         return SerializationUtils.clone(typedThis);
+    }
+
+    /**
+     * 做事函数
+     */
+    @FunctionalInterface
+    public interface DoSomething {
+
+        void doIt();
     }
 }

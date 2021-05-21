@@ -1,9 +1,11 @@
 package com.github.yulichang.interceptor;
 
+import com.baomidou.mybatisplus.core.metadata.TableFieldInfo;
+import com.baomidou.mybatisplus.core.metadata.TableInfo;
+import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.core.toolkit.StringPool;
-import com.github.yulichang.metadata.TableInfo;
-import com.github.yulichang.metadata.TableInfoHelper;
+import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.github.yulichang.method.MPJResultType;
 import com.github.yulichang.toolkit.Constant;
 import org.apache.ibatis.executor.Executor;
@@ -15,9 +17,16 @@ import org.apache.ibatis.plugin.Interceptor;
 import org.apache.ibatis.plugin.Intercepts;
 import org.apache.ibatis.plugin.Invocation;
 import org.apache.ibatis.plugin.Signature;
+import org.apache.ibatis.session.Configuration;
 import org.apache.ibatis.session.ResultHandler;
 import org.apache.ibatis.session.RowBounds;
+import org.apache.ibatis.type.JdbcType;
+import org.apache.ibatis.type.TypeHandler;
+import org.apache.ibatis.type.TypeHandlerRegistry;
+import org.apache.ibatis.type.UnknownTypeHandler;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -105,12 +114,22 @@ public class MPJInterceptor implements Interceptor {
      * 构建resultMap
      */
     private ResultMap newResultMap(MappedStatement ms, Class<?> resultType) {
-        com.baomidou.mybatisplus.core.metadata.TableInfo tableInfo = com.baomidou.mybatisplus.core.metadata.TableInfoHelper.getTableInfo(resultType);
+        TableInfo tableInfo = TableInfoHelper.getTableInfo(resultType);
         if (tableInfo != null && tableInfo.isAutoInitResultMap()) {
             ResultMap resultMap = RM_CACHE.get(resultType);
             if (resultMap == null) {
-                TableInfo info = TableInfoHelper.initTableInfo(ms.getConfiguration(), ms.getId().substring(0, ms.getId().lastIndexOf(".")), resultType);
-                resultMap = initResultMapIfNeed(info, resultType);
+                if (tableInfo.getEntityType() != resultType) {
+                    try {
+                        Method info = TableInfoHelper.class.getDeclaredMethod("initTableInfo", Configuration.class, String.class, Class.class);
+                        info.setAccessible(true);
+                        Object invoke = info.invoke(TableInfoHelper.class, ms.getConfiguration(), ms.getId().substring(0, ms.getId().lastIndexOf(".")), resultType);
+                        tableInfo = (TableInfo) invoke;
+//                        tableInfo = TableInfoHelper.initTableInfo(ms.getConfiguration(), ms.getId().substring(0, ms.getId().lastIndexOf(".")), resultType);
+                    } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
+                        e.printStackTrace();
+                    }
+                }
+                resultMap = initResultMapIfNeed(tableInfo, resultType);
                 RM_CACHE.put(resultType, resultMap);
             }
             return resultMap;
@@ -130,8 +149,33 @@ public class MPJInterceptor implements Interceptor {
             resultMappings.add(idMapping);
         }
         if (CollectionUtils.isNotEmpty(info.getFieldList())) {
-            info.getFieldList().forEach(i -> resultMappings.add(i.getResultMapping(info.getConfiguration())));
+            info.getFieldList().forEach(i -> resultMappings.add(getResultMapping(i, info.getConfiguration())));
         }
         return new ResultMap.Builder(info.getConfiguration(), id, resultType, resultMappings).build();
+    }
+
+
+    /**
+     * 获取 ResultMapping
+     *
+     * @param configuration MybatisConfiguration
+     * @return ResultMapping
+     */
+    private ResultMapping getResultMapping(TableFieldInfo info, final Configuration configuration) {
+        ResultMapping.Builder builder = new ResultMapping.Builder(configuration, info.getProperty(),
+                StringUtils.getTargetColumn(info.getColumn()), info.getPropertyType());
+        TypeHandlerRegistry registry = configuration.getTypeHandlerRegistry();
+        if (info.getJdbcType() != null && info.getJdbcType() != JdbcType.UNDEFINED) {
+            builder.jdbcType(info.getJdbcType());
+        }
+        if (info.getTypeHandler() != null && info.getTypeHandler() != UnknownTypeHandler.class) {
+            TypeHandler<?> typeHandler = registry.getMappingTypeHandler(info.getTypeHandler());
+            if (typeHandler == null) {
+                typeHandler = registry.getInstance(info.getPropertyType(), info.getTypeHandler());
+                // todo 这会有影响 registry.register(typeHandler);
+            }
+            builder.typeHandler(typeHandler);
+        }
+        return builder.build();
     }
 }

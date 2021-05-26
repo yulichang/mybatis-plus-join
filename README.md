@@ -1,8 +1,8 @@
 # mybatis-plus-join
 
-* 支持连表查询的[mybatis-plus](https://gitee.com/baomidou/mybatis-plus)
+* 支持连表查询的 [mybatis-plus](https://gitee.com/baomidou/mybatis-plus)
 
-* [演示示例](https://gitee.com/best_handsome/mybatis-plus-join-demo)
+* [演示工程](https://gitee.com/best_handsome/mybatis-plus-join-demo)
 
 * 点个Star支持一下吧 :)
 
@@ -54,8 +54,6 @@ QQ群:1022221898
 ### MPJLambdaWrapper用法
 
 #### MPJLambdaWrapper示例
-
-#### 简单的3表查询
 
 ```java
 class test {

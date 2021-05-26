@@ -21,10 +21,10 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 /**
- * copy {@link com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper}
+ * 参考 {@link com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper}
  * Lambda 语法使用 Wrapper
  * <p>
- * 推荐使用 Wrappers.<UserDO>lambdaWrapper();构造
+ * 推荐使用 Wrappers.<UserDO>lambdaJoin();构造
  *
  * @author yulichang
  * @see com.github.yulichang.toolkit.Wrappers

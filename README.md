@@ -6,6 +6,8 @@
 
 * 点个Star支持一下吧 :)
 
+* [1.1.8发布计划](https://gitee.com/best_handsome/mybatis-plus-join/issues/I3TEBF)
+
 QQ群:1022221898
 
 ## 使用方法

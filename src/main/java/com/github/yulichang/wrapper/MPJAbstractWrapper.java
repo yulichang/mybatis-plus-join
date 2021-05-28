@@ -15,6 +15,7 @@ import com.github.yulichang.toolkit.sql.SqlScriptUtils;
 import com.github.yulichang.wrapper.interfaces.Compare;
 import com.github.yulichang.wrapper.interfaces.Func;
 import com.github.yulichang.wrapper.interfaces.Join;
+import com.github.yulichang.wrapper.interfaces.on.OnCompare;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -34,9 +35,9 @@ import static java.util.stream.Collectors.joining;
  *
  * @author yulichang
  */
-@SuppressWarnings({"serial", "unchecked"})
+@SuppressWarnings("ALL")
 public abstract class MPJAbstractWrapper<T, Children extends MPJAbstractWrapper<T, Children>> extends Wrapper<T>
-        implements Compare<Children>, Nested<Children, Children>, Join<Children>, Func<Children> {
+        implements Compare<Children>, Nested<Children, Children>, Join<Children>, Func<Children>, OnCompare<Children> {
 
     /**
      * 占位符
@@ -383,6 +384,11 @@ public abstract class MPJAbstractWrapper<T, Children extends MPJAbstractWrapper<
                 () -> formatParam(null, val)));
     }
 
+    protected <X, S> Children addCondition(boolean condition, SFunction<X, ?> column, SqlKeyword sqlKeyword, SFunction<S, ?> val) {
+        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(column), sqlKeyword,
+                columnToSqlSegment(val)));
+    }
+
     /**
      * 多重嵌套查询条件
      *
@@ -595,5 +601,69 @@ public abstract class MPJAbstractWrapper<T, Children extends MPJAbstractWrapper<
     public interface DoSomething {
 
         void doIt();
+    }
+
+    /* ************************* on语句重载 *************************** */
+
+    @Override
+    public <R, S> Children eq(boolean condition, SFunction<R, ?> column, SFunction<S, ?> val) {
+        return addCondition(condition, column, EQ, val);
+    }
+
+    @Override
+    public <R, S> Children ne(boolean condition, SFunction<R, ?> column, SFunction<S, ?> val) {
+        return addCondition(condition, column, NE, val);
+    }
+
+    @Override
+    public <R, S> Children gt(boolean condition, SFunction<R, ?> column, SFunction<S, ?> val) {
+        return addCondition(condition, column, GT, val);
+    }
+
+    @Override
+    public <R, S> Children ge(boolean condition, SFunction<R, ?> column, SFunction<S, ?> val) {
+        return addCondition(condition, column, GE, val);
+    }
+
+    @Override
+    public <R, S> Children lt(boolean condition, SFunction<R, ?> column, SFunction<S, ?> val) {
+        return addCondition(condition, column, LT, val);
+    }
+
+    @Override
+    public <R, S> Children le(boolean condition, SFunction<R, ?> column, SFunction<S, ?> val) {
+        return addCondition(condition, column, LE, val);
+    }
+
+    @Override
+    public <R, S, U> Children between(boolean condition, SFunction<R, ?> column, SFunction<S, ?> val1, SFunction<U, ?> val2) {
+        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(column), BETWEEN,
+                columnToSqlSegment(val1), AND, columnToSqlSegment(val2)));
+    }
+
+    public <R, S> Children between(boolean condition, SFunction<R, ?> column, Object val1, SFunction<S, ?> val2) {
+        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(column), BETWEEN,
+                () -> formatParam(null, val1), AND, columnToSqlSegment(val2)));
+    }
+
+    public <R, S> Children between(boolean condition, SFunction<R, ?> column, SFunction<S, ?> val1, Object val2) {
+        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(column), BETWEEN,
+                columnToSqlSegment(val1), AND, () -> formatParam(null, val2)));
+    }
+
+    @Override
+    public <R, S, U> Children notBetween(boolean condition, SFunction<R, ?> column, SFunction<S, ?> val1, SFunction<U, ?> val2) {
+        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(column), NOT_BETWEEN,
+                columnToSqlSegment(val1), AND, columnToSqlSegment(val2)));
+    }
+
+    public <R, U> Children notBetween(boolean condition, SFunction<R, ?> column, Object val1, SFunction<U, ?> val2) {
+        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(column), NOT_BETWEEN,
+                () -> formatParam(null, val1), AND, columnToSqlSegment(val2)));
+    }
+
+    public <R, S> Children notBetween(boolean condition, SFunction<R, ?> column, SFunction<S, ?> val1, Object val2) {
+        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(column), NOT_BETWEEN,
+                columnToSqlSegment(val1), AND, () -> formatParam(null, val2)));
     }
 }

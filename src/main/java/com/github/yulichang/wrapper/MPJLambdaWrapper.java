@@ -8,9 +8,11 @@ import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
 import com.baomidou.mybatisplus.core.toolkit.*;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.github.yulichang.toolkit.Constant;
-import com.github.yulichang.toolkit.LambdaUtils;
 import com.github.yulichang.wrapper.interfaces.LambdaJoin;
 import com.github.yulichang.wrapper.interfaces.SFunctionQuery;
+import com.github.yulichang.wrapper.interfaces.on.OnFunction;
+import lombok.Data;
+import lombok.Getter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -64,11 +66,29 @@ public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWr
     private int tableIndex = 1;
 
     /**
+     * ON sql wrapper集合
+     */
+    private final List<MPJLambdaWrapper<?>> onWrappers = new ArrayList<>();
+
+    /**
+     * 连表关键字 on 条件 func 使用
+     */
+    @Getter
+    private String keyWord;
+
+    /**
+     * 连表实体类 on 条件 func 使用
+     */
+    @Getter
+    private Class<?> joinClass;
+
+    /**
      * 不建议直接 new 该实例，使用 Wrappers.lambdaQuery()
      */
     public MPJLambdaWrapper() {
         super.initNeed();
     }
+
 
     /**
      * 不建议直接 new 该实例，使用 Wrappers.lambdaQuery(...)
@@ -76,7 +96,7 @@ public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWr
     MPJLambdaWrapper(T entity, Class<T> entityClass, SharedString sqlSelect, AtomicInteger paramNameSeq,
                      Map<String, Object> paramNameValuePairs, MergeSegments mergeSegments,
                      SharedString lastSql, SharedString sqlComment, SharedString sqlFirst,
-                     Map<Class<?>, Integer> subTable) {
+                     Map<Class<?>, Integer> subTable, String keyWord, Class<?> joinClass) {
         super.setEntity(entity);
         super.setEntityClass(entityClass);
         this.paramNameSeq = paramNameSeq;
@@ -87,6 +107,8 @@ public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWr
         this.sqlComment = sqlComment;
         this.sqlFirst = sqlFirst;
         this.subTable = subTable;
+        this.keyWord = keyWord;
+        this.joinClass = joinClass;
     }
 
     /**
@@ -174,6 +196,19 @@ public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWr
 
 
     public String getFrom() {
+        if (StringUtils.isBlank(from.getStringValue())) {
+            StringBuilder value = new StringBuilder();
+            for (MPJLambdaWrapper<?> wrapper : onWrappers) {
+                String tableName = TableInfoHelper.getTableInfo(wrapper.getJoinClass()).getTableName();
+                value.append(wrapper.getKeyWord())
+                        .append(tableName)
+                        .append(Constant.SPACE_TABLE_ALIAS)
+                        .append(subTable.get(wrapper.getJoinClass()))
+                        .append(Constant.ON)
+                        .append(wrapper.getExpression().getNormal().getSqlSegment());
+            }
+            from.setStringValue(value.toString());
+        }
         return from.getStringValue();
     }
 
@@ -187,9 +222,13 @@ public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWr
      */
     @Override
     protected MPJLambdaWrapper<T> instance() {
+        return instance(null, null);
+    }
+
+    protected MPJLambdaWrapper<T> instance(String keyWord, Class<?> joinClass) {
         return new MPJLambdaWrapper<>(getEntity(), getEntityClass(), null, paramNameSeq, paramNameValuePairs,
                 new MergeSegments(), SharedString.emptyString(), SharedString.emptyString(), SharedString.emptyString(),
-                this.subTable);
+                this.subTable, keyWord, joinClass);
     }
 
     @Override
@@ -199,28 +238,13 @@ public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWr
     }
 
     @Override
-    public <L, X> MPJLambdaWrapper<T> join(String keyWord, boolean condition, Class<L> clazz, SFunction<L, ?> left, SFunction<X, ?> right) {
+    public <R> MPJLambdaWrapper<T> join(String keyWord, boolean condition, Class<R> clazz, OnFunction function) {
         if (condition) {
+            MPJLambdaWrapper<?> apply = function.apply(instance(keyWord, clazz));
+            onWrappers.add(apply);
             subTable.put(clazz, tableIndex);
             TableInfo leftInfo = TableInfoHelper.getTableInfo(clazz);
-            StringBuilder sb = new StringBuilder(keyWord)
-                    .append(leftInfo.getTableName())
-                    .append(Constant.SPACE_TABLE_ALIAS)
-                    .append(tableIndex)
-                    .append(Constant.ON_TABLE_ALIAS)
-                    .append(tableIndex)
-                    .append(StringPool.DOT)
-                    .append(getCache(left).getColumn())
-                    .append(Constant.EQUALS_TABLE_ALIAS)
-                    .append(getDefault(subTable.get(LambdaUtils.getEntityClass(right))))
-                    .append(StringPool.DOT)
-                    .append(getCache(right).getColumn());
             tableIndex++;
-            if (StringUtils.isBlank(from.getStringValue())) {
-                from.setStringValue(sb.toString());
-            } else {
-                from.setStringValue(from.getStringValue() + sb.toString());
-            }
         }
         return typedThis;
     }
@@ -228,6 +252,7 @@ public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWr
     /**
      * select字段
      */
+    @Data
     public static class SelectColumn {
 
         private Class<?> clazz;
@@ -239,30 +264,6 @@ public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWr
         public SelectColumn(Class<?> clazz, String columnName, String alias) {
             this.clazz = clazz;
             this.columnName = columnName;
-            this.alias = alias;
-        }
-
-        public Class<?> getClazz() {
-            return clazz;
-        }
-
-        public void setClazz(Class<?> clazz) {
-            this.clazz = clazz;
-        }
-
-        public String getColumnName() {
-            return columnName;
-        }
-
-        public void setColumnName(String columnName) {
-            this.columnName = columnName;
-        }
-
-        public String getAlias() {
-            return alias;
-        }
-
-        public void setAlias(String alias) {
             this.alias = alias;
         }
     }

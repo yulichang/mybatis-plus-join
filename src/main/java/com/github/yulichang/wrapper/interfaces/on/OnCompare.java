@@ -9,6 +9,8 @@ import java.io.Serializable;
  * 以及移除不会在ON语句中出现的条件 比如like相关 保留原来的like 只是不太可能会出现 on a.id like b.id 所以不会支持这种写法
  * <p>
  * {@link com.baomidou.mybatisplus.core.conditions.interfaces.Compare}
+ *
+ * @since 1.1.8
  */
 public interface OnCompare<Children> extends Serializable {
     /**

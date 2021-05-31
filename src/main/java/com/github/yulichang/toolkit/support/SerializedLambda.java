@@ -8,12 +8,7 @@ import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import java.io.*;
 
 /**
- * 这个类是从 {@link java.lang.invoke.SerializedLambda} 里面 copy 过来的，
- * 字段信息完全一样
- * <p>负责将一个支持序列的 Function 序列化为 SerializedLambda</p>
- *
- * @author HCL
- * @since 2018/05/10
+ * copy mp before 3.4.3 {@link com.baomidou.mybatisplus.core.toolkit.support.SerializedLambda}
  */
 @SuppressWarnings("unused")
 public class SerializedLambda implements Serializable {

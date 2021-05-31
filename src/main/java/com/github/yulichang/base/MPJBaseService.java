@@ -38,7 +38,6 @@ public interface MPJBaseService<T> extends IService<T> {
      */
     List<Map<String, Object>> selectJoinMaps(MPJBaseJoin wrapper);
 
-
     /**
      * 连接查询返回Map集合并分页
      */

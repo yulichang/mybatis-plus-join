@@ -6,14 +6,9 @@ import org.apache.ibatis.type.JdbcType;
 import org.apache.ibatis.type.TypeHandler;
 
 /**
- * <p>
- * sql 脚本工具类
- * </p>
- *
- * @author miemie
- * @since 2018-08-15
+ * copy mp 3.4.3 {@link com.baomidou.mybatisplus.core.toolkit.sql.SqlScriptUtils}
  */
-@SuppressWarnings("serial")
+@SuppressWarnings("all")
 public abstract class SqlScriptUtils implements Constants {
 
     /**
@@ -73,10 +68,10 @@ public abstract class SqlScriptUtils implements Constants {
      */
     public static String convertChoose(final String whenTest, final String whenSqlScript, final String otherwise) {
         return "<choose>" + NEWLINE
-            + "<when test=\"" + whenTest + QUOTE + RIGHT_CHEV + NEWLINE
-            + whenSqlScript + NEWLINE + "</when>" + NEWLINE
-            + "<otherwise>" + otherwise + "</otherwise>" + NEWLINE
-            + "</choose>";
+                + "<when test=\"" + whenTest + QUOTE + RIGHT_CHEV + NEWLINE
+                + whenSqlScript + NEWLINE + "</when>" + NEWLINE
+                + "<otherwise>" + otherwise + "</otherwise>" + NEWLINE
+                + "</choose>";
     }
 
     /**

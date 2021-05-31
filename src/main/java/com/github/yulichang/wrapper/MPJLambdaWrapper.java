@@ -235,6 +235,10 @@ public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWr
     public void clear() {
         super.clear();
         sqlSelect.toNull();
+        from.toNull();
+        selectColumns.clear();
+        ignoreColumns.clear();
+        subTable.clear();
     }
 
     @Override
@@ -243,7 +247,6 @@ public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWr
             MPJLambdaWrapper<?> apply = function.apply(instance(keyWord, clazz));
             onWrappers.add(apply);
             subTable.put(clazz, tableIndex);
-            TableInfo leftInfo = TableInfoHelper.getTableInfo(clazz);
             tableIndex++;
         }
         return typedThis;

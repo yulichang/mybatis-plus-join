@@ -55,8 +55,6 @@ QQ群:1022221898
 
 ### MPJLambdaWrapper用法
 
-#### MPJLambdaWrapper示例
-
 ```java
 class test {
     @Resource

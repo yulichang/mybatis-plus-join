@@ -14,6 +14,9 @@ public enum SqlMethod {
     /**
      * 连表查询
      */
+    SELECT_JOIN_COUNT("selectJoinCount", "查询满足条件总记录数",
+            "<script>\n%s SELECT COUNT(%s) FROM %s %s %s %s %s\n</script>"),
+
     SELECT_JOIN_ONE("selectJoinOne", "返回一条记录",
             "<script>\n%s SELECT %s FROM %s %s %s %s %s\n</script>"),
 

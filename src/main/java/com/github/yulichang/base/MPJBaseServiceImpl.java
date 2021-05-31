@@ -40,6 +40,11 @@ public class MPJBaseServiceImpl<M extends MPJBaseMapper<T>, T> extends ServiceIm
     }
 
     @Override
+    public Integer selectJoinCount(MPJBaseJoin wrapper) {
+        return baseMapper.selectJoinCount(wrapper);
+    }
+
+    @Override
     public <DTO> DTO selectJoinOne(Class<DTO> clazz, MPJBaseJoin wrapper) {
         return baseMapper.selectJoinOne(clazz, wrapper);
     }

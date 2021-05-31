@@ -30,6 +30,7 @@ public class MPJSqlInjector extends DefaultSqlInjector {
     @Override
     public List<AbstractMethod> getMethodList(Class<?> mapperClass) {
         List<AbstractMethod> list = super.getMethodList(mapperClass);
+        list.add(new SelectJoinCount());
         list.add(new SelectJoinOne());
         list.add(new SelectJoinList());
         list.add(new SelectJoinPage());

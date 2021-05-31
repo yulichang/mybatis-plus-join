@@ -17,6 +17,13 @@ import java.util.Map;
 public interface MPJBaseMapper<T> extends BaseMapper<T> {
 
     /**
+     * 根据 Wrapper 条件，查询总记录数
+     *
+     * @param wrapper joinWrapper
+     */
+    Integer selectJoinCount(@Param(Constants.WRAPPER) MPJBaseJoin wrapper);
+
+    /**
      * 连表查询返回一条记录
      *
      * @param wrapper joinWrapper

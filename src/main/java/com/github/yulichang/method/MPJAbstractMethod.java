@@ -51,6 +51,13 @@ public abstract class MPJAbstractMethod extends AbstractMethod {
                 SqlScriptUtils.unSafeParam(Q_WRAPPER_SQL_SELECT), selectColumns);
     }
 
+    @Override
+    protected String sqlCount() {
+        return SqlScriptUtils.convertChoose(String.format("%s != null and %s != null and %s != ''", WRAPPER,
+                Q_WRAPPER_SQL_SELECT, Q_WRAPPER_SQL_SELECT),
+                SqlScriptUtils.unSafeParam(Q_WRAPPER_SQL_SELECT), ASTERISK);
+    }
+
     protected String sqlAlias() {
         return SqlScriptUtils.convertIf("${ew.alias}", String.format("%s != null and %s != ''", "ew.alias", "ew.alias"), false);
     }

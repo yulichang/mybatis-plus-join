@@ -14,6 +14,11 @@ import java.util.Map;
 public interface MPJBaseService<T> extends IService<T> {
 
     /**
+     * 根据 Wrapper 条件，查询总记录数
+     */
+    Integer selectJoinCount(MPJBaseJoin wrapper);
+
+    /**
      * 连接查询返回一条记录
      */
     <DTO> DTO selectJoinOne(Class<DTO> clazz, MPJBaseJoin wrapper);

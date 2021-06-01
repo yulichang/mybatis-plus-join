@@ -14,7 +14,9 @@ import java.util.Objects;
 import static java.util.stream.Collectors.joining;
 
 /**
- * copy {@link com.baomidou.mybatisplus.core.conditions.AbstractLambdaWrapper}
+ * 参考 {@link com.baomidou.mybatisplus.core.conditions.AbstractLambdaWrapper}
+ *
+ * @author yulichang
  */
 @SuppressWarnings("serial")
 public abstract class MPJAbstractLambdaWrapper<T, Children extends MPJAbstractLambdaWrapper<T, Children>>
@@ -49,10 +51,10 @@ public abstract class MPJAbstractLambdaWrapper<T, Children extends MPJAbstractLa
         Class<?> aClass = LambdaUtils.getEntityClass(fn);
         Map<String, ColumnCache> cacheMap = columnMap.get(aClass);
         if (cacheMap == null) {
-            cacheMap = com.baomidou.mybatisplus.core.toolkit.LambdaUtils.getColumnMap(aClass);
+            cacheMap = LambdaUtils.getColumnMap(aClass);
             columnMap.put(aClass, cacheMap);
         }
-        return cacheMap.get(com.baomidou.mybatisplus.core.toolkit.LambdaUtils.formatKey(LambdaUtils.getName(fn)));
+        return cacheMap.get(LambdaUtils.formatKey(LambdaUtils.getName(fn)));
     }
 
     protected String getDefault(Integer i) {

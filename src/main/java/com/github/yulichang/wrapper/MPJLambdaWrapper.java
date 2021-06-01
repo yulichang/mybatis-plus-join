@@ -8,8 +8,10 @@ import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
 import com.baomidou.mybatisplus.core.toolkit.*;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.github.yulichang.toolkit.Constant;
+import com.github.yulichang.toolkit.LambdaUtils;
+import com.github.yulichang.wrapper.enums.BaseFuncEnum;
 import com.github.yulichang.wrapper.interfaces.LambdaJoin;
-import com.github.yulichang.wrapper.interfaces.SFunctionQuery;
+import com.github.yulichang.wrapper.interfaces.Query;
 import com.github.yulichang.wrapper.interfaces.on.OnFunction;
 import lombok.Data;
 import lombok.Getter;
@@ -33,7 +35,7 @@ import java.util.stream.Collectors;
  */
 @SuppressWarnings("all")
 public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWrapper<T>>
-        implements SFunctionQuery<MPJLambdaWrapper<T>>, LambdaJoin<MPJLambdaWrapper<T>> {
+        implements Query<MPJLambdaWrapper<T>>, LambdaJoin<MPJLambdaWrapper<T>> {
 
     /**
      * 查询字段 sql
@@ -116,33 +118,40 @@ public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWr
      *
      * @param columns 查询字段
      */
+    @Override
     @SafeVarargs
     public final <S> MPJLambdaWrapper<T> select(SFunction<S, ?>... columns) {
         if (ArrayUtils.isNotEmpty(columns)) {
             for (SFunction<S, ?> s : columns) {
-                selectColumns.add(new SelectColumn(com.github.yulichang.toolkit.LambdaUtils.getEntityClass(s), getCache(s).getColumn(), null));
+                selectColumns.add(SelectColumn.of(LambdaUtils.getEntityClass(s), getCache(s).getColumn()));
             }
         }
         return typedThis;
     }
 
+    @Override
     public <E> MPJLambdaWrapper<T> select(Class<E> entityClass, Predicate<TableFieldInfo> predicate) {
         TableInfo info = TableInfoHelper.getTableInfo(entityClass);
         Assert.notNull(info, "table can not be find");
         info.getFieldList().stream().filter(predicate).collect(Collectors.toList()).forEach(
-                i -> selectColumns.add(new SelectColumn(entityClass, i.getColumn(), null)));
+                i -> selectColumns.add(SelectColumn.of(entityClass, i.getColumn())));
         return typedThis;
     }
 
-    public final <S, X> MPJLambdaWrapper<T> selectAs(SFunction<S, ?> columns, SFunction<X, ?> alias) {
-        return selectAs(columns, com.github.yulichang.toolkit.LambdaUtils.getName(alias));
+    @Override
+    public <S> MPJLambdaWrapper<T> selectAs(SFunction<S, ?> column, String alias) {
+        selectColumns.add(SelectColumn.of(LambdaUtils.getEntityClass(column), getCache(column).getColumn(), alias));
+        return typedThis;
     }
 
-    /**
-     * @since 1.1.3
-     */
-    public final <S, X> MPJLambdaWrapper<T> selectAs(SFunction<S, ?> columns, String alias) {
-        selectColumns.add(new SelectColumn(com.github.yulichang.toolkit.LambdaUtils.getEntityClass(columns), getCache(columns).getColumn(), alias));
+    public <S> MPJLambdaWrapper<T> selectFunc(BaseFuncEnum funcEnum, SFunction<S, ?> column, String alias) {
+        selectColumns.add(SelectColumn.of(LambdaUtils.getEntityClass(column), getCache(column).getColumn(), alias, funcEnum));
+        return typedThis;
+    }
+
+    @Override
+    public MPJLambdaWrapper<T> selectFunc(BaseFuncEnum funcEnum, Object column, String alias) {
+        selectColumns.add(SelectColumn.of(null, column.toString(), alias, funcEnum));
         return typedThis;
     }
 
@@ -150,10 +159,10 @@ public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWr
         TableInfo info = TableInfoHelper.getTableInfo(clazz);
         Assert.notNull(info, "table can not be find -> %s", clazz);
         if (info.havePK()) {
-            selectColumns.add(new SelectColumn(clazz, info.getKeyColumn(), null));
+            selectColumns.add(SelectColumn.of(clazz, info.getKeyColumn()));
         }
         info.getFieldList().forEach(c ->
-                selectColumns.add(new SelectColumn(clazz, c.getColumn(), null)));
+                selectColumns.add(SelectColumn.of(clazz, c.getColumn())));
         return typedThis;
     }
 
@@ -172,29 +181,35 @@ public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWr
     public final <S> MPJLambdaWrapper<T> selectIgnore(SFunction<S, ?>... columns) {
         if (ArrayUtils.isNotEmpty(columns)) {
             for (SFunction<S, ?> s : columns) {
-                ignoreColumns.add(new SelectColumn(com.github.yulichang.toolkit.LambdaUtils.getEntityClass(s), getCache(s).getColumn(), null));
+                ignoreColumns.add(SelectColumn.of(LambdaUtils.getEntityClass(s), getCache(s).getColumn()));
             }
         }
         return typedThis;
     }
 
+    /**
+     * 查询条件 SQL 片段
+     */
     @Override
     public String getSqlSelect() {
         if (StringUtils.isBlank(sqlSelect.getStringValue())) {
             if (CollectionUtils.isNotEmpty(ignoreColumns)) {
-                selectColumns.removeIf(c -> ignoreColumns.stream().anyMatch(i ->
+                selectColumns.removeIf(c -> c.getFuncEnum() == null && ignoreColumns.stream().anyMatch(i ->
                         i.getClazz() == c.getClazz() && Objects.equals(c.getColumnName(), i.getColumnName())));
             }
-            String s = selectColumns.stream().map(i ->
-                    Constant.TABLE_ALIAS + getDefault(subTable.get(i.getClazz())) + StringPool.DOT + i.getColumnName() +
-                            (StringUtils.isBlank(i.getAlias()) ? StringPool.EMPTY : (Constant.AS + i.getAlias())))
-                    .collect(Collectors.joining(StringPool.COMMA));
+            String s = selectColumns.stream().map(i -> {
+                String str = Constant.TABLE_ALIAS + getDefault(subTable.get(i.getClazz())) + StringPool.DOT + i.getColumnName();
+                return (i.getFuncEnum() == null ? str : String.format(i.getFuncEnum().getSql(), str)) +
+                        (StringUtils.isBlank(i.getAlias()) ? StringPool.EMPTY : (Constant.AS + i.getAlias()));
+            }).collect(Collectors.joining(StringPool.COMMA));
             sqlSelect.setStringValue(s);
         }
         return sqlSelect.getStringValue();
     }
 
-
+    /**
+     * 获取连表部分语句
+     */
     public String getFrom() {
         if (StringUtils.isBlank(from.getStringValue())) {
             StringBuilder value = new StringBuilder();
@@ -264,10 +279,25 @@ public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWr
 
         private String alias;
 
-        public SelectColumn(Class<?> clazz, String columnName, String alias) {
+        private BaseFuncEnum funcEnum;
+
+        private SelectColumn(Class<?> clazz, String columnName, String alias, BaseFuncEnum funcEnum) {
             this.clazz = clazz;
             this.columnName = columnName;
             this.alias = alias;
+            this.funcEnum = funcEnum;
+        }
+
+        public static SelectColumn of(Class<?> clazz, String columnName) {
+            return of(clazz, columnName, null, null);
+        }
+
+        public static SelectColumn of(Class<?> clazz, String columnName, String alias) {
+            return of(clazz, columnName, alias, null);
+        }
+
+        public static SelectColumn of(Class<?> clazz, String columnName, String alias, BaseFuncEnum funcEnum) {
+            return new SelectColumn(clazz, columnName, alias, funcEnum);
         }
     }
 }

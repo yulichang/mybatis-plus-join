@@ -25,8 +25,6 @@ import org.apache.ibatis.type.TypeHandler;
 import org.apache.ibatis.type.TypeHandlerRegistry;
 import org.apache.ibatis.type.UnknownTypeHandler;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -110,17 +108,7 @@ public class MPJInterceptor implements Interceptor {
      */
     private ResultMap newResultMap(MappedStatement ms, Class<?> resultType) {
         TableInfo tableInfo = TableInfoHelper.getTableInfo(resultType);
-        if (tableInfo != null && tableInfo.isAutoInitResultMap()) {
-            if (tableInfo.getEntityType() != resultType) {
-                try {
-                    Method info = TableInfoHelper.class.getDeclaredMethod("initTableInfo", Configuration.class, String.class, Class.class);
-                    info.setAccessible(true);
-                    Object invoke = info.invoke(TableInfoHelper.class, ms.getConfiguration(), ms.getId().substring(0, ms.getId().lastIndexOf(".")), resultType);
-                    tableInfo = (TableInfo) invoke;
-                } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
-                    e.printStackTrace();
-                }
-            }
+        if (tableInfo != null && tableInfo.isAutoInitResultMap() && tableInfo.getEntityType() == resultType) {
             return initResultMapIfNeed(tableInfo, resultType);
         }
         return new ResultMap.Builder(ms.getConfiguration(), ms.getId(), resultType, EMPTY_RESULT_MAPPING).build();

@@ -55,6 +55,8 @@ QQ群:1022221898
 
 ### MPJLambdaWrapper用法
 
+#### 简单的三表查询
+
 ```java
 class test {
     @Resource

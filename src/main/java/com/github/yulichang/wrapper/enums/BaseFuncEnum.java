@@ -7,5 +7,8 @@ package com.github.yulichang.wrapper.enums;
  */
 public interface BaseFuncEnum {
 
+    /**
+     * 获取sql 片段
+     */
     String getSql();
 }

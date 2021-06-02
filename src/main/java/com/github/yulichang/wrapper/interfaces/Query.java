@@ -121,76 +121,76 @@ public interface Query<Children> extends Serializable {
     /**
      * MAX()
      */
-    default <S> Children selectMAX(SFunction<S, ?> column) {
+    default <S> Children selectMax(SFunction<S, ?> column) {
         return selectFunc(DefaultFuncEnum.MAX, column);
     }
 
-    default <X> Children selectMAX(Object column, SFunction<X, ?> alias) {
+    default <X> Children selectMax(Object column, SFunction<X, ?> alias) {
         return selectFunc(DefaultFuncEnum.MAX, column, alias);
     }
 
-    default Children selectMAX(Object column, String alias) {
+    default Children selectMax(Object column, String alias) {
         return selectFunc(DefaultFuncEnum.MAX, column, alias);
     }
 
-    default <S, X> Children selectMAX(SFunction<S, ?> column, SFunction<X, ?> alias) {
+    default <S, X> Children selectMax(SFunction<S, ?> column, SFunction<X, ?> alias) {
         return selectFunc(DefaultFuncEnum.MAX, column, alias);
     }
 
     /**
      * MIN()
      */
-    default <S> Children selectMIN(SFunction<S, ?> column) {
+    default <S> Children selectMin(SFunction<S, ?> column) {
         return selectFunc(DefaultFuncEnum.MIN, column);
     }
 
-    default <X> Children selectMIN(Object column, SFunction<X, ?> alias) {
+    default <X> Children selectMin(Object column, SFunction<X, ?> alias) {
         return selectFunc(DefaultFuncEnum.MIN, column, alias);
     }
 
-    default Children selectMIN(Object column, String alias) {
+    default Children selectMin(Object column, String alias) {
         return selectFunc(DefaultFuncEnum.MIN, column, alias);
     }
 
-    default <S, X> Children selectMIN(SFunction<S, ?> column, SFunction<X, ?> alias) {
+    default <S, X> Children selectMin(SFunction<S, ?> column, SFunction<X, ?> alias) {
         return selectFunc(DefaultFuncEnum.MIN, column, alias);
     }
 
     /**
      * MIN()
      */
-    default <S> Children selectAVG(SFunction<S, ?> column) {
+    default <S> Children selectAvg(SFunction<S, ?> column) {
         return selectFunc(DefaultFuncEnum.AVG, column);
     }
 
-    default <X> Children selectAVG(Object column, SFunction<X, ?> alias) {
+    default <X> Children selectAvg(Object column, SFunction<X, ?> alias) {
         return selectFunc(DefaultFuncEnum.AVG, column, alias);
     }
 
-    default Children selectAVG(Object column, String alias) {
+    default Children selectAvg(Object column, String alias) {
         return selectFunc(DefaultFuncEnum.AVG, column, alias);
     }
 
-    default <S, X> Children selectAVG(SFunction<S, ?> column, SFunction<X, ?> alias) {
+    default <S, X> Children selectAvg(SFunction<S, ?> column, SFunction<X, ?> alias) {
         return selectFunc(DefaultFuncEnum.AVG, column, alias);
     }
 
     /**
      * LEN()
      */
-    default <S> Children selectLEN(SFunction<S, ?> column) {
+    default <S> Children selectLen(SFunction<S, ?> column) {
         return selectFunc(DefaultFuncEnum.LEN, column);
     }
 
-    default <X> Children selectLEN(Object column, SFunction<X, ?> alias) {
+    default <X> Children selectLen(Object column, SFunction<X, ?> alias) {
         return selectFunc(DefaultFuncEnum.LEN, column, alias);
     }
 
-    default Children selectLEN(Object column, String alias) {
+    default Children selectLen(Object column, String alias) {
         return selectFunc(DefaultFuncEnum.LEN, column, alias);
     }
 
-    default <S, X> Children selectLEN(SFunction<S, ?> column, SFunction<X, ?> alias) {
+    default <S, X> Children selectLen(SFunction<S, ?> column, SFunction<X, ?> alias) {
         return selectFunc(DefaultFuncEnum.LEN, column, alias);
     }
 }

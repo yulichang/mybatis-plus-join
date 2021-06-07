@@ -39,8 +39,11 @@ public interface Query<Children> extends Serializable {
      */
     <E> Children select(Class<E> entityClass, Predicate<TableFieldInfo> predicate);
 
-    default <S, X> Children selectAs(SFunction<S, ?> columns, SFunction<X, ?> alias) {
-        return selectAs(columns, LambdaUtils.getName(alias));
+    /**
+     * ignore
+     */
+    default <S, X> Children selectAs(SFunction<S, ?> column, SFunction<X, ?> alias) {
+        return selectAs(column, LambdaUtils.getName(alias));
     }
 
     /**
@@ -48,6 +51,31 @@ public interface Query<Children> extends Serializable {
      */
     <S> Children selectAs(SFunction<S, ?> column, String alias);
 
+    /**
+     * ignore
+     */
+    <S> Children selectFunc(BaseFuncEnum funcEnum, SFunction<S, ?> column, String alias);
+
+    /**
+     * ignore
+     */
+    default <S> Children selectFunc(BaseFuncEnum funcEnum, SFunction<S, ?> column) {
+        return selectFunc(funcEnum, column, column);
+    }
+
+    /**
+     * ignore
+     */
+    default <S, X> Children selectFunc(BaseFuncEnum funcEnum, SFunction<S, ?> column, SFunction<X, ?> alias) {
+        return selectFunc(funcEnum, column, LambdaUtils.getName(alias));
+    }
+
+    /**
+     * ignore
+     */
+    default <X> Children selectFunc(BaseFuncEnum funcEnum, Object column, SFunction<X, ?> alias) {
+        return selectFunc(funcEnum, column, LambdaUtils.getName(alias));
+    }
 
     /**
      * 聚合函数查询
@@ -56,22 +84,26 @@ public interface Query<Children> extends Serializable {
      * @param column   函数作用的字段
      * @param alias    别名
      */
-    <S> Children selectFunc(BaseFuncEnum funcEnum, SFunction<S, ?> column, String alias);
-
-    default <S> Children selectFunc(BaseFuncEnum funcEnum, SFunction<S, ?> column) {
-        return selectFunc(funcEnum, column, column);
-    }
-
-
-    default <S, X> Children selectFunc(BaseFuncEnum funcEnum, SFunction<S, ?> column, SFunction<X, ?> alias) {
-        return selectFunc(funcEnum, column, LambdaUtils.getName(alias));
-    }
-
-    default <X> Children selectFunc(BaseFuncEnum funcEnum, Object column, SFunction<X, ?> alias) {
-        return selectFunc(funcEnum, column, LambdaUtils.getName(alias));
-    }
-
     Children selectFunc(BaseFuncEnum funcEnum, Object column, String alias);
+
+    /**
+     * 忽略查询字段
+     * <p>
+     * 用法: selectIgnore(UserDO::getId,UserDO::getSex)
+     * 注意: 一个selectIgnore只支持一个对象 如果要忽略多个实体的字段,请调用多次
+     * <p>
+     * .selectIgnore(UserDO::getId,UserDO::getSex)
+     * .selectIgnore(UserAddressDO::getArea,UserAddressDO::getCity)
+     *
+     * @since 1.1.3
+     */
+    @SuppressWarnings("unchecked")
+    <S> Children selectIgnore(SFunction<S, ?>... columns);
+
+    /**
+     * 查询实体类全部字段
+     */
+    Children selectAll(Class<?> clazz);
 
     /**
      * select sql 片段

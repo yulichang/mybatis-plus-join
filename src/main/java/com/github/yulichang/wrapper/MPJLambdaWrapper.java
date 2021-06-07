@@ -113,11 +113,6 @@ public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWr
         this.joinClass = joinClass;
     }
 
-    /**
-     * SELECT 部分 SQL 设置
-     *
-     * @param columns 查询字段
-     */
     @Override
     @SafeVarargs
     public final <S> MPJLambdaWrapper<T> select(SFunction<S, ?>... columns) {
@@ -166,17 +161,7 @@ public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWr
         return typedThis;
     }
 
-    /**
-     * 忽略查询字段
-     * <p>
-     * 用法: selectIgnore(UserDO::getId,UserDO::getSex)
-     * 注意: 一个selectIgnore只支持一个对象 如果要忽略多个实体的字段,请调用多次
-     * <p>
-     * .selectIgnore(UserDO::getId,UserDO::getSex)
-     * .selectIgnore(UserAddressDO::getArea,UserAddressDO::getCity)
-     *
-     * @since 1.1.3
-     */
+    @Override
     @SafeVarargs
     public final <S> MPJLambdaWrapper<T> selectIgnore(SFunction<S, ?>... columns) {
         if (ArrayUtils.isNotEmpty(columns)) {
@@ -273,13 +258,30 @@ public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWr
     @Data
     public static class SelectColumn {
 
+        /**
+         * 字段实体类
+         */
         private Class<?> clazz;
 
+        /**
+         * 数据库字段名
+         */
         private String columnName;
 
+        /**
+         * 字段别名
+         */
         private String alias;
 
+        /**
+         * 字段函数
+         */
         private BaseFuncEnum funcEnum;
+
+        /**
+         * 自定义函数填充参数
+         */
+        private List<SFunction<?, ?>> funcArgs;
 
         private SelectColumn(Class<?> clazz, String columnName, String alias, BaseFuncEnum funcEnum) {
             this.clazz = clazz;
@@ -289,11 +291,11 @@ public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWr
         }
 
         public static SelectColumn of(Class<?> clazz, String columnName) {
-            return of(clazz, columnName, null, null);
+            return new SelectColumn(clazz, columnName, null, null);
         }
 
         public static SelectColumn of(Class<?> clazz, String columnName, String alias) {
-            return of(clazz, columnName, alias, null);
+            return new SelectColumn(clazz, columnName, alias, null);
         }
 
         public static SelectColumn of(Class<?> clazz, String columnName, String alias, BaseFuncEnum funcEnum) {

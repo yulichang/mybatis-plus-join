@@ -239,6 +239,9 @@ public class MPJLambdaQueryWrapper<T> extends AbstractLambdaWrapper<T, MPJLambda
     public void clear() {
         super.clear();
         sqlSelect.toNull();
+        from.toNull();
+        selectColumns.clear();
+        ignoreColumns.clear();
     }
 
     @Override

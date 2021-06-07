@@ -194,6 +194,9 @@ public class MPJQueryWrapper<T> extends AbstractWrapper<T, String, MPJQueryWrapp
     public void clear() {
         super.clear();
         sqlSelect.toNull();
+        from.toNull();
+        selectColumns.clear();
+        ignoreColumns.clear();
     }
 
     @Override

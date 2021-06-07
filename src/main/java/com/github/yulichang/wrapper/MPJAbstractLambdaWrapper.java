@@ -18,7 +18,6 @@ import static java.util.stream.Collectors.joining;
  *
  * @author yulichang
  */
-@SuppressWarnings("serial")
 public abstract class MPJAbstractLambdaWrapper<T, Children extends MPJAbstractLambdaWrapper<T, Children>>
         extends MPJAbstractWrapper<T, Children> {
 
@@ -34,15 +33,16 @@ public abstract class MPJAbstractLambdaWrapper<T, Children extends MPJAbstractLa
 
     @Override
     protected <X> String columnToString(X column) {
-        return columnToString((SFunction<?, ?>) column, true);
+        return columnToString((SFunction<?, ?>) column);
     }
 
     @Override
-    protected <X> String columnsToString(X... columns) {
-        return Arrays.stream(columns).map(i -> columnToString((SFunction<?, ?>) i, true)).collect(joining(StringPool.COMMA));
+    @SafeVarargs
+    protected final <X> String columnsToString(X... columns) {
+        return Arrays.stream(columns).map(i -> columnToString((SFunction<?, ?>) i)).collect(joining(StringPool.COMMA));
     }
 
-    protected String columnToString(SFunction<?, ?> column, boolean onlyColumn) {
+    protected String columnToString(SFunction<?, ?> column) {
         return Constant.TABLE_ALIAS + getDefault(subTable.get(LambdaUtils.getEntityClass(column))) + StringPool.DOT +
                 getCache(column).getColumn();
     }

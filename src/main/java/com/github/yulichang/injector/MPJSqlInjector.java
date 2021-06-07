@@ -60,7 +60,7 @@ public class MPJSqlInjector extends DefaultSqlInjector {
                     // 循环注入自定义方法
                     methodList.forEach(m -> m.inject(builderAssistant, mapperClass, modelClass, tableInfo));
                 } else {
-                    logger.debug(mapperClass.toString() + ", No effective injection method was found.");
+                    logger.debug(mapperClass + ", No effective injection method was found.");
                 }
                 mapperRegistryCache.add(className);
             }

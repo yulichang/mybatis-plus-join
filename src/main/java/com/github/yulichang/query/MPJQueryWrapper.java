@@ -30,6 +30,7 @@ import java.util.stream.Collectors;
  * @author yulichang
  * @see com.github.yulichang.toolkit.Wrappers
  */
+@SuppressWarnings("unused")
 public class MPJQueryWrapper<T> extends AbstractWrapper<T, String, MPJQueryWrapper<T>>
         implements Query<MPJQueryWrapper<T>, T, String>, MPJJoin<MPJQueryWrapper<T>> {
 
@@ -141,6 +142,7 @@ public class MPJQueryWrapper<T> extends AbstractWrapper<T, String, MPJQueryWrapp
      *
      * @param as 实体对应的别名
      */
+    @SuppressWarnings({"DuplicatedCode", "UnusedReturnValue"})
     public final MPJQueryWrapper<T> selectAll(Class<?> clazz, String as) {
         TableInfo info = TableInfoHelper.getTableInfo(clazz);
         Assert.notNull(info, "can not find table info");

@@ -67,6 +67,10 @@ public class MPJTableInfoHelper {
      * @return 数据库表反射信息
      */
     public synchronized static TableInfo initTableInfo(Configuration configuration, String currentNamespace, Class<?> clazz) {
+        TableInfo info = TABLE_INFO_CACHE.get(clazz);
+        if (info != null) {
+            return info;
+        }
         /* 没有获取到缓存信息,则初始化 */
         TableInfo tableInfo = new TableInfo(clazz);
         tableInfo.setCurrentNamespace(currentNamespace);

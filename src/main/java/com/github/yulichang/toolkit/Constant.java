@@ -15,8 +15,6 @@ public interface Constant {
 
     String ON = " ON ";
 
-    String EQUALS = " = ";
-
     String JOIN = "JOIN";
 
     String LEFT = "LEFT";
@@ -46,14 +44,4 @@ public interface Constant {
      * " t"
      */
     String SPACE_TABLE_ALIAS = StringPool.SPACE + Constant.TABLE_ALIAS;
-
-    /**
-     * " ON t"
-     */
-    String ON_TABLE_ALIAS = Constant.ON + Constant.TABLE_ALIAS;
-
-    /**
-     * " = t"
-     */
-    String EQUALS_TABLE_ALIAS = Constant.EQUALS + Constant.TABLE_ALIAS;
 }

@@ -1,16 +1,15 @@
 package com.github.yulichang.interceptor;
 
-import com.baomidou.mybatisplus.core.metadata.TableFieldInfo;
+import com.baomidou.mybatisplus.core.metadata.MPJTableInfoHelper;
 import com.baomidou.mybatisplus.core.metadata.TableInfo;
 import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.core.toolkit.StringPool;
-import com.baomidou.mybatisplus.core.toolkit.StringUtils;
+import com.github.yulichang.exception.MPJException;
 import com.github.yulichang.method.MPJResultType;
 import com.github.yulichang.toolkit.Constant;
 import org.apache.ibatis.executor.Executor;
 import org.apache.ibatis.mapping.MappedStatement;
-import org.apache.ibatis.mapping.ResultFlag;
 import org.apache.ibatis.mapping.ResultMap;
 import org.apache.ibatis.mapping.ResultMapping;
 import org.apache.ibatis.plugin.Interceptor;
@@ -20,12 +19,11 @@ import org.apache.ibatis.plugin.Signature;
 import org.apache.ibatis.session.Configuration;
 import org.apache.ibatis.session.ResultHandler;
 import org.apache.ibatis.session.RowBounds;
-import org.apache.ibatis.type.JdbcType;
-import org.apache.ibatis.type.TypeHandler;
-import org.apache.ibatis.type.TypeHandlerRegistry;
-import org.apache.ibatis.type.UnknownTypeHandler;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -44,7 +42,7 @@ public class MPJInterceptor implements Interceptor {
     /**
      * 缓存MappedStatement,不需要每次都去重写构建MappedStatement
      */
-    private static final Map<String, MappedStatement> MS_CACHE = new ConcurrentHashMap<>();
+    private static final Map<String, Map<Configuration, MappedStatement>> MS_CACHE = new ConcurrentHashMap<>();
 
     @Override
     public Object intercept(Invocation invocation) throws Throwable {
@@ -77,9 +75,12 @@ public class MPJInterceptor implements Interceptor {
      */
     public MappedStatement newMappedStatement(MappedStatement ms, Class<?> resultType) {
         String id = ms.getId() + StringPool.UNDERSCORE + resultType.getName();
-        MappedStatement statement = MS_CACHE.get(id);
-        if (Objects.nonNull(statement)) {
-            return statement;
+        Map<Configuration, MappedStatement> statementMap = MS_CACHE.get(id);
+        if (CollectionUtils.isNotEmpty(statementMap)) {
+            MappedStatement statement = statementMap.get(ms.getConfiguration());
+            if (Objects.nonNull(statement)) {
+                return statement;
+            }
         }
         MappedStatement.Builder builder = new MappedStatement.Builder(ms.getConfiguration(), id, ms.getSqlSource(), ms.getSqlCommandType())
                 .resource(ms.getResource())
@@ -99,7 +100,12 @@ public class MPJInterceptor implements Interceptor {
         resultMaps.add(newResultMap(ms, resultType));
         builder.resultMaps(resultMaps);
         MappedStatement mappedStatement = builder.build();
-        MS_CACHE.put(id, mappedStatement);
+
+        if (statementMap == null) {
+            statementMap = new ConcurrentHashMap<>();
+            MS_CACHE.put(id, statementMap);
+        }
+        statementMap.put(ms.getConfiguration(), mappedStatement);
         return mappedStatement;
     }
 
@@ -109,50 +115,13 @@ public class MPJInterceptor implements Interceptor {
     private ResultMap newResultMap(MappedStatement ms, Class<?> resultType) {
         TableInfo tableInfo = TableInfoHelper.getTableInfo(resultType);
         if (tableInfo != null && tableInfo.isAutoInitResultMap() && tableInfo.getEntityType() == resultType) {
-            return initResultMapIfNeed(tableInfo, resultType);
+            return ms.getConfiguration().getResultMap(tableInfo.getResultMap());
+        }
+        TableInfo infoDTO = MPJTableInfoHelper.initTableInfo(ms.getConfiguration(),
+                ms.getId().substring(0, ms.getId().lastIndexOf(".")), resultType);
+        if (infoDTO.isAutoInitResultMap()) {
+            return ms.getConfiguration().getResultMap(infoDTO.getResultMap());
         }
         return new ResultMap.Builder(ms.getConfiguration(), ms.getId(), resultType, EMPTY_RESULT_MAPPING).build();
-    }
-
-    /**
-     * 构建resultMap
-     */
-    private ResultMap initResultMapIfNeed(TableInfo info, Class<?> resultType) {
-        String id = info.getCurrentNamespace() + ".mybatis-plus-join_" + resultType.getSimpleName();
-        List<ResultMapping> resultMappings = new ArrayList<>();
-        if (info.havePK()) {
-            ResultMapping idMapping = new ResultMapping.Builder(info.getConfiguration(), info.getKeyProperty(), info.getKeyColumn(), info.getKeyType())
-                    .flags(Collections.singletonList(ResultFlag.ID)).build();
-            resultMappings.add(idMapping);
-        }
-        if (CollectionUtils.isNotEmpty(info.getFieldList())) {
-            info.getFieldList().forEach(i -> resultMappings.add(getResultMapping(i, info.getConfiguration())));
-        }
-        return new ResultMap.Builder(info.getConfiguration(), id, resultType, resultMappings).build();
-    }
-
-
-    /**
-     * 获取 ResultMapping
-     *
-     * @param configuration MybatisConfiguration
-     * @return ResultMapping
-     */
-    private ResultMapping getResultMapping(TableFieldInfo info, final Configuration configuration) {
-        ResultMapping.Builder builder = new ResultMapping.Builder(configuration, info.getProperty(),
-                StringUtils.getTargetColumn(info.getColumn()), info.getPropertyType());
-        TypeHandlerRegistry registry = configuration.getTypeHandlerRegistry();
-        if (info.getJdbcType() != null && info.getJdbcType() != JdbcType.UNDEFINED) {
-            builder.jdbcType(info.getJdbcType());
-        }
-        if (info.getTypeHandler() != null && info.getTypeHandler() != UnknownTypeHandler.class) {
-            TypeHandler<?> typeHandler = registry.getMappingTypeHandler(info.getTypeHandler());
-            if (typeHandler == null) {
-                typeHandler = registry.getInstance(info.getPropertyType(), info.getTypeHandler());
-                // todo 这会有影响 registry.register(typeHandler);
-            }
-            builder.typeHandler(typeHandler);
-        }
-        return builder.build();
     }
 }

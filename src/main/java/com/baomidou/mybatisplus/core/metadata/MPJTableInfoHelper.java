@@ -11,6 +11,7 @@ import org.apache.ibatis.session.Configuration;
 
 import java.lang.reflect.Field;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static java.util.stream.Collectors.toList;
 
@@ -30,10 +31,32 @@ public class MPJTableInfoHelper {
 
     private static final Log logger = LogFactory.getLog(TableInfoHelper.class);
 
+
+    /**
+     * 储存反射类表信息
+     */
+    private static final Map<Class<?>, TableInfo> TABLE_INFO_CACHE = new ConcurrentHashMap<>();
+
     /**
      * 默认表主键名称
      */
     private static final String DEFAULT_ID_NAME = "id";
+
+
+    /**
+     * <p>
+     * 获取实体映射表信息
+     * </p>
+     *
+     * @param clazz 反射实体类
+     * @return 数据库表反射信息
+     */
+    public static TableInfo getTableInfo(Class<?> clazz) {
+        if (clazz == null || ReflectionKit.isPrimitiveOrWrapper(clazz) || clazz == String.class || clazz.isInterface()) {
+            return null;
+        }
+        return TABLE_INFO_CACHE.get(clazz);
+    }
 
     /**
      * <p>
@@ -60,6 +83,9 @@ public class MPJTableInfoHelper {
 
         /* 自动构建 resultMap */
         tableInfo.initResultMapIfNeed();
+
+        /* 添加缓存 */
+        TABLE_INFO_CACHE.put(clazz, tableInfo);
 
         /* 缓存 lambda */
         LambdaUtils.installCache(tableInfo);

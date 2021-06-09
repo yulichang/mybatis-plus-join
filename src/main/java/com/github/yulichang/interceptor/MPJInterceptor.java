@@ -5,7 +5,6 @@ import com.baomidou.mybatisplus.core.metadata.TableInfo;
 import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.core.toolkit.StringPool;
-import com.github.yulichang.exception.MPJException;
 import com.github.yulichang.method.MPJResultType;
 import com.github.yulichang.toolkit.Constant;
 import org.apache.ibatis.executor.Executor;
@@ -117,8 +116,11 @@ public class MPJInterceptor implements Interceptor {
         if (tableInfo != null && tableInfo.isAutoInitResultMap() && tableInfo.getEntityType() == resultType) {
             return ms.getConfiguration().getResultMap(tableInfo.getResultMap());
         }
-        TableInfo infoDTO = MPJTableInfoHelper.initTableInfo(ms.getConfiguration(),
-                ms.getId().substring(0, ms.getId().lastIndexOf(".")), resultType);
+        TableInfo infoDTO = MPJTableInfoHelper.getTableInfo(resultType);
+        if (infoDTO == null) {
+            infoDTO = MPJTableInfoHelper.initTableInfo(ms.getConfiguration(),
+                    ms.getId().substring(0, ms.getId().lastIndexOf(".")), resultType);
+        }
         if (infoDTO.isAutoInitResultMap()) {
             return ms.getConfiguration().getResultMap(infoDTO.getResultMap());
         }

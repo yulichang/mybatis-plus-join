@@ -5,6 +5,9 @@ import com.baomidou.mybatisplus.core.config.GlobalConfig;
 import com.baomidou.mybatisplus.core.toolkit.*;
 import org.apache.ibatis.logging.Log;
 import org.apache.ibatis.logging.LogFactory;
+import org.apache.ibatis.mapping.ResultFlag;
+import org.apache.ibatis.mapping.ResultMap;
+import org.apache.ibatis.mapping.ResultMapping;
 import org.apache.ibatis.reflection.Reflector;
 import org.apache.ibatis.reflection.ReflectorFactory;
 import org.apache.ibatis.session.Configuration;
@@ -86,7 +89,7 @@ public class MPJTableInfoHelper {
         initTableFields(clazz, globalConfig, tableInfo, excludePropertyList);
 
         /* 自动构建 resultMap */
-        tableInfo.initResultMapIfNeed();
+        initResultMapIfNeed(tableInfo);
 
         /* 添加缓存 */
         TABLE_INFO_CACHE.put(clazz, tableInfo);
@@ -94,6 +97,33 @@ public class MPJTableInfoHelper {
         /* 缓存 lambda */
         LambdaUtils.installCache(tableInfo);
         return tableInfo;
+    }
+
+
+    /**
+     * 自动构建 resultMap 并注入(如果条件符合的话)
+     */
+    private static void initResultMapIfNeed(TableInfo tableInfo) {
+        if (tableInfo.isAutoInitResultMap() && null == tableInfo.getResultMap()) {
+            String id = tableInfo.getCurrentNamespace() + ".mybatis-plus-join_" + tableInfo.getEntityType().getSimpleName();
+            tableInfo.setResultMap(id);
+            if (tableInfo.getConfiguration().getResultMapNames().contains(id)) {
+                tableInfo.getConfiguration().getResultMap(id);
+            }
+            List<ResultMapping> resultMappings = new ArrayList<>();
+            if (tableInfo.havePK()) {
+                ResultMapping idMapping = new ResultMapping.Builder(tableInfo.getConfiguration(), tableInfo.getKeyProperty(),
+                        tableInfo.getKeyColumn(), tableInfo.getKeyType())
+                        .flags(Collections.singletonList(ResultFlag.ID)).build();
+                resultMappings.add(idMapping);
+            }
+            if (CollectionUtils.isNotEmpty(tableInfo.getFieldList())) {
+                tableInfo.getFieldList().forEach(i -> resultMappings.add(i.getResultMapping(tableInfo.getConfiguration())));
+            }
+            ResultMap resultMap = new ResultMap.Builder(tableInfo.getConfiguration(), id, tableInfo.getEntityType(),
+                    resultMappings).build();
+            tableInfo.getConfiguration().addResultMap(resultMap);
+        }
     }
 
     /**

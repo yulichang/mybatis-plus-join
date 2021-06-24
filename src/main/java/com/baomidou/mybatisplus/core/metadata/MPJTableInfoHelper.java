@@ -180,9 +180,9 @@ public class MPJTableInfoHelper {
         tableInfo.setTableName(targetTableName);
 
         /* 开启了自定义 KEY 生成器 */
-        if (CollectionUtils.isNotEmpty(dbConfig.getKeyGenerators())) {
-            tableInfo.setKeySequence(clazz.getAnnotation(KeySequence.class));
-        }
+//        if (CollectionUtils.isNotEmpty(dbConfig.getKeyGenerators())) {
+//            tableInfo.setKeySequence(clazz.getAnnotation(KeySequence.class));
+//        }
         return excludeProperty;
     }
 
@@ -230,8 +230,6 @@ public class MPJTableInfoHelper {
         boolean existTableId = isExistTableId(list);
         // 是否存在 @TableLogic 注解
         boolean existTableLogic = isExistTableLogic(list);
-        // 是否存在 @OrderBy 注解
-        boolean existOrderBy = isExistOrderBy(list);
 
         List<TableFieldInfo> fieldList = new ArrayList<>(list.size());
         for (Field field : list) {
@@ -261,12 +259,12 @@ public class MPJTableInfoHelper {
 
             /* 有 @TableField 注解的字段初始化 */
             if (tableField != null) {
-                fieldList.add(new TableFieldInfo(dbConfig, tableInfo, field, tableField, reflector, existTableLogic, existOrderBy));
+                fieldList.add(new TableFieldInfo(dbConfig, tableInfo, field, tableField, reflector, existTableLogic));
                 continue;
             }
 
             /* 无 @TableField  注解的字段初始化 */
-            fieldList.add(new TableFieldInfo(dbConfig, tableInfo, field, reflector, existTableLogic, existOrderBy));
+            fieldList.add(new TableFieldInfo(dbConfig, tableInfo, field, reflector, existTableLogic));
         }
 
         /* 字段列表 */
@@ -300,18 +298,6 @@ public class MPJTableInfoHelper {
      */
     public static boolean isExistTableLogic(List<Field> list) {
         return list.stream().anyMatch(field -> field.isAnnotationPresent(TableLogic.class));
-    }
-
-    /**
-     * <p>
-     * 判断排序注解是否存在
-     * </p>
-     *
-     * @param list 字段列表
-     * @return true 为存在 @TableId 注解;
-     */
-    public static boolean isExistOrderBy(List<Field> list) {
-        return list.stream().anyMatch(field -> field.isAnnotationPresent(OrderBy.class));
     }
 
     /**

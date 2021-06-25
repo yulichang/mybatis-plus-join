@@ -139,14 +139,18 @@ public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWr
         return typedThis;
     }
 
-    public <S> MPJLambdaWrapper<T> selectFunc(BaseFuncEnum funcEnum, SFunction<S, ?> column, String alias) {
-        selectColumns.add(SelectColumn.of(LambdaUtils.getEntityClass(column), getCache(column).getColumn(), alias, funcEnum));
+    public <S> MPJLambdaWrapper<T> selectFunc(boolean condition, BaseFuncEnum funcEnum, SFunction<S, ?> column, String alias) {
+        if (condition) {
+            selectColumns.add(SelectColumn.of(LambdaUtils.getEntityClass(column), getCache(column).getColumn(), alias, funcEnum));
+        }
         return typedThis;
     }
 
     @Override
-    public MPJLambdaWrapper<T> selectFunc(BaseFuncEnum funcEnum, Object column, String alias) {
-        selectColumns.add(SelectColumn.of(null, column.toString(), alias, funcEnum));
+    public MPJLambdaWrapper<T> selectFunc(boolean condition, BaseFuncEnum funcEnum, Object column, String alias) {
+        if (condition) {
+            selectColumns.add(SelectColumn.of(null, column.toString(), alias, funcEnum));
+        }
         return typedThis;
     }
 

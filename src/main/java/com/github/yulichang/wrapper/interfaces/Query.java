@@ -52,39 +52,47 @@ public interface Query<Children> extends Serializable {
     <S> Children selectAs(SFunction<S, ?> column, String alias);
 
     /**
-     * ignore
-     */
-    <S> Children selectFunc(BaseFuncEnum funcEnum, SFunction<S, ?> column, String alias);
-
-    /**
-     * ignore
-     */
-    default <S> Children selectFunc(BaseFuncEnum funcEnum, SFunction<S, ?> column) {
-        return selectFunc(funcEnum, column, column);
-    }
-
-    /**
-     * ignore
-     */
-    default <S, X> Children selectFunc(BaseFuncEnum funcEnum, SFunction<S, ?> column, SFunction<X, ?> alias) {
-        return selectFunc(funcEnum, column, LambdaUtils.getName(alias));
-    }
-
-    /**
-     * ignore
-     */
-    default <X> Children selectFunc(BaseFuncEnum funcEnum, Object column, SFunction<X, ?> alias) {
-        return selectFunc(funcEnum, column, LambdaUtils.getName(alias));
-    }
-
-    /**
      * 聚合函数查询
      *
      * @param funcEnum 函数枚举 {@link com.github.yulichang.wrapper.enums.DefaultFuncEnum}
      * @param column   函数作用的字段
      * @param alias    别名
      */
-    Children selectFunc(BaseFuncEnum funcEnum, Object column, String alias);
+    Children selectFunc(boolean condition, BaseFuncEnum funcEnum, Object column, String alias);
+
+    <S> Children selectFunc(boolean condition, BaseFuncEnum funcEnum, SFunction<S, ?> column, String alias);
+
+    default <S> Children selectFunc(BaseFuncEnum funcEnum, Object column, String alias) {
+        return selectFunc(true, funcEnum, column, alias);
+    }
+
+    default <S> Children selectFunc(BaseFuncEnum funcEnum, SFunction<S, ?> column, String alias) {
+        return selectFunc(true, funcEnum, column, alias);
+    }
+
+    default <S, X> Children selectFunc(BaseFuncEnum funcEnum, SFunction<S, ?> column, SFunction<X, ?> alias) {
+        return selectFunc(true, funcEnum, column, LambdaUtils.getName(alias));
+    }
+
+    default <S> Children selectFunc(BaseFuncEnum funcEnum, SFunction<S, ?> column) {
+        return selectFunc(true, funcEnum, column, column);
+    }
+
+    default <X> Children selectFunc(BaseFuncEnum funcEnum, Object column, SFunction<X, ?> alias) {
+        return selectFunc(true, funcEnum, column, LambdaUtils.getName(alias));
+    }
+
+    default <S, X> Children selectFunc(boolean condition, BaseFuncEnum funcEnum, SFunction<S, ?> column, SFunction<X, ?> alias) {
+        return selectFunc(condition, funcEnum, column, LambdaUtils.getName(alias));
+    }
+
+    default <S> Children selectFunc(boolean condition, BaseFuncEnum funcEnum, SFunction<S, ?> column) {
+        return selectFunc(condition, funcEnum, column, column);
+    }
+
+    default <X> Children selectFunc(boolean condition, BaseFuncEnum funcEnum, Object column, SFunction<X, ?> alias) {
+        return selectFunc(condition, funcEnum, column, LambdaUtils.getName(alias));
+    }
 
     /**
      * 忽略查询字段
@@ -119,16 +127,24 @@ public interface Query<Children> extends Serializable {
         return selectFunc(DefaultFuncEnum.SUM, column);
     }
 
-    default <X> Children selectSum(Object column, SFunction<X, ?> alias) {
-        return selectFunc(DefaultFuncEnum.SUM, column, alias);
-    }
-
-    default Children selectSum(Object column, String alias) {
-        return selectFunc(DefaultFuncEnum.SUM, column, alias);
-    }
-
     default <S, X> Children selectSum(SFunction<S, ?> column, SFunction<X, ?> alias) {
         return selectFunc(DefaultFuncEnum.SUM, column, alias);
+    }
+
+    default <S, X> Children selectSum(SFunction<S, ?> column, String alias) {
+        return selectFunc(DefaultFuncEnum.SUM, column, alias);
+    }
+
+    default <S> Children selectSum(boolean condition, SFunction<S, ?> column) {
+        return selectFunc(condition, DefaultFuncEnum.SUM, column);
+    }
+
+    default <S, X> Children selectSum(boolean condition, SFunction<S, ?> column, SFunction<X, ?> alias) {
+        return selectFunc(condition, DefaultFuncEnum.SUM, column, alias);
+    }
+
+    default <S, X> Children selectSum(boolean condition, SFunction<S, ?> column, String alias) {
+        return selectFunc(condition, DefaultFuncEnum.SUM, column, alias);
     }
 
     /**
@@ -150,6 +166,30 @@ public interface Query<Children> extends Serializable {
         return selectFunc(DefaultFuncEnum.COUNT, column, alias);
     }
 
+    default <S, X> Children selectCount(SFunction<S, ?> column, String alias) {
+        return selectFunc(DefaultFuncEnum.COUNT, column, alias);
+    }
+
+    default <S> Children selectCount(boolean condition, SFunction<S, ?> column) {
+        return selectFunc(condition, DefaultFuncEnum.COUNT, column);
+    }
+
+    default <X> Children selectCount(boolean condition, Object column, SFunction<X, ?> alias) {
+        return selectFunc(condition, DefaultFuncEnum.COUNT, column, alias);
+    }
+
+    default Children selectCount(boolean condition, Object column, String alias) {
+        return selectFunc(condition, DefaultFuncEnum.COUNT, column, alias);
+    }
+
+    default <S, X> Children selectCount(boolean condition, SFunction<S, ?> column, SFunction<X, ?> alias) {
+        return selectFunc(condition, DefaultFuncEnum.COUNT, column, alias);
+    }
+
+    default <S, X> Children selectCount(boolean condition, SFunction<S, ?> column, String alias) {
+        return selectFunc(condition, DefaultFuncEnum.COUNT, column, alias);
+    }
+
     /**
      * MAX()
      */
@@ -157,16 +197,24 @@ public interface Query<Children> extends Serializable {
         return selectFunc(DefaultFuncEnum.MAX, column);
     }
 
-    default <X> Children selectMax(Object column, SFunction<X, ?> alias) {
-        return selectFunc(DefaultFuncEnum.MAX, column, alias);
-    }
-
-    default Children selectMax(Object column, String alias) {
-        return selectFunc(DefaultFuncEnum.MAX, column, alias);
-    }
-
     default <S, X> Children selectMax(SFunction<S, ?> column, SFunction<X, ?> alias) {
         return selectFunc(DefaultFuncEnum.MAX, column, alias);
+    }
+
+    default <S, X> Children selectMax(SFunction<S, ?> column, String alias) {
+        return selectFunc(DefaultFuncEnum.MAX, column, alias);
+    }
+
+    default <S> Children selectMax(boolean condition, SFunction<S, ?> column) {
+        return selectFunc(condition, DefaultFuncEnum.MAX, column);
+    }
+
+    default <S, X> Children selectMax(boolean condition, SFunction<S, ?> column, SFunction<X, ?> alias) {
+        return selectFunc(condition, DefaultFuncEnum.MAX, column, alias);
+    }
+
+    default <S, X> Children selectMax(boolean condition, SFunction<S, ?> column, String alias) {
+        return selectFunc(condition, DefaultFuncEnum.MAX, column, alias);
     }
 
     /**
@@ -176,16 +224,24 @@ public interface Query<Children> extends Serializable {
         return selectFunc(DefaultFuncEnum.MIN, column);
     }
 
-    default <X> Children selectMin(Object column, SFunction<X, ?> alias) {
-        return selectFunc(DefaultFuncEnum.MIN, column, alias);
-    }
-
-    default Children selectMin(Object column, String alias) {
-        return selectFunc(DefaultFuncEnum.MIN, column, alias);
-    }
-
     default <S, X> Children selectMin(SFunction<S, ?> column, SFunction<X, ?> alias) {
         return selectFunc(DefaultFuncEnum.MIN, column, alias);
+    }
+
+    default <S, X> Children selectMin(SFunction<S, ?> column, String alias) {
+        return selectFunc(DefaultFuncEnum.MIN, column, alias);
+    }
+
+    default <S> Children selectMin(boolean condition, SFunction<S, ?> column) {
+        return selectFunc(condition, DefaultFuncEnum.MIN, column);
+    }
+
+    default <S, X> Children selectMin(boolean condition, SFunction<S, ?> column, SFunction<X, ?> alias) {
+        return selectFunc(condition, DefaultFuncEnum.MIN, column, alias);
+    }
+
+    default <S, X> Children selectMin(boolean condition, SFunction<S, ?> column, String alias) {
+        return selectFunc(condition, DefaultFuncEnum.MIN, column, alias);
     }
 
     /**
@@ -195,16 +251,24 @@ public interface Query<Children> extends Serializable {
         return selectFunc(DefaultFuncEnum.AVG, column);
     }
 
-    default <X> Children selectAvg(Object column, SFunction<X, ?> alias) {
-        return selectFunc(DefaultFuncEnum.AVG, column, alias);
-    }
-
-    default Children selectAvg(Object column, String alias) {
-        return selectFunc(DefaultFuncEnum.AVG, column, alias);
-    }
-
     default <S, X> Children selectAvg(SFunction<S, ?> column, SFunction<X, ?> alias) {
         return selectFunc(DefaultFuncEnum.AVG, column, alias);
+    }
+
+    default <S, X> Children selectAvg(SFunction<S, ?> column, String alias) {
+        return selectFunc(DefaultFuncEnum.AVG, column, alias);
+    }
+
+    default <S> Children selectAvg(boolean condition, SFunction<S, ?> column) {
+        return selectFunc(condition, DefaultFuncEnum.AVG, column);
+    }
+
+    default <S, X> Children selectAvg(boolean condition, SFunction<S, ?> column, SFunction<X, ?> alias) {
+        return selectFunc(condition, DefaultFuncEnum.AVG, column, alias);
+    }
+
+    default <S, X> Children selectAvg(boolean condition, SFunction<S, ?> column, String alias) {
+        return selectFunc(condition, DefaultFuncEnum.AVG, column, alias);
     }
 
     /**
@@ -214,15 +278,23 @@ public interface Query<Children> extends Serializable {
         return selectFunc(DefaultFuncEnum.LEN, column);
     }
 
-    default <X> Children selectLen(Object column, SFunction<X, ?> alias) {
-        return selectFunc(DefaultFuncEnum.LEN, column, alias);
-    }
-
-    default Children selectLen(Object column, String alias) {
-        return selectFunc(DefaultFuncEnum.LEN, column, alias);
-    }
-
     default <S, X> Children selectLen(SFunction<S, ?> column, SFunction<X, ?> alias) {
         return selectFunc(DefaultFuncEnum.LEN, column, alias);
+    }
+
+    default <S, X> Children selectLen(SFunction<S, ?> column, String alias) {
+        return selectFunc(DefaultFuncEnum.LEN, column, alias);
+    }
+
+    default <S> Children selectLen(boolean condition, SFunction<S, ?> column) {
+        return selectFunc(condition, DefaultFuncEnum.LEN, column);
+    }
+
+    default <S, X> Children selectLen(boolean condition, SFunction<S, ?> column, SFunction<X, ?> alias) {
+        return selectFunc(condition, DefaultFuncEnum.LEN, column, alias);
+    }
+
+    default <S, X> Children selectLen(boolean condition, SFunction<S, ?> column, String alias) {
+        return selectFunc(condition, DefaultFuncEnum.LEN, column, alias);
     }
 }

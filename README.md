@@ -6,8 +6,6 @@
 
 * 点个Star支持一下吧 :)
 
-* [1.1.8发布计划](https://gitee.com/best_handsome/mybatis-plus-join/issues/I3TEBF)
-
 QQ群:1022221898
 
 ## 使用方法
@@ -21,12 +19,12 @@ QQ群:1022221898
   <dependency>
       <groupId>com.github.yulichang</groupId>
       <artifactId>mybatis-plus-join</artifactId>
-      <version>1.1.7.RC</version>
+      <version>1.1.8</version>
   </dependency>
   ```
 - Gradle
   ```
-   implementation group: 'com.github.yulichang', name: 'mybatis-plus-join', version: '1.1.7.RC'
+   implementation group: 'com.github.yulichang', name: 'mybatis-plus-join', version: '1.1.8'
   ```
   或者clone代码到本地自行安装,再引入以上依赖  
   <br>
@@ -38,18 +36,6 @@ QQ群:1022221898
 * mapper继承MPJBaseMapper (必选)
 * service继承MPJBaseService (可选)
 * serviceImpl继承MPJBaseServiceImpl (可选)
-
-1. MPJBaseMapper继承BaseMapper,在原有的方法基础上又添加了以下方法:
-    * selectJoinOne 连表查询一条记录对象
-    * selectJoinList 连表查询返回命中记录对象集合
-    * selectJoinPage 连表分页查询对象集合
-    * selectJoinMap 连表查询一条记录返回Map
-    * selectJoinMaps 连表查询返回命中记录Map集合
-    * selectJoinMapsPage 连表分页查询返回Map集合
-
-2. MPJBaseService 继承了IService,同样添加以上方法
-
-3. MPJBaseServiceImpl 继承了ServiceImpl,同样添加了以上方法
 
 ## 核心类 MPJLambdaWrapper和MPJQueryWrapper
 
@@ -113,6 +99,10 @@ WHERE (
   第三个参数:  参与连表的ON的另一个实体类属性
 * 默认主表别名是t,其他的表别名以先后调用的顺序使用t1,t2,t3....
 * 条件查询,可以查询主表以及参与连接的所有表的字段,全部调用mp原生的方法,正常使用没有sql注入风险
+
+MPJLambdaWrapper其他功能    
+* [简单的SQL函数使用](https://gitee.com/best_handsome/mybatis-plus-join/wikis/selectFunc()?sort_id=4082479)
+* [ON语句多条件支持](https://gitee.com/best_handsome/mybatis-plus-join/wikis/leftJoin?sort_id=3496671)
 
 #### 分页查询
 

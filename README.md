@@ -12,8 +12,6 @@ QQ群:1022221898
 
 ### 安装
 
-1. 在项目中添加依赖
-
 - Maven
   ```xml
   <dependency>
@@ -26,7 +24,7 @@ QQ群:1022221898
   ```
    implementation group: 'com.github.yulichang', name: 'mybatis-plus-join', version: '1.1.8'
   ```
-  或者clone代码到本地自行安装,再引入以上依赖  
+  或者clone代码到本地执行 mvn install, 再引入以上依赖  
   <br>
   注意: mybatis plus version >= 3.4.0
   <br>

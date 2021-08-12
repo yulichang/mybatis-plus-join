@@ -1,7 +1,11 @@
 package com.github.yulichang.base;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.enums.SqlKeyword;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.core.metadata.MPJMappingWrapper;
+import com.baomidou.mybatisplus.core.metadata.MPJTableFieldInfo;
 import com.baomidou.mybatisplus.core.toolkit.Constants;
 import com.github.yulichang.interfaces.MPJBaseJoin;
 import com.github.yulichang.toolkit.Constant;
@@ -73,4 +77,47 @@ public interface MPJBaseMapper<T> extends BaseMapper<T> {
      */
     <P extends IPage<?>> IPage<Map<String, Object>> selectJoinMapsPage(P page,
                                                                        @Param(Constants.WRAPPER) MPJBaseJoin wrapper);
+
+
+    /**
+     * 映射 wrapper 构造器
+     * 仅对使用 @MPJMapping 时使用
+     */
+    default Object mappingWrapperConstructor(boolean isCollection, boolean selectMap, SqlKeyword keyword,
+                                             String column, Object val, MPJTableFieldInfo fieldInfo) {
+        MPJMappingWrapper infoWrapper = fieldInfo.getWrapper();
+        MappingQuery<T> wrapper = new MappingQuery<>();
+        if (infoWrapper.isHasCondition()) {
+            infoWrapper.getConditionList().forEach(c -> wrapper.addCondition(true, c.getColumn(),
+                    c.getKeyword(), c.getVal()));
+        }
+        wrapper.eq(SqlKeyword.EQ == keyword, column, val)
+                .first(infoWrapper.isHasFirst(), infoWrapper.getFirst())
+                .last(infoWrapper.isHasLast(), infoWrapper.getLast());
+        if (SqlKeyword.IN == keyword) {
+            wrapper.in(column, (List<?>) val);
+        }
+        if (infoWrapper.isHasSelect()) {
+            wrapper.select(infoWrapper.getSelect());
+        }
+        if (infoWrapper.isHasApply()) {
+            infoWrapper.getApplyList().forEach(a -> wrapper.apply(a.getSql(), (Object[]) a.getVal()));
+        }
+
+
+        if (selectMap) {
+            return isCollection ? selectMaps(wrapper) : selectMaps(wrapper).stream().findFirst().orElse(null);
+        }
+        return isCollection ? selectList(wrapper) : selectOne(wrapper);
+    }
+
+    /**
+     * 公开 addCondition 方法
+     */
+    class MappingQuery<T> extends QueryWrapper<T> {
+        @Override
+        public QueryWrapper<T> addCondition(boolean condition, String column, SqlKeyword sqlKeyword, Object val) {
+            return super.addCondition(condition, column, sqlKeyword, val);
+        }
+    }
 }

@@ -3,7 +3,7 @@
 * 支持连表查询的 [mybatis-plus](https://gitee.com/baomidou/mybatis-plus)
 * [演示工程](https://gitee.com/best_handsome/mybatis-plus-join-demo)
 * 点个Star支持一下吧 :)
-* [一对一 一对多 (测试)](https://gitee.com/best_handsome/mybatis-plus-join/blob/master/MAPPING.md)
+* [一对一,一对多](https://gitee.com/best_handsome/mybatis-plus-join/blob/master/MAPPING.md)
 
 QQ群:1022221898
 

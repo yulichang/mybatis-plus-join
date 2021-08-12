@@ -17,5 +17,5 @@ public @interface MPJMappingApply {
     /**
      * .apply() 对应的可变参数
      */
-    String[] args();
+    String[] args() default {};
 }

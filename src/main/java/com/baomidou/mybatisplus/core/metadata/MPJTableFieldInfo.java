@@ -13,9 +13,12 @@ import lombok.Getter;
 import lombok.ToString;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 字段属性
@@ -36,15 +39,15 @@ public class MPJTableFieldInfo {
     /**
      * 属性
      */
-    private final Field field;
+    private Field field;
     /**
-     * 属性
+     * 数据结构是否是Map或者List<Map>
      */
-    private final boolean fieldIsMap;
+    private boolean fieldIsMap;
     /**
      * 属性是否是集合
      */
-    private final boolean isCollection;
+    private boolean isCollection;
     /**
      * 当前映射属性
      */
@@ -91,22 +94,24 @@ public class MPJTableFieldInfo {
      * 关联查询条件配置
      */
     private final MPJMappingWrapper wrapper;
+    /**
+     * 一对一查询结果数量不匹配是是否抛出异常
+     */
+    private final boolean isThrowExp;
 
     /**
      * 初始化关联字段信息
      */
-    public MPJTableFieldInfo(Class<?> entityType, MPJMapping mapping, Field field) {
-        field.setAccessible(true);
+    public MPJTableFieldInfo(Class<?> entityType, MPJMapping mapping, Field field1) {
+        initField(field1);
         this.entityType = entityType;
-        this.field = field;
         this.joinClass = mapping.tag();
-        this.isCollection = Collection.class.isAssignableFrom(field.getType());
+        this.isThrowExp = mapping.isThrowExp();
         this.thisMapKey = StringUtils.isBlank(mapping.thisMapKey()) ? null : mapping.thisMapKey();
         this.joinMapKey = StringUtils.isBlank(mapping.joinMapKsy()) ? null : mapping.joinMapKsy();
-        this.fieldIsMap = mapping.isMap();//TODO 应该可以自动检测
         this.wrapper = new MPJMappingWrapper(mapping);
-        if (this.isCollection && field.getType() != List.class && field.getType() != ArrayList.class) {
-            throw new MPJException("对多关系的数据结构目前只支持 <List> 暂不支持其他Collection实现 " + field.getType().getTypeName());
+        if (this.isCollection && this.field.getType() != List.class && this.field.getType() != ArrayList.class) {
+            throw new MPJException("对多关系的数据结构目前只支持 <List> 暂不支持其他Collection实现 " + this.field.getType().getTypeName());
         }
         if (StringUtils.isNotBlank(mapping.joinField())) {
             this.joinProperty = mapping.joinField();
@@ -121,6 +126,28 @@ public class MPJTableFieldInfo {
             TableInfo info = getTableInfo(this.entityType);
             Assert.isTrue(info.havePK(), "实体未定义主键 %s ", this.entityType.getName());
             this.thisProperty = info.getKeyProperty();
+        }
+    }
+
+    private void initField(Field field) {
+        field.setAccessible(true);
+        this.field = field;
+        this.isCollection = Collection.class.isAssignableFrom(field.getType());
+
+        if (Map.class.isAssignableFrom(field.getType())) {
+            this.fieldIsMap = true;
+        } else {
+            if (field.getGenericType() instanceof ParameterizedType) {
+                ParameterizedType t = (ParameterizedType) field.getGenericType();
+                Type type = t.getActualTypeArguments()[0];
+                if (type instanceof ParameterizedType) {
+                    this.fieldIsMap = ((ParameterizedType) type).getRawType() == Map.class;
+                } else {
+                    this.fieldIsMap = false;
+                }
+            } else {
+                this.fieldIsMap = false;
+            }
         }
     }
 
@@ -240,4 +267,32 @@ public class MPJTableFieldInfo {
                     this.joinField.getName() + " , " + o.getClass().getName());
         }
     }
+
+    public static <T> void bind(MPJTableFieldInfo fieldInfo, T i, List<?> data) {
+        if (!fieldInfo.isCollection()) {
+            if (data.size() > 1 && fieldInfo.isThrowExp()) {
+                throw new MPJException("Expected one result (or null) to be returned by select, but found: " +
+                        data.size() + " , " + fieldInfo.getField().getName());
+            } else {
+                fieldInfo.fieldSet(i, data.stream().findFirst().orElse(null));
+            }
+        } else {
+            fieldInfo.fieldSet(i, data);
+        }
+    }
+
+    public static void bindMap(MPJTableFieldInfo fieldInfo, Map<String, Object> i, List<?> data) {
+        if (!fieldInfo.isCollection()) {
+            if (data.size() > 1 && fieldInfo.isThrowExp()) {
+                throw new MPJException("Expected one result (or null) to be returned by select, but found: " +
+                        data.size() + " , " + fieldInfo.getField().getName());
+            } else {
+                i.put(fieldInfo.getField().getName(), data.stream().findFirst().orElse(null));
+            }
+        } else {
+            i.put(fieldInfo.getField().getName(), data);
+        }
+    }
+
+
 }

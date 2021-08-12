@@ -7,7 +7,7 @@ import com.github.yulichang.annotation.MPJMapping;
 import com.github.yulichang.annotation.MPJMappingApply;
 import com.github.yulichang.annotation.MPJMappingCondition;
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,7 +18,7 @@ import java.util.List;
  * @author yulichang
  * @since 1.2.0
  */
-@Data
+@Getter
 public class MPJMappingWrapper {
 
     private final boolean hasFirst;
@@ -69,18 +69,18 @@ public class MPJMappingWrapper {
         }
     }
 
-    @Data
+    @Getter
     @AllArgsConstructor
     public static class Apply {
-        private String sql;
-        private String[] val;
+        private final String sql;
+        private final String[] val;
     }
 
-    @Data
+    @Getter
     @AllArgsConstructor
     public static class Condition {
-        private SqlKeyword keyword;
-        private String column;
-        private String[] val;
+        private final SqlKeyword keyword;
+        private final String column;
+        private final String[] val;
     }
 }

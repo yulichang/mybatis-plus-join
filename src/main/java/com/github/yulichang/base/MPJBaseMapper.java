@@ -83,7 +83,7 @@ public interface MPJBaseMapper<T> extends BaseMapper<T> {
      * 映射 wrapper 构造器
      * 仅对使用 @MPJMapping 时使用
      */
-    default Object mappingWrapperConstructor(boolean isCollection, boolean selectMap, SqlKeyword keyword,
+    default Object mappingWrapperConstructor(boolean selectMap, SqlKeyword keyword,
                                              String column, Object val, MPJTableFieldInfo fieldInfo) {
         MPJMappingWrapper infoWrapper = fieldInfo.getWrapper();
         MappingQuery<T> wrapper = new MappingQuery<>();
@@ -103,12 +103,10 @@ public interface MPJBaseMapper<T> extends BaseMapper<T> {
         if (infoWrapper.isHasApply()) {
             infoWrapper.getApplyList().forEach(a -> wrapper.apply(a.getSql(), (Object[]) a.getVal()));
         }
-
-
         if (selectMap) {
-            return isCollection ? selectMaps(wrapper) : selectMaps(wrapper).stream().findFirst().orElse(null);
+            return selectMaps(wrapper);
         }
-        return isCollection ? selectList(wrapper) : selectOne(wrapper);
+        return selectList(wrapper);
     }
 
     /**

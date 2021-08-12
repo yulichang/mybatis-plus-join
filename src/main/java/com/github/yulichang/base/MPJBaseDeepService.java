@@ -17,7 +17,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * 深度查询
@@ -98,9 +97,9 @@ public interface MPJBaseDeepService<T> extends IService<T> {
                 for (MPJTableFieldInfo fieldInfo : tableInfo.getFieldList()) {
                     Object o = map.get(fieldInfo.getThisMapKey());
                     if (o != null) {
-                        map.put(fieldInfo.getField().getName(), fieldInfo.getJoinMapper()
-                                .mappingWrapperConstructor(fieldInfo.isCollection(), fieldInfo.isFieldIsMap(), SqlKeyword.EQ,
-                                        fieldInfo.getJoinColumn(), o, fieldInfo));
+                        List<?> data = (List<?>) fieldInfo.getJoinMapper().mappingWrapperConstructor(fieldInfo.isFieldIsMap(),
+                                SqlKeyword.EQ, fieldInfo.getJoinColumn(), o, fieldInfo);
+                        MPJTableFieldInfo.bindMap(fieldInfo, map, data);
                     }
                 }
             }
@@ -218,9 +217,9 @@ public interface MPJBaseDeepService<T> extends IService<T> {
             for (MPJTableFieldInfo fieldInfo : tableInfo.getFieldList()) {
                 Object get = fieldInfo.thisFieldGet(t);
                 if (get != null) {
-                    fieldInfo.fieldSet(t, fieldInfo.getJoinMapper().mappingWrapperConstructor(fieldInfo.isCollection(),
-                            fieldInfo.isFieldIsMap(), SqlKeyword.EQ, fieldInfo.getJoinColumn(),
-                            get, fieldInfo));
+                    List<?> o = (List<?>) fieldInfo.getJoinMapper().mappingWrapperConstructor(fieldInfo.isFieldIsMap(),
+                            SqlKeyword.EQ, fieldInfo.getJoinColumn(), get, fieldInfo);
+                    MPJTableFieldInfo.bind(fieldInfo, t, o);
                 }
             }
         }
@@ -243,13 +242,12 @@ public interface MPJBaseDeepService<T> extends IService<T> {
             for (MPJTableFieldInfo fieldInfo : tableInfo.getFieldList()) {
                 List<Object> itemList = list.stream().map(fieldInfo::thisFieldGet).collect(Collectors.toList());
                 if (CollectionUtils.isNotEmpty(itemList)) {
-                    List<?> joinList = (List<?>) fieldInfo.getJoinMapper().mappingWrapperConstructor(true,
+                    List<?> joinList = (List<?>) fieldInfo.getJoinMapper().mappingWrapperConstructor(
                             fieldInfo.isFieldIsMap(), SqlKeyword.IN, fieldInfo.getJoinColumn(), itemList, fieldInfo);
                     list.forEach(i -> {
-                        Stream<?> stream = joinList.stream().filter(j ->
-                                fieldInfo.joinFieldGet(j).equals(fieldInfo.thisFieldGet(i)));
-                        fieldInfo.fieldSet(i, fieldInfo.isCollection() ? stream.collect(Collectors.toList()) :
-                                stream.findFirst().orElse(null));
+                        List<?> data = joinList.stream().filter(j -> fieldInfo.joinFieldGet(j)
+                                .equals(fieldInfo.thisFieldGet(i))).collect(Collectors.toList());
+                        MPJTableFieldInfo.bind(fieldInfo, i, data);
                     });
                 } else {
                     list.forEach(i -> fieldInfo.fieldSet(i, new ArrayList<>()));
@@ -258,6 +256,7 @@ public interface MPJBaseDeepService<T> extends IService<T> {
         }
         return list;
     }
+
 
     /**
      * 查询映射关系
@@ -277,24 +276,23 @@ public interface MPJBaseDeepService<T> extends IService<T> {
                 List<Object> itemList = list.stream().map(m -> m.get(fieldInfo.getThisMapKey())).collect(Collectors.toList());
                 if (CollectionUtils.isNotEmpty(itemList)) {
                     if (fieldInfo.isFieldIsMap()) {
-                        List<Map<String, Object>> joinList = (List<Map<String, Object>>) fieldInfo.getJoinMapper().mappingWrapperConstructor(true,
-                                fieldInfo.isFieldIsMap(), SqlKeyword.IN, fieldInfo.getJoinColumn(), itemList, fieldInfo);
+                        List<Map<String, Object>> joinList = (List<Map<String, Object>>) fieldInfo.getJoinMapper()
+                                .mappingWrapperConstructor(fieldInfo.isFieldIsMap(), SqlKeyword.IN,
+                                        fieldInfo.getJoinColumn(), itemList, fieldInfo);
                         list.forEach(i -> {
-                            Stream<Map<String, Object>> stream = joinList.stream().filter(j -> j.containsKey(fieldInfo.getJoinMapKey())
-                                    && j.get(fieldInfo.getJoinMapKey()).equals(i.get(fieldInfo.getThisMapKey())));
-                            i.put(fieldInfo.getField().getName(), fieldInfo.isCollection() ? stream.collect(Collectors.toList()) :
-                                    stream.findFirst().orElse(null));
+                            List<Map<String, Object>> data = joinList.stream().filter(j -> j.containsKey(fieldInfo.getJoinMapKey())
+                                    && j.get(fieldInfo.getJoinMapKey()).equals(i.get(fieldInfo.getThisMapKey()))).collect(Collectors.toList());
+                            MPJTableFieldInfo.bindMap(fieldInfo, i, data);
                         });
                     } else {
-                        List<?> joinList = (List<?>) fieldInfo.getJoinMapper().mappingWrapperConstructor(true,
+                        List<?> joinList = (List<?>) fieldInfo.getJoinMapper().mappingWrapperConstructor(
                                 fieldInfo.isFieldIsMap(), SqlKeyword.IN, fieldInfo.getJoinColumn(), itemList, fieldInfo);
                         list.forEach(i -> {
-                            Stream<?> stream = joinList.stream().filter(j -> {
+                            List<?> data = joinList.stream().filter(j -> {
                                 Object o = fieldInfo.joinFieldGet(j);
                                 return o != null && o.equals(i.get(fieldInfo.getThisMapKey()));
-                            });
-                            i.put(fieldInfo.getField().getName(), fieldInfo.isCollection() ? stream.collect(Collectors.toList()) :
-                                    stream.findFirst().orElse(null));
+                            }).collect(Collectors.toList());
+                            MPJTableFieldInfo.bindMap(fieldInfo, i, data);
                         });
                     }
                 } else {
@@ -304,4 +302,6 @@ public interface MPJBaseDeepService<T> extends IService<T> {
         }
         return list;
     }
+
+
 }

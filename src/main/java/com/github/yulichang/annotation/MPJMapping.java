@@ -20,13 +20,6 @@ public @interface MPJMapping {
     Class<?> tag();
 
     /**
-     * 当前类的属性数据结构 是否是Map 或 List<Map>
-     * 如果是 true  关联查询会调用 getMap() / listMaps() 等Map相关方法进行匹配
-     * 如果是 false 关联查询会调用 getOne() / getById() / list() 等实体类相关方法进行匹配
-     */
-    boolean isMap() default false;
-
-    /**
      * 当前类的关联的字段名称 (是实体类字段名称而不是数据库字段名称)
      * 默认获取当前类上定义的主键 @TableId
      */
@@ -37,6 +30,20 @@ public @interface MPJMapping {
      * 默认获取关联类上定义的主键 @TableId
      */
     String joinField() default "";
+
+    /**
+     * 当前类的属性数据结构 是否是Map 或 List<Map>
+     * 如果是 true  关联查询会调用 getMap() / listMaps() 等Map相关方法进行匹配
+     * 如果是 false 关联查询会调用 getOne() / getById() / list() 等实体类相关方法进行匹配
+     */
+    boolean isMap() default false;
+
+    /**
+     * 一对一查询时 如果查询到多条记录是否抛出异常
+     * true  抛出异常
+     * false 不抛异常，获取列表第一条数据
+     */
+    boolean isThrowExp() default true;
 
     /**
      * 针对查询结果map的时候使用
@@ -82,6 +89,7 @@ public @interface MPJMapping {
 
     /**
      * 映射表查询条件之 last
+     * 建议不要在这使用分页语句，会导致关联查的时候查询不全
      * 等效于 Wrappers.<T>query().last(xxx);
      */
     String last() default "";

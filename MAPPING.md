@@ -59,7 +59,7 @@ public class UserDO {
      *  一对多
      */
     @TableField(exist = false)
-    @MPJMapping(tag = UserAddressDO.class, thisField = "id", joinField = "userId")
+    @MPJMapping(tag = UserAddressDO.class, thisField = "id", joinField = "pid")
     private List<UserDO> childUserList;
 }
 ```

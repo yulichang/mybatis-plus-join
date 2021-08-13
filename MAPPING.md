@@ -52,7 +52,7 @@ public class UserDO {
      *  一对一
      */
     @TableField(exist = false)
-    @MPJMapping(tag = UserDO.class, thisField = "pid", joinField = "pid")
+    @MPJMapping(tag = UserDO.class, thisField = "pid", joinField = "id")
     private UserDO pUser;
 
     /**

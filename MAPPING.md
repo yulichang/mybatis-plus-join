@@ -52,30 +52,15 @@ public class UserDO {
      *  一对一
      */
     @TableField(exist = false)
-    @MPJMapping(tag = UserDO.class, thisField = "pid" /*joinField = "id" 可以不填默认获取主键*/)
+    @MPJMapping(tag = UserDO.class, thisField = "pid", joinField = "pid")
     private UserDO pUser;
 
     /**
      *  一对多
      */
     @TableField(exist = false)
-    @MPJMapping(tag = UserAddressDO.class, /*thisField = "id" 可以不填默认获取主键*/ joinField = "userId")
-    private List<UserAddressDO> addressDOList;
-}
-```
-
-UserAddressDO.java
-
-```java
-
-@Data
-@TableName("user_address")
-public class UserAddressDO {
-
-    @TableId
-    private Integer id;
-    private Integer userId;
-    /* 其他属性略 */
+    @MPJMapping(tag = UserAddressDO.class, thisField = "id", joinField = "userId")
+    private List<UserDO> childUserList;
 }
 ```
 
@@ -83,45 +68,61 @@ public class UserAddressDO {
 
 ```java
 
+/**
+ * 一对一，一对多关系映射查询
+ * 映射只对MPJBaseDeepService中的方法有效果 ，一般以Deep结尾，比如 getByIdDeep listByIdsDeep 等
+ * 如果不需要关系映射就使用mybatis plus原生方法即可，比如 getById listByIds 等
+ *
+ * @see com.github.yulichang.base.MPJBaseDeepService
+ */
 @SpringBootTest
-public class MPJDeepTest {
+class MappingTest {
     @Resource
     private UserService userService;
 
+    /**
+     * 根据id查询
+     * <p>
+     * 查询过程：
+     * 一共查询了3次
+     * 第一次查询目标UserDO
+     * 第二次根据pid查询上级用户
+     * 第三次根据自身id查询下级用户
+     */
     @Test
     void test1() {
-        UserDO deep = userService.getByIdDeep(1);
+        UserDO deep = userService.getByIdDeep(2);
         System.out.println(deep);
     }
 
+    /**
+     * 查询全部
+     * <p>
+     * 查询过程：
+     * 一共查询了3次
+     * 第一次查询目标UserDO集合
+     * 第二次根据pid查询上级用户（不会一条记录一条记录的去查询，对pid进行汇总，用in语句一次性查出来，然后进行匹配）
+     * 第三次根据自身id查询下级用户（不会一条记录一条记录的去查询，对id进行汇总，用in语句一次性查出来，然后进行匹配）
+     */
     @Test
     void test2() {
-        List<UserDO> list = userService.listByIdsDeep(Arrays.asList(1, 4));
+        List<UserDO> list = userService.listDeep();
         list.forEach(System.out::println);
     }
 
+    /**
+     * 分页查询
+     * <p>
+     * 查询过程与上面一致
+     */
     @Test
     void test3() {
-        List<UserDO> list = userService.listByMapDeep(new HashMap<String, Object>() {{
-            put("id", 1);
-        }});
-        list.forEach(System.out::println);
+        Page<UserDO> page = userService.pageDeep(new Page<>(2, 2));
+        page.getRecords().forEach(System.out::println);
     }
 
-    @Test
-    void test4() {
-        UserDO one = userService.getOneDeep(Wrappers.<UserDO>lambdaQuery()
-                .eq(UserDO::getId, 1));
-        System.out.println(one);
-    }
-
-    @Test
-    void test5() {
-        Map<String, Object> deep = userService.getMapDeep(Wrappers.<UserDO>lambdaQuery()
-                .eq(UserDO::getId, 1));
-        System.out.println(deep);
-    }
 }
+
 ```
 
 MPJMapping 说明：
@@ -130,7 +131,9 @@ MPJMapping 说明：
 * MPJMapping thisField 当前类关联对应的字段的属性名，可以不填，默认为当前类的主键
 * MPJMapping joinField 关联类对应的字段的属性名，可以不填，默认为关联类的主键
 * MPJMapping isThrowExp 一对一查询时,如果查询到多条记录是否抛出异常,true:抛出异常,false:获取列表第一条数据
-* 更多功能请看代码注释 [MPJMapping](https://gitee.com/best_handsome/mybatis-plus-join/blob/master/src/main/java/com/github/yulichang/annotation/MPJMapping.java)
+*
+
+更多功能请看代码注释 [MPJMapping](https://gitee.com/best_handsome/mybatis-plus-join/blob/master/src/main/java/com/github/yulichang/annotation/MPJMapping.java)
 
 
 

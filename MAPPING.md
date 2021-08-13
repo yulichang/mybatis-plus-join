@@ -29,9 +29,9 @@ QQ群:1022221898
 
 ### 使用
 
-* mapper继承MPJBaseMapper (必选)
-* service继承MPJBaseService (可选)
-* serviceImpl继承MPJBaseServiceImpl (可选)
+* mapper继承MPJBaseMapper
+* service继承MPJBaseService
+* serviceImpl继承MPJBaseServiceImpl
 
 #### @MPJMapping注解
 

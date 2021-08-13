@@ -149,7 +149,7 @@ public class MPJQueryWrapper<T> extends AbstractWrapper<T, String, MPJQueryWrapp
         if (info.havePK()) {
             selectColumns.add(as + StringPool.DOT + info.getKeyColumn());
         }
-        selectColumns.addAll(info.getFieldList().stream().map(i ->
+        selectColumns.addAll(info.getFieldList().stream().filter(TableFieldInfo::isSelect).map(i ->
                 as + StringPool.DOT + i.getColumn()).collect(Collectors.toList()));
         return typedThis;
     }

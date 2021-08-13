@@ -160,7 +160,7 @@ public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWr
         if (info.havePK()) {
             selectColumns.add(SelectColumn.of(clazz, info.getKeyColumn()));
         }
-        info.getFieldList().forEach(c ->
+        info.getFieldList().stream().filter(TableFieldInfo::isSelect).forEach(c ->
                 selectColumns.add(SelectColumn.of(clazz, c.getColumn())));
         return typedThis;
     }

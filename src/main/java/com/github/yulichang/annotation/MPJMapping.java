@@ -32,13 +32,6 @@ public @interface MPJMapping {
     String joinField() default "";
 
     /**
-     * 当前类的属性数据结构 是否是Map 或 List<Map>
-     * 如果是 true  关联查询会调用 getMap() / listMaps() 等Map相关方法进行匹配
-     * 如果是 false 关联查询会调用 getOne() / getById() / list() 等实体类相关方法进行匹配
-     */
-    boolean isMap() default false;
-
-    /**
      * 一对一查询时 如果查询到多条记录是否抛出异常
      * true  抛出异常
      * false 不抛异常，获取列表第一条数据

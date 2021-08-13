@@ -52,14 +52,14 @@ public class UserDO {
      *  一对一
      */
     @TableField(exist = false)
-    @MPJMapping(tag = UserDO.class, thisField = "pid")
+    @MPJMapping(tag = UserDO.class, thisField = "pid" /*joinField = "id" 可以不填默认获取主键*/)
     private UserDO pUser;
 
     /**
      *  一对多
      */
     @TableField(exist = false)
-    @MPJMapping(tag = UserAddressDO.class, joinField = "userId")
+    @MPJMapping(tag = UserAddressDO.class, /*thisField = "id" 可以不填默认获取主键*/ joinField = "userId")
     private List<UserAddressDO> addressDOList;
 }
 ```

@@ -9,7 +9,6 @@ import com.github.yulichang.toolkit.LambdaUtils;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 
 import static java.util.stream.Collectors.joining;
 
@@ -27,7 +26,13 @@ public abstract class MPJAbstractLambdaWrapper<T, Children extends MPJAbstractLa
 
     @Override
     protected <X> String columnToString(X column) {
-        return columnToString((SFunction<?, ?>) column);
+        return columnToString((SFunction<?, ?>) column, hasAlias || entityClass !=
+                LambdaUtils.getEntityClass((SFunction<?, ?>) column));
+    }
+
+    @Override
+    protected <X> String columnToString(X column, boolean hasAlias) {
+        return columnToString((SFunction<?, ?>) column, hasAlias);
     }
 
     @Override
@@ -36,9 +41,9 @@ public abstract class MPJAbstractLambdaWrapper<T, Children extends MPJAbstractLa
         return Arrays.stream(columns).map(i -> columnToString((SFunction<?, ?>) i)).collect(joining(StringPool.COMMA));
     }
 
-    protected String columnToString(SFunction<?, ?> column) {
-        return MPJTableInfoHelper.getTableInfo(LambdaUtils.getEntityClass(column)).getAlias() + StringPool.DOT +
-                getCache(column).getColumn();
+    protected String columnToString(SFunction<?, ?> column, boolean hasAlias) {
+        return (hasAlias ? MPJTableInfoHelper.getTableInfo(LambdaUtils.getEntityClass(column)).getAliasDOT() :
+                StringPool.EMPTY) + getCache(column).getColumn();
     }
 
     protected ColumnCache getCache(SFunction<?, ?> fn) {
@@ -50,12 +55,4 @@ public abstract class MPJAbstractLambdaWrapper<T, Children extends MPJAbstractLa
         }
         return cacheMap.get(LambdaUtils.formatKey(LambdaUtils.getName(fn)));
     }
-
-    protected String getDefault(Integer i) {
-        if (Objects.nonNull(i)) {
-            return i.toString();
-        }
-        return StringPool.EMPTY;
-    }
-
 }

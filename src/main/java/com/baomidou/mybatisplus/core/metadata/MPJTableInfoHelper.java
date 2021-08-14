@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.config.GlobalConfig;
 import com.baomidou.mybatisplus.core.toolkit.*;
 import com.github.yulichang.annotation.MPJMapping;
 import com.github.yulichang.annotation.MPJTableAlias;
+import com.github.yulichang.toolkit.Constant;
 import org.apache.ibatis.builder.MapperBuilderAssistant;
 import org.apache.ibatis.logging.Log;
 import org.apache.ibatis.logging.LogFactory;
@@ -167,7 +168,8 @@ public class MPJTableInfoHelper {
             tableInfo.setAlias(tableAlias.value());
             return;
         }
-        tableInfo.setAlias("t" + index.getAndIncrement());
+        tableInfo.setAlias(Constant.TABLE_ALIAS + index.getAndIncrement());
+        tableInfo.setAliasDOT(tableInfo.getAlias() + StringPool.DOT);
     }
 
     /**

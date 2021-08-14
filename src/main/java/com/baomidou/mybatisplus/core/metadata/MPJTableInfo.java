@@ -30,6 +30,11 @@ public class MPJTableInfo {
     private String alias;
 
     /**
+     * 前缀
+     */
+    private String aliasDOT;
+
+    /**
      * 是否包含映射注解
      */
     private boolean hasMapping;

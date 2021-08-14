@@ -39,9 +39,4 @@ public interface Constant {
      * " INNER JOIN "
      */
     String INNER_JOIN = StringPool.SPACE + INNER + StringPool.SPACE + JOIN + StringPool.SPACE;
-
-    /**
-     * " t"
-     */
-    String SPACE_TABLE_ALIAS = StringPool.SPACE + Constant.TABLE_ALIAS;
 }

@@ -19,7 +19,15 @@ import java.util.List;
 @Accessors(chain = true)
 public class MPJTableInfo {
 
+    /**
+     * mybatis-plus 表信息
+     */
     private TableInfo tableInfo;
+
+    /**
+     * 表别名
+     */
+    private String alias;
 
     /**
      * 是否包含映射注解

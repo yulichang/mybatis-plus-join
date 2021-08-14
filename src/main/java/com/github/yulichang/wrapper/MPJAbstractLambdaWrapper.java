@@ -1,9 +1,9 @@
 package com.github.yulichang.wrapper;
 
+import com.baomidou.mybatisplus.core.metadata.MPJTableInfoHelper;
 import com.baomidou.mybatisplus.core.toolkit.StringPool;
 import com.baomidou.mybatisplus.core.toolkit.support.ColumnCache;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
-import com.github.yulichang.toolkit.Constant;
 import com.github.yulichang.toolkit.LambdaUtils;
 
 import java.util.Arrays;
@@ -20,12 +20,6 @@ import static java.util.stream.Collectors.joining;
  */
 public abstract class MPJAbstractLambdaWrapper<T, Children extends MPJAbstractLambdaWrapper<T, Children>>
         extends MPJAbstractWrapper<T, Children> {
-
-    /**
-     * 关联的表
-     */
-    protected Map<Class<?>, Integer> subTable = new HashMap<>();
-
     /**
      * 缓存字段
      */
@@ -43,7 +37,7 @@ public abstract class MPJAbstractLambdaWrapper<T, Children extends MPJAbstractLa
     }
 
     protected String columnToString(SFunction<?, ?> column) {
-        return Constant.TABLE_ALIAS + getDefault(subTable.get(LambdaUtils.getEntityClass(column))) + StringPool.DOT +
+        return MPJTableInfoHelper.getTableInfo(LambdaUtils.getEntityClass(column)).getAlias() + StringPool.DOT +
                 getCache(column).getColumn();
     }
 

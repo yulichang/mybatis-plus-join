@@ -2,6 +2,7 @@ package com.github.yulichang.wrapper;
 
 import com.baomidou.mybatisplus.core.conditions.SharedString;
 import com.baomidou.mybatisplus.core.conditions.segments.MergeSegments;
+import com.baomidou.mybatisplus.core.metadata.MPJTableInfoHelper;
 import com.baomidou.mybatisplus.core.metadata.TableFieldInfo;
 import com.baomidou.mybatisplus.core.metadata.TableInfo;
 import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
@@ -48,11 +49,6 @@ public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWr
     private final SharedString from = new SharedString();
 
     /**
-     * 主表别名
-     */
-    private final SharedString alias = new SharedString(Constant.TABLE_ALIAS);
-
-    /**
      * 查询的字段
      */
     private final List<SelectColumn> selectColumns = new ArrayList<>();
@@ -61,11 +57,6 @@ public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWr
      * 忽略查询的字段
      */
     private final List<SelectColumn> ignoreColumns = new ArrayList<>();
-
-    /**
-     * 表序号
-     */
-    private int tableIndex = 1;
 
     /**
      * ON sql wrapper集合
@@ -98,7 +89,7 @@ public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWr
     MPJLambdaWrapper(T entity, Class<T> entityClass, SharedString sqlSelect, AtomicInteger paramNameSeq,
                      Map<String, Object> paramNameValuePairs, MergeSegments mergeSegments,
                      SharedString lastSql, SharedString sqlComment, SharedString sqlFirst,
-                     Map<Class<?>, Integer> subTable, String keyWord, Class<?> joinClass) {
+                     String keyWord, Class<?> joinClass) {
         super.setEntity(entity);
         super.setEntityClass(entityClass);
         this.paramNameSeq = paramNameSeq;
@@ -108,7 +99,6 @@ public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWr
         this.lastSql = lastSql;
         this.sqlComment = sqlComment;
         this.sqlFirst = sqlFirst;
-        this.subTable = subTable;
         this.keyWord = keyWord;
         this.joinClass = joinClass;
     }
@@ -187,7 +177,7 @@ public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWr
                         i.getClazz() == c.getClazz() && Objects.equals(c.getColumnName(), i.getColumnName())));
             }
             String s = selectColumns.stream().map(i -> {
-                String str = Constant.TABLE_ALIAS + getDefault(subTable.get(i.getClazz())) + StringPool.DOT + i.getColumnName();
+                String str = MPJTableInfoHelper.getTableInfo(i.getClazz()).getAlias() + StringPool.DOT + i.getColumnName();
                 return (i.getFuncEnum() == null ? str : String.format(i.getFuncEnum().getSql(), str)) +
                         (StringUtils.isBlank(i.getAlias()) ? StringPool.EMPTY : (Constant.AS + i.getAlias()));
             }).collect(Collectors.joining(StringPool.COMMA));
@@ -206,8 +196,8 @@ public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWr
                 String tableName = TableInfoHelper.getTableInfo(wrapper.getJoinClass()).getTableName();
                 value.append(wrapper.getKeyWord())
                         .append(tableName)
-                        .append(Constant.SPACE_TABLE_ALIAS)
-                        .append(subTable.get(wrapper.getJoinClass()))
+                        .append(Constants.SPACE)
+                        .append(MPJTableInfoHelper.getTableInfo(wrapper.getJoinClass()).getAlias())
                         .append(Constant.ON)
                         .append(wrapper.getExpression().getNormal().getSqlSegment());
             }
@@ -216,8 +206,8 @@ public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWr
         return from.getStringValue();
     }
 
-    public String getAlias() {
-        return alias.getStringValue();
+    public boolean getAutoAlias() {
+        return true;
     }
 
     /**
@@ -232,7 +222,7 @@ public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWr
     protected MPJLambdaWrapper<T> instance(String keyWord, Class<?> joinClass) {
         return new MPJLambdaWrapper<>(getEntity(), getEntityClass(), null, paramNameSeq, paramNameValuePairs,
                 new MergeSegments(), SharedString.emptyString(), SharedString.emptyString(), SharedString.emptyString(),
-                this.subTable, keyWord, joinClass);
+                keyWord, joinClass);
     }
 
     @Override
@@ -242,7 +232,6 @@ public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWr
         from.toNull();
         selectColumns.clear();
         ignoreColumns.clear();
-        subTable.clear();
     }
 
     @Override
@@ -250,8 +239,6 @@ public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWr
         if (condition) {
             MPJLambdaWrapper<?> apply = function.apply(instance(keyWord, clazz));
             onWrappers.add(apply);
-            subTable.put(clazz, tableIndex);
-            tableIndex++;
         }
         return typedThis;
     }

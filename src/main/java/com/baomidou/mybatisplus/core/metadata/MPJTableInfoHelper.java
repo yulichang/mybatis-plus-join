@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.annotation.*;
 import com.baomidou.mybatisplus.core.config.GlobalConfig;
 import com.baomidou.mybatisplus.core.toolkit.*;
 import com.github.yulichang.annotation.MPJMapping;
+import com.github.yulichang.annotation.MPJTableAlias;
 import org.apache.ibatis.builder.MapperBuilderAssistant;
 import org.apache.ibatis.logging.Log;
 import org.apache.ibatis.logging.LogFactory;
@@ -17,6 +18,7 @@ import org.apache.ibatis.session.Configuration;
 import java.lang.reflect.Field;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static java.util.stream.Collectors.toList;
 
@@ -33,6 +35,11 @@ import static java.util.stream.Collectors.toList;
  * @see TableInfoHelper
  */
 public class MPJTableInfoHelper {
+
+    /**
+     * 用于生成别名的序号
+     */
+    private static final AtomicInteger index = new AtomicInteger(1);
 
     private static final Log logger = LogFactory.getLog(TableInfoHelper.class);
 
@@ -116,12 +123,12 @@ public class MPJTableInfoHelper {
         TableInfo tableInfo = TableInfoHelper.getTableInfo(clazz);
         if (tableInfo != null) {
             mpjTableInfo.setTableInfo(tableInfo);
+            initTableAlias(mpjTableInfo);
             initMapping(mpjTableInfo);
             /* 添加缓存 */
             TABLE_INFO_CACHE.put(clazz, mpjTableInfo);
             return mpjTableInfo;
         }
-
 
         tableInfo = new TableInfo(clazz);
         mpjTableInfo.setTableInfo(tableInfo);
@@ -146,11 +153,22 @@ public class MPJTableInfoHelper {
         /* 缓存 lambda */
         LambdaUtils.installCache(tableInfo);
 
+        /* 初始化表别名 */
+        initTableAlias(mpjTableInfo);
+
         /* 初始化映射关系 */
         initMapping(mpjTableInfo);
         return mpjTableInfo;
     }
 
+    private static void initTableAlias(MPJTableInfo tableInfo) {
+        MPJTableAlias tableAlias = tableInfo.getTableInfo().getEntityType().getAnnotation(MPJTableAlias.class);
+        if (tableAlias != null && StringUtils.isNotBlank(tableAlias.value())) {
+            tableInfo.setAlias(tableAlias.value());
+            return;
+        }
+        tableInfo.setAlias("t" + index.getAndIncrement());
+    }
 
     /**
      * 自动构建 resultMap 并注入(如果条件符合的话)

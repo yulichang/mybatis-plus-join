@@ -1,4 +1,4 @@
-package com.github.yulichang.base;
+package com.github.yulichang.base.service;
 
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.enums.SqlKeyword;
@@ -10,6 +10,7 @@ import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.github.yulichang.annotation.MPJMapping;
+import com.github.yulichang.base.MPJBaseMapper;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -30,7 +31,7 @@ import java.util.stream.Collectors;
  * @since 1.2.0
  */
 @SuppressWarnings("unused")
-public interface MPJBaseDeepService<T> extends IService<T> {
+public interface MPJDeepService<T> extends IService<T> {
 
     Class<T> currentModelClass();
 
@@ -40,7 +41,7 @@ public interface MPJBaseDeepService<T> extends IService<T> {
      * @param id 主键ID列表
      */
     default <R> T getByIdDeep(Serializable id) {
-        return queryMapping(getById(id));
+        return ((MPJBaseMapper<T>) getBaseMapper()).selectByIdDeep(id);
     }
 
 
@@ -50,7 +51,7 @@ public interface MPJBaseDeepService<T> extends IService<T> {
      * @param idList 主键ID列表
      */
     default List<T> listByIdsDeep(Collection<? extends Serializable> idList) {
-        return queryMapping(listByIds(idList));
+        return ((MPJBaseMapper<T>) getBaseMapper()).selectBatchIdsDeep(idList);
     }
 
     /**
@@ -59,7 +60,7 @@ public interface MPJBaseDeepService<T> extends IService<T> {
      * @param columnMap 表字段 map 对象
      */
     default List<T> listByMapDeep(Map<String, Object> columnMap) {
-        return queryMapping(listByMap(columnMap));
+        return ((MPJBaseMapper<T>) getBaseMapper()).selectByMapDeep(columnMap);
     }
 
 
@@ -70,7 +71,7 @@ public interface MPJBaseDeepService<T> extends IService<T> {
      * @param queryWrapper 实体对象封装操作类 {@link com.baomidou.mybatisplus.core.conditions.query.QueryWrapper}
      */
     default T getOneDeep(Wrapper<T> queryWrapper) {
-        return queryMapping(getOne(queryWrapper));
+        return ((MPJBaseMapper<T>) getBaseMapper()).selectOneDeep(queryWrapper);
     }
 
 
@@ -81,7 +82,7 @@ public interface MPJBaseDeepService<T> extends IService<T> {
      * @param throwEx      有多个 result 是否抛出异常
      */
     default T getOneDeep(Wrapper<T> queryWrapper, boolean throwEx) {
-        return queryMapping(getOne(queryWrapper, throwEx));
+        return ((MPJBaseMapper<T>) getBaseMapper()).queryMapping(getOne(queryWrapper, throwEx));
     }
 
     /**
@@ -114,7 +115,7 @@ public interface MPJBaseDeepService<T> extends IService<T> {
      * @param queryWrapper 实体对象封装操作类 {@link com.baomidou.mybatisplus.core.conditions.query.QueryWrapper}
      */
     default List<T> listDeep(Wrapper<T> queryWrapper) {
-        return queryMapping(list(queryWrapper));
+        return ((MPJBaseMapper<T>) getBaseMapper()).selectListDeep(queryWrapper);
     }
 
     /**
@@ -123,7 +124,7 @@ public interface MPJBaseDeepService<T> extends IService<T> {
      * @see Wrappers#emptyWrapper()
      */
     default List<T> listDeep() {
-        return queryMapping(list());
+        return ((MPJBaseMapper<T>) getBaseMapper()).selectListDeep(Wrappers.emptyWrapper());
     }
 
     /**
@@ -134,9 +135,7 @@ public interface MPJBaseDeepService<T> extends IService<T> {
      */
     default <E extends IPage<T>> E pageDeep(E page, Wrapper<T> queryWrapper) {
         E e = page(page, queryWrapper);
-        if (CollectionUtils.isNotEmpty(e.getRecords())) {
-            queryMapping(e.getRecords());
-        }
+        ((MPJBaseMapper<T>) getBaseMapper()).queryMapping(e.getRecords());
         return e;
     }
 
@@ -148,9 +147,7 @@ public interface MPJBaseDeepService<T> extends IService<T> {
      */
     default <E extends IPage<T>> E pageDeep(E page) {
         E e = page(page);
-        if (CollectionUtils.isNotEmpty(e.getRecords())) {
-            queryMapping(e.getRecords());
-        }
+        ((MPJBaseMapper<T>) getBaseMapper()).queryMapping(e.getRecords());
         return e;
     }
 
@@ -181,9 +178,7 @@ public interface MPJBaseDeepService<T> extends IService<T> {
      */
     default <E extends IPage<Map<String, Object>>> E pageMapsDeep(E page, Wrapper<T> queryWrapper) {
         E e = pageMaps(page, queryWrapper);
-        if (CollectionUtils.isNotEmpty(e.getRecords())) {
-            queryMapMapping(e.getRecords());
-        }
+        queryMapMapping(e.getRecords());
         return e;
     }
 
@@ -195,66 +190,8 @@ public interface MPJBaseDeepService<T> extends IService<T> {
      */
     default <E extends IPage<Map<String, Object>>> E pageMapsDeep(E page) {
         E e = pageMaps(page);
-        if (CollectionUtils.isNotEmpty(e.getRecords())) {
-            queryMapMapping(e.getRecords());
-        }
+        queryMapMapping(e.getRecords());
         return e;
-    }
-
-    /**
-     * 查询映射关系
-     * 对结果进行二次查询
-     * 可以自行查询然后在通过此方法进行二次查询
-     *
-     * @param t 第一次查询结果
-     */
-    default T queryMapping(T t) {
-        if (t == null) {
-            return null;
-        }
-        MPJTableInfo tableInfo = MPJTableInfoHelper.getTableInfo(currentModelClass());
-        if (tableInfo.isHasMapping()) {
-            for (MPJTableFieldInfo fieldInfo : tableInfo.getFieldList()) {
-                Object get = fieldInfo.thisFieldGet(t);
-                if (get != null) {
-                    List<?> o = (List<?>) fieldInfo.getJoinMapper().mappingWrapperConstructor(fieldInfo.isFieldIsMap(),
-                            SqlKeyword.EQ, fieldInfo.getJoinColumn(), get, fieldInfo);
-                    MPJTableFieldInfo.bind(fieldInfo, t, o);
-                }
-            }
-        }
-        return t;
-    }
-
-    /**
-     * 查询映射关系
-     * 对结果进行二次查询
-     * 可以自行查询然后在通过此方法进行二次查询
-     *
-     * @param list 第一次查询结果
-     */
-    default List<T> queryMapping(List<T> list) {
-        if (CollectionUtils.isEmpty(list)) {
-            return list;
-        }
-        MPJTableInfo tableInfo = MPJTableInfoHelper.getTableInfo(currentModelClass());
-        if (tableInfo.isHasMapping()) {
-            for (MPJTableFieldInfo fieldInfo : tableInfo.getFieldList()) {
-                List<Object> itemList = list.stream().map(fieldInfo::thisFieldGet).collect(Collectors.toList());
-                if (CollectionUtils.isNotEmpty(itemList)) {
-                    List<?> joinList = (List<?>) fieldInfo.getJoinMapper().mappingWrapperConstructor(
-                            fieldInfo.isFieldIsMap(), SqlKeyword.IN, fieldInfo.getJoinColumn(), itemList, fieldInfo);
-                    list.forEach(i -> {
-                        List<?> data = joinList.stream().filter(j -> fieldInfo.joinFieldGet(j)
-                                .equals(fieldInfo.thisFieldGet(i))).collect(Collectors.toList());
-                        MPJTableFieldInfo.bind(fieldInfo, i, data);
-                    });
-                } else {
-                    list.forEach(i -> fieldInfo.fieldSet(i, new ArrayList<>()));
-                }
-            }
-        }
-        return list;
     }
 
 

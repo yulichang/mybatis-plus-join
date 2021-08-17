@@ -30,8 +30,8 @@ QQ群:1022221898
 ### 使用
 
 * mapper继承MPJBaseMapper
-* service继承MPJBaseService
-* serviceImpl继承MPJBaseServiceImpl
+* service继承MPJBaseService (可选)
+* serviceImpl继承MPJBaseServiceImpl (可选)
 
 #### @MPJMapping注解
 
@@ -67,18 +67,17 @@ public class UserDO {
 使用
 
 ```java
-
 /**
  * 一对一，一对多关系映射查询
  * 映射只对MPJBaseDeepService中的方法有效果 ，一般以Deep结尾，比如 getByIdDeep listByIdsDeep 等
  * 如果不需要关系映射就使用mybatis plus原生方法即可，比如 getById listByIds 等
  *
- * @see com.github.yulichang.base.MPJBaseDeepService
+ * @see com.github.yulichang.base.service.MPJDeepService
  */
 @SpringBootTest
 class MappingTest {
     @Resource
-    private UserService userService;
+    private UserMapper userMapper;
 
     /**
      * 根据id查询
@@ -88,10 +87,11 @@ class MappingTest {
      * 第一次查询目标UserDO
      * 第二次根据pid查询上级用户
      * 第三次根据自身id查询下级用户
+     *
      */
     @Test
     void test1() {
-        UserDO deep = userService.getByIdDeep(2);
+        UserDO deep = userMapper.selectByIdDeep(1);
         System.out.println(deep);
     }
 
@@ -103,10 +103,11 @@ class MappingTest {
      * 第一次查询目标UserDO集合
      * 第二次根据pid查询上级用户（不会一条记录一条记录的去查询，对pid进行汇总，用in语句一次性查出来，然后进行匹配）
      * 第三次根据自身id查询下级用户（不会一条记录一条记录的去查询，对id进行汇总，用in语句一次性查出来，然后进行匹配）
+     *
      */
     @Test
     void test2() {
-        List<UserDO> list = userService.listDeep();
+        List<UserDO> list = userMapper.selectListDeep(Wrappers.emptyWrapper());
         list.forEach(System.out::println);
     }
 
@@ -117,9 +118,10 @@ class MappingTest {
      */
     @Test
     void test3() {
-        Page<UserDO> page = userService.pageDeep(new Page<>(2, 2));
+        Page<UserDO> page = userMapper.selectPageDeep(new Page<>(2, 2), Wrappers.emptyWrapper());
         page.getRecords().forEach(System.out::println);
     }
+
 
 }
 

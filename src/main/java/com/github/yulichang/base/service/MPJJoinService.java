@@ -1,7 +1,8 @@
-package com.github.yulichang.base;
+package com.github.yulichang.base.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.github.yulichang.base.MPJBaseMapper;
 import com.github.yulichang.interfaces.MPJBaseJoin;
 
 import java.util.List;
@@ -12,7 +13,7 @@ import java.util.Map;
  * @see IService
  */
 @SuppressWarnings("unused")
-public interface MPJBaseJoinService<T> extends IService<T> {
+public interface MPJJoinService<T> extends IService<T> {
 
     /**
      * 根据 Wrapper 条件，查询总记录数

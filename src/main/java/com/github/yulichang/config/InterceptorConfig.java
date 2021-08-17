@@ -1,8 +1,11 @@
 package com.github.yulichang.config;
 
+import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.github.yulichang.exception.MPJException;
 import com.github.yulichang.interceptor.MPJInterceptor;
+import org.apache.ibatis.logging.Log;
+import org.apache.ibatis.logging.LogFactory;
 import org.apache.ibatis.plugin.Interceptor;
 import org.apache.ibatis.plugin.InterceptorChain;
 import org.apache.ibatis.session.Configuration;
@@ -23,7 +26,9 @@ import java.util.List;
 @SuppressWarnings("SpringJavaAutowiredMembersInspection")
 public class InterceptorConfig implements ApplicationListener<ApplicationReadyEvent> {
 
-    @Autowired
+    private static final Log logger = LogFactory.getLog(TableInfoHelper.class);
+
+    @Autowired(required = false)
     private List<SqlSessionFactory> sqlSessionFactoryList;
     @Autowired
     private MPJInterceptor mpjInterceptor;
@@ -48,6 +53,8 @@ public class InterceptorConfig implements ApplicationListener<ApplicationReadyEv
             } catch (Exception ignored) {
                 throw new MPJException("mpjInterceptor exception");
             }
+        } else {
+            logger.warn("MPJ not define SqlSessionFactory");
         }
     }
 }

@@ -1,6 +1,6 @@
 # mybatis-plus-join
 
-* 本页功能只能在1.2.0测试版中使用,最新版本 1.2.0.Beta2
+* 本页功能只能在1.2.0测试版中使用,最新版本 1.2.0.Beta3
 
 * 点个Star支持一下吧 :)
 
@@ -15,12 +15,12 @@ QQ群:1022221898
   <dependency>
       <groupId>com.github.yulichang</groupId>
       <artifactId>mybatis-plus-join</artifactId>
-      <version>1.2.0.Beta2</version>
+      <version>1.2.0.Beta3</version>
   </dependency>
   ```
 - Gradle
   ```
-   implementation group: 'com.github.yulichang', name: 'mybatis-plus-join', version: '1.2.0.Beta2'
+   implementation group: 'com.github.yulichang', name: 'mybatis-plus-join', version: '1.2.0.Beta3'
   ```
   或者clone代码到本地执行 mvn install, 再引入以上依赖  
   <br>

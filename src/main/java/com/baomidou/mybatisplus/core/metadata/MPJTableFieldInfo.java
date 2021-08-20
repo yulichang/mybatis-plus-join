@@ -15,7 +15,6 @@ import lombok.ToString;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -40,6 +39,10 @@ public class MPJTableFieldInfo {
      * 属性
      */
     private Field field;
+    /**
+     * 属性名
+     */
+    private String property;
     /**
      * 数据结构是否是Map或者List<Map>
      */
@@ -67,7 +70,7 @@ public class MPJTableFieldInfo {
     /**
      * 映射实体类
      */
-    private final Class<?> joinClass;
+    private Class<?> joinClass;
     /**
      * 映射属性名
      */
@@ -102,15 +105,17 @@ public class MPJTableFieldInfo {
     /**
      * 初始化关联字段信息
      */
-    public MPJTableFieldInfo(Class<?> entityType, MPJMapping mapping, Field field1) {
-        initField(field1);
+    public MPJTableFieldInfo(Class<?> entityType, MPJMapping mapping, Field field) {
+        initField(field);
+        if (mapping.tag() != Object.class) {
+            this.joinClass = mapping.tag();
+        }
         this.entityType = entityType;
-        this.joinClass = mapping.tag();
         this.isThrowExp = mapping.isThrowExp();
         this.thisMapKey = StringUtils.isBlank(mapping.thisMapKey()) ? null : mapping.thisMapKey();
         this.joinMapKey = StringUtils.isBlank(mapping.joinMapKsy()) ? null : mapping.joinMapKsy();
         this.wrapper = new MPJMappingWrapper(mapping);
-        if (this.isCollection && this.field.getType() != List.class && this.field.getType() != ArrayList.class) {
+        if (this.isCollection && !List.class.isAssignableFrom(this.field.getType())) {
             throw new MPJException("对多关系的数据结构目前只支持 <List> 暂不支持其他Collection实现 " + this.field.getType().getTypeName());
         }
         if (StringUtils.isNotBlank(mapping.joinField())) {
@@ -132,6 +137,7 @@ public class MPJTableFieldInfo {
     private void initField(Field field) {
         field.setAccessible(true);
         this.field = field;
+        this.property = field.getName();
         this.isCollection = Collection.class.isAssignableFrom(field.getType());
 
         if (Map.class.isAssignableFrom(field.getType())) {
@@ -148,6 +154,15 @@ public class MPJTableFieldInfo {
             } else {
                 this.fieldIsMap = false;
             }
+        }
+
+        if (List.class.isAssignableFrom(field.getType())) {
+            if (field.getGenericType() instanceof ParameterizedType) {
+                ParameterizedType t = (ParameterizedType) field.getGenericType();
+                this.joinClass = (Class<?>) t.getActualTypeArguments()[0];
+            }
+        } else {
+            this.joinClass = field.getType();
         }
     }
 
@@ -269,28 +284,28 @@ public class MPJTableFieldInfo {
     }
 
     public static <T> void bind(MPJTableFieldInfo fieldInfo, T i, List<?> data) {
-        if (!fieldInfo.isCollection()) {
+        if (fieldInfo.isCollection()) {
+            fieldInfo.fieldSet(i, data);
+        } else {
             if (data.size() > 1 && fieldInfo.isThrowExp()) {
                 throw new MPJException("Expected one result (or null) to be returned by select, but found: " +
                         data.size() + " , " + fieldInfo.getField().getName());
             } else {
                 fieldInfo.fieldSet(i, data.stream().findFirst().orElse(null));
             }
-        } else {
-            fieldInfo.fieldSet(i, data);
         }
     }
 
     public static void bindMap(MPJTableFieldInfo fieldInfo, Map<String, Object> i, List<?> data) {
-        if (!fieldInfo.isCollection()) {
+        if (fieldInfo.isCollection()) {
+            i.put(fieldInfo.getField().getName(), data);
+        } else {
             if (data.size() > 1 && fieldInfo.isThrowExp()) {
                 throw new MPJException("Expected one result (or null) to be returned by select, but found: " +
                         data.size() + " , " + fieldInfo.getField().getName());
             } else {
                 i.put(fieldInfo.getField().getName(), data.stream().findFirst().orElse(null));
             }
-        } else {
-            i.put(fieldInfo.getField().getName(), data);
         }
     }
 

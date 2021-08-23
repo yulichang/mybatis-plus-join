@@ -1,6 +1,6 @@
 # mybatis-plus-join
 
-* 本页功能只能在1.2.0测试版中使用,最新版本 1.2.0.Beta4
+* 本页功能只能在1.2.0测试版中使用,最新版本 1.2.0.Beta3
 
 * 点个Star支持一下吧 :)
 
@@ -15,12 +15,12 @@ QQ群:1022221898
   <dependency>
       <groupId>com.github.yulichang</groupId>
       <artifactId>mybatis-plus-join</artifactId>
-      <version>1.2.0.Beta4</version>
+      <version>1.2.0.Beta3</version>
   </dependency>
   ```
 - Gradle
   ```
-   implementation group: 'com.github.yulichang', name: 'mybatis-plus-join', version: '1.2.0.Beta4'
+   implementation group: 'com.github.yulichang', name: 'mybatis-plus-join', version: '1.2.0.Beta3'
   ```
   或者clone代码到本地执行 mvn install, 再引入以上依赖  
   <br>
@@ -45,36 +45,22 @@ public class UserDO {
 
     @TableId
     private Integer id;
-    private Integer pid;
+    private Integer pid;//父id
     /* 其他属性略 */
 
     /**
-     * 查询上级 一对一
+     *  一对一
      */
     @TableField(exist = false)
-    @EntityMapping(thisField = "pid", joinField = "id")
+    @MPJMapping(tag = UserDO.class, thisField = "pid", joinField = "id")
     private UserDO pUser;
 
     /**
-     * 查询下级 一对多
+     *  一对多
      */
     @TableField(exist = false)
-    @EntityMapping(thisField = "id", joinField = "pid")
-    private List<UserDO> childUser;
-
-    /**
-     * 查询地址 (一对多)
-     */
-    @TableField(exist = false)
-    @EntityMapping(thisField = "id", joinField = "userId")
-    private List<UserAddressDO> addressList;
-
-    /**
-     * 绑定字段 （一对多）
-     */
-    @TableField(exist = false)
-    @FieldMapping(tag = UserDO.class, thisField = "id", joinField = "pid", select = "id")
-    private List<Integer> childIds;
+    @MPJMapping(tag = UserDO.class, thisField = "id", joinField = "pid")
+    private List<UserDO> childUserList;
 }
 ```
 
@@ -83,8 +69,8 @@ public class UserDO {
 ```java
 /**
  * 一对一，一对多关系映射查询
- * 映射查询一般以Deep结尾，比如 selectByIdDeep selectListDeep 等
- * 如果不需要关系映射就使用mybatis plus原生方法即可，比如 electById selectList 等
+ * 映射只对MPJBaseDeepService中的方法有效果 ，一般以Deep结尾，比如 getByIdDeep listByIdsDeep 等
+ * 如果不需要关系映射就使用mybatis plus原生方法即可，比如 getById listByIds 等
  *
  * @see com.github.yulichang.base.service.MPJDeepService
  */

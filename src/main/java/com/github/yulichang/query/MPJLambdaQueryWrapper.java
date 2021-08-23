@@ -138,7 +138,7 @@ public class MPJLambdaQueryWrapper<T> extends AbstractLambdaWrapper<T, MPJLambda
     public final MPJLambdaQueryWrapper<T> selectIgnore(SFunction<T, ?>... columns) {
         if (ArrayUtils.isNotEmpty(columns)) {
             for (SFunction<T, ?> s : columns) {
-                ignoreColumns.add(this.alias + StringPool.DOT + getColumnCache(s).getColumn());
+                ignoreColumns.add(this.alias + StringPool.DOT + super.columnToString(s, false));
             }
         }
         return typedThis;

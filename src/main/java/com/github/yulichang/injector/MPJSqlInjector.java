@@ -2,9 +2,11 @@ package com.github.yulichang.injector;
 
 import com.baomidou.mybatisplus.core.injector.AbstractMethod;
 import com.baomidou.mybatisplus.core.injector.DefaultSqlInjector;
+import com.baomidou.mybatisplus.core.injector.methods.*;
 import com.baomidou.mybatisplus.core.mapper.Mapper;
 import com.baomidou.mybatisplus.core.metadata.MPJTableAliasHelper;
 import com.baomidou.mybatisplus.core.metadata.MPJTableInfoHelper;
+import com.baomidou.mybatisplus.core.metadata.TableInfo;
 import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
 import com.baomidou.mybatisplus.core.toolkit.ClassUtils;
 import com.github.yulichang.method.*;
@@ -12,8 +14,12 @@ import org.apache.ibatis.builder.MapperBuilderAssistant;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.core.GenericTypeResolver;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Stream;
+
+import static java.util.stream.Collectors.toList;
 
 /**
  * SQL 注入器
@@ -24,9 +30,43 @@ import java.util.Objects;
 @ConditionalOnMissingBean(DefaultSqlInjector.class)
 public class MPJSqlInjector extends DefaultSqlInjector {
 
-    @Override
+    @SuppressWarnings("unused")
     public List<AbstractMethod> getMethodList(Class<?> mapperClass) {
-        List<AbstractMethod> list = super.getMethodList(mapperClass);
+        List<AbstractMethod> list = Stream.of(
+                new Insert(),
+                new Delete(),
+                new DeleteByMap(),
+                new DeleteById(),
+                new DeleteBatchByIds(),
+                new Update(),
+                new UpdateById(),
+                new SelectById(),
+                new SelectBatchByIds(),
+                new SelectByMap(),
+                new SelectOne(),
+                new SelectCount(),
+                new SelectMaps(),
+                new SelectMapsPage(),
+                new SelectObjs(),
+                new SelectList(),
+                new SelectPage()
+        ).collect(toList());
+        list.addAll(getJoinMethod());
+        return list;
+    }
+
+    /**
+     * mybatis plus 3.4.3.2
+     */
+    @Override
+    public List<AbstractMethod> getMethodList(Class<?> mapperClass, TableInfo tableInfo) {
+        List<AbstractMethod> list = super.getMethodList(mapperClass, tableInfo);
+        list.addAll(getJoinMethod());
+        return list;
+    }
+
+    private List<AbstractMethod> getJoinMethod() {
+        List<AbstractMethod> list = new ArrayList<>();
         list.add(new SelectJoinCount());
         list.add(new SelectJoinOne());
         list.add(new SelectJoinList());

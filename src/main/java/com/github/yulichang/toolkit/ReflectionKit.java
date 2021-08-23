@@ -182,16 +182,4 @@ public final class ReflectionKit {
     public static Class<?> resolvePrimitiveIfNecessary(Class<?> clazz) {
         return (clazz.isPrimitive() && clazz != void.class ? PRIMITIVE_TYPE_TO_WRAPPER_MAP.get(clazz) : clazz);
     }
-
-    /**
-     * 设置可访问对象的可访问权限为 true
-     *
-     * @param object 可访问的对象
-     * @param <T>    类型
-     * @return 返回设置后的对象
-     */
-    public static <T extends AccessibleObject> T setAccessible(T object) {
-        return AccessController.doPrivileged(new SetAccessibleAction<>(object));
-    }
-
 }

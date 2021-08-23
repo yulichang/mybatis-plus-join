@@ -25,14 +25,9 @@ public class MPJTableInfo {
     private TableInfo tableInfo;
 
     /**
-     * 表别名
+     * 是否包含 MPJMapping 或者 MPJMappingField
      */
-    private String alias;
-
-    /**
-     * 前缀
-     */
-    private String aliasDOT;
+    private boolean hasMappingOrField;
 
     /**
      * 是否包含映射注解
@@ -40,12 +35,17 @@ public class MPJTableInfo {
     private boolean hasMapping;
 
     /**
+     * 是否包含映射注解
+     */
+    private boolean hasMappingField;
+
+    /**
      * mapperClass
      */
     private Class<?> mapperClass;
 
     /**
-     * 包含映射注解的字段列表
+     * 包含映射实体注解的字段列表
      */
     private List<MPJTableFieldInfo> fieldList;
 }

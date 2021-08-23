@@ -11,6 +11,7 @@ import java.util.function.BiPredicate;
  * <p>
  * {@link com.baomidou.mybatisplus.core.conditions.interfaces.Compare}
  */
+@SuppressWarnings("unused")
 public interface Compare<Children> extends Serializable {
 
     /**
@@ -65,6 +66,7 @@ public interface Compare<Children> extends Serializable {
     /**
      * ignore
      */
+    @SuppressWarnings("UnusedReturnValue")
     default <R> Children eq(SFunction<R, ?> column, Object val) {
         return eq(true, column, val);
     }

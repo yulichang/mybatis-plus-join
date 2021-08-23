@@ -3,7 +3,6 @@ package com.baomidou.mybatisplus.core.metadata;
 
 import com.baomidou.mybatisplus.core.enums.SqlKeyword;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
-import com.github.yulichang.annotation.MPJMapping;
 import com.github.yulichang.annotation.MPJMappingApply;
 import com.github.yulichang.annotation.MPJMappingCondition;
 import lombok.AllArgsConstructor;
@@ -36,36 +35,37 @@ public class MPJMappingWrapper {
     private final boolean hasLast;
     private String last;
 
-    public MPJMappingWrapper(MPJMapping mapping) {
-        this.hasFirst = StringUtils.isNotBlank(mapping.first());
+    public MPJMappingWrapper(String first, String select, MPJMappingApply[] applys,
+                             MPJMappingCondition[] conditions, String last) {
+        this.hasFirst = StringUtils.isNotBlank(first);
         if (this.hasFirst) {
-            this.first = mapping.first();
+            this.first = first;
         }
 
-        this.hasSelect = StringUtils.isNotBlank(mapping.select());
+        this.hasSelect = StringUtils.isNotBlank(select);
         if (this.hasSelect) {
-            this.select = mapping.select();
+            this.select = select;
         }
 
-        this.hasApply = mapping.apply().length > 0;
+        this.hasApply = applys.length > 0;
         if (this.hasApply) {
             this.applyList = new ArrayList<>();
-            for (MPJMappingApply apply : mapping.apply()) {
+            for (MPJMappingApply apply : applys) {
                 this.applyList.add(new Apply(apply.value(), apply.args()));
             }
         }
 
-        this.hasCondition = mapping.condition().length > 0;
+        this.hasCondition = conditions.length > 0;
         if (this.hasCondition) {
             this.conditionList = new ArrayList<>();
-            for (MPJMappingCondition condition : mapping.condition()) {
+            for (MPJMappingCondition condition : conditions) {
                 conditionList.add(new Condition(condition.keyWord(), condition.column(), condition.value()));
             }
         }
 
-        this.hasLast = StringUtils.isNotBlank(mapping.last());
+        this.hasLast = StringUtils.isNotBlank(last);
         if (this.hasLast) {
-            this.last = mapping.last();
+            this.last = last;
         }
     }
 

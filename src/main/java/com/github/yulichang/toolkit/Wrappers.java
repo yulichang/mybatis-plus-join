@@ -8,6 +8,7 @@ import com.github.yulichang.wrapper.MPJLambdaWrapper;
  *
  * @author yulichang
  */
+@SuppressWarnings("unused")
 public class Wrappers {
 
     /**

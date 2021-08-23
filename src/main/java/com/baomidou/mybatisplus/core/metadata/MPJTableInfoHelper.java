@@ -3,9 +3,8 @@ package com.baomidou.mybatisplus.core.metadata;
 import com.baomidou.mybatisplus.annotation.*;
 import com.baomidou.mybatisplus.core.config.GlobalConfig;
 import com.baomidou.mybatisplus.core.toolkit.*;
-import com.github.yulichang.annotation.MPJMapping;
-import com.github.yulichang.annotation.MPJTableAlias;
-import com.github.yulichang.toolkit.Constant;
+import com.github.yulichang.annotation.EntityMapping;
+import com.github.yulichang.annotation.FieldMapping;
 import org.apache.ibatis.builder.MapperBuilderAssistant;
 import org.apache.ibatis.logging.Log;
 import org.apache.ibatis.logging.LogFactory;
@@ -19,7 +18,6 @@ import org.apache.ibatis.session.Configuration;
 import java.lang.reflect.Field;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import static java.util.stream.Collectors.toList;
 
@@ -37,10 +35,6 @@ import static java.util.stream.Collectors.toList;
  */
 public class MPJTableInfoHelper {
 
-    /**
-     * 用于生成别名的序号
-     */
-    private static final AtomicInteger index = new AtomicInteger(1);
 
     private static final Log logger = LogFactory.getLog(TableInfoHelper.class);
 
@@ -124,7 +118,6 @@ public class MPJTableInfoHelper {
         TableInfo tableInfo = TableInfoHelper.getTableInfo(clazz);
         if (tableInfo != null) {
             mpjTableInfo.setTableInfo(tableInfo);
-            initTableAlias(mpjTableInfo);
             initMapping(mpjTableInfo);
             /* 添加缓存 */
             TABLE_INFO_CACHE.put(clazz, mpjTableInfo);
@@ -154,22 +147,9 @@ public class MPJTableInfoHelper {
         /* 缓存 lambda */
         LambdaUtils.installCache(tableInfo);
 
-        /* 初始化表别名 */
-        initTableAlias(mpjTableInfo);
-
         /* 初始化映射关系 */
         initMapping(mpjTableInfo);
         return mpjTableInfo;
-    }
-
-    private static void initTableAlias(MPJTableInfo tableInfo) {
-        MPJTableAlias tableAlias = tableInfo.getTableInfo().getEntityType().getAnnotation(MPJTableAlias.class);
-        if (tableAlias != null && StringUtils.isNotBlank(tableAlias.value())) {
-            tableInfo.setAlias(tableAlias.value());
-            return;
-        }
-        tableInfo.setAlias(Constant.TABLE_ALIAS + index.getAndIncrement());
-        tableInfo.setAliasDOT(tableInfo.getAlias() + StringPool.DOT);
     }
 
     /**
@@ -371,7 +351,11 @@ public class MPJTableInfoHelper {
     }
 
     private static boolean isExistMapping(Class<?> clazz) {
-        return ReflectionKit.getFieldList(ClassUtils.getUserClass(clazz)).stream().anyMatch(field -> field.isAnnotationPresent(MPJMapping.class));
+        return ReflectionKit.getFieldList(ClassUtils.getUserClass(clazz)).stream().anyMatch(field -> field.isAnnotationPresent(EntityMapping.class));
+    }
+
+    private static boolean isExistMappingField(Class<?> clazz) {
+        return ReflectionKit.getFieldList(ClassUtils.getUserClass(clazz)).stream().anyMatch(field -> field.isAnnotationPresent(FieldMapping.class));
     }
 
     /**
@@ -512,12 +496,22 @@ public class MPJTableInfoHelper {
         // 是否存在 @MPJMapping 注解
         boolean existMapping = isExistMapping(mpjTableInfo.getTableInfo().getEntityType());
         mpjTableInfo.setHasMapping(existMapping);
+        // 是否存在 @MPJMappingField 注解
+        boolean existMappingField = isExistMappingField(mpjTableInfo.getTableInfo().getEntityType());
+        mpjTableInfo.setHasMappingField(existMappingField);
+        mpjTableInfo.setHasMappingOrField(existMapping || existMappingField);
         /* 关系映射初始化 */
         List<MPJTableFieldInfo> mpjFieldList = new ArrayList<>();
         List<Field> fields = ReflectionKit.getFieldList(ClassUtils.getUserClass(mpjTableInfo.getTableInfo().getEntityType()));
         for (Field field : fields) {
             if (existMapping) {
-                MPJMapping mapping = field.getAnnotation(MPJMapping.class);
+                EntityMapping mapping = field.getAnnotation(EntityMapping.class);
+                if (mapping != null) {
+                    mpjFieldList.add(new MPJTableFieldInfo(mpjTableInfo.getTableInfo().getEntityType(), mapping, field));
+                }
+            }
+            if (existMappingField) {
+                FieldMapping mapping = field.getAnnotation(FieldMapping.class);
                 if (mapping != null) {
                     mpjFieldList.add(new MPJTableFieldInfo(mpjTableInfo.getTableInfo().getEntityType(), mapping, field));
                 }
@@ -526,5 +520,4 @@ public class MPJTableInfoHelper {
         /* 映射字段列表 */
         mpjTableInfo.setFieldList(mpjFieldList);
     }
-
 }

@@ -39,6 +39,7 @@ import static java.util.stream.Collectors.toMap;
  * @author hcl
  * @since 2016-09-22
  */
+@SuppressWarnings("unused")
 public final class ReflectionKit {
     private static final Log logger = LogFactory.getLog(ReflectionKit.class);
     /**

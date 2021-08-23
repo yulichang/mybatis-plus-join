@@ -194,6 +194,7 @@ public class MPJLambdaQueryWrapper<T> extends AbstractLambdaWrapper<T, MPJLambda
      * @param clazz 表实体
      * @param as    表别名
      */
+    @SuppressWarnings("DuplicatedCode")
     public final MPJLambdaQueryWrapper<T> selectAll(Class<?> clazz, String as) {
         TableInfo info = TableInfoHelper.getTableInfo(clazz);
         Assert.notNull(info, "can not find table info");

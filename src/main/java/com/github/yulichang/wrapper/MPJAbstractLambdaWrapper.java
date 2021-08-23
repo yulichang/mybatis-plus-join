@@ -1,6 +1,6 @@
 package com.github.yulichang.wrapper;
 
-import com.baomidou.mybatisplus.core.metadata.MPJTableInfoHelper;
+import com.baomidou.mybatisplus.core.metadata.MPJTableAliasHelper;
 import com.baomidou.mybatisplus.core.toolkit.StringPool;
 import com.baomidou.mybatisplus.core.toolkit.support.ColumnCache;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
@@ -42,7 +42,7 @@ public abstract class MPJAbstractLambdaWrapper<T, Children extends MPJAbstractLa
     }
 
     protected String columnToString(SFunction<?, ?> column, boolean hasAlias) {
-        return (hasAlias ? MPJTableInfoHelper.getTableInfo(LambdaUtils.getEntityClass(column)).getAliasDOT() :
+        return (hasAlias ? MPJTableAliasHelper.get(LambdaUtils.getEntityClass(column)).getAliasDOT() :
                 StringPool.EMPTY) + getCache(column).getColumn();
     }
 

@@ -4,7 +4,7 @@ package com.github.yulichang.annotation;
 import java.lang.annotation.*;
 
 /**
- * 关系映射注解
+ * 字段关系映射注解
  *
  * @author yulichang
  * @since 1.2.0
@@ -12,13 +12,13 @@ import java.lang.annotation.*;
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.FIELD, ElementType.ANNOTATION_TYPE})
-public @interface MPJMapping {
+public @interface FieldMapping {
 
     /**
      * 关联的数据库实体类<br/>
      * 默认获取此注解所对应的类
      */
-    Class<?> tag() default Object.class;
+    Class<?> tag();
 
     /**
      * 当前类的关联的字段名称 (是实体类字段名称而不是数据库字段名称)<br/>
@@ -40,6 +40,11 @@ public @interface MPJMapping {
     boolean isThrowExp() default true;
 
     /**
+     * 字段映射对应的属性名
+     */
+    String select();
+
+    /**
      * 针对查询结果map的时候使用<br/>
      * 默认为thisField对应的数据库列名<br/>
      * <p>
@@ -56,13 +61,7 @@ public @interface MPJMapping {
      * 如果此类是以map方式查询的<br/>
      * 并且查询出来的map的key不是thisField对应的数据库列名就需要设置<br/>
      */
-    String joinMapKsy() default "";
-
-    /**
-     * 映射表查询条件之 select<br/>
-     * 等效于 Wrappers.<T>query().select(xxx);
-     */
-    String select() default "";
+    String joinMapKey() default "";
 
     /**
      * 映射表查询条件之 first<br/>

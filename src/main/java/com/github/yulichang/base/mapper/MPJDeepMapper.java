@@ -190,6 +190,40 @@ public interface MPJDeepMapper<T> extends BaseMapper<T> {
         return queryMapping(selectList(queryWrapper), property);
     }
 
+    /**
+     * 根据 Wrapper 条件，查询全部记录
+     *
+     * @param queryWrapper 实体对象封装操作类（可以为 null）
+     */
+    default List<Map<String, Object>> selectMapsDeep(Class<T> clazz, Wrapper<T> queryWrapper) {
+        return queryMapMapping(selectMaps(queryWrapper), clazz, null);
+    }
+
+    /**
+     * 根据 entity 条件，查询全部记录（并翻页）
+     * <p>
+     * JDK 默认不推荐泛型数组，会引起 Java堆污染(Heap Pollution)
+     *
+     * @param clazz        实体类class
+     * @param queryWrapper 实体对象封装操作类（可以为 null）
+     * @param property     需要关联的字段
+     */
+    default <R> List<Map<String, Object>> selectMapsDeep(Class<T> clazz, Wrapper<T> queryWrapper, SFunction<T, R>... property) {
+        return queryMapMapping(selectMaps(queryWrapper), clazz, Arrays.asList(property));
+    }
+
+    /**
+     * 针对可变参数堆污染提供的重载
+     * list为null或空，会查询全部映射关系
+     * <p>
+     * 例： selectMapsDeep(UserDO.class, queryWrapper, Arrays.asList(User::getId, ... ))
+     *
+     * @param queryWrapper 实体对象封装操作类（可以为 null）
+     * @param property     需要关联的字段
+     */
+    default <R> List<Map<String, Object>> selectMapsDeep(Class<T> clazz, Wrapper<T> queryWrapper, List<SFunction<T, R>> property) {
+        return queryMapMapping(selectMaps(queryWrapper), clazz, property);
+    }
 
     /**
      * 根据 entity 条件，查询全部记录（并翻页）
@@ -234,6 +268,54 @@ public interface MPJDeepMapper<T> extends BaseMapper<T> {
         return e;
     }
 
+
+    /**
+     * 根据 entity 条件，查询全部记录（并翻页）
+     *
+     * @param page         分页查询条件（可以为 RowBounds.DEFAULT）
+     * @param queryWrapper 实体对象封装操作类（可以为 null）
+     */
+    default <R, E extends IPage<Map<String, Object>>> E selectMapsPageDeep(E page, Class<T> clazz, Wrapper<T> queryWrapper) {
+        E e = selectMapsPage(page, queryWrapper);
+        queryMapMapping(e.getRecords(), clazz, null);
+        return e;
+    }
+
+
+    /**
+     * 根据 entity 条件，查询全部记录（并翻页）
+     * <p>
+     * JDK 默认不推荐泛型数组，会引起 Java堆污染(Heap Pollution)
+     *
+     * @param page         分页查询条件（可以为 RowBounds.DEFAULT）
+     * @param queryWrapper 实体对象封装操作类（可以为 null）
+     * @param property     需要关联的字段
+     */
+    default <R, E extends IPage<Map<String, Object>>> E selectMapsPageDeep(E page, Class<T> clazz, Wrapper<T> queryWrapper,
+                                                                           SFunction<T, R>... property) {
+        E e = selectMapsPage(page, queryWrapper);
+        queryMapMapping(e.getRecords(), clazz, Arrays.asList(property));
+        return e;
+    }
+
+
+    /**
+     * 针对可变参数堆污染提供的重载
+     * list为null或空，会查询全部映射关系
+     * <p>
+     * 例： selectMapsPage(page, UserDO.class, queryWrapper, Arrays.asList(User::getId, ... ))
+     *
+     * @param page         分页查询条件（可以为 RowBounds.DEFAULT）
+     * @param queryWrapper 实体对象封装操作类（可以为 null）
+     * @param property     需要关联的字段
+     */
+    default <R, E extends IPage<Map<String, Object>>> E selectMapsPageDeep(E page, Class<T> clazz, Wrapper<T> queryWrapper,
+                                                                           List<SFunction<T, R>> property) {
+        E e = selectMapsPage(page, queryWrapper);
+        queryMapMapping(e.getRecords(), clazz, property);
+        return e;
+    }
+
     /**
      * 查询映射关系<br/>
      * 对结果进行二次查询<br/>
@@ -247,22 +329,55 @@ public interface MPJDeepMapper<T> extends BaseMapper<T> {
             return null;
         }
         MPJTableInfo tableInfo = MPJTableInfoHelper.getTableInfo(t.getClass());
-        if (tableInfo.isHasMapping()) {
+        if (tableInfo.isHasMappingOrField()) {
             boolean hasProperty = CollectionUtils.isNotEmpty(property);
             List<String> list = hasProperty ? property.stream().map(LambdaUtils::getName).collect(
                     Collectors.toList()) : null;
             for (MPJTableFieldInfo fieldInfo : tableInfo.getFieldList()) {
                 if (!hasProperty || list.contains(fieldInfo.getProperty())) {
-                    Object get = fieldInfo.thisFieldGet(t);
-                    if (get != null) {
-                        List<?> o = (List<?>) fieldInfo.getJoinMapper().mappingWrapperConstructor(fieldInfo.isFieldIsMap(),
-                                SqlKeyword.EQ, fieldInfo.getJoinColumn(), get, fieldInfo);
-                        MPJTableFieldInfo.bind(fieldInfo, t, o);
+                    Object obj = fieldInfo.thisFieldGet(t);
+                    if (obj != null) {
+                        List<?> joinList = (List<?>) fieldInfo.getJoinMapper().mappingWrapperConstructor(
+                                fieldInfo.isFieldIsMap(), SqlKeyword.EQ, fieldInfo.getJoinColumn(), obj, fieldInfo);
+                        bindData(t, fieldInfo, joinList);
+                        fieldInfo.removeJoinField(joinList);
                     }
                 }
             }
         }
         return t;
+    }
+
+    /**
+     * 查询映射关系<br/>
+     * 对结果进行二次查询<br/>
+     * 可以自行查询然后在通过此方法进行二次查询<br/>
+     * list为null或空，会查询全部映射关系<br/>
+     *
+     * @param map 第一次查询结果
+     */
+    default <R> Map<String, Object> queryMapMapping(Map<String, Object> map, Class<T> clazz, List<SFunction<T, R>> property) {
+        if (CollectionUtils.isEmpty(map)) {
+            return map;
+        }
+        MPJTableInfo tableInfo = MPJTableInfoHelper.getTableInfo(clazz);
+        if (tableInfo.isHasMappingOrField()) {
+            boolean hasProperty = CollectionUtils.isNotEmpty(property);
+            List<String> list = hasProperty ? property.stream().map(LambdaUtils::getName).collect(
+                    Collectors.toList()) : null;
+            for (MPJTableFieldInfo fieldInfo : tableInfo.getFieldList()) {
+                if (!hasProperty || list.contains(fieldInfo.getProperty())) {
+                    Object obj = map.get(fieldInfo.getThisMapKey());
+                    if (obj != null) {
+                        List<?> joinList = (List<?>) fieldInfo.getJoinMapper().mappingWrapperConstructor(
+                                fieldInfo.isFieldIsMap(), SqlKeyword.EQ, fieldInfo.getJoinColumn(), obj, fieldInfo);
+                        bindMap(map, fieldInfo, joinList);
+                        fieldInfo.removeJoinField(joinList);
+                    }
+                }
+            }
+        }
+        return map;
     }
 
     /**
@@ -278,7 +393,7 @@ public interface MPJDeepMapper<T> extends BaseMapper<T> {
             return list;
         }
         MPJTableInfo tableInfo = MPJTableInfoHelper.getTableInfo(list.get(0).getClass());
-        if (tableInfo.isHasMapping()) {
+        if (tableInfo.isHasMappingOrField()) {
             boolean hasProperty = CollectionUtils.isNotEmpty(property);
             List<String> listProperty = hasProperty ? property.stream().map(LambdaUtils::getName).collect(
                     Collectors.toList()) : null;
@@ -287,12 +402,10 @@ public interface MPJDeepMapper<T> extends BaseMapper<T> {
                     List<Object> itemList = list.stream().map(fieldInfo::thisFieldGet).collect(Collectors.toList());
                     if (CollectionUtils.isNotEmpty(itemList)) {
                         List<?> joinList = (List<?>) fieldInfo.getJoinMapper().mappingWrapperConstructor(
-                                fieldInfo.isFieldIsMap(), SqlKeyword.IN, fieldInfo.getJoinColumn(), itemList, fieldInfo);
-                        list.forEach(i -> {
-                            List<?> data = joinList.stream().filter(j -> fieldInfo.joinFieldGet(j)
-                                    .equals(fieldInfo.thisFieldGet(i))).collect(Collectors.toList());
-                            MPJTableFieldInfo.bind(fieldInfo, i, data);
-                        });
+                                fieldInfo.isMappingEntity() && fieldInfo.isFieldIsMap(), SqlKeyword.IN,
+                                fieldInfo.getJoinColumn(), itemList, fieldInfo);
+                        list.forEach(i -> bindData(i, fieldInfo, joinList));
+                        fieldInfo.removeJoinField(joinList);
                     } else {
                         list.forEach(i -> fieldInfo.fieldSet(i, new ArrayList<>()));
                     }
@@ -303,8 +416,82 @@ public interface MPJDeepMapper<T> extends BaseMapper<T> {
     }
 
     /**
+     * 查询映射关系<br/>
+     * 对结果进行二次查询<br/>
+     * 可以自行查询然后在通过此方法进行二次查询<br/>
+     * list为null或空，会查询全部映射关系<br/>
+     *
+     * @param list 第一次查询结果
+     */
+    default <R> List<Map<String, Object>> queryMapMapping(List<Map<String, Object>> list, Class<T> clazz, List<SFunction<T, R>> property) {
+        if (CollectionUtils.isEmpty(list)) {
+            return list;
+        }
+        MPJTableInfo tableInfo = MPJTableInfoHelper.getTableInfo(clazz);
+        if (tableInfo.isHasMappingOrField()) {
+            boolean hasProperty = CollectionUtils.isNotEmpty(property);
+            List<String> listProperty = hasProperty ? property.stream().map(LambdaUtils::getName).collect(
+                    Collectors.toList()) : null;
+            for (MPJTableFieldInfo fieldInfo : tableInfo.getFieldList()) {
+                if (!hasProperty || listProperty.contains(fieldInfo.getProperty())) {
+                    List<Object> itemList = list.stream().map(m -> m.get(fieldInfo.getThisMapKey()))
+                            .collect(Collectors.toList());
+                    if (CollectionUtils.isNotEmpty(itemList)) {
+                        List<?> joinList = (List<?>) fieldInfo.getJoinMapper().mappingWrapperConstructor(
+                                fieldInfo.isMappingEntity() && fieldInfo.isFieldIsMap(), SqlKeyword.IN,
+                                fieldInfo.getJoinColumn(), itemList, fieldInfo);
+                        list.forEach(i -> bindMap(i, fieldInfo, joinList));
+                        fieldInfo.removeJoinField(joinList);
+                    } else {
+                        list.forEach(i -> i.put(fieldInfo.getField().getName(), new ArrayList<>()));
+                    }
+                }
+            }
+        }
+        return list;
+    }
+
+    /**
+     * 绑定数据
+     */
+    default void bindData(T t, MPJTableFieldInfo fieldInfo, List<?> joinList) {
+        if (fieldInfo.isMappingEntity()) {
+            List<?> list = joinList.stream().filter(j -> fieldInfo.joinFieldGet(j).equals(fieldInfo.thisFieldGet(t)))
+                    .collect(Collectors.toList());
+            MPJTableFieldInfo.bind(fieldInfo, t, list);
+        }
+        if (fieldInfo.isMappingField()) {
+            MPJTableFieldInfo.bind(fieldInfo, t, joinList.stream().filter(j -> fieldInfo.joinFieldGet(j).equals(
+                    fieldInfo.thisFieldGet(t))).map(fieldInfo::bindFieldGet).collect(Collectors.toList()));
+        }
+    }
+
+    /**
+     * 绑定数据
+     */
+    default void bindMap(Map<String, Object> t, MPJTableFieldInfo fieldInfo, List<?> joinList) {
+        List<?> list = null;
+        if (fieldInfo.isMappingEntity()) {
+            if (fieldInfo.isFieldIsMap()) {
+                list = ((List<Map<String, Object>>) joinList).stream().filter(j ->
+                        j.get(fieldInfo.getJoinMapKey()).equals(t.get(fieldInfo.getThisMapKey())))
+                        .collect(Collectors.toList());
+            } else {
+                list = joinList.stream().filter(j ->
+                        fieldInfo.joinFieldGet(j).equals(t.get(fieldInfo.getThisMapKey())))
+                        .collect(Collectors.toList());
+            }
+        }
+        if (fieldInfo.isMappingField()) {
+            list = joinList.stream().filter(j -> fieldInfo.joinFieldGet(j).equals(
+                    t.get(fieldInfo.getThisMapKey()))).map(fieldInfo::bindFieldGet).collect(Collectors.toList());
+        }
+        MPJTableFieldInfo.bindMap(fieldInfo, t, list);
+    }
+
+    /**
      * 映射 wrapper 构造器
-     * 仅对使用 @MPJMapping 时使用
+     * 仅对使用映射注解时使用
      */
     default Object mappingWrapperConstructor(boolean selectMap, SqlKeyword keyword,
                                              String column, Object val, MPJTableFieldInfo fieldInfo) {

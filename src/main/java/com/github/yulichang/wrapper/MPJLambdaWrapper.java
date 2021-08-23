@@ -72,7 +72,7 @@ public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWr
     MPJLambdaWrapper(Class<?> entityClass, AtomicInteger paramNameSeq,
                      Map<String, Object> paramNameValuePairs, MergeSegments mergeSegments,
                      SharedString lastSql, SharedString sqlComment, SharedString sqlFirst, boolean hasAlias) {
-        this.entityClass =entityClass;
+        this.entityClass = entityClass;
         this.paramNameSeq = paramNameSeq;
         this.paramNameValuePairs = paramNameValuePairs;
         this.expression = mergeSegments;
@@ -107,9 +107,9 @@ public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWr
     public <E> MPJLambdaWrapper<T> select(Class<E> entityClass, Predicate<TableFieldInfo> predicate) {
         TableInfo info = TableInfoHelper.getTableInfo(entityClass);
         Assert.notNull(info, "table can not be find");
-        MPJTableInfo tableInfo = MPJTableInfoHelper.getTableInfo(entityClass);
+        MPJTableAliasHelper.TableAlias alias = MPJTableAliasHelper.get(entityClass);
         info.getFieldList().stream().filter(predicate).collect(Collectors.toList()).forEach(i ->
-                selectColumns.add((hasAlias ? tableInfo.getAliasDOT() : StringPool.EMPTY) + i.getColumn()));
+                selectColumns.add((hasAlias ? alias.getAliasDOT() : StringPool.EMPTY) + i.getColumn()));
         return typedThis;
     }
 
@@ -139,7 +139,7 @@ public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWr
     public final MPJLambdaWrapper<T> selectAll(Class<?> clazz) {
         TableInfo info = TableInfoHelper.getTableInfo(clazz);
         Assert.notNull(info, "table can not be find -> %s", clazz);
-        String dot = hasAlias ? MPJTableInfoHelper.getTableInfo(clazz).getAliasDOT() : StringPool.EMPTY;
+        String dot = hasAlias ? MPJTableAliasHelper.get(clazz).getAliasDOT() : StringPool.EMPTY;
         if (info.havePK()) {
             selectColumns.add(dot + info.getKeyColumn());
         }
@@ -211,14 +211,14 @@ public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWr
     public <R> MPJLambdaWrapper<T> join(String keyWord, boolean condition, Class<R> clazz, OnFunction function) {
         if (condition) {
             joinSql.add(keyWord + TableInfoHelper.getTableInfo(clazz).getTableName() +
-                    Constants.SPACE + MPJTableInfoHelper.getTableInfo(clazz).getAlias() +
+                    Constants.SPACE + MPJTableAliasHelper.get(clazz).getAlias() +
                     Constant.ON + function.apply(instance()).getExpression().getNormal().getSqlSegment());
         }
         return typedThis;
     }
 
     private String getThisAlias(SFunction<?, ?> function) {
-        return hasAlias ? MPJTableInfoHelper.getTableInfo(LambdaUtils.getEntityClass(function)).getAliasDOT() :
+        return hasAlias ? MPJTableAliasHelper.get(LambdaUtils.getEntityClass(function)).getAliasDOT() :
                 StringPool.EMPTY;
     }
 }

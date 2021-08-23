@@ -1,22 +1,18 @@
 package com.github.yulichang.base.service;
 
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
-import com.baomidou.mybatisplus.core.enums.SqlKeyword;
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.core.metadata.MPJTableFieldInfo;
-import com.baomidou.mybatisplus.core.metadata.MPJTableInfo;
-import com.baomidou.mybatisplus.core.metadata.MPJTableInfoHelper;
-import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.github.yulichang.annotation.MPJMapping;
+import com.github.yulichang.annotation.EntityMapping;
 import com.github.yulichang.base.MPJBaseMapper;
-import com.github.yulichang.toolkit.LambdaUtils;
 
 import java.io.Serializable;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 深度查询
@@ -26,7 +22,7 @@ import java.util.stream.Collectors;
  * 多级查询可能存在循环引用的问题，也可能会导致全量查询
  *
  * @author yulichang
- * @see MPJMapping
+ * @see EntityMapping
  * @since 1.2.0
  */
 @SuppressWarnings({"unused", "unchecked"})
@@ -217,7 +213,8 @@ public interface MPJDeepService<T> extends IService<T> {
      * @param queryWrapper 实体对象封装操作类 {@link com.baomidou.mybatisplus.core.conditions.query.QueryWrapper}
      */
     default Map<String, Object> getMapDeep(Wrapper<T> queryWrapper) {
-        return queryMapMapping(getMap(queryWrapper), null);
+        return ((MPJBaseMapper<T>) getBaseMapper()).queryMapMapping(getMap(queryWrapper), currentModelClass(),
+                null);
     }
 
     /**
@@ -229,7 +226,8 @@ public interface MPJDeepService<T> extends IService<T> {
      * @param property     需要关联的字段
      */
     default <R> Map<String, Object> getMapDeep(Wrapper<T> queryWrapper, SFunction<T, R>... property) {
-        return queryMapMapping(getMap(queryWrapper), Arrays.asList(property));
+        return ((MPJBaseMapper<T>) getBaseMapper()).queryMapMapping(getMap(queryWrapper), currentModelClass(),
+                Arrays.asList(property));
     }
 
     /**
@@ -242,7 +240,7 @@ public interface MPJDeepService<T> extends IService<T> {
      * @param property     需要关联的字段
      */
     default <R> Map<String, Object> getMapDeep(Wrapper<T> queryWrapper, List<SFunction<T, R>> property) {
-        return queryMapMapping(getMap(queryWrapper), property);
+        return ((MPJBaseMapper<T>) getBaseMapper()).queryMapMapping(getMap(queryWrapper), currentModelClass(), property);
     }
 
     /**
@@ -405,7 +403,7 @@ public interface MPJDeepService<T> extends IService<T> {
      * @param queryWrapper 实体对象封装操作类 {@link com.baomidou.mybatisplus.core.conditions.query.QueryWrapper}
      */
     default List<Map<String, Object>> listMapsDeep(Wrapper<T> queryWrapper) {
-        return queryMapMapping(listMaps(queryWrapper), null);
+        return ((MPJBaseMapper<T>) getBaseMapper()).queryMapMapping(listMaps(queryWrapper), currentModelClass(), null);
     }
 
     /**
@@ -417,7 +415,8 @@ public interface MPJDeepService<T> extends IService<T> {
      * @param property     需要关联的字段
      */
     default <R> List<Map<String, Object>> listMapsDeep(Wrapper<T> queryWrapper, SFunction<T, R>... property) {
-        return queryMapMapping(listMaps(queryWrapper), Arrays.asList(property));
+        return ((MPJBaseMapper<T>) getBaseMapper()).queryMapMapping(listMaps(queryWrapper), currentModelClass(),
+                Arrays.asList(property));
     }
 
     /**
@@ -430,7 +429,7 @@ public interface MPJDeepService<T> extends IService<T> {
      * @param property     需要关联的字段
      */
     default <R> List<Map<String, Object>> listMapsDeep(Wrapper<T> queryWrapper, List<SFunction<T, R>> property) {
-        return queryMapMapping(listMaps(queryWrapper), property);
+        return ((MPJBaseMapper<T>) getBaseMapper()).queryMapMapping(listMaps(queryWrapper), currentModelClass(), property);
     }
 
     /**
@@ -439,7 +438,7 @@ public interface MPJDeepService<T> extends IService<T> {
      * @see Wrappers#emptyWrapper()
      */
     default List<Map<String, Object>> listMapsDeep() {
-        return queryMapMapping(listMaps(), null);
+        return ((MPJBaseMapper<T>) getBaseMapper()).queryMapMapping(listMaps(), currentModelClass(), null);
     }
 
     /**
@@ -451,7 +450,7 @@ public interface MPJDeepService<T> extends IService<T> {
      * @see Wrappers#emptyWrapper()
      */
     default <R> List<Map<String, Object>> listMapsDeep(SFunction<T, R>... property) {
-        return queryMapMapping(listMaps(), Arrays.asList(property));
+        return ((MPJBaseMapper<T>) getBaseMapper()).queryMapMapping(listMaps(), currentModelClass(), Arrays.asList(property));
     }
 
     /**
@@ -464,7 +463,7 @@ public interface MPJDeepService<T> extends IService<T> {
      * @see Wrappers#emptyWrapper()
      */
     default <R> List<Map<String, Object>> listMapsDeep(List<SFunction<T, R>> property) {
-        return queryMapMapping(listMaps(), property);
+        return ((MPJBaseMapper<T>) getBaseMapper()).queryMapMapping(listMaps(), currentModelClass(), property);
     }
 
     /**
@@ -475,7 +474,7 @@ public interface MPJDeepService<T> extends IService<T> {
      */
     default <E extends IPage<Map<String, Object>>> E pageMapsDeep(E page, Wrapper<T> queryWrapper) {
         E e = pageMaps(page, queryWrapper);
-        queryMapMapping(e.getRecords(), null);
+        ((MPJBaseMapper<T>) getBaseMapper()).queryMapMapping(e.getRecords(), currentModelClass(), null);
         return e;
     }
 
@@ -490,7 +489,7 @@ public interface MPJDeepService<T> extends IService<T> {
      */
     default <R, E extends IPage<Map<String, Object>>> E pageMapsDeep(E page, Wrapper<T> queryWrapper, SFunction<T, R>... property) {
         E e = pageMaps(page, queryWrapper);
-        queryMapMapping(e.getRecords(), Arrays.asList(property));
+        ((MPJBaseMapper<T>) getBaseMapper()).queryMapMapping(e.getRecords(), currentModelClass(), Arrays.asList(property));
         return e;
     }
 
@@ -506,7 +505,7 @@ public interface MPJDeepService<T> extends IService<T> {
      */
     default <R, E extends IPage<Map<String, Object>>> E pageMapsDeep(E page, Wrapper<T> queryWrapper, List<SFunction<T, R>> property) {
         E e = pageMaps(page, queryWrapper);
-        queryMapMapping(e.getRecords(), property);
+        ((MPJBaseMapper<T>) getBaseMapper()).queryMapMapping(e.getRecords(), currentModelClass(), property);
         return e;
     }
 
@@ -518,7 +517,7 @@ public interface MPJDeepService<T> extends IService<T> {
      */
     default <E extends IPage<Map<String, Object>>> E pageMapsDeep(E page) {
         E e = pageMaps(page);
-        queryMapMapping(e.getRecords(), null);
+        ((MPJBaseMapper<T>) getBaseMapper()).queryMapMapping(e.getRecords(), currentModelClass(), null);
         return e;
     }
 
@@ -533,7 +532,7 @@ public interface MPJDeepService<T> extends IService<T> {
      */
     default <R, E extends IPage<Map<String, Object>>> E pageMapsDeep(E page, SFunction<T, R>... property) {
         E e = pageMaps(page);
-        queryMapMapping(e.getRecords(), Arrays.asList(property));
+        ((MPJBaseMapper<T>) getBaseMapper()).queryMapMapping(e.getRecords(), currentModelClass(), Arrays.asList(property));
         return e;
     }
 
@@ -549,90 +548,7 @@ public interface MPJDeepService<T> extends IService<T> {
      */
     default <R, E extends IPage<Map<String, Object>>> E pageMapsDeep(E page, List<SFunction<T, R>> property) {
         E e = pageMaps(page);
-        queryMapMapping(e.getRecords(), property);
+        ((MPJBaseMapper<T>) getBaseMapper()).queryMapMapping(e.getRecords(), currentModelClass(), property);
         return e;
-    }
-
-    /**
-     * 查询映射关系<br/>
-     * 对结果进行二次查询<br/>
-     * 可以自行查询然后在通过此方法进行二次查询<br/>
-     * list为null或空，会查询全部映射关系<br/>
-     *
-     * @param map 第一次查询结果
-     */
-    default <R> Map<String, Object> queryMapMapping(Map<String, Object> map, List<SFunction<T, R>> property) {
-        if (CollectionUtils.isNotEmpty(map)) {
-            MPJTableInfo tableInfo = MPJTableInfoHelper.getTableInfo(currentModelClass());
-            if (tableInfo.isHasMapping()) {
-                boolean hasProperty = CollectionUtils.isNotEmpty(property);
-                List<String> list = hasProperty ? property.stream().map(LambdaUtils::getName).collect(
-                        Collectors.toList()) : null;
-                for (MPJTableFieldInfo fieldInfo : tableInfo.getFieldList()) {
-                    if (!hasProperty || list.contains(fieldInfo.getProperty())) {
-                        Object o = map.get(fieldInfo.getThisMapKey());
-                        if (o != null) {
-                            List<?> data = (List<?>) fieldInfo.getJoinMapper().mappingWrapperConstructor(
-                                    fieldInfo.isFieldIsMap(), SqlKeyword.EQ, fieldInfo.getJoinColumn(), o, fieldInfo);
-                            MPJTableFieldInfo.bindMap(fieldInfo, map, data);
-                        }
-                    }
-                }
-            }
-        }
-        return map;
-    }
-
-    /**
-     * 查询映射关系<br/>
-     * 对结果进行二次查询<br/>
-     * 可以自行查询然后在通过此方法进行二次查询<br/>
-     * list为null或空，会查询全部映射关系<br/>
-     *
-     * @param list 第一次查询结果
-     */
-    @SuppressWarnings("unchecked")
-    default <R> List<Map<String, Object>> queryMapMapping(List<Map<String, Object>> list, List<SFunction<T, R>> property) {
-        if (CollectionUtils.isEmpty(list)) {
-            return list;
-        }
-        MPJTableInfo tableInfo = MPJTableInfoHelper.getTableInfo(currentModelClass());
-        if (tableInfo.isHasMapping()) {
-            boolean hasProperty = CollectionUtils.isNotEmpty(property);
-            List<String> listProperty = hasProperty ? property.stream().map(LambdaUtils::getName).collect(
-                    Collectors.toList()) : null;
-            for (MPJTableFieldInfo fieldInfo : tableInfo.getFieldList()) {
-                if (!hasProperty || listProperty.contains(fieldInfo.getProperty())) {
-                    List<Object> itemList = list.stream().map(m -> m.get(fieldInfo.getThisMapKey()))
-                            .collect(Collectors.toList());
-                    if (CollectionUtils.isNotEmpty(itemList)) {
-                        if (fieldInfo.isFieldIsMap()) {
-                            List<Map<String, Object>> joinList = (List<Map<String, Object>>) fieldInfo.getJoinMapper()
-                                    .mappingWrapperConstructor(fieldInfo.isFieldIsMap(), SqlKeyword.IN,
-                                            fieldInfo.getJoinColumn(), itemList, fieldInfo);
-                            list.forEach(i -> {
-                                List<Map<String, Object>> data = joinList.stream().filter(j -> j.containsKey(
-                                        fieldInfo.getJoinMapKey()) && j.get(fieldInfo.getJoinMapKey()).equals(
-                                        i.get(fieldInfo.getThisMapKey()))).collect(Collectors.toList());
-                                MPJTableFieldInfo.bindMap(fieldInfo, i, data);
-                            });
-                        } else {
-                            List<?> joinList = (List<?>) fieldInfo.getJoinMapper().mappingWrapperConstructor(
-                                    fieldInfo.isFieldIsMap(), SqlKeyword.IN, fieldInfo.getJoinColumn(), itemList, fieldInfo);
-                            list.forEach(i -> {
-                                List<?> data = joinList.stream().filter(j -> {
-                                    Object o = fieldInfo.joinFieldGet(j);
-                                    return o != null && o.equals(i.get(fieldInfo.getThisMapKey()));
-                                }).collect(Collectors.toList());
-                                MPJTableFieldInfo.bindMap(fieldInfo, i, data);
-                            });
-                        }
-                    } else {
-                        list.forEach(i -> i.put(fieldInfo.getField().getName(), new ArrayList<>()));
-                    }
-                }
-            }
-        }
-        return list;
     }
 }

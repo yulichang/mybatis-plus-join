@@ -33,7 +33,7 @@ QQ群:1022221898
 * service继承MPJBaseService (可选)
 * serviceImpl继承MPJBaseServiceImpl (可选)
 
-#### @MPJMapping注解
+#### @EntityMapping 和 @FieldMapping 注解
 
 UserDO.java
 

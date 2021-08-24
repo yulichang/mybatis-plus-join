@@ -22,7 +22,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class MPJTableAliasHelper {
 
-    public static final Map<Class<?>, TableAlias> CACHE = new ConcurrentHashMap<>();
+    private static final Map<Class<?>, TableAlias> CACHE = new ConcurrentHashMap<>();
 
     /**
      * 用于生成别名的序号

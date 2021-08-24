@@ -5,9 +5,8 @@ import com.baomidou.mybatisplus.core.injector.DefaultSqlInjector;
 import com.baomidou.mybatisplus.core.injector.methods.*;
 import com.baomidou.mybatisplus.core.mapper.Mapper;
 import com.baomidou.mybatisplus.core.metadata.MPJTableAliasHelper;
-import com.baomidou.mybatisplus.core.metadata.MPJTableInfoHelper;
+import com.baomidou.mybatisplus.core.metadata.MPJTableMapperHelper;
 import com.baomidou.mybatisplus.core.metadata.TableInfo;
-import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
 import com.baomidou.mybatisplus.core.toolkit.ClassUtils;
 import com.github.yulichang.method.*;
 import org.apache.ibatis.builder.MapperBuilderAssistant;
@@ -30,7 +29,10 @@ import static java.util.stream.Collectors.toList;
 @ConditionalOnMissingBean(DefaultSqlInjector.class)
 public class MPJSqlInjector extends DefaultSqlInjector {
 
-    @SuppressWarnings("unused")
+    /**
+     * 升级到 mybatis plus 3.4.3.2 后对之前的版本兼容
+     */
+    @SuppressWarnings({"unused", "deprecation"})
     public List<AbstractMethod> getMethodList(Class<?> mapperClass) {
         List<AbstractMethod> list = Stream.of(
                 new Insert(),
@@ -79,10 +81,10 @@ public class MPJSqlInjector extends DefaultSqlInjector {
 
     @Override
     public void inspectInject(MapperBuilderAssistant builderAssistant, Class<?> mapperClass) {
-        MPJTableAliasHelper.init(Objects.requireNonNull(getSuperClassGenericType(mapperClass, Mapper.class, 0)));
+        Class<?> modelClass = getSuperClassGenericType(mapperClass, Mapper.class, 0);
+        MPJTableAliasHelper.init(Objects.requireNonNull(modelClass));
         super.inspectInject(builderAssistant, mapperClass);
-        TableInfoHelper.getTableInfos().forEach(i ->
-                MPJTableInfoHelper.initTableInfo(builderAssistant, i.getEntityType(), mapperClass));
+        MPJTableMapperHelper.init(modelClass, mapperClass);
     }
 
     public static Class<?> getSuperClassGenericType(final Class<?> clazz, final Class<?> genericIfc, final int index) {

@@ -1,6 +1,5 @@
 package com.github.yulichang.config;
 
-import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.github.yulichang.exception.MPJException;
 import com.github.yulichang.interceptor.MPJInterceptor;
@@ -26,7 +25,7 @@ import java.util.List;
 @SuppressWarnings("SpringJavaAutowiredMembersInspection")
 public class InterceptorConfig implements ApplicationListener<ApplicationReadyEvent> {
 
-    private static final Log logger = LogFactory.getLog(TableInfoHelper.class);
+    private static final Log logger = LogFactory.getLog(InterceptorConfig.class);
 
     @Autowired(required = false)
     private List<SqlSessionFactory> sqlSessionFactoryList;

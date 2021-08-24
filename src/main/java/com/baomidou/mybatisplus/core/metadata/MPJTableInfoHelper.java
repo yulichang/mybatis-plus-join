@@ -33,6 +33,7 @@ import static java.util.stream.Collectors.toList;
  * @author yulichang
  * @see TableInfoHelper
  */
+@SuppressWarnings("deprecation")
 public class MPJTableInfoHelper {
 
 
@@ -73,6 +74,7 @@ public class MPJTableInfoHelper {
      * @param clazz       反射实体类
      * @param mapperClass mapperClass
      */
+    @SuppressWarnings("unused")
     public synchronized static void initTableInfo(MapperBuilderAssistant builderAssistant, Class<?> clazz, Class<?> mapperClass) {
         MPJTableInfo targetTableInfo = TABLE_INFO_CACHE.get(clazz);
         final Configuration configuration = builderAssistant.getConfiguration();
@@ -150,6 +152,29 @@ public class MPJTableInfoHelper {
         /* 初始化映射关系 */
         initMapping(mpjTableInfo);
         return mpjTableInfo;
+    }
+
+    /**
+     * <p>
+     * 实体类反射获取表信息【初始化】
+     * </p>
+     *
+     * @param clazz 反射实体类
+     */
+    public synchronized static void initTableInfo(Class<?> clazz, Class<?> mapperClass) {
+        MPJTableInfo info = TABLE_INFO_CACHE.get(clazz);
+        if (info != null) {
+            return;
+        }
+        MPJTableInfo mpjTableInfo = new MPJTableInfo();
+        mpjTableInfo.setMapperClass(mapperClass);
+        TableInfo tableInfo = TableInfoHelper.getTableInfo(clazz);
+        if (tableInfo == null) {
+            return;
+        }
+        mpjTableInfo.setTableInfo(tableInfo);
+        initMapping(mpjTableInfo);
+        TABLE_INFO_CACHE.put(clazz, mpjTableInfo);
     }
 
     /**

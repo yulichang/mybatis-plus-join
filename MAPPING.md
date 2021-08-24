@@ -1,6 +1,6 @@
 # mybatis-plus-join
 
-* 本页功能只能在1.2.0测试版中使用,最新版本 1.2.0.Beta3
+* 本页功能只能在1.2.0测试版中使用,最新版本 1.2.0.Beta5
 
 * 点个Star支持一下吧 :)
 
@@ -15,12 +15,12 @@ QQ群:1022221898
   <dependency>
       <groupId>com.github.yulichang</groupId>
       <artifactId>mybatis-plus-join</artifactId>
-      <version>1.2.0.Beta3</version>
+      <version>1.2.0.Beta5</version>
   </dependency>
   ```
 - Gradle
   ```
-   implementation group: 'com.github.yulichang', name: 'mybatis-plus-join', version: '1.2.0.Beta3'
+   implementation group: 'com.github.yulichang', name: 'mybatis-plus-join', version: '1.2.0.Beta5'
   ```
   或者clone代码到本地执行 mvn install, 再引入以上依赖  
   <br>
@@ -49,18 +49,32 @@ public class UserDO {
     /* 其他属性略 */
 
     /**
-     *  一对一
+     * 查询上级 一对一
      */
     @TableField(exist = false)
-    @MPJMapping(tag = UserDO.class, thisField = "pid", joinField = "id")
+    @EntityMapping(thisField = "pid", joinField = "id")
     private UserDO pUser;
 
     /**
-     *  一对多
+     * 查询下级 一对多
      */
     @TableField(exist = false)
-    @MPJMapping(tag = UserDO.class, thisField = "id", joinField = "pid")
-    private List<UserDO> childUserList;
+    @EntityMapping(thisField = "id", joinField = "pid")
+    private List<UserDO> childUser;
+
+    /**
+     * 查询地址 (一对多)
+     */
+    @TableField(exist = false)
+    @EntityMapping(thisField = "id", joinField = "userId")
+    private List<UserAddressDO> addressList;
+
+    /**
+     * 绑定字段 （一对多）
+     */
+    @TableField(exist = false)
+    @FieldMapping(tag = UserDO.class, thisField = "id", joinField = "pid", select = "id")
+    private List<Integer> childIds;
 }
 ```
 
@@ -87,11 +101,10 @@ class MappingTest {
      * 第一次查询目标UserDO
      * 第二次根据pid查询上级用户
      * 第三次根据自身id查询下级用户
-     *
      */
     @Test
     void test1() {
-        UserDO deep = userMapper.selectByIdDeep(1);
+        UserDO deep = userMapper.selectByIdDeep(2);
         System.out.println(deep);
     }
 
@@ -103,7 +116,6 @@ class MappingTest {
      * 第一次查询目标UserDO集合
      * 第二次根据pid查询上级用户（不会一条记录一条记录的去查询，对pid进行汇总，用in语句一次性查出来，然后进行匹配）
      * 第三次根据自身id查询下级用户（不会一条记录一条记录的去查询，对id进行汇总，用in语句一次性查出来，然后进行匹配）
-     *
      */
     @Test
     void test2() {
@@ -121,9 +133,6 @@ class MappingTest {
         Page<UserDO> page = userMapper.selectPageDeep(new Page<>(2, 2), Wrappers.emptyWrapper());
         page.getRecords().forEach(System.out::println);
     }
-
-
-}
 
 ```
 

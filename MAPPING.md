@@ -86,7 +86,7 @@ public class UserDO {
  * 映射只对以Deep结尾，比如 getByIdDeep listByIdsDeep 等
  * 如果不需要关系映射就使用mybatis plus原生方法即可，比如 getById listByIds 等
  *
- * 注意：关系映射不会去关联查询，而是执行多次单表查询（使用in语句查询后对结果进行匹配）
+ * 注意：关系映射不会去关联查询，而是执行多次单表查询（对结果汇总后使用in语句查询,再对结果进行匹配）
  */
 @SpringBootTest
 class MappingTest {

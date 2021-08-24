@@ -2,6 +2,7 @@ package com.baomidou.mybatisplus.core.metadata;
 
 
 import com.baomidou.mybatisplus.core.enums.SqlKeyword;
+import com.baomidou.mybatisplus.core.toolkit.StringPool;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.github.yulichang.annotation.MPJMappingApply;
 import com.github.yulichang.annotation.MPJMappingCondition;
@@ -9,6 +10,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -35,8 +37,14 @@ public class MPJMappingWrapper {
     private final boolean hasLast;
     private String last;
 
+    private final boolean hasOrderByAsc;
+    private List<String> orderByAsc;
+
+    private final boolean hasOrderByDesc;
+    private List<String> orderByDesc;
+
     public MPJMappingWrapper(String first, String select, MPJMappingApply[] applys,
-                             MPJMappingCondition[] conditions, String last) {
+                             MPJMappingCondition[] conditions, String last, String orderByAsc, String orderByDesc) {
         this.hasFirst = StringUtils.isNotBlank(first);
         if (this.hasFirst) {
             this.first = first;
@@ -66,6 +74,16 @@ public class MPJMappingWrapper {
         this.hasLast = StringUtils.isNotBlank(last);
         if (this.hasLast) {
             this.last = last;
+        }
+
+        this.hasOrderByAsc = StringUtils.isNotBlank(orderByAsc);
+        if (this.hasOrderByAsc) {
+            this.orderByAsc = Arrays.asList(orderByAsc.split(StringPool.COMMA));
+        }
+
+        this.hasOrderByDesc = StringUtils.isNotBlank(orderByDesc);
+        if (this.hasOrderByDesc) {
+            this.orderByDesc = Arrays.asList(orderByDesc.split(StringPool.COMMA));
         }
     }
 

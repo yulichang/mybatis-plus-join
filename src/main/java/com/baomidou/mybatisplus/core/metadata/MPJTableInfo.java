@@ -25,7 +25,7 @@ public class MPJTableInfo {
     private TableInfo tableInfo;
 
     /**
-     * 是否包含 MPJMapping 或者 MPJMappingField
+     * 是否包含 EntityMapping 或者 FieldMapping
      */
     private boolean hasMappingOrField;
 

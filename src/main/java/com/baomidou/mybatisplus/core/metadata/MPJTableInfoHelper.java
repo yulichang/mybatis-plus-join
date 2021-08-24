@@ -518,10 +518,10 @@ public class MPJTableInfoHelper {
      * 初始化映射相关
      */
     public static void initMapping(MPJTableInfo mpjTableInfo) {
-        // 是否存在 @MPJMapping 注解
+        // 是否存在 @EntityMapping 注解
         boolean existMapping = isExistMapping(mpjTableInfo.getTableInfo().getEntityType());
         mpjTableInfo.setHasMapping(existMapping);
-        // 是否存在 @MPJMappingField 注解
+        // 是否存在 @FieldMapping 注解
         boolean existMappingField = isExistMappingField(mpjTableInfo.getTableInfo().getEntityType());
         mpjTableInfo.setHasMappingField(existMappingField);
         mpjTableInfo.setHasMappingOrField(existMapping || existMappingField);

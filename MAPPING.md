@@ -83,7 +83,7 @@ public class UserDO {
 ```java
 /**
  * 一对一，一对多关系映射查询
- * 映射只对MPJBaseDeepService中的方法有效果 ，一般以Deep结尾，比如 getByIdDeep listByIdsDeep 等
+ * 映射只对以Deep结尾，比如 getByIdDeep listByIdsDeep 等
  * 如果不需要关系映射就使用mybatis plus原生方法即可，比如 getById listByIds 等
  *
  * @see com.github.yulichang.base.service.MPJDeepService
@@ -133,18 +133,19 @@ class MappingTest {
         Page<UserDO> page = userMapper.selectPageDeep(new Page<>(2, 2), Wrappers.emptyWrapper());
         page.getRecords().forEach(System.out::println);
     }
-
+}
 ```
 
 MPJMapping 说明：
 
-* MPJMapping tag 关联实体类
-* MPJMapping thisField 当前类关联对应的字段的属性名，可以不填，默认为当前类的主键
-* MPJMapping joinField 关联类对应的字段的属性名，可以不填，默认为关联类的主键
-* MPJMapping isThrowExp 一对一查询时,如果查询到多条记录是否抛出异常,true:抛出异常,false:获取列表第一条数据
+* @EntityMapping / @FieldMapping tag 关联实体类
+* @EntityMapping / @FieldMapping thisField 当前类关联对应的字段的属性名，可以不填，默认为当前类的主键
+* @EntityMapping / @FieldMapping joinField 关联类对应的字段的属性名，可以不填，默认为关联类的主键
+* @EntityMapping / @FieldMapping isThrowExp 一对一查询时,如果查询到多条记录是否抛出异常,true:抛出异常,false:获取列表第一条数据
 *
 
-更多功能请看代码注释 [MPJMapping](https://gitee.com/best_handsome/mybatis-plus-join/blob/master/src/main/java/com/github/yulichang/annotation/MPJMapping.java)
+更多功能请看代码注释 [EntityMapping](https://gitee.com/best_handsome/mybatis-plus-join/blob/master/src/main/java/com/github/yulichang/annotation/EntityMapping.java)
+[FieldMapping](https://gitee.com/best_handsome/mybatis-plus-join/blob/master/src/main/java/com/github/yulichang/annotation/FieldMapping.java)
 
 
 

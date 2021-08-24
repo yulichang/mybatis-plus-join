@@ -82,6 +82,18 @@ public @interface EntityMapping {
     MPJMappingCondition[] condition() default {};
 
     /**
+     * 映射表查询条件之 orderBy<br/>
+     * 等效于 Wrappers.<T>query().orderByAsc(xxx);
+     */
+    String orderByAsc() default "";
+
+    /**
+     * 映射表查询条件之 orderByDesc<br/>
+     * 等效于 Wrappers.<T>query().orderByDesc(xxx);
+     */
+    String orderByDesc() default "";
+
+    /**
      * 映射表查询条件之 last<br/>
      * 建议不要在这使用分页语句，会导致关联查的时候查询不全<br/>
      * 等效于 Wrappers.<T>query().last(xxx);

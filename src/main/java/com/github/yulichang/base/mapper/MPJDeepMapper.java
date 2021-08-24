@@ -503,8 +503,11 @@ public interface MPJDeepMapper<T> extends BaseMapper<T> {
         }
         wrapper.eq(SqlKeyword.EQ == keyword, column, val)
                 .first(infoWrapper.isHasFirst(), infoWrapper.getFirst())
+                .orderByAsc(infoWrapper.isHasOrderByAsc(), infoWrapper.getOrderByAsc())
+                .orderByDesc(infoWrapper.isHasOrderByDesc(), infoWrapper.getOrderByDesc())
                 .last(infoWrapper.isHasLast(), infoWrapper.getLast());
         if (SqlKeyword.IN == keyword) {
+            //由于Java发放调用机制 无法使用链式
             wrapper.in(column, (List<?>) val);
         }
         if (infoWrapper.isHasSelect()) {

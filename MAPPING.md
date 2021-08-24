@@ -112,7 +112,7 @@ class MappingTest {
     }
 
     /**
-     * 跟多方法请查阅 MPJDeepMapper 或者 MPJDeepService
+     * 更多方法请查阅 MPJDeepMapper 或者 MPJDeepService
      * 使用方式与 mybatis plus 一致
      */
 }

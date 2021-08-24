@@ -86,53 +86,35 @@ public class UserDO {
  * 映射只对以Deep结尾，比如 getByIdDeep listByIdsDeep 等
  * 如果不需要关系映射就使用mybatis plus原生方法即可，比如 getById listByIds 等
  *
- * @see com.github.yulichang.base.service.MPJDeepService
+ * 注意：关系映射不会去关联查询，而是执行多次单表查询（使用in语句查询后对结果进行匹配）
  */
 @SpringBootTest
 class MappingTest {
     @Resource
     private UserMapper userMapper;
 
-    /**
-     * 根据id查询
-     * <p>
-     * 查询过程：
-     * 一共查询了3次
-     * 第一次查询目标UserDO
-     * 第二次根据pid查询上级用户
-     * 第三次根据自身id查询下级用户
-     */
     @Test
     void test1() {
         UserDO deep = userMapper.selectByIdDeep(2);
         System.out.println(deep);
     }
 
-    /**
-     * 查询全部
-     * <p>
-     * 查询过程：
-     * 一共查询了3次
-     * 第一次查询目标UserDO集合
-     * 第二次根据pid查询上级用户（不会一条记录一条记录的去查询，对pid进行汇总，用in语句一次性查出来，然后进行匹配）
-     * 第三次根据自身id查询下级用户（不会一条记录一条记录的去查询，对id进行汇总，用in语句一次性查出来，然后进行匹配）
-     */
     @Test
     void test2() {
         List<UserDO> list = userMapper.selectListDeep(Wrappers.emptyWrapper());
         list.forEach(System.out::println);
     }
 
-    /**
-     * 分页查询
-     * <p>
-     * 查询过程与上面一致
-     */
     @Test
     void test3() {
         Page<UserDO> page = userMapper.selectPageDeep(new Page<>(2, 2), Wrappers.emptyWrapper());
         page.getRecords().forEach(System.out::println);
     }
+
+    /**
+     * 跟多方法请查阅 MPJDeepMapper 或者 MPJDeepService
+     * 使用方式与 mybatis plus 一致
+     */
 }
 ```
 

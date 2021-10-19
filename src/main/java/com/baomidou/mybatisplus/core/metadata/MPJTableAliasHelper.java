@@ -7,6 +7,7 @@ import com.github.yulichang.toolkit.Constant;
 import lombok.Data;
 
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -30,6 +31,10 @@ public class MPJTableAliasHelper {
     private static final AtomicInteger index = new AtomicInteger(1);
 
     public static void init(Class<?> clazz) {
+        TableAlias as = CACHE.get(clazz);
+        if (Objects.nonNull(as)) {
+            return;
+        }
         TableAlias alias = new TableAlias();
         MPJTableAlias tableAlias = clazz.getAnnotation(MPJTableAlias.class);
         if (tableAlias != null && StringUtils.isNotBlank(tableAlias.value())) {

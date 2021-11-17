@@ -2,20 +2,21 @@ package com.github.yulichang.injector;
 
 import com.baomidou.mybatisplus.core.injector.AbstractMethod;
 import com.baomidou.mybatisplus.core.injector.DefaultSqlInjector;
+import com.baomidou.mybatisplus.core.injector.methods.*;
 import com.baomidou.mybatisplus.core.mapper.Mapper;
+import com.baomidou.mybatisplus.core.metadata.MPJTableMapperHelper;
 import com.baomidou.mybatisplus.core.metadata.TableInfo;
-import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
-import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
-import com.baomidou.mybatisplus.core.toolkit.GlobalConfigUtils;
+import com.baomidou.mybatisplus.core.toolkit.ClassUtils;
 import com.github.yulichang.method.*;
-import com.github.yulichang.toolkit.ReflectionKit;
 import org.apache.ibatis.builder.MapperBuilderAssistant;
-import org.apache.ibatis.logging.Log;
-import org.apache.ibatis.logging.LogFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.core.GenericTypeResolver;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
+import java.util.stream.Stream;
+
+import static java.util.stream.Collectors.toList;
 
 /**
  * SQL 注入器
@@ -25,11 +26,47 @@ import java.util.Set;
  */
 @ConditionalOnMissingBean(DefaultSqlInjector.class)
 public class MPJSqlInjector extends DefaultSqlInjector {
-    private static final Log logger = LogFactory.getLog(MPJSqlInjector.class);
 
-    @Override
+    /**
+     * 升级到 mybatis plus 3.4.3.2 后对之前的版本兼容
+     */
+    @SuppressWarnings({"unused", "deprecation"})
     public List<AbstractMethod> getMethodList(Class<?> mapperClass) {
-        List<AbstractMethod> list = super.getMethodList(mapperClass);
+        List<AbstractMethod> list = Stream.of(
+                new Insert(),
+                new Delete(),
+                new DeleteByMap(),
+                new DeleteById(),
+                new DeleteBatchByIds(),
+                new Update(),
+                new UpdateById(),
+                new SelectById(),
+                new SelectBatchByIds(),
+                new SelectByMap(),
+                new SelectOne(),
+                new SelectCount(),
+                new SelectMaps(),
+                new SelectMapsPage(),
+                new SelectObjs(),
+                new SelectList(),
+                new SelectPage()
+        ).collect(toList());
+        list.addAll(getJoinMethod());
+        return list;
+    }
+
+    /**
+     * mybatis plus 3.4.3.2
+     */
+    @Override
+    public List<AbstractMethod> getMethodList(Class<?> mapperClass, TableInfo tableInfo) {
+        List<AbstractMethod> list = super.getMethodList(mapperClass, tableInfo);
+        list.addAll(getJoinMethod());
+        return list;
+    }
+
+    private List<AbstractMethod> getJoinMethod() {
+        List<AbstractMethod> list = new ArrayList<>();
         list.add(new SelectJoinCount());
         list.add(new SelectJoinOne());
         list.add(new SelectJoinList());
@@ -40,30 +77,15 @@ public class MPJSqlInjector extends DefaultSqlInjector {
         return list;
     }
 
-    /**
-     * mybatis plus 3.4.3 bug
-     * <p>
-     * https://gitee.com/baomidou/mybatis-plus/issues/I3SE8R
-     * <p>
-     * https://gitee.com/baomidou/mybatis-plus/commit/7210b461b23211e6b95ca6de2d846aa392bdc28c
-     */
     @Override
     public void inspectInject(MapperBuilderAssistant builderAssistant, Class<?> mapperClass) {
-        Class<?> modelClass = ReflectionKit.getSuperClassGenericType(mapperClass, Mapper.class, 0);
-        if (modelClass != null) {
-            String className = mapperClass.toString();
-            Set<String> mapperRegistryCache = GlobalConfigUtils.getMapperRegistryCache(builderAssistant.getConfiguration());
-            if (!mapperRegistryCache.contains(className)) {
-                List<AbstractMethod> methodList = this.getMethodList(mapperClass);
-                if (CollectionUtils.isNotEmpty(methodList)) {
-                    TableInfo tableInfo = TableInfoHelper.initTableInfo(builderAssistant, modelClass);
-                    // 循环注入自定义方法
-                    methodList.forEach(m -> m.inject(builderAssistant, mapperClass, modelClass, tableInfo));
-                } else {
-                    logger.debug(mapperClass + ", No effective injection method was found.");
-                }
-                mapperRegistryCache.add(className);
-            }
-        }
+        Class<?> modelClass = getSuperClassGenericType(mapperClass, Mapper.class, 0);
+        super.inspectInject(builderAssistant, mapperClass);
+        MPJTableMapperHelper.init(modelClass, mapperClass);
+    }
+
+    public static Class<?> getSuperClassGenericType(final Class<?> clazz, final Class<?> genericIfc, final int index) {
+        Class<?>[] typeArguments = GenericTypeResolver.resolveTypeArguments(ClassUtils.getUserClass(clazz), genericIfc);
+        return null == typeArguments ? null : typeArguments[index];
     }
 }

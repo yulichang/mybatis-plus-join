@@ -12,6 +12,7 @@ import java.io.Serializable;
  *
  * @since 1.1.8
  */
+@SuppressWarnings("unused")
 public interface OnCompare<Children> extends Serializable {
     /**
      * ignore

@@ -8,7 +8,7 @@ import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import java.io.*;
 
 /**
- * copy mp before 3.4.3 {@link com.baomidou.mybatisplus.core.toolkit.support.SerializedLambda}
+ * copy mp before 3.4.3
  */
 @SuppressWarnings("unused")
 public class SerializedLambda implements Serializable {

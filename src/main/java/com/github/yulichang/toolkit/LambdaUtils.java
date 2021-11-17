@@ -84,6 +84,7 @@ public final class LambdaUtils {
      *
      * @param tableInfo 表信息
      */
+    @SuppressWarnings("unused")
     public static void installCache(TableInfo tableInfo) {
         COLUMN_CACHE_MAP.put(tableInfo.getEntityType().getName(), createColumnCacheMap(tableInfo));
     }

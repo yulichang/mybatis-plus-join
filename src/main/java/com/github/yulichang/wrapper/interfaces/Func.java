@@ -11,12 +11,13 @@ import java.util.function.Consumer;
  * <p>
  * copy {@link com.baomidou.mybatisplus.core.conditions.interfaces.Func}
  */
-@SuppressWarnings("unchecked")
+@SuppressWarnings({"unchecked", "unused"})
 public interface Func<Children> extends Serializable {
 
     /**
      * ignore
      */
+    @SuppressWarnings("UnusedReturnValue")
     default <R> Children isNull(SFunction<R, ?> column) {
         return isNull(true, column);
     }

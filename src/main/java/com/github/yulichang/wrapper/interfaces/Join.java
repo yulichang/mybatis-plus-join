@@ -8,6 +8,7 @@ import java.io.Serializable;
  * 无改动 在mybatis 3.4.2 升级 3.4.3 后有改动 exists 和 not exists
  * 为了保证 mybatis plus 3.4.3之前的也能正常使用
  */
+@SuppressWarnings("unused")
 public interface Join<Children> extends Serializable {
 
     /**

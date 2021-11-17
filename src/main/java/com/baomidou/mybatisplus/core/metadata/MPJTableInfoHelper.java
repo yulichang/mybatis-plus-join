@@ -3,6 +3,9 @@ package com.baomidou.mybatisplus.core.metadata;
 import com.baomidou.mybatisplus.annotation.*;
 import com.baomidou.mybatisplus.core.config.GlobalConfig;
 import com.baomidou.mybatisplus.core.toolkit.*;
+import com.github.yulichang.annotation.EntityMapping;
+import com.github.yulichang.annotation.FieldMapping;
+import org.apache.ibatis.builder.MapperBuilderAssistant;
 import org.apache.ibatis.logging.Log;
 import org.apache.ibatis.logging.LogFactory;
 import org.apache.ibatis.mapping.ResultFlag;
@@ -30,7 +33,9 @@ import static java.util.stream.Collectors.toList;
  * @author yulichang
  * @see TableInfoHelper
  */
+@SuppressWarnings("deprecation")
 public class MPJTableInfoHelper {
+
 
     private static final Log logger = LogFactory.getLog(TableInfoHelper.class);
 
@@ -38,7 +43,7 @@ public class MPJTableInfoHelper {
     /**
      * 储存反射类表信息
      */
-    private static final Map<Class<?>, TableInfo> TABLE_INFO_CACHE = new ConcurrentHashMap<>();
+    private static final Map<Class<?>, MPJTableInfo> TABLE_INFO_CACHE = new ConcurrentHashMap<>();
 
     /**
      * 默认表主键名称
@@ -54,11 +59,22 @@ public class MPJTableInfoHelper {
      * @param clazz 反射实体类
      * @return 数据库表反射信息
      */
-    public static TableInfo getTableInfo(Class<?> clazz) {
+    public static MPJTableInfo getTableInfo(Class<?> clazz) {
         if (clazz == null || ReflectionKit.isPrimitiveOrWrapper(clazz) || clazz == String.class || clazz.isInterface()) {
             return null;
         }
         return TABLE_INFO_CACHE.get(clazz);
+    }
+
+    /**
+     * <p>
+     * 获取所有实体映射表信息
+     * </p>
+     *
+     * @return 数据库表反射信息集合
+     */
+    public static List<MPJTableInfo> getTableInfos() {
+        return Collections.unmodifiableList(new ArrayList<>(TABLE_INFO_CACHE.values()));
     }
 
     /**
@@ -69,13 +85,25 @@ public class MPJTableInfoHelper {
      * @param clazz 反射实体类
      * @return 数据库表反射信息
      */
-    public synchronized static TableInfo initTableInfo(Configuration configuration, String currentNamespace, Class<?> clazz) {
-        TableInfo info = TABLE_INFO_CACHE.get(clazz);
+    public synchronized static MPJTableInfo initTableInfo(Configuration configuration, String currentNamespace, Class<?> clazz, Class<?> mapperClass) {
+        MPJTableInfo info = TABLE_INFO_CACHE.get(clazz);
         if (info != null) {
             return info;
         }
         /* 没有获取到缓存信息,则初始化 */
-        TableInfo tableInfo = new TableInfo(clazz);
+        MPJTableInfo mpjTableInfo = new MPJTableInfo();
+        mpjTableInfo.setMapperClass(mapperClass);
+        TableInfo tableInfo = TableInfoHelper.getTableInfo(clazz);
+        if (tableInfo != null) {
+            mpjTableInfo.setTableInfo(tableInfo);
+            initMapping(mpjTableInfo);
+            /* 添加缓存 */
+            TABLE_INFO_CACHE.put(clazz, mpjTableInfo);
+            return mpjTableInfo;
+        }
+
+        tableInfo = new TableInfo(clazz);
+        mpjTableInfo.setTableInfo(tableInfo);
         tableInfo.setCurrentNamespace(currentNamespace);
         tableInfo.setConfiguration(configuration);
         GlobalConfig globalConfig = GlobalConfigUtils.getGlobalConfig(configuration);
@@ -86,19 +114,44 @@ public class MPJTableInfoHelper {
         List<String> excludePropertyList = excludeProperty != null && excludeProperty.length > 0 ? Arrays.asList(excludeProperty) : Collections.emptyList();
 
         /* 初始化字段相关 */
-        initTableFields(clazz, globalConfig, tableInfo, excludePropertyList);
+        initTableFields(clazz, globalConfig, mpjTableInfo, excludePropertyList);
 
         /* 自动构建 resultMap */
         initResultMapIfNeed(tableInfo);
 
         /* 添加缓存 */
-        TABLE_INFO_CACHE.put(clazz, tableInfo);
+        TABLE_INFO_CACHE.put(clazz, mpjTableInfo);
 
         /* 缓存 lambda */
         LambdaUtils.installCache(tableInfo);
-        return tableInfo;
+
+        /* 初始化映射关系 */
+        initMapping(mpjTableInfo);
+        return mpjTableInfo;
     }
 
+    /**
+     * <p>
+     * 实体类反射获取表信息【初始化】
+     * </p>
+     *
+     * @param clazz 反射实体类
+     */
+    public synchronized static void initTableInfo(Class<?> clazz, Class<?> mapperClass) {
+        MPJTableInfo info = TABLE_INFO_CACHE.get(clazz);
+        if (info != null) {
+            return;
+        }
+        MPJTableInfo mpjTableInfo = new MPJTableInfo();
+        mpjTableInfo.setMapperClass(mapperClass);
+        TableInfo tableInfo = TableInfoHelper.getTableInfo(clazz);
+        if (tableInfo == null) {
+            return;
+        }
+        mpjTableInfo.setTableInfo(tableInfo);
+        initMapping(mpjTableInfo);
+        TABLE_INFO_CACHE.put(clazz, mpjTableInfo);
+    }
 
     /**
      * 自动构建 resultMap 并注入(如果条件符合的话)
@@ -179,10 +232,6 @@ public class MPJTableInfoHelper {
 
         tableInfo.setTableName(targetTableName);
 
-        /* 开启了自定义 KEY 生成器 */
-//        if (CollectionUtils.isNotEmpty(dbConfig.getKeyGenerators())) {
-//            tableInfo.setKeySequence(clazz.getAnnotation(KeySequence.class));
-//        }
         return excludeProperty;
     }
 
@@ -216,12 +265,12 @@ public class MPJTableInfoHelper {
      *
      * @param clazz        实体类
      * @param globalConfig 全局配置
-     * @param tableInfo    数据库表反射信息
+     * @param mpjTableInfo 数据库表反射信息
      */
-    private static void initTableFields(Class<?> clazz, GlobalConfig globalConfig, TableInfo tableInfo, List<String> excludeProperty) {
+    private static void initTableFields(Class<?> clazz, GlobalConfig globalConfig, MPJTableInfo mpjTableInfo, List<String> excludeProperty) {
         /* 数据库全局配置 */
         GlobalConfig.DbConfig dbConfig = globalConfig.getDbConfig();
-        ReflectorFactory reflectorFactory = tableInfo.getConfiguration().getReflectorFactory();
+        ReflectorFactory reflectorFactory = mpjTableInfo.getTableInfo().getConfiguration().getReflectorFactory();
         Reflector reflector = reflectorFactory.findForClass(clazz);
         List<Field> list = getAllFields(clazz);
         // 标记是否读取到主键
@@ -244,31 +293,33 @@ public class MPJTableInfoHelper {
                     if (isReadPK) {
                         throw ExceptionUtils.mpe("@TableId can't more than one in Class: \"%s\".", clazz.getName());
                     } else {
-                        initTableIdWithAnnotation(dbConfig, tableInfo, field, tableId, reflector);
+                        initTableIdWithAnnotation(dbConfig, mpjTableInfo.getTableInfo(), field, tableId, reflector);
                         isReadPK = true;
                         continue;
                     }
                 }
             } else if (!isReadPK) {
-                isReadPK = initTableIdWithoutAnnotation(dbConfig, tableInfo, field, reflector);
+                isReadPK = initTableIdWithoutAnnotation(dbConfig, mpjTableInfo.getTableInfo(), field, reflector);
                 if (isReadPK) {
                     continue;
                 }
             }
+
             final TableField tableField = field.getAnnotation(TableField.class);
 
             /* 有 @TableField 注解的字段初始化 */
             if (tableField != null) {
-                fieldList.add(new TableFieldInfo(dbConfig, tableInfo, field, tableField, reflector, existTableLogic));
+                fieldList.add(new TableFieldInfo(dbConfig, mpjTableInfo.getTableInfo(), field, tableField, reflector, existTableLogic));
                 continue;
             }
 
             /* 无 @TableField  注解的字段初始化 */
-            fieldList.add(new TableFieldInfo(dbConfig, tableInfo, field, reflector, existTableLogic));
+            fieldList.add(new TableFieldInfo(dbConfig, mpjTableInfo.getTableInfo(), field, reflector, existTableLogic));
         }
 
         /* 字段列表 */
-        tableInfo.setFieldList(fieldList);
+        mpjTableInfo.getTableInfo().setFieldList(fieldList);
+
 
         /* 未发现主键注解，提示警告信息 */
         if (!isReadPK) {
@@ -298,6 +349,14 @@ public class MPJTableInfoHelper {
      */
     public static boolean isExistTableLogic(List<Field> list) {
         return list.stream().anyMatch(field -> field.isAnnotationPresent(TableLogic.class));
+    }
+
+    private static boolean isExistMapping(Class<?> clazz) {
+        return ReflectionKit.getFieldList(ClassUtils.getUserClass(clazz)).stream().anyMatch(field -> field.isAnnotationPresent(EntityMapping.class));
+    }
+
+    private static boolean isExistMappingField(Class<?> clazz) {
+        return ReflectionKit.getFieldList(ClassUtils.getUserClass(clazz)).stream().anyMatch(field -> field.isAnnotationPresent(FieldMapping.class));
     }
 
     /**
@@ -429,5 +488,37 @@ public class MPJTableInfoHelper {
                     TableField tableField = field.getAnnotation(TableField.class);
                     return (tableField == null || tableField.exist());
                 }).collect(toList());
+    }
+
+    /**
+     * 初始化映射相关
+     */
+    public static void initMapping(MPJTableInfo mpjTableInfo) {
+        // 是否存在 @EntityMapping 注解
+        boolean existMapping = isExistMapping(mpjTableInfo.getTableInfo().getEntityType());
+        mpjTableInfo.setHasMapping(existMapping);
+        // 是否存在 @FieldMapping 注解
+        boolean existMappingField = isExistMappingField(mpjTableInfo.getTableInfo().getEntityType());
+        mpjTableInfo.setHasMappingField(existMappingField);
+        mpjTableInfo.setHasMappingOrField(existMapping || existMappingField);
+        /* 关系映射初始化 */
+        List<MPJTableFieldInfo> mpjFieldList = new ArrayList<>();
+        List<Field> fields = ReflectionKit.getFieldList(ClassUtils.getUserClass(mpjTableInfo.getTableInfo().getEntityType()));
+        for (Field field : fields) {
+            if (existMapping) {
+                EntityMapping mapping = field.getAnnotation(EntityMapping.class);
+                if (mapping != null) {
+                    mpjFieldList.add(new MPJTableFieldInfo(mpjTableInfo.getTableInfo().getEntityType(), mapping, field));
+                }
+            }
+            if (existMappingField) {
+                FieldMapping mapping = field.getAnnotation(FieldMapping.class);
+                if (mapping != null) {
+                    mpjFieldList.add(new MPJTableFieldInfo(mpjTableInfo.getTableInfo().getEntityType(), mapping, field));
+                }
+            }
+        }
+        /* 映射字段列表 */
+        mpjTableInfo.setFieldList(mpjFieldList);
     }
 }

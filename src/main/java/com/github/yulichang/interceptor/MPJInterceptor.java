@@ -1,5 +1,6 @@
 package com.github.yulichang.interceptor;
 
+import com.baomidou.mybatisplus.core.metadata.MPJTableInfo;
 import com.baomidou.mybatisplus.core.metadata.MPJTableInfoHelper;
 import com.baomidou.mybatisplus.core.metadata.TableInfo;
 import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
@@ -116,13 +117,13 @@ public class MPJInterceptor implements Interceptor {
         if (tableInfo != null && tableInfo.isAutoInitResultMap() && tableInfo.getEntityType() == resultType) {
             return ms.getConfiguration().getResultMap(tableInfo.getResultMap());
         }
-        TableInfo infoDTO = MPJTableInfoHelper.getTableInfo(resultType);
+        MPJTableInfo infoDTO = MPJTableInfoHelper.getTableInfo(resultType);
         if (infoDTO == null) {
             infoDTO = MPJTableInfoHelper.initTableInfo(ms.getConfiguration(),
-                    ms.getId().substring(0, ms.getId().lastIndexOf(".")), resultType);
+                    ms.getId().substring(0, ms.getId().lastIndexOf(".")), resultType, null);
         }
-        if (infoDTO.isAutoInitResultMap()) {
-            return ms.getConfiguration().getResultMap(infoDTO.getResultMap());
+        if (infoDTO.getTableInfo().isAutoInitResultMap()) {
+            return ms.getConfiguration().getResultMap(infoDTO.getTableInfo().getResultMap());
         }
         return new ResultMap.Builder(ms.getConfiguration(), ms.getId(), resultType, EMPTY_RESULT_MAPPING).build();
     }

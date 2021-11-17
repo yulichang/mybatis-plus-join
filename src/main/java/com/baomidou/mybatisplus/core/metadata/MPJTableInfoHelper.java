@@ -82,6 +82,41 @@ public class MPJTableInfoHelper {
      * 实体类反射获取表信息【初始化】
      * </p>
      *
+     * @param clazz       反射实体类
+     * @param mapperClass mapperClass
+     */
+    @SuppressWarnings("unused")
+    public synchronized static void initTableInfo(MapperBuilderAssistant builderAssistant, Class<?> clazz, Class<?> mapperClass) {
+        MPJTableInfo targetTableInfo = TABLE_INFO_CACHE.get(clazz);
+        final Configuration configuration = builderAssistant.getConfiguration();
+        if (targetTableInfo != null) {
+            Configuration oldConfiguration = targetTableInfo.getTableInfo().getConfiguration();
+            if (!oldConfiguration.equals(configuration)) {
+                // 不是同一个 Configuration,进行重新初始化
+                initTableInfo(configuration, builderAssistant.getCurrentNamespace(), clazz, mapperClass);
+            }
+            return;
+        }
+        initTableInfo(configuration, builderAssistant.getCurrentNamespace(), clazz, mapperClass);
+    }
+
+
+    /**
+     * <p>
+     * 获取所有实体映射表信息
+     * </p>
+     *
+     * @return 数据库表反射信息集合
+     */
+    public static List<MPJTableInfo> getTableInfos() {
+        return Collections.unmodifiableList(new ArrayList<>(TABLE_INFO_CACHE.values()));
+    }
+
+    /**
+     * <p>
+     * 实体类反射获取表信息【初始化】
+     * </p>
+     *
      * @param clazz 反射实体类
      * @return 数据库表反射信息
      */

@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.github.yulichang</groupId>
     <artifactId>mybatis-plus-join</artifactId>
-    <version>1.1.8</version>
+    <version>1.2.0.Beta5</version>
     <name>mybatis-plus-join</name>
     <description>An enhanced toolkit of Mybatis-Plus to simplify development.</description>
     <url>https://github.com/yulichang/mybatis-plus-join</url>
@@ -32,13 +32,16 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <jdkVersion>1.8</jdkVersion>
         <jdkVersion.test>1.8</jdkVersion.test>
+
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
     </properties>
 
     <dependencies>
         <dependency>
             <groupId>com.baomidou</groupId>
             <artifactId>mybatis-plus-boot-starter</artifactId>
-            <version>3.4.3</version>
+            <version>3.4.3.2</version>
             <scope>provided</scope>
         </dependency>
 

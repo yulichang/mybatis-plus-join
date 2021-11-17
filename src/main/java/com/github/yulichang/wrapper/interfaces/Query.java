@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.github.yulichang.toolkit.LambdaUtils;
 import com.github.yulichang.wrapper.enums.BaseFuncEnum;
 import com.github.yulichang.wrapper.enums.DefaultFuncEnum;
+import com.github.yulichang.wrapper.interfaces.on.OnFunction;
 
 import java.io.Serializable;
 import java.util.function.Predicate;
@@ -50,6 +51,22 @@ public interface Query<Children> extends Serializable {
      * 别名查询
      */
     <S> Children selectAs(SFunction<S, ?> column, String alias);
+
+    /**
+     * 子查询
+     *
+     * @param clazz    查询的类
+     * @param function 查询lambda
+     * @param alias    别名
+     */
+    Children selectQuery(Class<?> clazz, OnFunction function, String alias);
+
+    /**
+     * ignore
+     */
+    default <S> Children selectQuery(Class<?> clazz, OnFunction function, SFunction<S, ?> alias) {
+        return selectQuery(clazz, function, LambdaUtils.getName(alias));
+    }
 
     /**
      * 聚合函数查询

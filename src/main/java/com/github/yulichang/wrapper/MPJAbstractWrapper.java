@@ -11,6 +11,7 @@ import com.baomidou.mybatisplus.core.toolkit.*;
 import com.baomidou.mybatisplus.core.toolkit.sql.SqlUtils;
 import com.baomidou.mybatisplus.core.toolkit.sql.StringEscape;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
+import com.github.yulichang.toolkit.LambdaUtils;
 import com.github.yulichang.toolkit.sql.SqlScriptUtils;
 import com.github.yulichang.wrapper.interfaces.Compare;
 import com.github.yulichang.wrapper.interfaces.Func;
@@ -35,9 +36,16 @@ import static java.util.stream.Collectors.joining;
  *
  * @author yulichang
  */
-@SuppressWarnings("ALL")
+//@SuppressWarnings("ALL")
+@SuppressWarnings({"unchecked", "unused"})
 public abstract class MPJAbstractWrapper<T, Children extends MPJAbstractWrapper<T, Children>> extends Wrapper<T>
         implements Compare<Children>, Nested<Children, Children>, Join<Children>, Func<Children>, OnCompare<Children> {
+
+
+    /**
+     * 是否使用别名
+     */
+    protected boolean hasAlias;
 
     /**
      * 占位符
@@ -51,7 +59,7 @@ public abstract class MPJAbstractWrapper<T, Children extends MPJAbstractWrapper<
     /**
      * 其他
      */
-    /* mybatis plus 3.4.3新增 这个时wrapper的别名 不是MPJ的别名 */
+    /* mybatis plus 3.4.3新增 这个是wrapper的别名 不是MPJ的别名 */
     protected SharedString paramAlias;
     protected SharedString lastSql;
     /**
@@ -71,30 +79,11 @@ public abstract class MPJAbstractWrapper<T, Children extends MPJAbstractWrapper<
     /**
      * 实体类型(主要用于确定泛型以及取TableInfo缓存)
      */
-    private Class<T> entityClass;
+    protected Class<?> entityClass;
 
     @Override
     public T getEntity() {
         return entity;
-    }
-
-    public Children setEntity(T entity) {
-        this.entity = entity;
-        return typedThis;
-    }
-
-    public Class<T> getEntityClass() {
-        if (entityClass == null && entity != null) {
-            entityClass = (Class<T>) entity.getClass();
-        }
-        return entityClass;
-    }
-
-    public Children setEntityClass(Class<T> entityClass) {
-        if (entityClass != null) {
-            this.entityClass = entityClass;
-        }
-        return typedThis;
     }
 
     @Override
@@ -329,7 +318,6 @@ public abstract class MPJAbstractWrapper<T, Children extends MPJAbstractWrapper<
      * 字段 SQL 注入过滤处理，子类重写实现过滤逻辑
      *
      * @param column 字段内容
-     * @return
      */
     protected <X> SFunction<X, ?> columnSqlInjectFilter(SFunction<X, ?> column) {
         return column;
@@ -384,9 +372,11 @@ public abstract class MPJAbstractWrapper<T, Children extends MPJAbstractWrapper<
                 () -> formatParam(null, val)));
     }
 
-    protected <X, S> Children addCondition(boolean condition, SFunction<X, ?> column, SqlKeyword sqlKeyword, SFunction<S, ?> val) {
-        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(column), sqlKeyword,
-                columnToSqlSegment(val)));
+    protected <X, S> Children addCondition(boolean condition, SFunction<X, ?> column, SqlKeyword sqlKeyword,
+                                           SFunction<S, ?> val) {
+        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(column, hasAlias || entityClass !=
+                LambdaUtils.getEntityClass(column)), sqlKeyword, columnToSqlSegment(val, hasAlias ||
+                entityClass != LambdaUtils.getEntityClass(val))));
     }
 
     /**
@@ -417,6 +407,7 @@ public abstract class MPJAbstractWrapper<T, Children extends MPJAbstractWrapper<
      * @param params  参数
      * @return sql片段
      */
+    @SuppressWarnings("SameParameterValue")
     protected final String formatSqlMaybeWithParam(String sqlStr, String mapping, Object... params) {
         if (StringUtils.isBlank(sqlStr)) {
             // todo 何时会这样?
@@ -572,10 +563,18 @@ public abstract class MPJAbstractWrapper<T, Children extends MPJAbstractWrapper<
         return () -> columnToString(column);
     }
 
+    protected final <X> ISqlSegment columnToSqlSegment(SFunction<X, ?> column, boolean hasAlias) {
+        return () -> columnToString(column, hasAlias);
+    }
+
     /**
      * 获取 columnName
      */
     protected <X> String columnToString(X column) {
+        return (String) column;
+    }
+
+    protected <X> String columnToString(X column, boolean hasAlias) {
         return (String) column;
     }
 
@@ -633,37 +632,5 @@ public abstract class MPJAbstractWrapper<T, Children extends MPJAbstractWrapper<
     @Override
     public <R, S> Children le(boolean condition, SFunction<R, ?> column, SFunction<S, ?> val) {
         return addCondition(condition, column, LE, val);
-    }
-
-    @Override
-    public <R, S, U> Children between(boolean condition, SFunction<R, ?> column, SFunction<S, ?> val1, SFunction<U, ?> val2) {
-        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(column), BETWEEN,
-                columnToSqlSegment(val1), AND, columnToSqlSegment(val2)));
-    }
-
-    public <R, S> Children between(boolean condition, SFunction<R, ?> column, Object val1, SFunction<S, ?> val2) {
-        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(column), BETWEEN,
-                () -> formatParam(null, val1), AND, columnToSqlSegment(val2)));
-    }
-
-    public <R, S> Children between(boolean condition, SFunction<R, ?> column, SFunction<S, ?> val1, Object val2) {
-        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(column), BETWEEN,
-                columnToSqlSegment(val1), AND, () -> formatParam(null, val2)));
-    }
-
-    @Override
-    public <R, S, U> Children notBetween(boolean condition, SFunction<R, ?> column, SFunction<S, ?> val1, SFunction<U, ?> val2) {
-        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(column), NOT_BETWEEN,
-                columnToSqlSegment(val1), AND, columnToSqlSegment(val2)));
-    }
-
-    public <R, U> Children notBetween(boolean condition, SFunction<R, ?> column, Object val1, SFunction<U, ?> val2) {
-        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(column), NOT_BETWEEN,
-                () -> formatParam(null, val1), AND, columnToSqlSegment(val2)));
-    }
-
-    public <R, S> Children notBetween(boolean condition, SFunction<R, ?> column, SFunction<S, ?> val1, Object val2) {
-        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(column), NOT_BETWEEN,
-                columnToSqlSegment(val1), AND, () -> formatParam(null, val2)));
     }
 }

@@ -68,17 +68,6 @@ public class MPJTableInfoHelper {
 
     /**
      * <p>
-     * 获取所有实体映射表信息
-     * </p>
-     *
-     * @return 数据库表反射信息集合
-     */
-    public static List<MPJTableInfo> getTableInfos() {
-        return Collections.unmodifiableList(new ArrayList<>(TABLE_INFO_CACHE.values()));
-    }
-
-    /**
-     * <p>
      * 实体类反射获取表信息【初始化】
      * </p>
      *

@@ -1,7 +1,11 @@
 package com.github.yulichang.injector;
 
+import com.baomidou.mybatisplus.core.MybatisConfiguration;
+import com.baomidou.mybatisplus.core.config.GlobalConfig;
 import com.baomidou.mybatisplus.core.injector.AbstractMethod;
+import com.baomidou.mybatisplus.core.injector.AbstractSqlInjector;
 import com.baomidou.mybatisplus.core.injector.DefaultSqlInjector;
+import com.baomidou.mybatisplus.core.injector.ISqlInjector;
 import com.baomidou.mybatisplus.core.injector.methods.*;
 import com.baomidou.mybatisplus.core.mapper.Mapper;
 import com.baomidou.mybatisplus.core.metadata.MPJTableMapperHelper;
@@ -24,8 +28,9 @@ import static java.util.stream.Collectors.toList;
  * @author yulichang
  * @see DefaultSqlInjector
  */
-@ConditionalOnMissingBean(DefaultSqlInjector.class)
+@ConditionalOnMissingBean({DefaultSqlInjector.class, AbstractSqlInjector.class, ISqlInjector.class})
 public class MPJSqlInjector extends DefaultSqlInjector {
+
 
     /**
      * 升级到 mybatis plus 3.4.3.2 后对之前的版本兼容

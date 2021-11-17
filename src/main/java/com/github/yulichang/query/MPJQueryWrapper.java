@@ -47,7 +47,7 @@ public class MPJQueryWrapper<T> extends AbstractWrapper<T, String, MPJQueryWrapp
     /**
      * 主表别名
      */
-    private String alias = Constant.TABLE_ALIAS;
+    private final SharedString alias = new SharedString(Constant.TABLE_ALIAS);
 
     /**
      * 查询的列
@@ -88,14 +88,6 @@ public class MPJQueryWrapper<T> extends AbstractWrapper<T, String, MPJQueryWrapp
         this.ignoreColumns = ignoreColumns;
     }
 
-    /**
-     * 设置表别名(默认为 t 可以调用此方法修改,调用后才生效，所以最好第一个调用)
-     */
-    public final MPJQueryWrapper<T> alias(String tableAlias) {
-        this.alias = tableAlias;
-        return typedThis;
-    }
-
     @Override
     public MPJQueryWrapper<T> select(String... columns) {
         if (ArrayUtils.isNotEmpty(columns)) {
@@ -130,7 +122,7 @@ public class MPJQueryWrapper<T> extends AbstractWrapper<T, String, MPJQueryWrapp
         TableInfo info = TableInfoHelper.getTableInfo(entityClass);
         Assert.notNull(info, "can not find table info");
         selectColumns.addAll(info.getFieldList().stream().filter(predicate).map(c ->
-                this.alias + StringPool.DOT + c.getColumn()).collect(Collectors.toList()));
+                Constant.TABLE_ALIAS + StringPool.DOT + c.getColumn()).collect(Collectors.toList()));
         return typedThis;
     }
 
@@ -141,7 +133,7 @@ public class MPJQueryWrapper<T> extends AbstractWrapper<T, String, MPJQueryWrapp
      * @param clazz 主表class
      */
     public final MPJQueryWrapper<T> selectAll(Class<T> clazz) {
-        selectAll(clazz, this.alias);
+        selectAll(clazz, Constant.TABLE_ALIAS);
         return typedThis;
     }
 
@@ -157,7 +149,7 @@ public class MPJQueryWrapper<T> extends AbstractWrapper<T, String, MPJQueryWrapp
         if (info.havePK()) {
             selectColumns.add(as + StringPool.DOT + info.getKeyColumn());
         }
-        selectColumns.addAll(info.getFieldList().stream().filter(TableFieldInfo::isSelect).map(i ->
+        selectColumns.addAll(info.getFieldList().stream().map(i ->
                 as + StringPool.DOT + i.getColumn()).collect(Collectors.toList()));
         return typedThis;
     }
@@ -178,18 +170,13 @@ public class MPJQueryWrapper<T> extends AbstractWrapper<T, String, MPJQueryWrapp
         return from.getStringValue();
     }
 
-    public boolean getAutoAlias() {
-        return false;
-    }
-
     public String getAlias() {
-        return alias;
+        return alias.getStringValue();
     }
 
     /**
      * 返回一个支持 lambda 函数写法的 wrapper
      */
-    @SuppressWarnings("deprecation")
     public MPJLambdaQueryWrapper<T> lambda() {
         return new MPJLambdaQueryWrapper<>(getEntity(), getEntityClass(), from, sqlSelect, paramNameSeq, paramNameValuePairs,
                 expression, lastSql, sqlComment, sqlFirst, selectColumns, ignoreColumns);

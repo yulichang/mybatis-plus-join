@@ -50,7 +50,7 @@ public class MPJLambdaQueryWrapper<T> extends AbstractLambdaWrapper<T, MPJLambda
     /**
      * 主表别名
      */
-    private String alias = Constant.TABLE_ALIAS;
+    private final SharedString alias = new SharedString(Constant.TABLE_ALIAS);
 
     /**
      * 查询的列
@@ -88,14 +88,6 @@ public class MPJLambdaQueryWrapper<T> extends AbstractLambdaWrapper<T, MPJLambda
         this.sqlFirst = sqlFirst;
         this.selectColumns = selectColumns;
         this.ignoreColumns = ignoreColumns;
-    }
-
-    /**
-     * 设置表别名(默认为 t 可以调用此方法修改,调用后才生效，所以最好第一个调用)
-     */
-    public final MPJLambdaQueryWrapper<T> alias(String tableAlias) {
-        this.alias = tableAlias;
-        return typedThis;
     }
 
     /**
@@ -138,7 +130,7 @@ public class MPJLambdaQueryWrapper<T> extends AbstractLambdaWrapper<T, MPJLambda
     public final MPJLambdaQueryWrapper<T> selectIgnore(SFunction<T, ?>... columns) {
         if (ArrayUtils.isNotEmpty(columns)) {
             for (SFunction<T, ?> s : columns) {
-                ignoreColumns.add(this.alias + StringPool.DOT + super.columnToString(s, false));
+                ignoreColumns.add(Constant.TABLE_ALIAS + StringPool.DOT + getColumnCache(s).getColumn());
             }
         }
         return typedThis;
@@ -146,7 +138,7 @@ public class MPJLambdaQueryWrapper<T> extends AbstractLambdaWrapper<T, MPJLambda
 
     @Override
     protected String columnToString(SFunction<T, ?> column, boolean onlyColumn) {
-        return this.alias + StringPool.DOT + super.columnToString(column, onlyColumn);
+        return Constant.TABLE_ALIAS + StringPool.DOT + super.columnToString(column, onlyColumn);
     }
 
     public MPJLambdaQueryWrapper<T> select(String... columns) {
@@ -174,7 +166,7 @@ public class MPJLambdaQueryWrapper<T> extends AbstractLambdaWrapper<T, MPJLambda
         TableInfo info = TableInfoHelper.getTableInfo(entityClass);
         Assert.notNull(info, "can not find table info");
         selectColumns.addAll(info.getFieldList().stream().filter(predicate).map(c ->
-                this.alias + StringPool.DOT + c.getColumn()).collect(Collectors.toList()));
+                Constant.TABLE_ALIAS + StringPool.DOT + c.getColumn()).collect(Collectors.toList()));
         return typedThis;
     }
 
@@ -185,7 +177,7 @@ public class MPJLambdaQueryWrapper<T> extends AbstractLambdaWrapper<T, MPJLambda
      * @param clazz 主表class
      */
     public final MPJLambdaQueryWrapper<T> selectAll(Class<T> clazz) {
-        return selectAll(clazz, this.alias);
+        return selectAll(clazz, Constant.TABLE_ALIAS);
     }
 
     /**
@@ -194,14 +186,13 @@ public class MPJLambdaQueryWrapper<T> extends AbstractLambdaWrapper<T, MPJLambda
      * @param clazz 表实体
      * @param as    表别名
      */
-    @SuppressWarnings("DuplicatedCode")
     public final MPJLambdaQueryWrapper<T> selectAll(Class<?> clazz, String as) {
         TableInfo info = TableInfoHelper.getTableInfo(clazz);
         Assert.notNull(info, "can not find table info");
         if (info.havePK()) {
             selectColumns.add(as + StringPool.DOT + info.getKeyColumn());
         }
-        selectColumns.addAll(info.getFieldList().stream().filter(TableFieldInfo::isSelect).map(i ->
+        selectColumns.addAll(info.getFieldList().stream().map(i ->
                 as + StringPool.DOT + i.getColumn()).collect(Collectors.toList()));
         return typedThis;
     }
@@ -229,12 +220,9 @@ public class MPJLambdaQueryWrapper<T> extends AbstractLambdaWrapper<T, MPJLambda
         return from.getStringValue();
     }
 
-    public boolean getAutoAlias() {
-        return false;
-    }
 
     public String getAlias() {
-        return alias;
+        return alias.getStringValue();
     }
 
     /**

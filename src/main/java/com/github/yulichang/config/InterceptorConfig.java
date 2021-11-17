@@ -1,7 +1,9 @@
 package com.github.yulichang.config;
 
+import com.baomidou.mybatisplus.core.injector.ISqlInjector;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.github.yulichang.exception.MPJException;
+import com.github.yulichang.injector.MPJSqlInjector;
 import com.github.yulichang.interceptor.MPJInterceptor;
 import org.apache.ibatis.logging.Log;
 import org.apache.ibatis.logging.LogFactory;
@@ -31,6 +33,8 @@ public class InterceptorConfig implements ApplicationListener<ApplicationReadyEv
     private List<SqlSessionFactory> sqlSessionFactoryList;
     @Autowired
     private MPJInterceptor mpjInterceptor;
+    @Autowired(required = false)
+    private ISqlInjector iSqlInjector;
 
     @Override
     @SuppressWarnings("unchecked")
@@ -44,16 +48,21 @@ public class InterceptorConfig implements ApplicationListener<ApplicationReadyEv
                     Field interceptors = InterceptorChain.class.getDeclaredField("interceptors");
                     interceptors.setAccessible(true);
                     List<Interceptor> list = (List<Interceptor>) interceptors.get(chain);
-                    if (CollectionUtils.isNotEmpty(list) && list.get(list.size() - 1) != mpjInterceptor) {
-                        list.removeIf(i -> i == mpjInterceptor);
+                    if (CollectionUtils.isNotEmpty(list)) {
+                        if (list.get(list.size() - 1) != mpjInterceptor) {
+                            list.removeIf(i -> i == mpjInterceptor);
+                            list.add(mpjInterceptor);
+                        }
+                    } else {
                         list.add(mpjInterceptor);
                     }
                 }
             } catch (Exception ignored) {
                 throw new MPJException("mpjInterceptor exception");
             }
-        } else {
-            logger.warn("MPJ not define SqlSessionFactory");
+        }
+        if (iSqlInjector != null && !(iSqlInjector instanceof MPJSqlInjector)) {
+            logger.error("sql注入器未继承 MPJSqlInjector -> " + iSqlInjector.getClass());
         }
     }
 }

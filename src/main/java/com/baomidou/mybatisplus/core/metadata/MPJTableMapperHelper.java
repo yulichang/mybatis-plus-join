@@ -2,7 +2,6 @@ package com.baomidou.mybatisplus.core.metadata;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * 实体类对应的mapper管理

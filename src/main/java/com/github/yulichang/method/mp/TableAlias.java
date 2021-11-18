@@ -3,6 +3,7 @@ package com.github.yulichang.method.mp;
 import com.baomidou.mybatisplus.core.metadata.TableInfo;
 import com.baomidou.mybatisplus.core.toolkit.Constants;
 import com.baomidou.mybatisplus.core.toolkit.sql.SqlScriptUtils;
+import com.github.yulichang.method.MPJBaseMethod;
 import com.github.yulichang.toolkit.Constant;
 
 /**
@@ -11,7 +12,7 @@ import com.github.yulichang.toolkit.Constant;
  * @author yulichang
  * @since 1.2.0
  */
-public interface TableAlias extends Constants {
+public interface TableAlias extends Constants, MPJBaseMethod {
 
     default String getTableName(TableInfo tableInfo) {
         return tableInfo.getTableName() + SPACE + SqlScriptUtils.convertIf("${ew.alias}",
@@ -38,15 +39,7 @@ public interface TableAlias extends Constants {
             sqlScript = SqlScriptUtils.convertWhere(sqlScript);
             return newLine ? NEWLINE + sqlScript : sqlScript;
         } else {
-            String sqlScript = SqlScriptUtils.convertIf(String.format("${%s}", WRAPPER_SQLSEGMENT),
-                    String.format("%s != null and %s != '' and %s", WRAPPER_SQLSEGMENT, WRAPPER_SQLSEGMENT,
-                            WRAPPER_NONEMPTYOFWHERE), true);
-            sqlScript = SqlScriptUtils.convertWhere(sqlScript) + NEWLINE;
-            sqlScript += SqlScriptUtils.convertIf(String.format(" ${%s}", WRAPPER_SQLSEGMENT),
-                    String.format("%s != null and %s != '' and %s", WRAPPER_SQLSEGMENT, WRAPPER_SQLSEGMENT,
-                            WRAPPER_EMPTYOFWHERE), true);
-            sqlScript = SqlScriptUtils.convertIf(sqlScript, String.format("%s != null", WRAPPER), true);
-            return newLine ? NEWLINE + sqlScript : sqlScript;
+            return whereEntityWrapper(newLine);
         }
     }
 

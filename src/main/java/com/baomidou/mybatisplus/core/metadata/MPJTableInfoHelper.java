@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.config.GlobalConfig;
 import com.baomidou.mybatisplus.core.toolkit.*;
 import com.github.yulichang.annotation.EntityMapping;
 import com.github.yulichang.annotation.FieldMapping;
+import com.github.yulichang.exception.MPJException;
 import org.apache.ibatis.builder.MapperBuilderAssistant;
 import org.apache.ibatis.logging.Log;
 import org.apache.ibatis.logging.LogFactory;
@@ -15,6 +16,10 @@ import org.apache.ibatis.reflection.Reflector;
 import org.apache.ibatis.reflection.ReflectorFactory;
 import org.apache.ibatis.session.Configuration;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.lang.reflect.Field;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -544,5 +549,26 @@ public class MPJTableInfoHelper {
         }
         /* 映射字段列表 */
         mpjTableInfo.setFieldList(mpjFieldList);
+    }
+
+    /**
+     * 复制tableInfo对象
+     * 由于各个版本的MP的TableInfo对象存在差异，为了兼容性采用反射，而不是getter setter
+     */
+    public static TableInfo copyAndSetTableName(TableInfo tableInfo, String tableName) {
+        try {
+            TableInfo table = new TableInfo(tableInfo.getEntityType());
+            //反射拷贝对象
+            Field[] fields = TableInfo.class.getDeclaredFields();
+            for (Field f : fields) {
+                f.setAccessible(true);
+                f.set(table, f.get(tableInfo));
+            }
+            table.setTableName(tableName);
+            return table;
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new MPJException("TableInfo 对象拷贝失败 -> " + tableInfo.getEntityType().getName());
+        }
     }
 }

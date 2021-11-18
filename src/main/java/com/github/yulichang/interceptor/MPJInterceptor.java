@@ -5,10 +5,15 @@ import com.baomidou.mybatisplus.core.metadata.MPJTableInfoHelper;
 import com.baomidou.mybatisplus.core.metadata.TableInfo;
 import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
+import com.baomidou.mybatisplus.core.toolkit.Constants;
 import com.baomidou.mybatisplus.core.toolkit.StringPool;
+import com.github.yulichang.config.InterceptorConfig;
+import com.github.yulichang.interfaces.MPJBaseJoin;
 import com.github.yulichang.method.MPJResultType;
 import com.github.yulichang.toolkit.Constant;
 import org.apache.ibatis.executor.Executor;
+import org.apache.ibatis.logging.Log;
+import org.apache.ibatis.logging.LogFactory;
 import org.apache.ibatis.mapping.MappedStatement;
 import org.apache.ibatis.mapping.ResultMap;
 import org.apache.ibatis.mapping.ResultMapping;
@@ -37,6 +42,9 @@ import java.util.concurrent.ConcurrentHashMap;
 @SuppressWarnings("unchecked")
 @Intercepts(@Signature(type = Executor.class, method = "query", args = {MappedStatement.class, Object.class, RowBounds.class, ResultHandler.class}))
 public class MPJInterceptor implements Interceptor {
+    private static final Log logger = LogFactory.getLog(MPJInterceptor.class);
+
+
     private static final List<ResultMapping> EMPTY_RESULT_MAPPING = new ArrayList<>(0);
 
     /**
@@ -50,17 +58,21 @@ public class MPJInterceptor implements Interceptor {
         if (args[0] instanceof MappedStatement) {
             MappedStatement ms = (MappedStatement) args[0];
             if (args[1] instanceof Map) {
-                Map<String, ?> map = (Map<String, ?>) args[1];
-                if (CollectionUtils.isNotEmpty(map)) {
-                    if (map.containsKey(Constant.CLAZZ)) {
-                        Class<?> clazz = (Class<?>) map.get(Constant.CLAZZ);
-                        if (Objects.nonNull(clazz)) {
-                            List<ResultMap> list = ms.getResultMaps();
-                            if (CollectionUtils.isNotEmpty(list)) {
-                                ResultMap resultMap = list.get(0);
-                                if (resultMap.getType() == MPJResultType.class) {
-                                    args[0] = newMappedStatement(ms, clazz);
-                                }
+                Map<String, Object> map = (Map<String, Object>) args[1];
+                Object ew = map.get(Constants.WRAPPER);
+                if (!map.containsKey(Constant.PARAM_TYPE)) {
+                    map.put(Constant.PARAM_TYPE, Objects.nonNull(ew) && (ew instanceof MPJBaseJoin));
+                } else {
+                    logger.warn(String.format("请不要使用MPJ预留参数名 %s", Constant.PARAM_TYPE));
+                }
+                if (CollectionUtils.isNotEmpty(map) && map.containsKey(Constant.CLAZZ)) {
+                    Class<?> clazz = (Class<?>) map.get(Constant.CLAZZ);
+                    if (Objects.nonNull(clazz)) {
+                        List<ResultMap> list = ms.getResultMaps();
+                        if (CollectionUtils.isNotEmpty(list)) {
+                            ResultMap resultMap = list.get(0);
+                            if (resultMap.getType() == MPJResultType.class) {
+                                args[0] = newMappedStatement(ms, clazz);
                             }
                         }
                     }
@@ -69,6 +81,7 @@ public class MPJInterceptor implements Interceptor {
         }
         return invocation.proceed();
     }
+
 
     /**
      * 构建新的MappedStatement

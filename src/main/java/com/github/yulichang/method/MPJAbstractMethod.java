@@ -20,8 +20,7 @@ public abstract class MPJAbstractMethod extends AbstractMethod {
      */
     @Override
     protected String sqlWhereEntityWrapper(boolean newLine, TableInfo table) {
-        String sqlScript = EMPTY;
-        sqlScript += SqlScriptUtils.convertIf(String.format(SqlScriptUtils.convertIf(" AND", String.format("%s and %s", WRAPPER_NONEMPTYOFENTITY, WRAPPER_NONEMPTYOFNORMAL), false) + " ${%s}", WRAPPER_SQLSEGMENT),
+        String sqlScript = SqlScriptUtils.convertIf(String.format("${%s}", WRAPPER_SQLSEGMENT),
                 String.format("%s != null and %s != '' and %s", WRAPPER_SQLSEGMENT, WRAPPER_SQLSEGMENT,
                         WRAPPER_NONEMPTYOFWHERE), true);
         sqlScript = SqlScriptUtils.convertWhere(sqlScript) + NEWLINE;

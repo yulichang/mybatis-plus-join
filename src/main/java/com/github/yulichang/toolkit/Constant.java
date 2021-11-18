@@ -25,6 +25,8 @@ public interface Constant {
 
     String CLAZZ = "resultTypeClass_Eg1sG";
 
+    String PARAM_TYPE = "paramType_Gr8re1Ee";
+
     /**
      * " LEFT JOIN "
      */

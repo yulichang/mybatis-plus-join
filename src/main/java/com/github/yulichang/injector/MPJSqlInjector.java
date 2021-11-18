@@ -1,22 +1,37 @@
 package com.github.yulichang.injector;
 
-import com.baomidou.mybatisplus.core.MybatisConfiguration;
-import com.baomidou.mybatisplus.core.config.GlobalConfig;
 import com.baomidou.mybatisplus.core.injector.AbstractMethod;
 import com.baomidou.mybatisplus.core.injector.AbstractSqlInjector;
 import com.baomidou.mybatisplus.core.injector.DefaultSqlInjector;
 import com.baomidou.mybatisplus.core.injector.ISqlInjector;
-import com.baomidou.mybatisplus.core.injector.methods.*;
+import com.baomidou.mybatisplus.core.injector.methods.Delete;
+import com.baomidou.mybatisplus.core.injector.methods.DeleteById;
+import com.baomidou.mybatisplus.core.injector.methods.DeleteByMap;
+import com.baomidou.mybatisplus.core.injector.methods.Insert;
+import com.baomidou.mybatisplus.core.injector.methods.DeleteBatchByIds;
+import com.baomidou.mybatisplus.core.injector.methods.SelectById;
+import com.baomidou.mybatisplus.core.injector.methods.Update;
+import com.baomidou.mybatisplus.core.injector.methods.UpdateById;
+import com.baomidou.mybatisplus.core.injector.methods.SelectBatchByIds;
+import com.baomidou.mybatisplus.core.injector.methods.SelectByMap;
 import com.baomidou.mybatisplus.core.mapper.Mapper;
 import com.baomidou.mybatisplus.core.metadata.MPJTableMapperHelper;
 import com.baomidou.mybatisplus.core.metadata.TableInfo;
 import com.baomidou.mybatisplus.core.toolkit.ClassUtils;
 import com.github.yulichang.method.*;
+import com.github.yulichang.method.mp.SelectCount;
+import com.github.yulichang.method.mp.SelectList;
+import com.github.yulichang.method.mp.SelectMaps;
+import com.github.yulichang.method.mp.SelectMapsPage;
+import com.github.yulichang.method.mp.SelectObjs;
+import com.github.yulichang.method.mp.SelectOne;
+import com.github.yulichang.method.mp.SelectPage;
 import org.apache.ibatis.builder.MapperBuilderAssistant;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.core.GenericTypeResolver;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -31,11 +46,14 @@ import static java.util.stream.Collectors.toList;
 @ConditionalOnMissingBean({DefaultSqlInjector.class, AbstractSqlInjector.class, ISqlInjector.class})
 public class MPJSqlInjector extends DefaultSqlInjector {
 
+    private static final List<String> METHOD_LIST = Arrays.asList("SelectOne", "SelectCount",
+            "SelectMaps", "SelectMapsPage", "SelectObjs", "SelectList", "SelectPage");
+
 
     /**
      * 升级到 mybatis plus 3.4.3.2 后对之前的版本兼容
      */
-    @SuppressWarnings({"unused", "deprecation"})
+    @SuppressWarnings("unused")
     public List<AbstractMethod> getMethodList(Class<?> mapperClass) {
         List<AbstractMethod> list = Stream.of(
                 new Insert(),
@@ -47,16 +65,17 @@ public class MPJSqlInjector extends DefaultSqlInjector {
                 new UpdateById(),
                 new SelectById(),
                 new SelectBatchByIds(),
-                new SelectByMap(),
-                new SelectOne(),
-                new SelectCount(),
-                new SelectMaps(),
-                new SelectMapsPage(),
-                new SelectObjs(),
-                new SelectList(),
-                new SelectPage()
+                new SelectByMap()
+//                new com.baomidou.mybatisplus.core.injector.methods.SelectOne(),
+//                new com.baomidou.mybatisplus.core.injector.methods.SelectCount(),
+//                new com.baomidou.mybatisplus.core.injector.methods.SelectMaps(),
+//                new com.baomidou.mybatisplus.core.injector.methods.SelectMapsPage(),
+//                new com.baomidou.mybatisplus.core.injector.methods.SelectObjs(),
+//                new com.baomidou.mybatisplus.core.injector.methods.SelectList(),
+//                new com.baomidou.mybatisplus.core.injector.methods.SelectPage()
         ).collect(toList());
         list.addAll(getJoinMethod());
+        list.addAll(getSelectMethod());
         return list;
     }
 
@@ -66,6 +85,8 @@ public class MPJSqlInjector extends DefaultSqlInjector {
     @Override
     public List<AbstractMethod> getMethodList(Class<?> mapperClass, TableInfo tableInfo) {
         List<AbstractMethod> list = super.getMethodList(mapperClass, tableInfo);
+        list.removeIf(i -> METHOD_LIST.contains(i.getClass().getSimpleName()));
+        list.addAll(getSelectMethod());
         list.addAll(getJoinMethod());
         return list;
     }
@@ -79,6 +100,18 @@ public class MPJSqlInjector extends DefaultSqlInjector {
         list.add(new SelectJoinMap());
         list.add(new SelectJoinMaps());
         list.add(new SelectJoinMapsPage());
+        return list;
+    }
+
+    private List<AbstractMethod> getSelectMethod() {
+        List<AbstractMethod> list = new ArrayList<>();
+        list.add(new SelectOne());
+        list.add(new SelectCount());
+        list.add(new SelectMaps());
+        list.add(new SelectMapsPage());
+        list.add(new SelectObjs());
+        list.add(new SelectList());
+        list.add(new SelectPage());
         return list;
     }
 

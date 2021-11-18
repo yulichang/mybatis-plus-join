@@ -39,7 +39,6 @@ import java.util.concurrent.ConcurrentHashMap;
  *
  * @author yulichang
  */
-@SuppressWarnings("unchecked")
 @Intercepts(@Signature(type = Executor.class, method = "query", args = {MappedStatement.class, Object.class, RowBounds.class, ResultHandler.class}))
 public class MPJInterceptor implements Interceptor {
     private static final Log logger = LogFactory.getLog(MPJInterceptor.class);
@@ -53,13 +52,14 @@ public class MPJInterceptor implements Interceptor {
     private static final Map<String, Map<Configuration, MappedStatement>> MS_CACHE = new ConcurrentHashMap<>();
 
     @Override
+    @SuppressWarnings({"Java8MapApi", "unchecked"})
     public Object intercept(Invocation invocation) throws Throwable {
         Object[] args = invocation.getArgs();
         if (args[0] instanceof MappedStatement) {
             MappedStatement ms = (MappedStatement) args[0];
             if (args[1] instanceof Map) {
                 Map<String, Object> map = (Map<String, Object>) args[1];
-                Object ew = map.get(Constants.WRAPPER);
+                Object ew = map.containsKey(Constants.WRAPPER) ? map.get(Constants.WRAPPER) : null;
                 if (!map.containsKey(Constant.PARAM_TYPE)) {
                     map.put(Constant.PARAM_TYPE, Objects.nonNull(ew) && (ew instanceof MPJBaseJoin));
                 } else {

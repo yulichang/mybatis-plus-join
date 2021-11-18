@@ -567,7 +567,6 @@ public class MPJTableInfoHelper {
             table.setTableName(tableName);
             return table;
         } catch (Exception e) {
-            e.printStackTrace();
             throw new MPJException("TableInfo 对象拷贝失败 -> " + tableInfo.getEntityType().getName());
         }
     }

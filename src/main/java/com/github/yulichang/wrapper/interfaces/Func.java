@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 
 import java.io.Serializable;
 import java.util.Collection;
+import java.util.List;
 import java.util.function.Consumer;
 
 /**
@@ -170,6 +171,25 @@ public interface Func<Children> extends Serializable {
     /**
      * ignore
      */
+    default <R> Children groupBy(SFunction<R, ?> column) {
+        return groupBy(true, column);
+    }
+
+    /**
+     * ignore
+     */
+    default <R> Children groupBy(List<SFunction<R, ?>> column) {
+        return groupBy(true, column);
+    }
+
+    /**
+     * ignore
+     */
+    <R> Children groupBy(boolean condition, List<SFunction<R, ?>> columns);
+
+    /**
+     * ignore
+     */
     default <R> Children groupBy(SFunction<R, ?> column, SFunction<R, ?>... columns) {
         return groupBy(true, column, columns);
     }
@@ -184,6 +204,25 @@ public interface Func<Children> extends Serializable {
      * @return children
      */
     <R> Children groupBy(boolean condition, SFunction<R, ?> column, SFunction<R, ?>... columns);
+
+    /**
+     * ignore
+     */
+    default <R> Children orderByAsc(SFunction<R, ?> column) {
+        return orderByAsc(true, column);
+    }
+
+    /**
+     * ignore
+     */
+    default <R> Children orderByAsc(List<SFunction<R, ?>> columns) {
+        return orderByAsc(true, columns);
+    }
+
+    /**
+     * ignore
+     */
+    <R> Children orderByAsc(boolean condition, List<SFunction<R, ?>> columns);
 
     /**
      * ignore
@@ -204,6 +243,25 @@ public interface Func<Children> extends Serializable {
     default <R> Children orderByAsc(boolean condition, SFunction<R, ?> column, SFunction<R, ?>... columns) {
         return orderBy(condition, true, column, columns);
     }
+
+    /**
+     * ignore
+     */
+    default <R> Children orderByDesc(SFunction<R, ?> column) {
+        return orderByDesc(true, column);
+    }
+
+    /**
+     * ignore
+     */
+    default <R> Children orderByDesc(List<SFunction<R, ?>> columns) {
+        return orderByDesc(true, columns);
+    }
+
+    /**
+     * ignore
+     */
+    <R> Children orderByDesc(boolean condition, List<SFunction<R, ?>> columns);
 
     /**
      * ignore

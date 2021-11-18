@@ -66,13 +66,6 @@ public class MPJSqlInjector extends DefaultSqlInjector {
                 new SelectById(),
                 new SelectBatchByIds(),
                 new SelectByMap()
-//                new com.baomidou.mybatisplus.core.injector.methods.SelectOne(),
-//                new com.baomidou.mybatisplus.core.injector.methods.SelectCount(),
-//                new com.baomidou.mybatisplus.core.injector.methods.SelectMaps(),
-//                new com.baomidou.mybatisplus.core.injector.methods.SelectMapsPage(),
-//                new com.baomidou.mybatisplus.core.injector.methods.SelectObjs(),
-//                new com.baomidou.mybatisplus.core.injector.methods.SelectList(),
-//                new com.baomidou.mybatisplus.core.injector.methods.SelectPage()
         ).collect(toList());
         list.addAll(getJoinMethod());
         list.addAll(getSelectMethod());

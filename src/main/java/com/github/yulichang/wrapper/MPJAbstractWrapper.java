@@ -17,10 +17,7 @@ import com.github.yulichang.wrapper.interfaces.Func;
 import com.github.yulichang.wrapper.interfaces.Join;
 import com.github.yulichang.wrapper.interfaces.on.OnCompare;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiPredicate;
 import java.util.function.Consumer;
@@ -302,6 +299,17 @@ public abstract class MPJAbstractWrapper<T, Children extends MPJAbstractWrapper<
     }
 
     @Override
+    public <R> Children groupBy(boolean condition, List<SFunction<R, ?>> columns) {
+        return maybeDo(condition, () -> {
+            if (CollectionUtils.isNotEmpty(columns)) {
+                String one = (StringPool.COMMA + columnsToString(columns));
+                final String finalOne = one;
+                appendSqlSegments(GROUP_BY, () -> finalOne);
+            }
+        });
+    }
+
+    @Override
     public <X> Children groupBy(boolean condition, SFunction<X, ?> column, SFunction<X, ?>... columns) {
         return maybeDo(condition, () -> {
             String one = columnToString(column);
@@ -310,6 +318,28 @@ public abstract class MPJAbstractWrapper<T, Children extends MPJAbstractWrapper<
             }
             final String finalOne = one;
             appendSqlSegments(GROUP_BY, () -> finalOne);
+        });
+    }
+
+    @Override
+    public <R> Children orderByAsc(boolean condition, List<SFunction<R, ?>> columns) {
+        return maybeDo(condition, () -> {
+            final SqlKeyword mode = ASC;
+            if (CollectionUtils.isNotEmpty(columns)) {
+                columns.forEach(c -> appendSqlSegments(ORDER_BY,
+                        columnToSqlSegment(columnSqlInjectFilter(c)), mode));
+            }
+        });
+    }
+
+    @Override
+    public <R> Children orderByDesc(boolean condition, List<SFunction<R, ?>> columns) {
+        return maybeDo(condition, () -> {
+            final SqlKeyword mode = DESC;
+            if (CollectionUtils.isNotEmpty(columns)) {
+                columns.forEach(c -> appendSqlSegments(ORDER_BY,
+                        columnToSqlSegment(columnSqlInjectFilter(c)), mode));
+            }
         });
     }
 

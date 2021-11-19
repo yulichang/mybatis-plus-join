@@ -33,7 +33,7 @@ import java.util.stream.Collectors;
  * @author yulichang
  */
 @Deprecated
-@SuppressWarnings({"DeprecatedIsStillUsed", "unused"})
+@SuppressWarnings("unused")
 public class MPJLambdaQueryWrapper<T> extends AbstractLambdaWrapper<T, MPJLambdaQueryWrapper<T>>
         implements Query<MPJLambdaQueryWrapper<T>, T, SFunction<T, ?>>, MPJJoin<MPJLambdaQueryWrapper<T>> {
 
@@ -130,7 +130,7 @@ public class MPJLambdaQueryWrapper<T> extends AbstractLambdaWrapper<T, MPJLambda
     public final MPJLambdaQueryWrapper<T> selectIgnore(SFunction<T, ?>... columns) {
         if (ArrayUtils.isNotEmpty(columns)) {
             for (SFunction<T, ?> s : columns) {
-                ignoreColumns.add(Constant.TABLE_ALIAS + StringPool.DOT + getColumnCache(s).getColumn());
+                ignoreColumns.add(Constant.TABLE_ALIAS + StringPool.DOT + columnToString(s));
             }
         }
         return typedThis;

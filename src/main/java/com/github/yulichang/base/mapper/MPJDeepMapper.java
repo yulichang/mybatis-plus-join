@@ -474,11 +474,11 @@ public interface MPJDeepMapper<T> extends BaseMapper<T> {
         if (fieldInfo.isMappingEntity()) {
             if (fieldInfo.isFieldIsMap()) {
                 list = ((List<Map<String, Object>>) joinList).stream().filter(j ->
-                        j.get(fieldInfo.getJoinMapKey()).equals(t.get(fieldInfo.getThisMapKey())))
+                                j.get(fieldInfo.getJoinMapKey()).equals(t.get(fieldInfo.getThisMapKey())))
                         .collect(Collectors.toList());
             } else {
                 list = joinList.stream().filter(j ->
-                        fieldInfo.joinFieldGet(j).equals(t.get(fieldInfo.getThisMapKey())))
+                                fieldInfo.joinFieldGet(j).equals(t.get(fieldInfo.getThisMapKey())))
                         .collect(Collectors.toList());
             }
         }
@@ -501,13 +501,23 @@ public interface MPJDeepMapper<T> extends BaseMapper<T> {
             infoWrapper.getConditionList().forEach(c -> wrapper.addCondition(true, c.getColumn(),
                     c.getKeyword(), c.getVal()));
         }
-        wrapper.eq(SqlKeyword.EQ == keyword, column, val)
-                .first(infoWrapper.isHasFirst(), infoWrapper.getFirst())
-                .orderByAsc(infoWrapper.isHasOrderByAsc(), infoWrapper.getOrderByAsc())
-                .orderByDesc(infoWrapper.isHasOrderByDesc(), infoWrapper.getOrderByDesc())
-                .last(infoWrapper.isHasLast(), infoWrapper.getLast());
+        wrapper.eq(SqlKeyword.EQ == keyword, column, val);
+        //此处不用链式调用，提高效率
+        if (infoWrapper.isHasFirst()) {
+            wrapper.first(infoWrapper.getFirst());
+        }
+        if (infoWrapper.isHasOrderByAsc()) {
+            //mybatis plus 3.4.3 之后支持数组，但之前版本仅支持可变参数，为了兼容，多个循环处理
+            infoWrapper.getOrderByAsc().forEach(wrapper::orderByAsc);
+        }
+        if (infoWrapper.isHasOrderByDesc()) {
+            //mybatis plus 3.4.3 之后支持数组，但之前版本仅支持可变参数，为了兼容，多个循环处理
+            infoWrapper.getOrderByAsc().forEach(wrapper::orderByDesc);
+        }
+        if (infoWrapper.isHasLast()) {
+            wrapper.last(infoWrapper.getLast());
+        }
         if (SqlKeyword.IN == keyword) {
-            //由于Java发放调用机制 无法使用链式
             wrapper.in(column, (List<?>) val);
         }
         if (infoWrapper.isHasSelect()) {

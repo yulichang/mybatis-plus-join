@@ -20,7 +20,7 @@ public abstract class MPJAbstractMethod extends AbstractMethod implements MPJBas
      */
     @Override
     protected String sqlWhereEntityWrapper(boolean newLine, TableInfo table) {
-        return whereEntityWrapper(newLine);
+        return mpjSqlWhereEntityWrapper(newLine, table);
     }
 
     @Override

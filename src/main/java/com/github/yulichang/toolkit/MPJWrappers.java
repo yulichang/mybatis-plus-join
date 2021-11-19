@@ -9,17 +9,17 @@ import com.github.yulichang.wrapper.MPJLambdaWrapper;
  * @author yulichang
  */
 @SuppressWarnings("unused")
-public class Wrappers {
+public class MPJWrappers {
 
     /**
-     * Wrappers.<UserDO>queryJoin()
+     * MPJWrappers.<UserDO>queryJoin()
      */
     public static <T> MPJQueryWrapper<T> queryJoin() {
         return new MPJQueryWrapper<>();
     }
 
     /**
-     * Wrappers.<UserDO>lambdaJoin()
+     * MPJWrappers.<UserDO>lambdaJoin()
      */
     public static <T> MPJLambdaWrapper<T> lambdaJoin() {
         return new MPJLambdaWrapper<>();

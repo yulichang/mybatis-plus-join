@@ -13,6 +13,7 @@ import com.baomidou.mybatisplus.core.toolkit.StringPool;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.github.yulichang.query.interfaces.MPJJoin;
 import com.github.yulichang.toolkit.Constant;
+import com.github.yulichang.toolkit.MPJWrappers;
 import org.springframework.util.Assert;
 
 import java.util.ArrayList;
@@ -25,10 +26,10 @@ import java.util.stream.Collectors;
 
 /**
  * copy {@link com.baomidou.mybatisplus.core.conditions.query.QueryWrapper}
- * 推荐使用 Wrappers.<UserDO>queryJoin();构造
+ * 推荐使用 MPJWrappers.<UserDO>queryJoin();构造
  *
  * @author yulichang
- * @see com.github.yulichang.toolkit.Wrappers
+ * @see MPJWrappers
  */
 @SuppressWarnings("unused")
 public class MPJQueryWrapper<T> extends AbstractWrapper<T, String, MPJQueryWrapper<T>>
@@ -177,6 +178,7 @@ public class MPJQueryWrapper<T> extends AbstractWrapper<T, String, MPJQueryWrapp
     /**
      * 返回一个支持 lambda 函数写法的 wrapper
      */
+    @Deprecated
     public MPJLambdaQueryWrapper<T> lambda() {
         return new MPJLambdaQueryWrapper<>(getEntity(), getEntityClass(), from, sqlSelect, paramNameSeq, paramNameValuePairs,
                 expression, lastSql, sqlComment, sqlFirst, selectColumns, ignoreColumns);

@@ -9,6 +9,7 @@ import com.baomidou.mybatisplus.core.toolkit.*;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.github.yulichang.toolkit.Constant;
 import com.github.yulichang.toolkit.LambdaUtils;
+import com.github.yulichang.toolkit.MPJWrappers;
 import com.github.yulichang.wrapper.enums.BaseFuncEnum;
 import com.github.yulichang.wrapper.interfaces.LambdaJoin;
 import com.github.yulichang.wrapper.interfaces.Query;
@@ -28,12 +29,12 @@ import java.util.stream.Collectors;
  * 参考 {@link com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper}
  * Lambda 语法使用 Wrapper
  * <p>
- * 推荐使用 Wrappers.<UserDO>lambdaJoin();构造
+ * 推荐使用 MPJWrappers.<UserDO>lambdaJoin();构造
  *
  * @author yulichang
- * @see com.github.yulichang.toolkit.Wrappers
+ * @see MPJWrappers
  */
-@SuppressWarnings("all")
+@SuppressWarnings("unused")
 public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWrapper<T>>
         implements Query<MPJLambdaWrapper<T>>, LambdaJoin<MPJLambdaWrapper<T>> {
 
@@ -85,7 +86,7 @@ public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWr
     private Class<?> joinClass;
 
     /**
-     * 不建议直接 new 该实例，使用 Wrappers.lambdaQuery()
+     * 不建议直接 new 该实例，使用 MPJWrappers.<UserDO>lambdaQuery()
      */
     public MPJLambdaWrapper() {
         super.initNeed();
@@ -93,7 +94,7 @@ public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWr
 
 
     /**
-     * 不建议直接 new 该实例，使用 Wrappers.lambdaQuery(...)
+     * 不建议直接 new 该实例，使用 MPJWrappers.<UserDO>lambdaQuery()
      */
     MPJLambdaWrapper(T entity, Class<T> entityClass, SharedString sqlSelect, AtomicInteger paramNameSeq,
                      Map<String, Object> paramNameValuePairs, MergeSegments mergeSegments,

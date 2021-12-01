@@ -7,14 +7,10 @@ import com.baomidou.mybatisplus.core.conditions.segments.MergeSegments;
 import com.baomidou.mybatisplus.core.metadata.TableFieldInfo;
 import com.baomidou.mybatisplus.core.metadata.TableInfo;
 import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
-import com.baomidou.mybatisplus.core.toolkit.ArrayUtils;
-import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
-import com.baomidou.mybatisplus.core.toolkit.StringPool;
-import com.baomidou.mybatisplus.core.toolkit.StringUtils;
+import com.baomidou.mybatisplus.core.toolkit.*;
 import com.github.yulichang.query.interfaces.MPJJoin;
 import com.github.yulichang.toolkit.Constant;
 import com.github.yulichang.toolkit.MPJWrappers;
-import org.springframework.util.Assert;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -48,7 +44,7 @@ public class MPJQueryWrapper<T> extends AbstractWrapper<T, String, MPJQueryWrapp
     /**
      * 主表别名
      */
-    private final SharedString alias = new SharedString(Constant.TABLE_ALIAS);
+    private String alias = Constant.TABLE_ALIAS;
 
     /**
      * 查询的列
@@ -113,7 +109,7 @@ public class MPJQueryWrapper<T> extends AbstractWrapper<T, String, MPJQueryWrapp
 
     /**
      * 此方法只能用于主表
-     * 不好含主键
+     * 不含主键
      *
      * @param entityClass 主表class
      * @param predicate   条件lambda
@@ -123,7 +119,7 @@ public class MPJQueryWrapper<T> extends AbstractWrapper<T, String, MPJQueryWrapp
         TableInfo info = TableInfoHelper.getTableInfo(entityClass);
         Assert.notNull(info, "can not find table info");
         selectColumns.addAll(info.getFieldList().stream().filter(predicate).map(c ->
-                Constant.TABLE_ALIAS + StringPool.DOT + c.getColumn()).collect(Collectors.toList()));
+                alias + StringPool.DOT + c.getColumn()).collect(Collectors.toList()));
         return typedThis;
     }
 
@@ -134,7 +130,7 @@ public class MPJQueryWrapper<T> extends AbstractWrapper<T, String, MPJQueryWrapp
      * @param clazz 主表class
      */
     public final MPJQueryWrapper<T> selectAll(Class<T> clazz) {
-        selectAll(clazz, Constant.TABLE_ALIAS);
+        selectAll(clazz, alias);
         return typedThis;
     }
 
@@ -172,7 +168,23 @@ public class MPJQueryWrapper<T> extends AbstractWrapper<T, String, MPJQueryWrapp
     }
 
     public String getAlias() {
-        return alias.getStringValue();
+        return alias;
+    }
+
+    /**
+     * 设置主表别名
+     * 如果要用，请最先调用，
+     * <pre>
+     * 正例  new QueryWrapper().setAlias("a").selectAll(UserDO.class)....
+     * 反例  new QueryWrapper().selectAll(UserDO.class).setAlias("a")....
+     * <pre/>
+     *
+     * @param alias 主表别名
+     */
+    public MPJQueryWrapper<T> setAlias(String alias) {
+        Assert.isTrue(StringUtils.isNotBlank(alias), "别名不能为空");
+        this.alias = alias;
+        return this;
     }
 
     /**

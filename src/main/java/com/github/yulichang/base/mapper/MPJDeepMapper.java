@@ -498,8 +498,16 @@ public interface MPJDeepMapper<T> extends BaseMapper<T> {
         MPJMappingWrapper infoWrapper = fieldInfo.getWrapper();
         MappingQuery<T> wrapper = new MappingQuery<>();
         if (infoWrapper.isHasCondition()) {
-            infoWrapper.getConditionList().forEach(c -> wrapper.addCondition(true, c.getColumn(),
-                    c.getKeyword(), c.getVal()));
+            infoWrapper.getConditionList().forEach(c -> {
+                if (c.getKeyword() == SqlKeyword.BETWEEN) {
+                    wrapper.between(c.getColumn(), c.getVal()[0], c.getVal()[1]);
+                } else if (c.getKeyword() == SqlKeyword.IN) {
+                    wrapper.in(c.getColumn(), (Object[]) c.getVal());
+                } else {
+                    wrapper.addCondition(true, c.getColumn(),
+                            c.getKeyword(), c.getVal()[0]);
+                }
+            });
         }
         wrapper.eq(SqlKeyword.EQ == keyword, column, val);
         //此处不用链式调用，提高效率

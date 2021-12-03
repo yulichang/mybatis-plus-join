@@ -166,7 +166,7 @@ public class MPJTableFieldInfo {
                 .filter(i -> i.getColumn().equals(bindName))
                 .map(TableFieldInfo::getField).findFirst().orElse(null);
         if (field == null && bindName.equals(info.getKeyColumn())) {
-            this.bindField = ReflectionKit.getFieldList(joinClass).stream().filter(f ->
+            field = ReflectionKit.getFieldList(joinClass).stream().filter(f ->
                     f.getName().equals(info.getKeyProperty())).findFirst().orElse(null);
         }
         if (field == null) {

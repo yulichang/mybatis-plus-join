@@ -17,7 +17,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * 字段属性
@@ -162,9 +161,14 @@ public class MPJTableFieldInfo {
     }
 
     private void initBindField(String bindName) {
-        Field field = TableInfoHelper.getTableInfo(this.joinClass).getFieldList().stream()
+        TableInfo info = TableInfoHelper.getTableInfo(this.joinClass);
+        Field field = info.getFieldList().stream()
                 .filter(i -> i.getColumn().equals(bindName))
                 .map(TableFieldInfo::getField).findFirst().orElse(null);
+        if (field == null && bindName.equals(info.getKeyColumn())) {
+            this.bindField = ReflectionKit.getFieldList(joinClass).stream().filter(f ->
+                    f.getName().equals(info.getKeyProperty())).findFirst().orElse(null);
+        }
         if (field == null) {
             throw new MPJException("字段不存在 " + this.joinClass.getName() + " ，" + bindName);
         }

@@ -7,7 +7,6 @@ import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.core.toolkit.Constants;
 import com.baomidou.mybatisplus.core.toolkit.StringPool;
-import com.github.yulichang.config.InterceptorConfig;
 import com.github.yulichang.interfaces.MPJBaseJoin;
 import com.github.yulichang.method.MPJResultType;
 import com.github.yulichang.toolkit.Constant;

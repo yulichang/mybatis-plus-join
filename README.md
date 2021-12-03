@@ -16,12 +16,12 @@ QQ群:1022221898
   <dependency>
       <groupId>com.github.yulichang</groupId>
       <artifactId>mybatis-plus-join</artifactId>
-      <version>1.1.8</version>
+      <version>1.2.0</version>
   </dependency>
   ```
 - Gradle
   ```
-   implementation group: 'com.github.yulichang', name: 'mybatis-plus-join', version: '1.1.8'
+   implementation group: 'com.github.yulichang', name: 'mybatis-plus-join', version: '1.2.0'
   ```
   或者clone代码到本地执行 mvn install, 再引入以上依赖  
   <br>

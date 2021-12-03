@@ -1,38 +1,5 @@
 # mybatis-plus-join
 
-* 本页功能只能在1.2.0测试版中使用,最新版本 1.2.0.Beta6
-
-* 点个Star支持一下吧 :)
-
-QQ群:1022221898
-
-## 使用方法
-
-### 安装
-
-- Maven
-  ```xml
-  <dependency>
-      <groupId>com.github.yulichang</groupId>
-      <artifactId>mybatis-plus-join</artifactId>
-      <version>1.2.0.Beta6</version>
-  </dependency>
-  ```
-- Gradle
-  ```
-   implementation group: 'com.github.yulichang', name: 'mybatis-plus-join', version: '1.2.0.Beta6'
-  ```
-  或者clone代码到本地执行 mvn install, 再引入以上依赖  
-  <br>
-  注意: mybatis plus version >= 3.4.0
-  <br>
-
-### 使用
-
-* mapper继承MPJBaseMapper
-* service继承MPJBaseService (可选)
-* serviceImpl继承MPJBaseServiceImpl (可选)
-
 #### @EntityMapping 和 @FieldMapping 注解
 
 UserDO.java

@@ -36,7 +36,8 @@ public class UserDO {
     @EntityMapping(thisField = "id", joinField = "pid",
             condition = {
                     @MPJMappingCondition(column = "sex", value = "0"),//sex = '0' 默认条件是等于
-                    @MPJMappingCondition(column = "name", value = "张三", keyWord = SqlKeyword.LIKE)},//name like '%a%'
+                    @MPJMappingCondition(column = "name", value = "张三", keyWord = SqlKeyword.LIKE)//name like '%a%'
+            },
             apply = @MPJMappingApply(value = "id between 1 and 20"))//拼接sql 同 wrapper.apply()
     private List<UserDO> childUserCondition;
 

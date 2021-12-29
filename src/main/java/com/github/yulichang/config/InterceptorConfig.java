@@ -14,6 +14,7 @@ import org.apache.ibatis.session.SqlSessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.ApplicationListener;
+import org.springframework.core.annotation.Order;
 
 import java.lang.reflect.Field;
 import java.util.List;
@@ -24,6 +25,7 @@ import java.util.List;
  *
  * @author yulichang
  */
+@Order(Integer.MIN_VALUE)
 @SuppressWarnings("SpringJavaAutowiredMembersInspection")
 public class InterceptorConfig implements ApplicationListener<ApplicationReadyEvent> {
 

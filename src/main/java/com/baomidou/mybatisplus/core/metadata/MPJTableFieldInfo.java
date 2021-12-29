@@ -1,9 +1,9 @@
 package com.baomidou.mybatisplus.core.metadata;
 
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.toolkit.*;
 import com.github.yulichang.annotation.EntityMapping;
 import com.github.yulichang.annotation.FieldMapping;
-import com.github.yulichang.base.MPJBaseMapper;
 import com.github.yulichang.exception.MPJException;
 import com.github.yulichang.toolkit.SpringContentUtils;
 import lombok.EqualsAndHashCode;
@@ -107,7 +107,7 @@ public class MPJTableFieldInfo {
     /**
      * 关联的mapper引用
      */
-    private MPJBaseMapper<?> joinMapper;
+    private BaseMapper<?> joinMapper;
     /**
      * 关联查询条件配置
      */
@@ -269,14 +269,14 @@ public class MPJTableFieldInfo {
         }
     }
 
-    public MPJBaseMapper<?> getJoinMapper() {
+    public BaseMapper<?> getJoinMapper() {
         if (this.joinMapper == null) {
             MPJTableInfo joinTableInfo = MPJTableInfoHelper.getTableInfos().stream().filter(table ->
                     table.getTableInfo().getEntityType() == this.joinClass).findFirst().orElse(null);
             if (joinTableInfo == null) {
                 throw new MPJException("未注册 mapper " + this.joinClass.getName());
             }
-            this.joinMapper = (MPJBaseMapper<?>) SpringContentUtils.getApplicationContext().getBean(joinTableInfo.getMapperClass());
+            this.joinMapper = (BaseMapper<?>) SpringContentUtils.getApplicationContext().getBean(joinTableInfo.getMapperClass());
         }
         return this.joinMapper;
     }

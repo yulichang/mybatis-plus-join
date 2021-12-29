@@ -261,7 +261,7 @@ public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWr
      * select字段
      */
     @Data
-    public static class SelectColumn {
+    private static class SelectColumn {
 
         /**
          * 字段实体类

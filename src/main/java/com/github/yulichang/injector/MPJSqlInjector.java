@@ -29,6 +29,7 @@ import com.github.yulichang.method.mp.SelectPage;
 import org.apache.ibatis.builder.MapperBuilderAssistant;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.core.GenericTypeResolver;
+import org.springframework.core.annotation.Order;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -43,6 +44,7 @@ import static java.util.stream.Collectors.toList;
  * @author yulichang
  * @see DefaultSqlInjector
  */
+@Order(Integer.MIN_VALUE)
 @ConditionalOnMissingBean({DefaultSqlInjector.class, AbstractSqlInjector.class, ISqlInjector.class})
 public class MPJSqlInjector extends DefaultSqlInjector {
 

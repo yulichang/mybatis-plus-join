@@ -1,12 +1,12 @@
 package com.github.yulichang.base.mapper;
 
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.enums.SqlKeyword;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.*;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
+import com.github.yulichang.base.mapper.wrapper.MappingQuery;
 import com.github.yulichang.toolkit.LambdaUtils;
 
 import java.io.Serializable;
@@ -14,6 +14,8 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
+ * 关联查询
+ *
  * @author yulichang
  * @see BaseMapper
  */
@@ -337,7 +339,7 @@ public interface MPJDeepMapper<T> extends BaseMapper<T> {
                 if (!hasProperty || list.contains(fieldInfo.getProperty())) {
                     Object obj = fieldInfo.thisFieldGet(t);
                     if (obj != null) {
-                        List<?> joinList = (List<?>) fieldInfo.getJoinMapper().mpjMappingWrapperConstructor(
+                        List<?> joinList = MappingQuery.mpjQueryList(fieldInfo.getJoinMapper(),
                                 fieldInfo.isFieldIsMap(), SqlKeyword.EQ, fieldInfo.getJoinColumn(), obj, fieldInfo);
                         mpjBindData(t, fieldInfo, joinList);
                         fieldInfo.removeJoinField(joinList);
@@ -369,7 +371,7 @@ public interface MPJDeepMapper<T> extends BaseMapper<T> {
                 if (!hasProperty || list.contains(fieldInfo.getProperty())) {
                     Object obj = map.get(fieldInfo.getThisMapKey());
                     if (obj != null) {
-                        List<?> joinList = (List<?>) fieldInfo.getJoinMapper().mpjMappingWrapperConstructor(
+                        List<?> joinList = MappingQuery.mpjQueryList(fieldInfo.getJoinMapper(),
                                 fieldInfo.isFieldIsMap(), SqlKeyword.EQ, fieldInfo.getJoinColumn(), obj, fieldInfo);
                         mpjBindMap(map, fieldInfo, joinList);
                         fieldInfo.removeJoinField(joinList);
@@ -401,7 +403,7 @@ public interface MPJDeepMapper<T> extends BaseMapper<T> {
                 if (!hasProperty || listProperty.contains(fieldInfo.getProperty())) {
                     List<Object> itemList = list.stream().map(fieldInfo::thisFieldGet).collect(Collectors.toList());
                     if (CollectionUtils.isNotEmpty(itemList)) {
-                        List<?> joinList = (List<?>) fieldInfo.getJoinMapper().mpjMappingWrapperConstructor(
+                        List<?> joinList = MappingQuery.mpjQueryList(fieldInfo.getJoinMapper(),
                                 fieldInfo.isMappingEntity() && fieldInfo.isFieldIsMap(), SqlKeyword.IN,
                                 fieldInfo.getJoinColumn(), itemList, fieldInfo);
                         list.forEach(i -> mpjBindData(i, fieldInfo, joinList));
@@ -437,7 +439,7 @@ public interface MPJDeepMapper<T> extends BaseMapper<T> {
                     List<Object> itemList = list.stream().map(m -> m.get(fieldInfo.getThisMapKey()))
                             .collect(Collectors.toList());
                     if (CollectionUtils.isNotEmpty(itemList)) {
-                        List<?> joinList = (List<?>) fieldInfo.getJoinMapper().mpjMappingWrapperConstructor(
+                        List<?> joinList = MappingQuery.mpjQueryList(fieldInfo.getJoinMapper(),
                                 fieldInfo.isMappingEntity() && fieldInfo.isFieldIsMap(), SqlKeyword.IN,
                                 fieldInfo.getJoinColumn(), itemList, fieldInfo);
                         list.forEach(i -> mpjBindMap(i, fieldInfo, joinList));
@@ -487,66 +489,5 @@ public interface MPJDeepMapper<T> extends BaseMapper<T> {
                     t.get(fieldInfo.getThisMapKey()))).map(fieldInfo::bindFieldGet).collect(Collectors.toList());
         }
         MPJTableFieldInfo.bindMap(fieldInfo, t, list);
-    }
-
-    /**
-     * 映射 wrapper 构造器
-     * 仅对使用映射注解时使用
-     */
-    default Object mpjMappingWrapperConstructor(boolean selectMap, SqlKeyword keyword,
-                                                String column, Object val, MPJTableFieldInfo fieldInfo) {
-        MPJMappingWrapper infoWrapper = fieldInfo.getWrapper();
-        MappingQuery<T> wrapper = new MappingQuery<>();
-        if (infoWrapper.isHasCondition()) {
-            infoWrapper.getConditionList().forEach(c -> {
-                if (c.getKeyword() == SqlKeyword.BETWEEN) {
-                    wrapper.between(c.getColumn(), c.getVal()[0], c.getVal()[1]);
-                } else if (c.getKeyword() == SqlKeyword.IN) {
-                    wrapper.in(c.getColumn(), (Object[]) c.getVal());
-                } else {
-                    wrapper.addCondition(true, c.getColumn(),
-                            c.getKeyword(), c.getVal()[0]);
-                }
-            });
-        }
-        wrapper.eq(SqlKeyword.EQ == keyword, column, val);
-        //此处不用链式调用，提高效率
-        if (infoWrapper.isHasFirst()) {
-            wrapper.first(infoWrapper.getFirst());
-        }
-        if (infoWrapper.isHasOrderByAsc()) {
-            //mybatis plus 3.4.3 之后支持数组，但之前版本仅支持可变参数，为了兼容，多个循环处理
-            infoWrapper.getOrderByAsc().forEach(wrapper::orderByAsc);
-        }
-        if (infoWrapper.isHasOrderByDesc()) {
-            //mybatis plus 3.4.3 之后支持数组，但之前版本仅支持可变参数，为了兼容，多个循环处理
-            infoWrapper.getOrderByAsc().forEach(wrapper::orderByDesc);
-        }
-        if (infoWrapper.isHasLast()) {
-            wrapper.last(infoWrapper.getLast());
-        }
-        if (SqlKeyword.IN == keyword) {
-            wrapper.in(column, (List<?>) val);
-        }
-        if (infoWrapper.isHasSelect()) {
-            wrapper.select(infoWrapper.getSelect());
-        }
-        if (infoWrapper.isHasApply()) {
-            infoWrapper.getApplyList().forEach(a -> wrapper.apply(a.getSql(), (Object[]) a.getVal()));
-        }
-        if (selectMap) {
-            return selectMaps(wrapper);
-        }
-        return selectList(wrapper);
-    }
-
-    /**
-     * 公开 addCondition 方法
-     */
-    class MappingQuery<T> extends QueryWrapper<T> {
-        @Override
-        public QueryWrapper<T> addCondition(boolean condition, String column, SqlKeyword sqlKeyword, Object val) {
-            return super.addCondition(condition, column, sqlKeyword, val);
-        }
     }
 }

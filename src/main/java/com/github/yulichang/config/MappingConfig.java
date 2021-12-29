@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.metadata.MPJTableMapperHelper;
 import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.ApplicationListener;
+import org.springframework.core.annotation.Order;
 
 /**
  * 关系映射配置
@@ -12,6 +13,7 @@ import org.springframework.context.ApplicationListener;
  * @author yulichang
  * @since 1.2.0
  */
+@Order(Integer.MIN_VALUE)
 public class MappingConfig implements ApplicationListener<ApplicationReadyEvent> {
 
     @Override

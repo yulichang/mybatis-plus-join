@@ -33,7 +33,7 @@ public class InterceptorConfig implements ApplicationListener<ApplicationReadyEv
 
     @Autowired(required = false)
     private List<SqlSessionFactory> sqlSessionFactoryList;
-    @Autowired
+    @Autowired(required = false)
     private MPJInterceptor mpjInterceptor;
     @Autowired(required = false)
     private ISqlInjector iSqlInjector;

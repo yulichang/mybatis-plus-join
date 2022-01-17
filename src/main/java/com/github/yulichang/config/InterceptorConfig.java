@@ -14,10 +14,10 @@ import org.apache.ibatis.session.SqlSessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.ApplicationListener;
-import org.springframework.core.annotation.Order;
 
 import java.lang.reflect.Field;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * 拦截器配置类 如果配置了分页插件,可能会使拦截器失效
@@ -25,7 +25,6 @@ import java.util.List;
  *
  * @author yulichang
  */
-@Order(Integer.MIN_VALUE)
 @SuppressWarnings("SpringJavaAutowiredMembersInspection")
 public class InterceptorConfig implements ApplicationListener<ApplicationReadyEvent> {
 
@@ -41,7 +40,7 @@ public class InterceptorConfig implements ApplicationListener<ApplicationReadyEv
     @Override
     @SuppressWarnings("unchecked")
     public void onApplicationEvent(ApplicationReadyEvent event) {
-        if (CollectionUtils.isNotEmpty(sqlSessionFactoryList)) {
+        if (CollectionUtils.isNotEmpty(sqlSessionFactoryList) && Objects.nonNull(mpjInterceptor)) {
             try {
                 for (SqlSessionFactory factory : sqlSessionFactoryList) {
                     Field interceptorChain = Configuration.class.getDeclaredField("interceptorChain");

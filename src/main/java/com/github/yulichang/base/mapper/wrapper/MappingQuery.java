@@ -49,7 +49,7 @@ public class MappingQuery<T> extends QueryWrapper<T> {
         }
         if (infoWrapper.isHasOrderByDesc()) {
             //mybatis plus 3.4.3 之后支持数组，但之前版本仅支持可变参数，为了兼容，多个循环处理
-            infoWrapper.getOrderByAsc().forEach(wrapper::orderByDesc);
+            infoWrapper.getOrderByDesc().forEach(wrapper::orderByDesc);
         }
         if (infoWrapper.isHasLast()) {
             wrapper.last(infoWrapper.getLast());

@@ -56,6 +56,11 @@ public class MPJQueryWrapper<T> extends AbstractWrapper<T, String, MPJQueryWrapp
      */
     private List<String> ignoreColumns = new ArrayList<>();
 
+    /**
+     * 是否 select distinct
+     */
+    private boolean selectDistinct = false;
+
 
     public MPJQueryWrapper() {
         super.initNeed();
@@ -83,6 +88,15 @@ public class MPJQueryWrapper<T> extends AbstractWrapper<T, String, MPJQueryWrapp
         this.sqlFirst = sqlFirst;
         this.selectColumns = selectColumns;
         this.ignoreColumns = ignoreColumns;
+    }
+
+    /**
+     * sql去重
+     * select distinct
+     */
+    public MPJQueryWrapper<T> distinct() {
+        this.selectDistinct = true;
+        return typedThis;
     }
 
     @Override
@@ -162,6 +176,9 @@ public class MPJQueryWrapper<T> extends AbstractWrapper<T, String, MPJQueryWrapp
         return sqlSelect.getStringValue();
     }
 
+    public boolean getSelectDistinct() {
+        return selectDistinct;
+    }
 
     public String getFrom() {
         return from.getStringValue();

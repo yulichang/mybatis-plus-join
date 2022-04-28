@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.core.metadata.TableInfo;
 import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
 import com.baomidou.mybatisplus.core.toolkit.*;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
+import com.github.yulichang.query.MPJQueryWrapper;
 import com.github.yulichang.toolkit.Constant;
 import com.github.yulichang.toolkit.LambdaUtils;
 import com.github.yulichang.toolkit.MPJWrappers;
@@ -64,6 +65,11 @@ public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWr
     private final List<SelectColumn> ignoreColumns = new ArrayList<>();
 
     /**
+     * 是否 select distinct
+     */
+    private boolean selectDistinct = false;
+
+    /**
      * 表序号
      */
     private int tableIndex = 1;
@@ -112,6 +118,16 @@ public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWr
         this.subTable = subTable;
         this.keyWord = keyWord;
         this.joinClass = joinClass;
+    }
+
+
+    /**
+     * sql去重
+     * select distinct
+     */
+    public MPJLambdaWrapper<T> distinct() {
+        this.selectDistinct = true;
+        return typedThis;
     }
 
     @Override
@@ -219,6 +235,11 @@ public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWr
 
     public String getAlias() {
         return alias.getStringValue();
+    }
+
+
+    public boolean getSelectDistinct() {
+        return selectDistinct;
     }
 
     /**

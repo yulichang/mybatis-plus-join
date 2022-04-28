@@ -2,6 +2,7 @@ package com.github.yulichang.method.mp;
 
 import com.baomidou.mybatisplus.core.metadata.MPJTableInfoHelper;
 import com.baomidou.mybatisplus.core.metadata.TableInfo;
+import com.baomidou.mybatisplus.core.toolkit.StringPool;
 import com.baomidou.mybatisplus.core.toolkit.sql.SqlScriptUtils;
 import com.github.yulichang.toolkit.Constant;
 import org.apache.ibatis.mapping.MappedStatement;
@@ -21,5 +22,12 @@ public class SelectMapsPage extends com.baomidou.mybatisplus.core.injector.metho
     protected String sqlWhereEntityWrapper(boolean newLine, TableInfo table) {
         return SqlScriptUtils.convertChoose(String.format("%s == null or !%s", Constant.PARAM_TYPE, Constant.PARAM_TYPE),
                 super.sqlWhereEntityWrapper(newLine, table), mpjSqlWhereEntityWrapper(newLine, table));
+    }
+
+    @Override
+    protected String sqlSelectColumns(TableInfo table, boolean queryWrapper) {
+        String selectColumns = super.sqlSelectColumns(table, queryWrapper);
+        return SqlScriptUtils.convertChoose(String.format("%s == null or !%s", Constant.PARAM_TYPE, Constant.PARAM_TYPE),
+                selectColumns, mpjSqlSelectColumns() + StringPool.SPACE + selectColumns);
     }
 }

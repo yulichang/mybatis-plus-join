@@ -15,26 +15,17 @@ public interface MPJBaseMethod extends Constants {
     default String mpjSqlWhereEntityWrapper(boolean newLine, TableInfo table) {
         if (table.isWithLogicDelete()) {
             String sqlScript = (NEWLINE + getLogicDeleteSql(table, true, true) + NEWLINE);
-            String normalSqlScript = SqlScriptUtils.convertIf(String.format("AND ${%s}", WRAPPER_SQLSEGMENT),
-                    String.format("%s != null and %s != '' and %s", WRAPPER_SQLSEGMENT, WRAPPER_SQLSEGMENT,
-                            WRAPPER_NONEMPTYOFNORMAL), true);
+            String normalSqlScript = SqlScriptUtils.convertIf(String.format("AND ${%s}", WRAPPER_SQLSEGMENT), String.format("%s != null and %s != '' and %s", WRAPPER_SQLSEGMENT, WRAPPER_SQLSEGMENT, WRAPPER_NONEMPTYOFNORMAL), true);
             normalSqlScript += NEWLINE;
-            normalSqlScript += SqlScriptUtils.convertIf(String.format(" ${%s}", WRAPPER_SQLSEGMENT),
-                    String.format("%s != null and %s != '' and %s", WRAPPER_SQLSEGMENT, WRAPPER_SQLSEGMENT,
-                            WRAPPER_EMPTYOFNORMAL), true);
+            normalSqlScript += SqlScriptUtils.convertIf(String.format(" ${%s}", WRAPPER_SQLSEGMENT), String.format("%s != null and %s != '' and %s", WRAPPER_SQLSEGMENT, WRAPPER_SQLSEGMENT, WRAPPER_EMPTYOFNORMAL), true);
             sqlScript += normalSqlScript;
-            sqlScript = SqlScriptUtils.convertChoose(String.format("%s != null", WRAPPER), sqlScript,
-                    table.getLogicDeleteSql(false, true));
+            sqlScript = SqlScriptUtils.convertChoose(String.format("%s != null", WRAPPER), sqlScript, table.getLogicDeleteSql(false, true));
             sqlScript = SqlScriptUtils.convertWhere(sqlScript);
             return newLine ? NEWLINE + sqlScript : sqlScript;
         } else {
-            String sqlScript = SqlScriptUtils.convertIf(String.format("${%s}", WRAPPER_SQLSEGMENT),
-                    String.format("%s != null and %s != '' and %s", WRAPPER_SQLSEGMENT, WRAPPER_SQLSEGMENT,
-                            WRAPPER_NONEMPTYOFWHERE), true);
+            String sqlScript = SqlScriptUtils.convertIf(String.format("${%s}", WRAPPER_SQLSEGMENT), String.format("%s != null and %s != '' and %s", WRAPPER_SQLSEGMENT, WRAPPER_SQLSEGMENT, WRAPPER_NONEMPTYOFWHERE), true);
             sqlScript = SqlScriptUtils.convertWhere(sqlScript) + NEWLINE;
-            sqlScript += SqlScriptUtils.convertIf(String.format(" ${%s}", WRAPPER_SQLSEGMENT),
-                    String.format("%s != null and %s != '' and %s", WRAPPER_SQLSEGMENT, WRAPPER_SQLSEGMENT,
-                            WRAPPER_EMPTYOFWHERE), true);
+            sqlScript += SqlScriptUtils.convertIf(String.format(" ${%s}", WRAPPER_SQLSEGMENT), String.format("%s != null and %s != '' and %s", WRAPPER_SQLSEGMENT, WRAPPER_SQLSEGMENT, WRAPPER_EMPTYOFWHERE), true);
             sqlScript = SqlScriptUtils.convertIf(sqlScript, String.format("%s != null", WRAPPER), true);
             return newLine ? NEWLINE + sqlScript : sqlScript;
         }
@@ -54,14 +45,12 @@ public interface MPJBaseMethod extends Constants {
 
 
     default String formatLogicDeleteSql(TableInfo tableInfo, boolean isWhere) {
-        final String value = isWhere ? tableInfo.getLogicDeleteFieldInfo().getLogicNotDeleteValue() :
-                tableInfo.getLogicDeleteFieldInfo().getLogicDeleteValue();
+        final String value = isWhere ? tableInfo.getLogicDeleteFieldInfo().getLogicNotDeleteValue() : tableInfo.getLogicDeleteFieldInfo().getLogicDeleteValue();
         if (isWhere) {
             if (NULL.equalsIgnoreCase(value)) {
                 return "${ew.alias}." + tableInfo.getLogicDeleteFieldInfo().getColumn() + " IS NULL";
             } else {
-                return "${ew.alias}." + tableInfo.getLogicDeleteFieldInfo().getColumn() + EQUALS + String.format(
-                        tableInfo.getLogicDeleteFieldInfo().isCharSequence() ? "'%s'" : "%s", value);
+                return "${ew.alias}." + tableInfo.getLogicDeleteFieldInfo().getColumn() + EQUALS + String.format(tableInfo.getLogicDeleteFieldInfo().isCharSequence() ? "'%s'" : "%s", value);
             }
         }
         final String targetStr = "${ew.alias}." + tableInfo.getLogicDeleteFieldInfo().getColumn() + EQUALS;
@@ -70,6 +59,10 @@ public interface MPJBaseMethod extends Constants {
         } else {
             return targetStr + String.format(tableInfo.getLogicDeleteFieldInfo().isCharSequence() ? "'%s'" : "%s", value);
         }
+    }
+
+    default String mpjSqlSelectColumns() {
+        return SqlScriptUtils.convertIf("DISTINCT", "ew.selectDistinct", false);
     }
 
 }

@@ -39,7 +39,6 @@ import java.util.concurrent.ConcurrentHashMap;
  *
  * @author yulichang
  */
-@Order(Integer.MIN_VALUE)
 @Intercepts(@Signature(type = Executor.class, method = "query", args = {MappedStatement.class, Object.class, RowBounds.class, ResultHandler.class}))
 public class MPJInterceptor implements Interceptor {
     private static final Log logger = LogFactory.getLog(MPJInterceptor.class);

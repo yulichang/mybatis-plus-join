@@ -97,7 +97,8 @@ WHERE (
 * 默认主表别名是t,其他的表别名以先后调用的顺序使用t1,t2,t3....
 * 条件查询,可以查询主表以及参与连接的所有表的字段,全部调用mp原生的方法,正常使用没有sql注入风险
 
-MPJLambdaWrapper其他功能    
+MPJLambdaWrapper其他功能
+
 * [简单的SQL函数使用](https://gitee.com/best_handsome/mybatis-plus-join/wikis/selectFunc()?sort_id=4082479)
 * [ON语句多条件支持](https://gitee.com/best_handsome/mybatis-plus-join/wikis/leftJoin?sort_id=3496671)
 
@@ -276,6 +277,39 @@ WHERE (
     AND a.province <= ?)
 ORDER BY
     addr.id DESC
+```
+
+#### 指定返回列实体类，按需要返回列
+
+```java
+
+class test {
+    @Resource
+    private UserMapper userMapper;
+
+    void testJoin() {
+        IPage<UserDTO> page = userMapper.selectJoinPage(new Page<>(1, 10), UserVo.class,
+                new MPJQueryWrapper<UserDO>()
+                        .selectAsClass(UserDO.class, UserVo.class);
+    }
+}
+```
+
+说明：
+比如我们需要查询用户表有10个字段，然而我们只需要3个就够了，用mybatis-plus提供的select
+需要一个属性一个属性填入很不优雅，现在我们可以用selectAsClass(UserDO.class, UserVo.class)
+；即可按所需的UserVo返回，前提是UserVo.class中的属性必须是UserDO.class中存在的
+
+对应sql
+
+```
+SELECT 
+    t.id,
+    t.name,
+    t.sex
+FROM 
+    user t
+LIMIT ?,?
 ```
 
 # [wiki](https://gitee.com/best_handsome/mybatis-plus-join/wikis)

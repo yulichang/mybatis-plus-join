@@ -15,6 +15,7 @@ public enum DefaultFuncEnum implements BaseFuncEnum {
 
     SUM("SUM(%s)"),
     COUNT("COUNT(%s)"),
+    COUNT_DISTINCT("COUNT(DISTINCT %s)"),
     MAX("MAX(%s)"),
     MIN("MIN(%s)"),
     AVG("AVG(%s)"),

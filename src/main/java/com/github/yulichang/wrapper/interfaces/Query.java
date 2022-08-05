@@ -191,6 +191,49 @@ public interface Query<Children> extends Serializable {
     }
 
     /**
+     * COUNT(DISTINCT)
+     */
+    default <S> Children selectCountDistinct(SFunction<S, ?> column) {
+        return selectFunc(DefaultFuncEnum.COUNT_DISTINCT, column);
+    }
+
+    default <X> Children selectCountDistinct(Object column, SFunction<X, ?> alias) {
+        return selectFunc(DefaultFuncEnum.COUNT_DISTINCT, column, alias);
+    }
+
+    default Children selectCountDistinct(Object column, String alias) {
+        return selectFunc(DefaultFuncEnum.COUNT_DISTINCT, column, alias);
+    }
+
+    default <S, X> Children selectCountDistinct(SFunction<S, ?> column, SFunction<X, ?> alias) {
+        return selectFunc(DefaultFuncEnum.COUNT_DISTINCT, column, alias);
+    }
+
+    default <S, X> Children selectCountDistinct(SFunction<S, ?> column, String alias) {
+        return selectFunc(DefaultFuncEnum.COUNT_DISTINCT, column, alias);
+    }
+
+    default <S> Children selectCountDistinct(boolean condition, SFunction<S, ?> column) {
+        return selectFunc(condition, DefaultFuncEnum.COUNT_DISTINCT, column);
+    }
+
+    default <X> Children selectCountDistinct(boolean condition, Object column, SFunction<X, ?> alias) {
+        return selectFunc(condition, DefaultFuncEnum.COUNT_DISTINCT, column, alias);
+    }
+
+    default Children selectCountDistinct(boolean condition, Object column, String alias) {
+        return selectFunc(condition, DefaultFuncEnum.COUNT_DISTINCT, column, alias);
+    }
+
+    default <S, X> Children selectCountDistinct(boolean condition, SFunction<S, ?> column, SFunction<X, ?> alias) {
+        return selectFunc(condition, DefaultFuncEnum.COUNT_DISTINCT, column, alias);
+    }
+
+    default <S, X> Children selectCountDistinct(boolean condition, SFunction<S, ?> column, String alias) {
+        return selectFunc(condition, DefaultFuncEnum.COUNT_DISTINCT, column, alias);
+    }
+
+    /**
      * MAX()
      */
     default <S> Children selectMax(SFunction<S, ?> column) {

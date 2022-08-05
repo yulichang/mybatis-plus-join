@@ -2,12 +2,12 @@ package com.github.yulichang.wrapper;
 
 import com.baomidou.mybatisplus.core.conditions.SharedString;
 import com.baomidou.mybatisplus.core.conditions.segments.MergeSegments;
+import com.baomidou.mybatisplus.core.metadata.MPJResultHelper;
 import com.baomidou.mybatisplus.core.metadata.TableFieldInfo;
 import com.baomidou.mybatisplus.core.metadata.TableInfo;
 import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
 import com.baomidou.mybatisplus.core.toolkit.*;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
-import com.github.yulichang.query.MPJQueryWrapper;
 import com.github.yulichang.toolkit.Constant;
 import com.github.yulichang.toolkit.LambdaUtils;
 import com.github.yulichang.toolkit.MPJWrappers;
@@ -18,10 +18,7 @@ import com.github.yulichang.wrapper.interfaces.on.OnFunction;
 import lombok.Data;
 import lombok.Getter;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -40,45 +37,37 @@ public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWr
         implements Query<MPJLambdaWrapper<T>>, LambdaJoin<MPJLambdaWrapper<T>> {
 
     /**
-     * 查询字段 sql
-     */
-    private SharedString sqlSelect = new SharedString();
-
-    /**
      * 查询表
      */
     private final SharedString from = new SharedString();
-
     /**
      * 主表别名
      */
     private final SharedString alias = new SharedString(Constant.TABLE_ALIAS);
-
     /**
      * 查询的字段
      */
     private final List<SelectColumn> selectColumns = new ArrayList<>();
-
     /**
      * 忽略查询的字段
      */
     private final List<SelectColumn> ignoreColumns = new ArrayList<>();
-
-    /**
-     * 是否 select distinct
-     */
-    private boolean selectDistinct = false;
-
-    /**
-     * 表序号
-     */
-    private int tableIndex = 1;
-
     /**
      * ON sql wrapper集合
      */
     private final List<MPJLambdaWrapper<?>> onWrappers = new ArrayList<>();
-
+    /**
+     * 查询字段 sql
+     */
+    private SharedString sqlSelect = new SharedString();
+    /**
+     * 是否 select distinct
+     */
+    private boolean selectDistinct = false;
+    /**
+     * 表序号
+     */
+    private int tableIndex = 1;
     /**
      * 连表关键字 on 条件 func 使用
      */
@@ -147,6 +136,15 @@ public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWr
         Assert.notNull(info, "table can not be find");
         info.getFieldList().stream().filter(predicate).collect(Collectors.toList()).forEach(
                 i -> selectColumns.add(SelectColumn.of(entityClass, i.getColumn())));
+        return typedThis;
+    }
+
+    public <E> MPJLambdaWrapper<T> selectAsClass(Class<E> sourceEntityClass, Class<?> resultEntityClass) {
+        TableInfo info = TableInfoHelper.getTableInfo(sourceEntityClass);
+        Assert.notNull(info, "table can not be find");
+        Set<String> voTableInfo = MPJResultHelper.getVoTableInfo(sourceEntityClass, resultEntityClass);
+        Assert.notNull(info, "table can not be find");
+        voTableInfo.forEach(i -> selectColumns.add(SelectColumn.of(sourceEntityClass, i)));
         return typedThis;
     }
 

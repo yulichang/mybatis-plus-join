@@ -139,12 +139,13 @@ public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWr
         return typedThis;
     }
 
-    public <E> MPJLambdaWrapper<T> selectAsClass(Class<E> sourceEntityClass, Class<?> resultEntityClass) {
-        TableInfo info = TableInfoHelper.getTableInfo(sourceEntityClass);
-        Assert.notNull(info, "table can not be find");
-        Set<String> voTableInfo = MPJResultHelper.getVoTableInfo(sourceEntityClass, resultEntityClass);
-        Assert.notNull(info, "table can not be find");
-        voTableInfo.forEach(i -> selectColumns.add(SelectColumn.of(sourceEntityClass, i)));
+    public <E> MPJLambdaWrapper<T> selectAsClass(Class<?> resultEntityClass, Class<?>... sourceEntityClass) {
+        Map<String, Set<String>> voTableInfo = MPJResultHelper.getVoTableInfo(resultEntityClass, sourceEntityClass);
+        Assert.notNull(voTableInfo, "table can not be find");
+        for (Class<?> entityClass : sourceEntityClass) {
+            Set<String> columns = voTableInfo.get(entityClass.getName());
+            columns.forEach(i -> selectColumns.add(SelectColumn.of(entityClass, i)));
+        }
         return typedThis;
     }
 

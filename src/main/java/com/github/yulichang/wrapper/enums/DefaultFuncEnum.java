@@ -12,7 +12,8 @@ package com.github.yulichang.wrapper.enums;
  * @author yulichang
  */
 public enum DefaultFuncEnum implements BaseFuncEnum {
-
+    DATE_FORMAT_Y_M_D("DATE_FORMAT(%s,'%%Y-%%m-%%d')"),
+    DATE_FORMAT_Y_M("DATE_FORMAT(%s,'%%Y-%%m')"),
     SUM("SUM(%s)"),
     COUNT("COUNT(%s)"),
     COUNT_DISTINCT("COUNT(DISTINCT %s)"),

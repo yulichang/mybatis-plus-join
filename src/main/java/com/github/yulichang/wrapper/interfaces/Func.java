@@ -187,6 +187,8 @@ public interface Func<Children> extends Serializable {
      */
     <R> Children groupBy(boolean condition, List<SFunction<R, ?>> columns);
 
+    <R> Children groupBy(String... columns);
+
     /**
      * ignore
      */

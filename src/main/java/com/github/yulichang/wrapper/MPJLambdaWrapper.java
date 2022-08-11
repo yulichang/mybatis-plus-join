@@ -23,6 +23,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+import static com.baomidou.mybatisplus.core.enums.SqlKeyword.GROUP_BY;
+
 /**
  * 参考 {@link com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper}
  * Lambda 语法使用 Wrapper
@@ -275,6 +277,15 @@ public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWr
             tableIndex++;
         }
         return typedThis;
+    }
+
+    @Override
+    public <R> MPJLambdaWrapper<T> groupBy(String... columns) {
+        return maybeDo(true, () -> {
+            final String finalOne = String.join(StringPool.COMMA, columns);
+            ;
+            appendSqlSegments(GROUP_BY, () -> finalOne);
+        });
     }
 
     /**

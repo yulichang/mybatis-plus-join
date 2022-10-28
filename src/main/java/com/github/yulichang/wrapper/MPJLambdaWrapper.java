@@ -2,7 +2,6 @@ package com.github.yulichang.wrapper;
 
 import com.baomidou.mybatisplus.core.conditions.SharedString;
 import com.baomidou.mybatisplus.core.conditions.segments.MergeSegments;
-import com.baomidou.mybatisplus.core.metadata.MPJResultHelper;
 import com.baomidou.mybatisplus.core.metadata.TableFieldInfo;
 import com.baomidou.mybatisplus.core.metadata.TableInfo;
 import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
@@ -11,6 +10,7 @@ import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.github.yulichang.toolkit.Constant;
 import com.github.yulichang.toolkit.LambdaUtils;
 import com.github.yulichang.toolkit.MPJWrappers;
+import com.github.yulichang.toolkit.ReflectionKit;
 import com.github.yulichang.wrapper.enums.BaseFuncEnum;
 import com.github.yulichang.wrapper.interfaces.LambdaJoin;
 import com.github.yulichang.wrapper.interfaces.Query;
@@ -18,12 +18,14 @@ import com.github.yulichang.wrapper.interfaces.on.OnFunction;
 import lombok.Data;
 import lombok.Getter;
 
-import java.util.*;
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-
-import static com.baomidou.mybatisplus.core.enums.SqlKeyword.GROUP_BY;
 
 /**
  * 参考 {@link com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper}
@@ -141,12 +143,18 @@ public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWr
         return typedThis;
     }
 
-    public <E> MPJLambdaWrapper<T> selectAsClass(Class<?> resultEntityClass, Class<?>... sourceEntityClass) {
-        Map<String, Set<String>> voTableInfo = MPJResultHelper.getVoTableInfo(resultEntityClass, sourceEntityClass);
-        Assert.notNull(voTableInfo, "table can not be find");
-        for (Class<?> entityClass : sourceEntityClass) {
-            Set<String> columns = voTableInfo.get(entityClass.getName());
-            columns.forEach(i -> selectColumns.add(SelectColumn.of(entityClass, i)));
+    @Override
+    public <E> MPJLambdaWrapper<T> selectAsClass(Class<E> source, Class<?> tag) {
+        TableInfo tableInfo = TableInfoHelper.getTableInfo(source);
+        Assert.notNull(tableInfo, "table can not be find");
+        List<Field> tagFields = ReflectionKit.getFieldList(tag);
+        tableInfo.getFieldList().forEach(i -> {
+            if (tagFields.stream().anyMatch(f -> f.getName().equals(i.getProperty()))) {
+                selectColumns.add(SelectColumn.of(source, i.getColumn()));
+            }
+        });
+        if (tableInfo.havePK() && tagFields.stream().anyMatch(i -> i.getName().equals(tableInfo.getKeyProperty()))) {
+            selectColumns.add(SelectColumn.of(source, tableInfo.getKeyProperty()));
         }
         return typedThis;
     }
@@ -277,15 +285,6 @@ public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWr
             tableIndex++;
         }
         return typedThis;
-    }
-
-    @Override
-    public <R> MPJLambdaWrapper<T> groupBy(String... columns) {
-        return maybeDo(true, () -> {
-            final String finalOne = String.join(StringPool.COMMA, columns);
-            ;
-            appendSqlSegments(GROUP_BY, () -> finalOne);
-        });
     }
 
     /**

@@ -279,39 +279,6 @@ ORDER BY
     addr.id DESC
 ```
 
-#### 指定返回列实体类，按需要返回列
-
-```java
-
-class test {
-    @Resource
-    private UserMapper userMapper;
-
-    void testJoin() {
-        IPage<UserDTO> page = userMapper.selectJoinPage(new Page<>(1, 10), UserVo.class,
-                new MPJQueryWrapper<UserDO>()
-                        .selectAsClass(UserDO.class, UserVo.class);
-    }
-}
-```
-
-说明：
-比如我们需要查询用户表有10个字段，然而我们只需要3个就够了，用mybatis-plus提供的select
-需要一个属性一个属性填入很不优雅，现在我们可以用selectAsClass(UserDO.class, UserVo.class)
-；即可按所需的UserVo返回，前提是UserVo.class中的属性必须是UserDO.class中存在的
-
-对应sql
-
-```
-SELECT 
-    t.id,
-    t.name,
-    t.sex
-FROM 
-    user t
-LIMIT ?,?
-```
-
 # [wiki](https://gitee.com/best_handsome/mybatis-plus-join/wikis)
 
 

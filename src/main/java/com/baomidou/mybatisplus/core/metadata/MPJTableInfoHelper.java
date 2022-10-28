@@ -21,6 +21,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -561,13 +562,16 @@ public class MPJTableInfoHelper {
             //反射拷贝对象
             Field[] fields = TableInfo.class.getDeclaredFields();
             for (Field f : fields) {
-                f.setAccessible(true);
-                f.set(table, f.get(tableInfo));
+//                jacoco 等测试覆盖率框架可能会增强TableInfo字节码，增加static字段
+                if (!Modifier.isStatic(f.getModifiers())) {
+                    f.setAccessible(true);
+                    f.set(table, f.get(tableInfo));
+                }
             }
             table.setTableName(tableName);
             return table;
         } catch (Exception e) {
-            throw new MPJException("TableInfo 对象拷贝失败 -> " + tableInfo.getEntityType().getName());
+            throw new MPJException("TableInfo 对象拷贝失败 -> " + tableInfo.getEntityType().getName(),e);
         }
     }
 }

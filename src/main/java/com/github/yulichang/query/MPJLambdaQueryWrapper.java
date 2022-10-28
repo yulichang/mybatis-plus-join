@@ -35,7 +35,7 @@ import java.util.stream.Collectors;
 @Deprecated
 @SuppressWarnings("unused")
 public class MPJLambdaQueryWrapper<T> extends AbstractLambdaWrapper<T, MPJLambdaQueryWrapper<T>>
-        implements Query<MPJLambdaQueryWrapper<T>, T, SFunction<T, ?>>, MPJJoin<MPJLambdaQueryWrapper<T>> {
+        implements Query<MPJLambdaQueryWrapper<T>, T, SFunction<T, ?>>, MPJJoin<MPJLambdaQueryWrapper<T>, T> {
 
     /**
      * 查询字段

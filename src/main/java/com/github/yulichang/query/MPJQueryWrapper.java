@@ -29,7 +29,7 @@ import java.util.stream.Collectors;
  */
 @SuppressWarnings("unused")
 public class MPJQueryWrapper<T> extends AbstractWrapper<T, String, MPJQueryWrapper<T>>
-        implements Query<MPJQueryWrapper<T>, T, String>, MPJJoin<MPJQueryWrapper<T>> {
+        implements Query<MPJQueryWrapper<T>, T, String>, MPJJoin<MPJQueryWrapper<T>, T> {
 
     /**
      * 查询字段

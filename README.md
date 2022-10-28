@@ -1,9 +1,8 @@
 # mybatis-plus-join
 
-* 支持连表查询的 [mybatis-plus](https://gitee.com/baomidou/mybatis-plus)
+* 对 [mybatis-plus](https://gitee.com/baomidou/mybatis-plus) 多表查询的扩展
 * [演示工程](https://gitee.com/best_handsome/mybatis-plus-join-demo)
 * 点个Star支持一下吧 :)
-* [一对一,一对多](https://gitee.com/best_handsome/mybatis-plus-join/blob/master/MAPPING.md)
 
 QQ群:1022221898
 
@@ -34,9 +33,7 @@ QQ群:1022221898
 * service继承MPJBaseService (可选)
 * serviceImpl继承MPJBaseServiceImpl (可选)
 
-## 核心类 MPJLambdaWrapper和MPJQueryWrapper
-
-### MPJLambdaWrapper用法
+### Lambda形式用法（MPJLambdaWrapper）
 
 #### 简单的三表查询
 
@@ -97,7 +94,8 @@ WHERE (
 * 默认主表别名是t,其他的表别名以先后调用的顺序使用t1,t2,t3....
 * 条件查询,可以查询主表以及参与连接的所有表的字段,全部调用mp原生的方法,正常使用没有sql注入风险
 
-MPJLambdaWrapper其他功能    
+MPJLambdaWrapper其他功能
+
 * [简单的SQL函数使用](https://gitee.com/best_handsome/mybatis-plus-join/wikis/selectFunc()?sort_id=4082479)
 * [ON语句多条件支持](https://gitee.com/best_handsome/mybatis-plus-join/wikis/leftJoin?sort_id=3496671)
 
@@ -140,7 +138,7 @@ FROM
 LIMIT ?,?
 ```
 
-### MPJQueryWrapper
+### String形式用法（MPJQueryWrapper）
 
 #### 简单的3表查询
 

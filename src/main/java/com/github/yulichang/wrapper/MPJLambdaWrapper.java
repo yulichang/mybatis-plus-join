@@ -7,7 +7,6 @@ import com.baomidou.mybatisplus.core.metadata.TableInfo;
 import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
 import com.baomidou.mybatisplus.core.toolkit.*;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
-import com.github.yulichang.query.MPJQueryWrapper;
 import com.github.yulichang.toolkit.Constant;
 import com.github.yulichang.toolkit.LambdaUtils;
 import com.github.yulichang.toolkit.MPJWrappers;
@@ -37,7 +36,7 @@ import java.util.stream.Collectors;
  */
 @SuppressWarnings("unused")
 public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWrapper<T>>
-        implements Query<MPJLambdaWrapper<T>>, LambdaJoin<MPJLambdaWrapper<T>> {
+        implements Query<MPJLambdaWrapper<T>>, LambdaJoin<MPJLambdaWrapper<T>, T> {
 
     /**
      * 查询字段 sql

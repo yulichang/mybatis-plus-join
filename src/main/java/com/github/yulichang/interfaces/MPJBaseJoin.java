@@ -3,5 +3,6 @@ package com.github.yulichang.interfaces;
 /**
  * @author yulichang
  */
-public interface MPJBaseJoin {
+@SuppressWarnings("unused")
+public interface MPJBaseJoin<T> {
 }

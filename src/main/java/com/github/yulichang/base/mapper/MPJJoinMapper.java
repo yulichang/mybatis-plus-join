@@ -21,7 +21,7 @@ public interface MPJJoinMapper<T> extends BaseMapper<T> {
      *
      * @param wrapper joinWrapper
      */
-    Integer selectJoinCount(@Param(Constants.WRAPPER) MPJBaseJoin wrapper);
+    Integer selectJoinCount(@Param(Constants.WRAPPER) MPJBaseJoin<T> wrapper);
 
     /**
      * 连表查询返回一条记录
@@ -30,14 +30,14 @@ public interface MPJJoinMapper<T> extends BaseMapper<T> {
      * @param clazz   resultType
      */
     <DTO> DTO selectJoinOne(@Param(Constant.CLAZZ) Class<DTO> clazz,
-                            @Param(Constants.WRAPPER) MPJBaseJoin wrapper);
+                            @Param(Constants.WRAPPER) MPJBaseJoin<T> wrapper);
 
     /**
      * 连表查询返回Map
      *
      * @param wrapper joinWrapper
      */
-    Map<String, Object> selectJoinMap(@Param(Constants.WRAPPER) MPJBaseJoin wrapper);
+    Map<String, Object> selectJoinMap(@Param(Constants.WRAPPER) MPJBaseJoin<T> wrapper);
 
     /**
      * 连表查询返回记录集合
@@ -46,14 +46,14 @@ public interface MPJJoinMapper<T> extends BaseMapper<T> {
      * @param clazz   resultType
      */
     <DTO> List<DTO> selectJoinList(@Param(Constant.CLAZZ) Class<DTO> clazz,
-                                   @Param(Constants.WRAPPER) MPJBaseJoin wrapper);
+                                   @Param(Constants.WRAPPER) MPJBaseJoin<T> wrapper);
 
     /**
      * 连表查询返回Map集合
      *
      * @param wrapper joinWrapper
      */
-    List<Map<String, Object>> selectJoinMaps(@Param(Constants.WRAPPER) MPJBaseJoin wrapper);
+    List<Map<String, Object>> selectJoinMaps(@Param(Constants.WRAPPER) MPJBaseJoin<T> wrapper);
 
     /**
      * 连表查询返回记录集合并分页
@@ -64,7 +64,7 @@ public interface MPJJoinMapper<T> extends BaseMapper<T> {
      */
     <DTO, P extends IPage<?>> IPage<DTO> selectJoinPage(P page,
                                                         @Param(Constant.CLAZZ) Class<DTO> clazz,
-                                                        @Param(Constants.WRAPPER) MPJBaseJoin wrapper);
+                                                        @Param(Constants.WRAPPER) MPJBaseJoin<T> wrapper);
 
     /**
      * 连表查询返回Map集合并分页
@@ -72,5 +72,5 @@ public interface MPJJoinMapper<T> extends BaseMapper<T> {
      * @param wrapper joinWrapper
      */
     <P extends IPage<?>> IPage<Map<String, Object>> selectJoinMapsPage(P page,
-                                                                       @Param(Constants.WRAPPER) MPJBaseJoin wrapper);
+                                                                       @Param(Constants.WRAPPER) MPJBaseJoin<T> wrapper);
 }

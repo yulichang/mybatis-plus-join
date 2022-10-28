@@ -40,6 +40,18 @@ public interface Query<Children> extends Serializable {
     <E> Children select(Class<E> entityClass, Predicate<TableFieldInfo> predicate);
 
     /**
+     * 说明：
+     * 比如我们需要查询用户表有10个字段，然而我们只需要3个就够了，用mybatis-plus提供的select<p />
+     * 需要一个属性一个属性填入很不优雅，现在我们可以用selectAsClass(UserDO.class, UserVo.class)<p />
+     * 即可按所需的UserVo返回，前提是UserVo.class中的属性必须是UserDO.class中存在的
+     *
+     * @param source 数据源实体类
+     * @param tag    目标类
+     * @return children
+     */
+    <E> Children selectAsClass(Class<E> source, Class<?> tag);
+
+    /**
      * ignore
      */
     default <S, X> Children selectAs(SFunction<S, ?> column, SFunction<X, ?> alias) {
@@ -53,6 +65,11 @@ public interface Query<Children> extends Serializable {
 
     /**
      * 聚合函数查询
+     * <p>
+     * wrapper.selectFunc(() -> "COUNT(%s)", "t.id", "total");
+     * <p>
+     * lambda
+     * wrapper.selectFunc(() -> "COUNT(%s)", UserDO::getId, UserDTO::getTotal);
      *
      * @param funcEnum 函数枚举 {@link com.github.yulichang.wrapper.enums.DefaultFuncEnum}
      * @param column   函数作用的字段

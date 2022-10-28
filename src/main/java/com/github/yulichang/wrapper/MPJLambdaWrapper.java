@@ -10,6 +10,7 @@ import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.github.yulichang.toolkit.Constant;
 import com.github.yulichang.toolkit.LambdaUtils;
 import com.github.yulichang.toolkit.MPJWrappers;
+import com.github.yulichang.toolkit.ReflectionKit;
 import com.github.yulichang.wrapper.enums.BaseFuncEnum;
 import com.github.yulichang.wrapper.interfaces.LambdaJoin;
 import com.github.yulichang.wrapper.interfaces.Query;
@@ -17,6 +18,7 @@ import com.github.yulichang.wrapper.interfaces.on.OnFunction;
 import lombok.Data;
 import lombok.Getter;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -39,45 +41,37 @@ public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWr
         implements Query<MPJLambdaWrapper<T>>, LambdaJoin<MPJLambdaWrapper<T>, T> {
 
     /**
-     * 查询字段 sql
-     */
-    private SharedString sqlSelect = new SharedString();
-
-    /**
      * 查询表
      */
     private final SharedString from = new SharedString();
-
     /**
      * 主表别名
      */
     private final SharedString alias = new SharedString(Constant.TABLE_ALIAS);
-
     /**
      * 查询的字段
      */
     private final List<SelectColumn> selectColumns = new ArrayList<>();
-
     /**
      * 忽略查询的字段
      */
     private final List<SelectColumn> ignoreColumns = new ArrayList<>();
-
-    /**
-     * 是否 select distinct
-     */
-    private boolean selectDistinct = false;
-
-    /**
-     * 表序号
-     */
-    private int tableIndex = 1;
-
     /**
      * ON sql wrapper集合
      */
     private final List<MPJLambdaWrapper<?>> onWrappers = new ArrayList<>();
-
+    /**
+     * 查询字段 sql
+     */
+    private SharedString sqlSelect = new SharedString();
+    /**
+     * 是否 select distinct
+     */
+    private boolean selectDistinct = false;
+    /**
+     * 表序号
+     */
+    private int tableIndex = 1;
     /**
      * 连表关键字 on 条件 func 使用
      */
@@ -146,6 +140,22 @@ public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWr
         Assert.notNull(info, "table can not be find");
         info.getFieldList().stream().filter(predicate).collect(Collectors.toList()).forEach(
                 i -> selectColumns.add(SelectColumn.of(entityClass, i.getColumn())));
+        return typedThis;
+    }
+
+    @Override
+    public <E> MPJLambdaWrapper<T> selectAsClass(Class<E> source, Class<?> tag) {
+        TableInfo tableInfo = TableInfoHelper.getTableInfo(source);
+        Assert.notNull(tableInfo, "table can not be find");
+        List<Field> tagFields = ReflectionKit.getFieldList(tag);
+        tableInfo.getFieldList().forEach(i -> {
+            if (tagFields.stream().anyMatch(f -> f.getName().equals(i.getProperty()))) {
+                selectColumns.add(SelectColumn.of(source, i.getColumn()));
+            }
+        });
+        if (tableInfo.havePK() && tagFields.stream().anyMatch(i -> i.getName().equals(tableInfo.getKeyProperty()))) {
+            selectColumns.add(SelectColumn.of(source, tableInfo.getKeyProperty()));
+        }
         return typedThis;
     }
 

@@ -15,7 +15,7 @@ import com.baomidou.mybatisplus.core.injector.methods.UpdateById;
 import com.baomidou.mybatisplus.core.injector.methods.SelectBatchByIds;
 import com.baomidou.mybatisplus.core.injector.methods.SelectByMap;
 import com.baomidou.mybatisplus.core.mapper.Mapper;
-import com.baomidou.mybatisplus.core.metadata.MPJTableMapperHelper;
+import com.github.yulichang.mapper.MPJTableMapperHelper;
 import com.baomidou.mybatisplus.core.metadata.TableInfo;
 import com.baomidou.mybatisplus.core.toolkit.ClassUtils;
 import com.github.yulichang.method.*;

@@ -1,8 +1,7 @@
-package com.baomidou.mybatisplus.core.metadata;
+package com.github.yulichang.mapper;
 
-import lombok.AccessLevel;
+import com.baomidou.mybatisplus.core.metadata.TableInfo;
 import lombok.Data;
-import lombok.Setter;
 import lombok.experimental.Accessors;
 
 import java.util.List;
@@ -15,7 +14,6 @@ import java.util.List;
  * @since 1.2.0
  */
 @Data
-@Setter(AccessLevel.PACKAGE)
 @Accessors(chain = true)
 public class MPJTableInfo {
 

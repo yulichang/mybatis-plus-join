@@ -1,4 +1,4 @@
-package com.baomidou.mybatisplus.core.metadata;
+package com.github.yulichang.mapper;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;

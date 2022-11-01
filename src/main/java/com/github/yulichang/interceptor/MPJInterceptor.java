@@ -1,15 +1,19 @@
 package com.github.yulichang.interceptor;
 
-import com.baomidou.mybatisplus.core.metadata.MPJTableInfo;
-import com.baomidou.mybatisplus.core.metadata.MPJTableInfoHelper;
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.core.metadata.TableFieldInfo;
 import com.baomidou.mybatisplus.core.metadata.TableInfo;
 import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.core.toolkit.Constants;
 import com.baomidou.mybatisplus.core.toolkit.StringPool;
+import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.github.yulichang.interfaces.MPJBaseJoin;
 import com.github.yulichang.method.MPJResultType;
 import com.github.yulichang.toolkit.Constant;
+import com.github.yulichang.toolkit.ReflectionKit;
+import com.github.yulichang.wrapper.MPJLambdaWrapper;
+import com.github.yulichang.wrapper.SelectColumn;
 import org.apache.ibatis.executor.Executor;
 import org.apache.ibatis.logging.Log;
 import org.apache.ibatis.logging.LogFactory;
@@ -23,13 +27,17 @@ import org.apache.ibatis.plugin.Signature;
 import org.apache.ibatis.session.Configuration;
 import org.apache.ibatis.session.ResultHandler;
 import org.apache.ibatis.session.RowBounds;
-import org.springframework.core.annotation.Order;
+import org.apache.ibatis.type.TypeHandler;
+import org.apache.ibatis.type.TypeHandlerRegistry;
+import org.apache.ibatis.type.UnknownTypeHandler;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 /**
  * 连表拦截器
@@ -43,11 +51,10 @@ import java.util.concurrent.ConcurrentHashMap;
 public class MPJInterceptor implements Interceptor {
     private static final Log logger = LogFactory.getLog(MPJInterceptor.class);
 
-
     private static final List<ResultMapping> EMPTY_RESULT_MAPPING = new ArrayList<>(0);
 
     /**
-     * 缓存MappedStatement,不需要每次都去重写构建MappedStatement
+     * 缓存MappedStatement,不需要每次都去重新构建MappedStatement
      */
     private static final Map<String, Map<Configuration, MappedStatement>> MS_CACHE = new ConcurrentHashMap<>();
 
@@ -72,7 +79,7 @@ public class MPJInterceptor implements Interceptor {
                         if (CollectionUtils.isNotEmpty(list)) {
                             ResultMap resultMap = list.get(0);
                             if (resultMap.getType() == MPJResultType.class) {
-                                args[0] = newMappedStatement(ms, clazz);
+                                args[0] = getMappedStatement(ms, clazz, ew);
                             }
                         }
                     }
@@ -84,10 +91,16 @@ public class MPJInterceptor implements Interceptor {
 
 
     /**
-     * 构建新的MappedStatement
+     * 获取MappedStatement
      */
-    public MappedStatement newMappedStatement(MappedStatement ms, Class<?> resultType) {
+    public MappedStatement getMappedStatement(MappedStatement ms, Class<?> resultType, Object ew) {
         String id = ms.getId() + StringPool.UNDERSCORE + resultType.getName();
+
+        if (ew instanceof MPJLambdaWrapper) {
+            //不走缓存
+            return buildMappedStatement(ms, resultType, ew, id);
+        }
+        //走缓存
         Map<Configuration, MappedStatement> statementMap = MS_CACHE.get(id);
         if (CollectionUtils.isNotEmpty(statementMap)) {
             MappedStatement statement = statementMap.get(ms.getConfiguration());
@@ -95,6 +108,20 @@ public class MPJInterceptor implements Interceptor {
                 return statement;
             }
         }
+        MappedStatement mappedStatement = buildMappedStatement(ms, resultType, ew, id);
+        if (statementMap == null) {
+            statementMap = new ConcurrentHashMap<>();
+            MS_CACHE.put(id, statementMap);
+        }
+        statementMap.put(ms.getConfiguration(), mappedStatement);
+        return mappedStatement;
+    }
+
+
+    /**
+     * 构建新的MappedStatement
+     */
+    private MappedStatement buildMappedStatement(MappedStatement ms, Class<?> resultType, Object ew, String id) {
         MappedStatement.Builder builder = new MappedStatement.Builder(ms.getConfiguration(), id, ms.getSqlSource(), ms.getSqlCommandType())
                 .resource(ms.getResource())
                 .fetchSize(ms.getFetchSize())
@@ -110,33 +137,90 @@ public class MPJInterceptor implements Interceptor {
             builder.keyProperty(String.join(StringPool.COMMA, ms.getKeyProperties()));
         }
         List<ResultMap> resultMaps = new ArrayList<>();
-        resultMaps.add(newResultMap(ms, resultType));
+        resultMaps.add(buildResultMap(ms, resultType, ew));
         builder.resultMaps(resultMaps);
-        MappedStatement mappedStatement = builder.build();
-
-        if (statementMap == null) {
-            statementMap = new ConcurrentHashMap<>();
-            MS_CACHE.put(id, statementMap);
-        }
-        statementMap.put(ms.getConfiguration(), mappedStatement);
-        return mappedStatement;
+        return builder.build();
     }
 
     /**
      * 构建resultMap
      */
-    private ResultMap newResultMap(MappedStatement ms, Class<?> resultType) {
+    @SuppressWarnings({"rawtypes", "unchecked", "ConstantConditions"})
+    private ResultMap buildResultMap(MappedStatement ms, Class<?> resultType, Object obj) {
         TableInfo tableInfo = TableInfoHelper.getTableInfo(resultType);
-        if (tableInfo != null && tableInfo.isAutoInitResultMap() && tableInfo.getEntityType() == resultType) {
-            return ms.getConfiguration().getResultMap(tableInfo.getResultMap());
+        if (tableInfo == null || !(obj instanceof MPJLambdaWrapper)) {
+            return getDefaultResultMap(tableInfo, ms, resultType);
         }
-        MPJTableInfo infoDTO = MPJTableInfoHelper.getTableInfo(resultType);
-        if (infoDTO == null) {
-            infoDTO = MPJTableInfoHelper.initTableInfo(ms.getConfiguration(),
-                    ms.getId().substring(0, ms.getId().lastIndexOf(".")), resultType, null);
+        MPJLambdaWrapper wrapper = (MPJLambdaWrapper) obj;
+        String currentNamespace = ms.getResource().split(StringPool.SPACE)[0];
+        String id = currentNamespace + StringPool.DOT + Constants.MYBATIS_PLUS + StringPool.UNDERSCORE + resultType.getSimpleName();
+        if (wrapper.isResultMap()) {
+            //TODO
+            //添加 collection 标签
+            return new ResultMap.Builder(ms.getConfiguration(), ms.getId(), resultType, EMPTY_RESULT_MAPPING).build();
+        } else {
+            List<SelectColumn> columnList = wrapper.getSelectColumns();
+            List<ResultMapping> resultMappings = new ArrayList<>();
+            columnList.forEach(i -> {
+                //别名优先
+                if (StringUtils.isNotBlank(i.getAlias())) {
+                    resultMappings.add(new ResultMapping.Builder(ms.getConfiguration(), i.getAlias())
+                            .column(i.getColumnName()).build());
+                } else if (i.getTableFieldInfo() != null) {
+                    //其次field info
+                    TableFieldInfo info = i.getTableFieldInfo();
+                    if (info.getTypeHandler() != null && info.getTypeHandler() != UnknownTypeHandler.class) {
+                        TypeHandlerRegistry registry = ms.getConfiguration().getTypeHandlerRegistry();
+                        TypeHandler<?> typeHandler = registry.getMappingTypeHandler(info.getTypeHandler());
+                        if (typeHandler == null) {
+                            typeHandler = registry.getInstance(info.getPropertyType(), info.getTypeHandler());
+                        }
+                        resultMappings.add(new ResultMapping.Builder(ms.getConfiguration(), info.getProperty(),
+                                info.getColumn(), info.getPropertyType())
+                                .typeHandler(typeHandler).build());
+                    } else {
+                        resultMappings.add(new ResultMapping.Builder(ms.getConfiguration(), info.getProperty(),
+                                info.getColumn(), info.getPropertyType()).build());
+                    }
+                } else {
+                    //最后取值
+                    TableFieldInfo info = tableInfo.getFieldList().stream().filter(t -> t.getColumn().equals(i.getColumnName()))
+                            .findFirst().orElseGet(null);
+                    if (info != null && Objects.equals(tableInfo.getKeyColumn(), i.getColumnName())) {
+                        resultMappings.add(new ResultMapping.Builder(ms.getConfiguration(), tableInfo.getKeyProperty(),
+                                tableInfo.getKeyColumn(), tableInfo.getKeyType()).build());
+                    } else if (info != null) {
+                        resultMappings.add(new ResultMapping.Builder(ms.getConfiguration(), info.getProperty(),
+                                info.getColumn(), info.getPropertyType()).build());
+                    } else {
+                        resultMappings.add(new ResultMapping.Builder(ms.getConfiguration(), i.getColumnName())
+                                .column(i.getColumnName()).build());
+                    }
+                }
+            });
+            return new ResultMap.Builder(ms.getConfiguration(), id, resultType, resultMappings).build();
         }
-        if (infoDTO.getTableInfo().isAutoInitResultMap()) {
-            return ms.getConfiguration().getResultMap(infoDTO.getTableInfo().getResultMap());
+    }
+
+
+    //TODO 可以加缓存
+    private ResultMap getDefaultResultMap(TableInfo tableInfo, MappedStatement ms, Class<?> resultType) {
+        if (tableInfo != null && tableInfo.isAutoInitResultMap()) {
+            //补充不全的属性
+            ResultMap resultMap = ms.getConfiguration().getResultMap(tableInfo.getResultMap());
+            List<ResultMapping> resultMappings = resultMap.getResultMappings();
+            List<Field> notExistField = ReflectionKit.getFieldList(resultType).stream().filter(i ->
+                    !i.getAnnotation(TableField.class).exist()).collect(Collectors.toList());
+            if (CollectionUtils.isNotEmpty(notExistField)) {
+                //复制已有的resultMapping
+                List<ResultMapping> resultMappingList = new ArrayList<>(resultMappings);
+                //复制不存在的resultMapping
+                for (Field i : notExistField) {
+                    resultMappingList.add(new ResultMapping.Builder(ms.getConfiguration(),
+                            i.getName(), i.getName(), i.getType()).build());
+                }
+                return new ResultMap.Builder(ms.getConfiguration(), ms.getId(), resultType, resultMappingList).build();
+            }
         }
         return new ResultMap.Builder(ms.getConfiguration(), ms.getId(), resultType, EMPTY_RESULT_MAPPING).build();
     }

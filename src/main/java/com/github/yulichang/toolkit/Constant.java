@@ -23,6 +23,8 @@ public interface Constant {
 
     String INNER = "INNER";
 
+    String FULL = "FULL";
+
     String CLAZZ = "resultTypeClass_Eg1sG";
 
     String PARAM_TYPE = "paramType_Gr8re1Ee";
@@ -41,6 +43,11 @@ public interface Constant {
      * " INNER JOIN "
      */
     String INNER_JOIN = StringPool.SPACE + INNER + StringPool.SPACE + JOIN + StringPool.SPACE;
+
+    /**
+     * " FULL JOIN "
+     */
+    String FULL_JOIN = StringPool.SPACE + FULL + StringPool.SPACE + JOIN + StringPool.SPACE;
 
     /**
      * " t"

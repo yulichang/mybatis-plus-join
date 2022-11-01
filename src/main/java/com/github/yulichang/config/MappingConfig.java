@@ -1,7 +1,7 @@
 package com.github.yulichang.config;
 
 import com.baomidou.mybatisplus.core.metadata.MPJTableInfoHelper;
-import com.baomidou.mybatisplus.core.metadata.MPJTableMapperHelper;
+import com.github.yulichang.mapper.MPJTableMapperHelper;
 import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.ApplicationListener;

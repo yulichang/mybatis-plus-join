@@ -15,6 +15,7 @@ public class SpringContentUtils implements ApplicationContextAware {
     private static ApplicationContext context;
 
     @Override
+    @SuppressWarnings("NullableProblems")
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         context = applicationContext;
     }

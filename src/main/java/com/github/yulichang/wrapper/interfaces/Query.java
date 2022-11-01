@@ -112,20 +112,6 @@ public interface Query<Children> extends Serializable {
     }
 
     /**
-     * 忽略查询字段
-     * <p>
-     * 用法: selectIgnore(UserDO::getId,UserDO::getSex)
-     * 注意: 一个selectIgnore只支持一个对象 如果要忽略多个实体的字段,请调用多次
-     * <p>
-     * .selectIgnore(UserDO::getId,UserDO::getSex)
-     * .selectIgnore(UserAddressDO::getArea,UserAddressDO::getCity)
-     *
-     * @since 1.1.3
-     */
-    @SuppressWarnings("unchecked")
-    <S> Children selectIgnore(SFunction<S, ?>... columns);
-
-    /**
      * 查询实体类全部字段
      */
     Children selectAll(Class<?> clazz);

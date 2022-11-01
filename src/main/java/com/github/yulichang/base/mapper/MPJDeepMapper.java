@@ -7,6 +7,8 @@ import com.baomidou.mybatisplus.core.metadata.*;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.github.yulichang.base.mapper.wrapper.MappingQuery;
+import com.github.yulichang.mapper.MPJTableFieldInfo;
+import com.github.yulichang.mapper.MPJTableInfo;
 import com.github.yulichang.toolkit.LambdaUtils;
 
 import java.io.Serializable;

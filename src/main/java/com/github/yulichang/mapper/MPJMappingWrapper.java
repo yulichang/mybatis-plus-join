@@ -1,4 +1,4 @@
-package com.baomidou.mybatisplus.core.metadata;
+package com.github.yulichang.mapper;
 
 
 import com.baomidou.mybatisplus.core.enums.SqlKeyword;

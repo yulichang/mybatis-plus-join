@@ -1,6 +1,10 @@
-package com.baomidou.mybatisplus.core.metadata;
+package com.github.yulichang.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.baomidou.mybatisplus.core.metadata.MPJTableInfoHelper;
+import com.baomidou.mybatisplus.core.metadata.TableFieldInfo;
+import com.baomidou.mybatisplus.core.metadata.TableInfo;
+import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
 import com.baomidou.mybatisplus.core.toolkit.*;
 import com.github.yulichang.annotation.EntityMapping;
 import com.github.yulichang.annotation.FieldMapping;
@@ -22,7 +26,6 @@ import java.util.Map;
  * 字段属性
  *
  * @author yulichang
- * @see TableFieldInfo
  * @since 1.2.0
  */
 @Getter

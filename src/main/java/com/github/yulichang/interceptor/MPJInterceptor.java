@@ -28,10 +28,7 @@ import org.apache.ibatis.type.TypeHandlerRegistry;
 import org.apache.ibatis.type.UnknownTypeHandler;
 
 import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -153,7 +150,9 @@ public class MPJInterceptor implements Interceptor {
         String currentNamespace = ms.getResource().split(StringPool.SPACE)[0];
         String id = currentNamespace + StringPool.DOT + Constants.MYBATIS_PLUS + StringPool.UNDERSCORE + resultType.getSimpleName();
 
-        if (!(obj instanceof MPJLambdaWrapper)) {
+        if (!(obj instanceof MPJLambdaWrapper) || Map.class.isAssignableFrom(resultType) ||
+                ReflectionKit.isPrimitiveOrWrapper(resultType) ||
+                Collection.class.isAssignableFrom(resultType)) {
             return getDefaultResultMap(tableInfo, ms, resultType, id);
         }
         MPJLambdaWrapper wrapper = (MPJLambdaWrapper) obj;

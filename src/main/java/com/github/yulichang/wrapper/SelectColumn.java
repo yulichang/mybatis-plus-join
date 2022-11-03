@@ -5,7 +5,7 @@ import com.baomidou.mybatisplus.core.toolkit.StringPool;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.github.yulichang.toolkit.UniqueObject;
 import com.github.yulichang.wrapper.enums.BaseFuncEnum;
-import lombok.Data;
+import lombok.Getter;
 
 import java.util.Objects;
 
@@ -15,38 +15,38 @@ import java.util.Objects;
  * @author yulichang
  * @since 1.2.5
  */
-@Data
+@Getter
 public class SelectColumn implements UniqueObject {
 
     /**
      * 字段实体类
      */
-    private Class<?> clazz;
+    private final Class<?> clazz;
 
     /**
      * 数据库字段名
      */
-    private String columnName;
+    private final String columnName;
 
     /**
      * 字段信息
      */
-    private TableFieldInfo tableFieldInfo;
+    private final TableFieldInfo tableFieldInfo;
 
     /**
      * 字段别名
      */
-    private String alias;
+    private final String alias;
 
     /**
      * 目标属性
      */
-    private String tagProperty;
+    private final String tagProperty;
 
     /**
      * 字段函数
      */
-    private BaseFuncEnum funcEnum;
+    private final BaseFuncEnum funcEnum;
 
 
     private SelectColumn(Class<?> clazz, String columnName, TableFieldInfo tableFieldInfo, String alias, String tagProperty, BaseFuncEnum funcEnum) {

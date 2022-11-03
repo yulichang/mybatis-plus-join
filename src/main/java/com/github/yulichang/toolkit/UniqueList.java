@@ -11,7 +11,7 @@ import java.util.Collection;
  * @author yulichang
  * @since 1.2.5
  */
-public class CacheList<T extends UniqueObject> extends ArrayList<T> implements UniqueObject {
+public class UniqueList<T extends UniqueObject> extends ArrayList<T> implements UniqueObject {
 
     private String uniqueKey;
 

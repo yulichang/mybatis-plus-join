@@ -1,10 +1,10 @@
 package com.github.yulichang.wrapper;
 
 import com.baomidou.mybatisplus.core.toolkit.StringPool;
-import com.baomidou.mybatisplus.core.toolkit.support.ColumnCache;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.github.yulichang.toolkit.Constant;
 import com.github.yulichang.toolkit.LambdaUtils;
+import com.github.yulichang.toolkit.support.ColumnCache;
 
 import java.util.Arrays;
 import java.util.HashMap;

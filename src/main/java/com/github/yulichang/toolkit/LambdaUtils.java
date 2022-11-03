@@ -4,8 +4,8 @@ package com.github.yulichang.toolkit;
 import com.baomidou.mybatisplus.core.metadata.TableInfo;
 import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
-import com.baomidou.mybatisplus.core.toolkit.support.ColumnCache;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
+import com.github.yulichang.toolkit.support.ColumnCache;
 import com.github.yulichang.toolkit.support.SerializedLambda;
 import org.apache.ibatis.reflection.property.PropertyNamer;
 
@@ -79,15 +79,6 @@ public final class LambdaUtils {
         return key.toUpperCase(ENGLISH);
     }
 
-    /**
-     * 将传入的表信息加入缓存
-     *
-     * @param tableInfo 表信息
-     */
-    @SuppressWarnings("unused")
-    public static void installCache(TableInfo tableInfo) {
-        COLUMN_CACHE_MAP.put(tableInfo.getEntityType().getName(), createColumnCacheMap(tableInfo));
-    }
 
     /**
      * 缓存实体字段 MAP 信息
@@ -100,13 +91,14 @@ public final class LambdaUtils {
 
         if (info.havePK()) {
             map = CollectionUtils.newHashMapWithExpectedSize(info.getFieldList().size() + 1);
-            map.put(formatKey(info.getKeyProperty()), new ColumnCache(info.getKeyColumn(), info.getKeySqlSelect()));
+            map.put(formatKey(info.getKeyProperty()), new ColumnCache(info.getKeyColumn(), info.getKeySqlSelect(),
+                    null, info.getKeyProperty(), true));
         } else {
             map = CollectionUtils.newHashMapWithExpectedSize(info.getFieldList().size());
         }
 
         info.getFieldList().forEach(i ->
-                map.put(formatKey(i.getProperty()), new ColumnCache(i.getColumn(), i.getSqlSelect()))
+                map.put(formatKey(i.getProperty()), new ColumnCache(i.getColumn(), i.getSqlSelect(), i, null, false))
         );
         return map;
     }

@@ -1,4 +1,4 @@
-package com.github.yulichang.wrapper;
+package com.github.yulichang.toolkit.support;
 
 import com.baomidou.mybatisplus.core.metadata.TableFieldInfo;
 import com.baomidou.mybatisplus.core.toolkit.StringPool;

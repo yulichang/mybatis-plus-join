@@ -12,6 +12,7 @@ import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.github.yulichang.toolkit.*;
 import com.github.yulichang.toolkit.support.ColumnCache;
+import com.github.yulichang.toolkit.support.SelectColumn;
 import com.github.yulichang.wrapper.enums.BaseFuncEnum;
 import com.github.yulichang.wrapper.interfaces.LambdaJoin;
 import com.github.yulichang.wrapper.interfaces.Query;

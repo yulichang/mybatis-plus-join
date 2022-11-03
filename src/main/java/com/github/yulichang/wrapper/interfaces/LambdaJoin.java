@@ -116,6 +116,34 @@ public interface LambdaJoin<Children, Entity> extends MPJBaseJoin<Entity> {
     }
 
     /**
+     * ignore 参考 left join
+     */
+    default <T, X> Children fullJoin(Class<T> clazz, SFunction<T, ?> left, SFunction<X, ?> right) {
+        return fullJoin(true, clazz, left, right);
+    }
+
+    /**
+     * ignore 参考 left join
+     */
+    default <T> Children fullJoin(Class<T> clazz, OnFunction function) {
+        return fullJoin(true, clazz, function);
+    }
+
+    /**
+     * ignore 参考 left join
+     */
+    default <T, X> Children fullJoin(boolean condition, Class<T> clazz, SFunction<T, ?> left, SFunction<X, ?> right) {
+        return fullJoin(condition, clazz, on -> on.eq(left, right));
+    }
+
+    /**
+     * ignore 参考 left join
+     */
+    default <T> Children fullJoin(boolean condition, Class<T> clazz, OnFunction function) {
+        return join(Constant.FULL_JOIN, condition, clazz, function);
+    }
+
+    /**
      * 查询基类 可以直接调用此方法实现以上所有功能
      *
      * @param keyWord   连表关键字

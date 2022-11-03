@@ -9,7 +9,7 @@ import com.github.yulichang.method.MPJResultType;
 import com.github.yulichang.toolkit.Constant;
 import com.github.yulichang.toolkit.ReflectionKit;
 import com.github.yulichang.wrapper.MPJLambdaWrapper;
-import com.github.yulichang.wrapper.SelectColumn;
+import com.github.yulichang.toolkit.support.SelectColumn;
 import org.apache.ibatis.executor.Executor;
 import org.apache.ibatis.logging.Log;
 import org.apache.ibatis.logging.LogFactory;

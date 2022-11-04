@@ -6,7 +6,9 @@ import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
 import com.baomidou.mybatisplus.core.toolkit.Assert;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.github.yulichang.toolkit.LambdaUtils;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.Setter;
 import org.apache.ibatis.type.JdbcType;
 import org.apache.ibatis.type.TypeHandler;
 
@@ -17,6 +19,7 @@ import org.apache.ibatis.type.TypeHandler;
  * @since 1.2.5
  */
 @Getter
+@Setter(AccessLevel.PACKAGE)
 public class Result {
 
     private boolean isId;
@@ -31,9 +34,9 @@ public class Result {
 
     private JdbcType jdbcType;
 
-    private TypeHandler<?> typeHandle;
+    private Class<? extends TypeHandler<?>> typeHandle;
 
-    private Result() {
+    public Result() {
     }
 
     public static class Builder<E, T> {

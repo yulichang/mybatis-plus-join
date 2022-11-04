@@ -160,10 +160,10 @@ public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWr
             builder = new Collection.Builder<>(dtoFieldName, child, field.getType());
         } else {
             Class<Z> ofType = (Class<Z>) genericType;
-            if (ReflectionKit.isPrimitiveOrWrapper(ofType) || fieldMap.isEmpty()) {
+            if (ReflectionKit.isPrimitiveOrWrapper(ofType)) {
                 throw new MPJException("collection 不支持基本数据类型");
             }
-            builder = new Collection.Builder<>(dtoFieldName, child, field.getType(), ofType);
+            builder = new Collection.Builder<>(dtoFieldName, child, field.getType(), ofType, true);
         }
         this.resultMapCollection.add(builder.build());
         return typedThis;
@@ -178,7 +178,7 @@ public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWr
         //获取集合泛型
         Class<?> genericType = ReflectionKit.getGenericType(field);
         Class<Z> ofType = (Class<Z>) genericType;
-        Collection.Builder<C, Z> builder = new Collection.Builder<>(dtoFieldName, child, field.getType(), ofType);
+        Collection.Builder<C, Z> builder = new Collection.Builder<>(dtoFieldName, child, field.getType(), ofType, false);
         this.resultMapCollection.add(collection.apply(builder).build());
         return typedThis;
     }

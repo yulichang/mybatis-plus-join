@@ -25,7 +25,7 @@ import java.util.Objects;
  *
  * @author yulichang
  */
-@SuppressWarnings("SpringJavaAutowiredMembersInspection")
+@SuppressWarnings("NullableProblems")
 public class InterceptorConfig implements ApplicationListener<ApplicationReadyEvent> {
 
     private static final Log logger = LogFactory.getLog(InterceptorConfig.class);

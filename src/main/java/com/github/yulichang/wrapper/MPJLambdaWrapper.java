@@ -10,6 +10,7 @@ import com.baomidou.mybatisplus.core.toolkit.Assert;
 import com.baomidou.mybatisplus.core.toolkit.StringPool;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
+import com.github.yulichang.exception.MPJException;
 import com.github.yulichang.toolkit.*;
 import com.github.yulichang.toolkit.support.ColumnCache;
 import com.github.yulichang.toolkit.support.SelectColumn;
@@ -17,6 +18,8 @@ import com.github.yulichang.wrapper.enums.BaseFuncEnum;
 import com.github.yulichang.wrapper.interfaces.LambdaJoin;
 import com.github.yulichang.wrapper.interfaces.Query;
 import com.github.yulichang.wrapper.interfaces.on.OnFunction;
+import com.github.yulichang.wrapper.resultmap.Collection;
+import com.github.yulichang.wrapper.resultmap.MFunc;
 import lombok.Getter;
 
 import java.lang.reflect.Field;
@@ -36,7 +39,7 @@ import java.util.stream.Collectors;
  * @author yulichang
  * @see MPJWrappers
  */
-@SuppressWarnings("unused")
+@SuppressWarnings({"unused", "unchecked"})
 public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWrapper<T>>
         implements Query<MPJLambdaWrapper<T>>, LambdaJoin<MPJLambdaWrapper<T>, T> {
 
@@ -58,6 +61,16 @@ public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWr
      */
     private final List<MPJLambdaWrapper<?>> onWrappers = new ArrayList<>();
     /**
+     * 敌对多映射关系
+     */
+    @Getter
+    private final List<Collection<?, ?>> resultMapCollection = new ArrayList<>();
+    /**
+     * 是否构建是否存在一对多
+     */
+    @Getter
+    private boolean resultMap = false;
+    /**
      * 查询字段 sql
      */
     private SharedString sqlSelect = new SharedString();
@@ -65,11 +78,6 @@ public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWr
      * 是否 select distinct
      */
     private boolean selectDistinct = false;
-    /**
-     * 是否构建resultMap
-     */
-    @Getter
-    private final boolean resultMap = false;
     /**
      * 表序号
      */
@@ -138,10 +146,53 @@ public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWr
         return typedThis;
     }
 
+    // TODO 重载重复代码简化
+    public <S, C, Z, F extends java.util.Collection<?>> MPJLambdaWrapper<T> selectCollection(Class<C> child, SFunction<S, F> dtoField) {
+        String dtoFieldName = LambdaUtils.getName(dtoField);
+        Class<S> dtoClass = LambdaUtils.getEntityClass(dtoField);
+        Map<String, Field> fieldMap = ReflectionKit.getFieldMap(dtoClass);
+        Field field = fieldMap.get(dtoFieldName);
+        this.resultMap = true;
+        Class<?> genericType = ReflectionKit.getGenericType(field);
+        Collection.Builder<C, Z> builder;
+        if (genericType == null || genericType.isAssignableFrom(child)) {
+            //找不到集合泛型 List List<?> List<Object> ， 直接查询数据库实体
+            builder = new Collection.Builder<>(dtoFieldName, child, field.getType());
+        } else {
+            Class<Z> ofType = (Class<Z>) genericType;
+            if (ReflectionKit.isPrimitiveOrWrapper(ofType) || fieldMap.isEmpty()) {
+                throw new MPJException("collection 不支持基本数据类型");
+            }
+            builder = new Collection.Builder<>(dtoFieldName, child, field.getType(), ofType);
+        }
+        this.resultMapCollection.add(builder.build());
+        return typedThis;
+    }
+
+    public <S, C, Z, F extends java.util.Collection<Z>> MPJLambdaWrapper<T>
+    selectCollection(Class<C> child, SFunction<S, F> dtoField, MFunc<Collection.Builder<C, Z>> collection) {
+        String dtoFieldName = LambdaUtils.getName(dtoField);
+        Class<S> dtoClass = LambdaUtils.getEntityClass(dtoField);
+        Field field = ReflectionKit.getFieldMap(dtoClass).get(dtoFieldName);
+        this.resultMap = true;
+        //获取集合泛型
+        Class<?> genericType = ReflectionKit.getGenericType(field);
+        Class<Z> ofType = (Class<Z>) genericType;
+        Collection.Builder<C, Z> builder = new Collection.Builder<>(dtoFieldName, child, field.getType(), ofType);
+        this.resultMapCollection.add(collection.apply(builder).build());
+        return typedThis;
+    }
+
+    public <S, C, Z, F> MPJLambdaWrapper<T> selectAssociation(Class<C> child, SFunction<S, F> dtoField, MFunc<Collection.Builder<C, F>> collection) {
+        //TODO
+        return typedThis;
+    }
+
+
     @Override
     public <E> MPJLambdaWrapper<T> select(Class<E> entityClass, Predicate<TableFieldInfo> predicate) {
         TableInfo info = TableInfoHelper.getTableInfo(entityClass);
-        Assert.notNull(info, "table can not be find");
+        Assert.notNull(info, "table not find by class <%s>", entityClass.getName());
         info.getFieldList().stream().filter(predicate).collect(Collectors.toList()).forEach(
                 i -> selectColumns.add(SelectColumn.of(entityClass, i.getColumn(), i, null, i.getProperty(), null)));
         return typedThis;
@@ -150,7 +201,7 @@ public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWr
     @Override
     public <E> MPJLambdaWrapper<T> selectAsClass(Class<E> source, Class<?> tag) {
         TableInfo tableInfo = TableInfoHelper.getTableInfo(source);
-        Assert.notNull(tableInfo, "table can not be find");
+        Assert.notNull(tableInfo, "table not find by class <%s>", source.getName());
         List<Field> tagFields = ReflectionKit.getFieldList(tag);
         tableInfo.getFieldList().forEach(i -> {
             if (tagFields.stream().anyMatch(f -> f.getName().equals(i.getProperty()))) {

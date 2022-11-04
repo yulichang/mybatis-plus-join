@@ -23,8 +23,7 @@ import org.apache.ibatis.logging.Log;
 import org.apache.ibatis.logging.LogFactory;
 import org.springframework.core.GenericTypeResolver;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
+import java.lang.reflect.*;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
@@ -99,6 +98,28 @@ public final class ReflectionKit {
     public static Class<?> getSuperClassGenericType(final Class<?> clazz, final Class<?> genericIfc, final int index) {
         Class<?>[] typeArguments = GenericTypeResolver.resolveTypeArguments(ClassUtils.getUserClass(clazz), genericIfc);
         return null == typeArguments ? null : typeArguments[index];
+    }
+
+
+    /**
+     * Collection字段的泛型
+     */
+    public static Class<?> getGenericType(Field field) {
+        Type type = field.getGenericType();
+        //没有写泛型
+        if (!(type instanceof ParameterizedType)) {
+            return Object.class;
+        }
+        ParameterizedType pt = (ParameterizedType) type;
+        Type[] actualTypeArguments = pt.getActualTypeArguments();
+        Type argument = actualTypeArguments[0];
+        //通配符泛型 ? , ? extends XXX , ? super XXX
+        if (argument instanceof WildcardType) {
+            //获取上界
+            Type[] types = ((WildcardType) argument).getUpperBounds();
+            return (Class<?>) types[0];
+        }
+        return (Class<?>) argument;
     }
 
     /**

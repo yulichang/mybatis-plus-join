@@ -1,6 +1,9 @@
 package com.github.yulichang.config;
 
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInterceptor;
+import com.github.pagehelper.autoconfigure.PageHelperAutoConfiguration;
 import com.github.yulichang.toolkit.InterceptorList;
 import org.apache.ibatis.logging.Log;
 import org.apache.ibatis.logging.LogFactory;
@@ -16,37 +19,24 @@ import java.util.List;
 
 /**
  * 兼容 page helper 插件类
- * <p>
- * 可以自定义Conditional注解简化代码 todo
  *
  * @author yulichang
  */
 @Configuration
+@ConditionalOnBean(SqlSessionFactory.class)
+@AutoConfigureBefore(value = {PageHelper.class, PageHelperAutoConfiguration.class, PageInterceptor.class})
 @SuppressWarnings("unused")
 public class InterceptorConfig {
 
+
     private static final Log logger = LogFactory.getLog(InterceptorConfig.class);
 
-    @Configuration
-    @ConditionalOnBean(type = "com.github.pagehelper.autoconfigure.PageHelperAutoConfiguration")
-    @AutoConfigureBefore(name = {"com.github.pagehelper.autoconfigure.PageHelperAutoConfiguration"})
-    public static class PhSpringBoot {
-        public PhSpringBoot(List<SqlSessionFactory> sqlSessionFactoryList) {
-            replaceInterceptorChain(sqlSessionFactoryList);
-        }
-    }
-
-    @Configuration
-    @ConditionalOnBean(type = "com.github.pagehelper.PageInterceptor")
-    @AutoConfigureBefore(name = {"com.github.pagehelper.PageInterceptor"})
-    public static class PhSpring {
-        public PhSpring(List<SqlSessionFactory> sqlSessionFactoryList) {
-            replaceInterceptorChain(sqlSessionFactoryList);
-        }
+    public InterceptorConfig(List<SqlSessionFactory> sqlSessionFactoryList) {
+        replaceInterceptorChain(sqlSessionFactoryList);
     }
 
     @SuppressWarnings("unchecked")
-    public static void replaceInterceptorChain(List<SqlSessionFactory> sqlSessionFactoryList) {
+    private void replaceInterceptorChain(List<SqlSessionFactory> sqlSessionFactoryList) {
         if (CollectionUtils.isEmpty(sqlSessionFactoryList)) {
             return;
         }

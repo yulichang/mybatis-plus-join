@@ -8,8 +8,8 @@ import com.github.yulichang.interfaces.MPJBaseJoin;
 import com.github.yulichang.method.MPJResultType;
 import com.github.yulichang.toolkit.Constant;
 import com.github.yulichang.toolkit.ReflectionKit;
-import com.github.yulichang.wrapper.MPJLambdaWrapper;
 import com.github.yulichang.toolkit.support.SelectColumn;
+import com.github.yulichang.wrapper.MPJLambdaWrapper;
 import org.apache.ibatis.executor.Executor;
 import org.apache.ibatis.logging.Log;
 import org.apache.ibatis.logging.LogFactory;
@@ -39,8 +39,11 @@ import java.util.concurrent.ConcurrentHashMap;
  *
  * @author yulichang
  */
+@SuppressWarnings("unchecked")
 @Intercepts(@Signature(type = Executor.class, method = "query", args = {MappedStatement.class, Object.class, RowBounds.class, ResultHandler.class}))
 public class MPJInterceptor implements Interceptor {
+
+
     private static final Log logger = LogFactory.getLog(MPJInterceptor.class);
 
     private static final List<ResultMapping> EMPTY_RESULT_MAPPING = new ArrayList<>(0);
@@ -54,6 +57,7 @@ public class MPJInterceptor implements Interceptor {
      * 打印 MPJ resultMap
      */
     private static final boolean printResultMap = false;
+
 
     @Override
     @SuppressWarnings({"Java8MapApi", "unchecked"})

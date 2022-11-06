@@ -11,6 +11,15 @@ import org.apache.ibatis.mapping.SqlSource;
  */
 public class SelectJoinOne extends MPJAbstractMethod {
 
+    public SelectJoinOne() {
+        super(SqlMethod.SELECT_JOIN_ONE.getMethod());
+    }
+
+    @SuppressWarnings("unused")
+    public SelectJoinOne(String name) {
+        super(name);
+    }
+
     @Override
     public MappedStatement injectMappedStatement(Class<?> mapperClass, Class<?> modelClass, TableInfo tableInfo) {
         SqlMethod sqlMethod = SqlMethod.SELECT_JOIN_ONE;

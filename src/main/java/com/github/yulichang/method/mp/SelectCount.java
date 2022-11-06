@@ -11,6 +11,15 @@ import org.apache.ibatis.mapping.MappedStatement;
  */
 public class SelectCount extends com.baomidou.mybatisplus.core.injector.methods.SelectCount implements TableAlias {
 
+    public SelectCount() {
+        super();
+    }
+
+    @SuppressWarnings("unused")
+    public SelectCount(String name) {
+        super(name);
+    }
+
     @Override
     public MappedStatement injectMappedStatement(Class<?> mapperClass, Class<?> modelClass, TableInfo tableInfo) {
         return super.injectMappedStatement(mapperClass, modelClass,

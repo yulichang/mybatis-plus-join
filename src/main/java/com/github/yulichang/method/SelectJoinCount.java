@@ -12,6 +12,16 @@ import org.apache.ibatis.mapping.SqlSource;
  */
 public class SelectJoinCount extends MPJAbstractMethod {
 
+    @SuppressWarnings("deprecation")
+    public SelectJoinCount() {
+        super();
+    }
+
+    @SuppressWarnings("unused")
+    public SelectJoinCount(String name) {
+        super(name);
+    }
+
     @Override
     public MappedStatement injectMappedStatement(Class<?> mapperClass, Class<?> modelClass, TableInfo tableInfo) {
         SqlMethod sqlMethod = SqlMethod.SELECT_JOIN_COUNT;

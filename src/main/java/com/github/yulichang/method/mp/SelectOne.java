@@ -17,6 +17,15 @@ import org.apache.ibatis.mapping.MappedStatement;
 @SuppressWarnings("deprecation")
 public class SelectOne extends com.baomidou.mybatisplus.core.injector.methods.SelectOne implements TableAlias {
 
+    public SelectOne() {
+        super();
+    }
+
+    @SuppressWarnings("unused")
+    public SelectOne(String name) {
+        super(name);
+    }
+
     @Override
     public MappedStatement injectMappedStatement(Class<?> mapperClass, Class<?> modelClass, TableInfo tableInfo) {
         return super.injectMappedStatement(mapperClass, modelClass,

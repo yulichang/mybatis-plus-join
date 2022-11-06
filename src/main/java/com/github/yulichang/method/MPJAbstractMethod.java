@@ -15,6 +15,18 @@ import java.util.List;
  */
 public abstract class MPJAbstractMethod extends AbstractMethod implements MPJBaseMethod {
 
+
+    @Deprecated
+    @SuppressWarnings("DeprecatedIsStillUsed")
+    public MPJAbstractMethod() {
+        super();
+    }
+
+    @SuppressWarnings({"unused", "deprecation"})
+    protected MPJAbstractMethod(String methodName) {
+        super();
+    }
+
     /**
      * 连表操作不考虑entity查询和逻辑删除
      */

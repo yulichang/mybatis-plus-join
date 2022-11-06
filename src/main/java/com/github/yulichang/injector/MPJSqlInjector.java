@@ -1,23 +1,15 @@
 package com.github.yulichang.injector;
 
+import com.baomidou.mybatisplus.core.MybatisPlusVersion;
 import com.baomidou.mybatisplus.core.injector.AbstractMethod;
 import com.baomidou.mybatisplus.core.injector.AbstractSqlInjector;
 import com.baomidou.mybatisplus.core.injector.DefaultSqlInjector;
 import com.baomidou.mybatisplus.core.injector.ISqlInjector;
-import com.baomidou.mybatisplus.core.injector.methods.Delete;
-import com.baomidou.mybatisplus.core.injector.methods.DeleteById;
-import com.baomidou.mybatisplus.core.injector.methods.DeleteByMap;
-import com.baomidou.mybatisplus.core.injector.methods.Insert;
-import com.baomidou.mybatisplus.core.injector.methods.DeleteBatchByIds;
-import com.baomidou.mybatisplus.core.injector.methods.SelectById;
-import com.baomidou.mybatisplus.core.injector.methods.Update;
-import com.baomidou.mybatisplus.core.injector.methods.UpdateById;
-import com.baomidou.mybatisplus.core.injector.methods.SelectBatchByIds;
-import com.baomidou.mybatisplus.core.injector.methods.SelectByMap;
+import com.baomidou.mybatisplus.core.injector.methods.*;
 import com.baomidou.mybatisplus.core.mapper.Mapper;
-import com.github.yulichang.mapper.MPJTableMapperHelper;
 import com.baomidou.mybatisplus.core.metadata.TableInfo;
 import com.baomidou.mybatisplus.core.toolkit.ClassUtils;
+import com.github.yulichang.mapper.MPJTableMapperHelper;
 import com.github.yulichang.method.*;
 import com.github.yulichang.method.mp.SelectCount;
 import com.github.yulichang.method.mp.SelectList;
@@ -89,13 +81,28 @@ public class MPJSqlInjector extends DefaultSqlInjector {
 
     private List<AbstractMethod> getJoinMethod() {
         List<AbstractMethod> list = new ArrayList<>();
-        list.add(new SelectJoinCount());
-        list.add(new SelectJoinOne());
-        list.add(new SelectJoinList());
-        list.add(new SelectJoinPage());
-        list.add(new SelectJoinMap());
-        list.add(new SelectJoinMaps());
-        list.add(new SelectJoinMapsPage());
+
+        String version = MybatisPlusVersion.getVersion();
+        String[] split = version.split("\\.");
+        int v1 = Integer.parseInt(split[0]);
+        int v2 = Integer.parseInt(split[1]);
+        if ((v1 == 3 && v2 >= 5) || v1 > 3) {
+            list.add(new SelectJoinCount(SqlMethod.SELECT_JOIN_COUNT.getMethod()));
+            list.add(new SelectJoinOne(SqlMethod.SELECT_JOIN_ONE.getMethod()));
+            list.add(new SelectJoinList(SqlMethod.SELECT_JOIN_LIST.getMethod()));
+            list.add(new SelectJoinPage(SqlMethod.SELECT_JOIN_PAGE.getMethod()));
+            list.add(new SelectJoinMap(SqlMethod.SELECT_JOIN_MAP.getMethod()));
+            list.add(new SelectJoinMaps(SqlMethod.SELECT_JOIN_MAPS.getMethod()));
+            list.add(new SelectJoinMapsPage(SqlMethod.SELECT_JOIN_MAPS_PAGE.getMethod()));
+        } else {
+            list.add(new SelectJoinCount());
+            list.add(new SelectJoinOne());
+            list.add(new SelectJoinList());
+            list.add(new SelectJoinPage());
+            list.add(new SelectJoinMap());
+            list.add(new SelectJoinMaps());
+            list.add(new SelectJoinMapsPage());
+        }
         return list;
     }
 

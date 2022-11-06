@@ -13,6 +13,15 @@ import java.util.Map;
  */
 public class SelectJoinMap extends MPJAbstractMethod {
 
+    public SelectJoinMap() {
+        super(SqlMethod.SELECT_JOIN_LIST.getMethod());
+    }
+
+    @SuppressWarnings("unused")
+    public SelectJoinMap(String name) {
+        super(name);
+    }
+
     @Override
     public MappedStatement injectMappedStatement(Class<?> mapperClass, Class<?> modelClass, TableInfo tableInfo) {
         SqlMethod sqlMethod = SqlMethod.SELECT_JOIN_MAP;

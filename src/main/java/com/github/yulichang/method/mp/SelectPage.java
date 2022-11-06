@@ -12,6 +12,15 @@ import org.apache.ibatis.mapping.MappedStatement;
  */
 public class SelectPage extends com.baomidou.mybatisplus.core.injector.methods.SelectPage implements TableAlias {
 
+    public SelectPage() {
+        super();
+    }
+
+    @SuppressWarnings("unused")
+    public SelectPage(String name) {
+        super(name);
+    }
+
     @Override
     public MappedStatement injectMappedStatement(Class<?> mapperClass, Class<?> modelClass, TableInfo tableInfo) {
         return super.injectMappedStatement(mapperClass, modelClass,

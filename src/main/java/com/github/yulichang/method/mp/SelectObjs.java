@@ -12,6 +12,15 @@ import org.apache.ibatis.mapping.MappedStatement;
  */
 public class SelectObjs extends com.baomidou.mybatisplus.core.injector.methods.SelectObjs implements TableAlias {
 
+    public SelectObjs() {
+        super();
+    }
+
+    @SuppressWarnings("unused")
+    public SelectObjs(String name) {
+        super(name);
+    }
+
     @Override
     public MappedStatement injectMappedStatement(Class<?> mapperClass, Class<?> modelClass, TableInfo tableInfo) {
         return super.injectMappedStatement(mapperClass, modelClass,

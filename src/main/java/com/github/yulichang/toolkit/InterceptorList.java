@@ -36,14 +36,13 @@ public class InterceptorList<E extends Interceptor> extends ArrayList<E> {
         if (this.isEmpty()) {
             return super.add(e);
         }
+        boolean add = super.add(e);
         Predicate<E> predicate = i -> i instanceof MPJInterceptor;
         if (this.stream().anyMatch(predicate)) {
             E mpjInterceptor = super.stream().filter(predicate).findFirst().orElse(null);
             super.removeIf(predicate);
-            boolean a = super.add(e);
-            boolean b = super.add(mpjInterceptor);
-            return a && b;
+            return super.add(mpjInterceptor);
         }
-        return super.add(e);
+        return add;
     }
 }

@@ -12,6 +12,15 @@ import org.apache.ibatis.mapping.MappedStatement;
  */
 public class SelectList extends com.baomidou.mybatisplus.core.injector.methods.SelectList implements TableAlias {
 
+    public SelectList() {
+        super();
+    }
+
+    @SuppressWarnings("unused")
+    public SelectList(String name) {
+        super(name);
+    }
+
     @Override
     public MappedStatement injectMappedStatement(Class<?> mapperClass, Class<?> modelClass, TableInfo tableInfo) {
         return super.injectMappedStatement(mapperClass, modelClass,

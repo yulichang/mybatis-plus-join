@@ -1,7 +1,6 @@
 # mybatis-plus-join
 
 * 对 [mybatis-plus](https://gitee.com/baomidou/mybatis-plus) 多表查询的扩展
-* 支持 mybatis <collection>和<association>标签
 * [演示工程](https://gitee.com/best_handsome/mybatis-plus-join-demo)
 * 点个Star支持一下吧 :)
 

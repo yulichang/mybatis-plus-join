@@ -105,7 +105,7 @@ class test {
         MPJLambdaWrapper<UserDO> wrapper = new MPJLambdaWrapper<UserDO>()
                 .selectAll(UserDO.class)
                 //一对多查询
-                .selectCollection(AddressDO.class, UDTO::getAddressList)
+                .selectCollection(AddressDO.class, UesrDTO::getAddressList)
                 .leftJoin(AddressDO.class, AddressDO::getUserId, UserDO::getId);
 
         List<UserDTO> dtoList = userMapper.selectJoinList(UserDTO.class, wrapper);

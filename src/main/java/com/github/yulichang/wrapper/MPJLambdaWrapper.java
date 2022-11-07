@@ -57,7 +57,7 @@ public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWr
      * 查询的字段
      */
     @Getter
-    private final List<SelectColumn> selectColumns = new UniqueList<>();
+    private final List<SelectColumn> selectColumns = new ArrayList<>();
     /**
      * ON sql wrapper集合
      */

@@ -4,11 +4,9 @@ import com.baomidou.mybatisplus.core.metadata.TableFieldInfo;
 import com.baomidou.mybatisplus.core.metadata.TableInfo;
 import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
 import com.baomidou.mybatisplus.core.toolkit.Assert;
-import com.baomidou.mybatisplus.core.toolkit.StringPool;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.github.yulichang.toolkit.LambdaUtils;
-import com.github.yulichang.toolkit.UniqueObject;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
@@ -23,7 +21,7 @@ import org.apache.ibatis.type.TypeHandler;
  */
 @Getter
 @Setter(AccessLevel.PACKAGE)
-public class Result implements UniqueObject {
+public class Result {
 
     private boolean isId;
 
@@ -42,10 +40,6 @@ public class Result implements UniqueObject {
     public Result() {
     }
 
-    @Override
-    public String getUniqueKey() {
-        return String.join(StringPool.DASH, String.valueOf(isId), property, column);
-    }
 
     @SuppressWarnings({"UnusedReturnValue", "unused"})
     public static class Builder<E, T> {

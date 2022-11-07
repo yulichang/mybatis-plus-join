@@ -1,13 +1,9 @@
 package com.github.yulichang.toolkit.support;
 
 import com.baomidou.mybatisplus.core.metadata.TableFieldInfo;
-import com.baomidou.mybatisplus.core.toolkit.StringPool;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
-import com.github.yulichang.toolkit.UniqueObject;
 import com.github.yulichang.wrapper.enums.BaseFuncEnum;
 import lombok.Getter;
-
-import java.util.Objects;
 
 /**
  * MPJLambdaWrapper 查询字段
@@ -16,7 +12,7 @@ import java.util.Objects;
  * @since 1.2.5
  */
 @Getter
-public class SelectColumn implements UniqueObject {
+public class SelectColumn {
 
     /**
      * 字段实体类
@@ -76,14 +72,5 @@ public class SelectColumn implements UniqueObject {
         if (tagProperty != null)
             tagProperty = StringUtils.getTargetColumn(tagProperty);
         return new SelectColumn(clazz, columnName, tableFieldInfo, alias, tagProperty, keyType, label, funcEnum);
-    }
-
-    /**
-     * 获取唯一标识
-     */
-    @Override
-    public String getUniqueKey() {
-        return String.join(StringPool.AMPERSAND, clazz.getName(), columnName, alias,
-                Objects.isNull(funcEnum) ? null : funcEnum.getSql());
     }
 }

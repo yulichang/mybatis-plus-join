@@ -92,13 +92,13 @@ public final class LambdaUtils {
         if (info.havePK()) {
             map = CollectionUtils.newHashMapWithExpectedSize(info.getFieldList().size() + 1);
             map.put(formatKey(info.getKeyProperty()), new ColumnCache(info.getKeyColumn(), info.getKeySqlSelect(),
-                    null, info.getKeyProperty(), true));
+                    null, info.getKeyProperty(), true, info.getKeyType()));
         } else {
             map = CollectionUtils.newHashMapWithExpectedSize(info.getFieldList().size());
         }
 
         info.getFieldList().forEach(i ->
-                map.put(formatKey(i.getProperty()), new ColumnCache(i.getColumn(), i.getSqlSelect(), i, null, false))
+                map.put(formatKey(i.getProperty()), new ColumnCache(i.getColumn(), i.getSqlSelect(), i, null, false, null))
         );
         return map;
     }

@@ -21,6 +21,9 @@ public class ColumnCache extends com.baomidou.mybatisplus.core.toolkit.support.C
     @Getter
     private boolean isPK;
 
+    @Getter
+    private Class<?> keyType;
+
 
     @Deprecated
     public ColumnCache(String column, String columnSelect) {
@@ -32,10 +35,11 @@ public class ColumnCache extends com.baomidou.mybatisplus.core.toolkit.support.C
         super(column, columnSelect, mapping);
     }
 
-    public ColumnCache(String column, String columnSelect, TableFieldInfo tableFieldInfo, String keyProperty, boolean isPK) {
+    public ColumnCache(String column, String columnSelect, TableFieldInfo tableFieldInfo, String keyProperty, boolean isPK, Class<?> keyType) {
         super(column, columnSelect);
         this.tableFieldInfo = tableFieldInfo;
         this.keyProperty = keyProperty;
         this.isPK = isPK;
+        this.keyType = keyType;
     }
 }

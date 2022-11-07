@@ -18,12 +18,14 @@ import com.github.yulichang.wrapper.enums.BaseFuncEnum;
 import com.github.yulichang.wrapper.interfaces.LambdaJoin;
 import com.github.yulichang.wrapper.interfaces.Query;
 import com.github.yulichang.wrapper.interfaces.on.OnFunction;
-import com.github.yulichang.wrapper.resultmap.Collection;
+import com.github.yulichang.wrapper.resultmap.LabelType;
 import com.github.yulichang.wrapper.resultmap.MFunc;
+import com.github.yulichang.wrapper.resultmap.MybatisLabel;
 import lombok.Getter;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -61,10 +63,10 @@ public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWr
      */
     private final List<MPJLambdaWrapper<?>> onWrappers = new ArrayList<>();
     /**
-     * 敌对多映射关系
+     * 映射关系
      */
     @Getter
-    private final List<Collection<?, ?>> resultMapCollection = new ArrayList<>();
+    private final List<MybatisLabel<?, ?>> resultMapMybatisLabel = new ArrayList<>();
     /**
      * 是否构建是否存在一对多
      */
@@ -140,13 +142,35 @@ public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWr
             for (SFunction<S, ?> s : columns) {
                 ColumnCache cache = getCache(s);
                 selectColumns.add(SelectColumn.of(LambdaUtils.getEntityClass(s), cache.getColumn(), cache.getTableFieldInfo(),
-                        null, cache.getTableFieldInfo() == null ? cache.getKeyProperty() : cache.getTableFieldInfo().getProperty(), null));
+                        null, cache.getTableFieldInfo() == null ? cache.getKeyProperty() : cache.getTableFieldInfo().getProperty(), cache.getKeyType(), null));
             }
         }
         return typedThis;
     }
 
-    // TODO 重载重复代码简化
+    /**
+     * 一对多查询 调用此方法发必需要调用对应的 left join / right join ... 连表方法，否则会报错
+     * <p>
+     * 举例 UserDO UserAddressDO 为一对多关系  UserDTO 为结果类
+     * <pre>
+     *     MPJLambdaQueryWrapper<UserDO> wrapper = new MPJLambdaQueryWrapper();
+     *     wrapper.selectAll(UserDO.class)
+     *            .selectCollection(UserAddressDO.class, UserDTO::getAddressListDTO)
+     *            .leftJoin(UserAddressDO.class, ...... )
+     *            .eq(...)
+     *            ...
+     * <pre/>
+     * 会自动将 UserAddressDO类中相同属性的字段 以mybatis<collection>的方式映射到UserDTO.addressListDTO属性中
+     *
+     * @since 1.2.5
+     *
+     * @param child    连表数据库实体类
+     * @param dtoField 包装类对应的属性
+     * @param <S>      包装类
+     * @param <C>      对多数据库实体类
+     * @param <Z>      包装类集合泛型
+     * @param <F>      包装类集合字段泛型
+     */
     public <S, C, Z, F extends java.util.Collection<?>> MPJLambdaWrapper<T> selectCollection(Class<C> child, SFunction<S, F> dtoField) {
         String dtoFieldName = LambdaUtils.getName(dtoField);
         Class<S> dtoClass = LambdaUtils.getEntityClass(dtoField);
@@ -154,23 +178,51 @@ public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWr
         Field field = fieldMap.get(dtoFieldName);
         this.resultMap = true;
         Class<?> genericType = ReflectionKit.getGenericType(field);
-        Collection.Builder<C, Z> builder;
+        MybatisLabel.Builder<C, Z> builder;
         if (genericType == null || genericType.isAssignableFrom(child)) {
             //找不到集合泛型 List List<?> List<Object> ， 直接查询数据库实体
-            builder = new Collection.Builder<>(dtoFieldName, child, field.getType());
+            builder = new MybatisLabel.Builder<>(LabelType.COLLECTION, dtoFieldName, child, field.getType());
         } else {
             Class<Z> ofType = (Class<Z>) genericType;
             if (ReflectionKit.isPrimitiveOrWrapper(ofType)) {
                 throw new MPJException("collection 不支持基本数据类型");
             }
-            builder = new Collection.Builder<>(dtoFieldName, child, field.getType(), ofType, true);
+            builder = new MybatisLabel.Builder<>(LabelType.COLLECTION, dtoFieldName, child, field.getType(), ofType, true);
         }
-        this.resultMapCollection.add(builder.build());
+        this.resultMapMybatisLabel.add(builder.build());
         return typedThis;
     }
 
+    /**
+     * 一对多查询 调用此方法发必需要调用对应的 left join / right join ... 连表方法，否则会报错
+     * <p>
+     * 举例 UserDO UserAddressDO 为一对多关系  UserDTO 为结果类
+     * <pre>
+     *     MPJLambdaQueryWrapper<UserDO> wrapper = new MPJLambdaQueryWrapper();
+     *     wrapper.selectAll(UserDO.class)
+     *            .selectCollection(UserAddressDO.class, UserDTO::getAddressListDTO, map -> map
+     *                 .id(UserAddressDO::getId, AddressDTO::getId)                     //如果属性名一致 可以传一个
+     *                 .result(UserAddressDO::getUserId)                                //如果属性名一致 可以传一个
+     *                 .result(UserAddressDO::getAddress, AddressDTO::getAddress)))     //如果属性名一致 可以传一个
+     *            .leftJoin(UserAddressDO.class, ...... )
+     *            .eq(...)
+     *            ...
+     * <pre/>
+     *
+     * 会自动将 UserAddressDO类中指定的字段 以mybatis<collection>的方式映射到UserDTO.addressListDTO属性中
+     *
+     * @since 1.2.5
+     *
+     * @param child      连表数据库实体类
+     * @param dtoField   包装类对应的属性
+     * @param collection collection标签内容
+     * @param <S>        包装类
+     * @param <C>        对多数据库实体类
+     * @param <Z>        包装类集合泛型
+     * @param <F>        包装类集合字段泛型
+     */
     public <S, C, Z, F extends java.util.Collection<Z>> MPJLambdaWrapper<T>
-    selectCollection(Class<C> child, SFunction<S, F> dtoField, MFunc<Collection.Builder<C, Z>> collection) {
+    selectCollection(Class<C> child, SFunction<S, F> dtoField, MFunc<MybatisLabel.Builder<C, Z>> collection) {
         String dtoFieldName = LambdaUtils.getName(dtoField);
         Class<S> dtoClass = LambdaUtils.getEntityClass(dtoField);
         Field field = ReflectionKit.getFieldMap(dtoClass).get(dtoFieldName);
@@ -178,13 +230,49 @@ public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWr
         //获取集合泛型
         Class<?> genericType = ReflectionKit.getGenericType(field);
         Class<Z> ofType = (Class<Z>) genericType;
-        Collection.Builder<C, Z> builder = new Collection.Builder<>(dtoFieldName, child, field.getType(), ofType, false);
-        this.resultMapCollection.add(collection.apply(builder).build());
+        MybatisLabel.Builder<C, Z> builder = new MybatisLabel.Builder<>(LabelType.COLLECTION, dtoFieldName, child, field.getType(), ofType, false);
+        this.resultMapMybatisLabel.add(collection.apply(builder).build());
         return typedThis;
     }
 
-    public <S, C, Z, F> MPJLambdaWrapper<T> selectAssociation(Class<C> child, SFunction<S, F> dtoField, MFunc<Collection.Builder<C, F>> collection) {
-        //TODO
+    /**
+     * 对一查询 用法参考 selectCollection
+     *
+     * @since 1.2.5
+     */
+    public <S, C, F> MPJLambdaWrapper<T> selectAssociation(Class<C> child, SFunction<S, F> dtoField) {
+        String dtoFieldName = LambdaUtils.getName(dtoField);
+        Class<S> dtoClass = LambdaUtils.getEntityClass(dtoField);
+        Map<String, Field> fieldMap = ReflectionKit.getFieldMap(dtoClass);
+        Field field = fieldMap.get(dtoFieldName);
+        Assert.isFalse(Collection.class.isAssignableFrom(field.getType()), "association 不支持集合类");
+        if (ReflectionKit.isPrimitiveOrWrapper(field.getType())) {
+            throw new MPJException("association 不支持基本数据类型");
+        }
+        this.resultMap = true;
+        MybatisLabel.Builder<C, F> builder;
+        builder = new MybatisLabel.Builder<>(LabelType.ASSOCIATION, dtoFieldName, child, field.getType(), (Class<F>) field.getType(), true);
+        this.resultMapMybatisLabel.add(builder.build());
+        return typedThis;
+    }
+
+    /**
+     * 对一查询 用法参考 selectCollection
+     *
+     * @since 1.2.5
+     */
+    public <S, C, F> MPJLambdaWrapper<T> selectAssociation(Class<C> child, SFunction<S, F> dtoField,
+                                                           MFunc<MybatisLabel.Builder<C, F>> collection) {
+        String dtoFieldName = LambdaUtils.getName(dtoField);
+        Class<S> dtoClass = LambdaUtils.getEntityClass(dtoField);
+        Field field = ReflectionKit.getFieldMap(dtoClass).get(dtoFieldName);
+        this.resultMap = true;
+        Assert.isFalse(Collection.class.isAssignableFrom(field.getType()), "association 不支持集合类");
+        if (ReflectionKit.isPrimitiveOrWrapper(field.getType())) {
+            throw new MPJException("association 不支持基本数据类型");
+        }
+        MybatisLabel.Builder<C, F> builder = new MybatisLabel.Builder<>(LabelType.ASSOCIATION, dtoFieldName, child, field.getType(), (Class<F>) child, false);
+        this.resultMapMybatisLabel.add(collection.apply(builder).build());
         return typedThis;
     }
 
@@ -194,7 +282,7 @@ public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWr
         TableInfo info = TableInfoHelper.getTableInfo(entityClass);
         Assert.notNull(info, "table not find by class <%s>", entityClass.getName());
         info.getFieldList().stream().filter(predicate).collect(Collectors.toList()).forEach(
-                i -> selectColumns.add(SelectColumn.of(entityClass, i.getColumn(), i, null, i.getProperty(), null)));
+                i -> selectColumns.add(SelectColumn.of(entityClass, i.getColumn(), i, null, i.getProperty(), null, null)));
         return typedThis;
     }
 
@@ -205,11 +293,12 @@ public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWr
         List<Field> tagFields = ReflectionKit.getFieldList(tag);
         tableInfo.getFieldList().forEach(i -> {
             if (tagFields.stream().anyMatch(f -> f.getName().equals(i.getProperty()))) {
-                selectColumns.add(SelectColumn.of(source, i.getColumn(), i, null, i.getProperty(), null));
+                selectColumns.add(SelectColumn.of(source, i.getColumn(), i, null, i.getProperty(), null, null));
             }
         });
         if (tableInfo.havePK() && tagFields.stream().anyMatch(i -> i.getName().equals(tableInfo.getKeyProperty()))) {
-            selectColumns.add(SelectColumn.of(source, tableInfo.getKeyColumn(), null, null, tableInfo.getKeyProperty(), null));
+            selectColumns.add(SelectColumn.of(source, tableInfo.getKeyColumn(), null, null,
+                    tableInfo.getKeyProperty(), tableInfo.getKeyType(), null));
         }
         return typedThis;
     }
@@ -217,14 +306,16 @@ public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWr
     @Override
     public <S> MPJLambdaWrapper<T> selectAs(SFunction<S, ?> column, String alias) {
         ColumnCache cache = getCache(column);
-        selectColumns.add(SelectColumn.of(LambdaUtils.getEntityClass(column), cache.getColumn(), cache.getTableFieldInfo(), alias, null, null));
+        selectColumns.add(SelectColumn.of(LambdaUtils.getEntityClass(column), cache.getColumn(), cache.getTableFieldInfo(),
+                alias, null, cache.getKeyType(), null));
         return typedThis;
     }
 
     public <S> MPJLambdaWrapper<T> selectFunc(boolean condition, BaseFuncEnum funcEnum, SFunction<S, ?> column, String alias) {
         if (condition) {
             ColumnCache cache = getCache(column);
-            selectColumns.add(SelectColumn.of(LambdaUtils.getEntityClass(column), cache.getColumn(), cache.getTableFieldInfo(), alias, alias, funcEnum));
+            selectColumns.add(SelectColumn.of(LambdaUtils.getEntityClass(column), cache.getColumn(),
+                    cache.getTableFieldInfo(), alias, alias, cache.getKeyType(), funcEnum));
         }
         return typedThis;
     }
@@ -232,7 +323,7 @@ public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWr
     @Override
     public MPJLambdaWrapper<T> selectFunc(boolean condition, BaseFuncEnum funcEnum, Object column, String alias) {
         if (condition) {
-            selectColumns.add(SelectColumn.of(null, column.toString(), null, alias, alias, funcEnum));
+            selectColumns.add(SelectColumn.of(null, column.toString(), null, alias, alias, null, funcEnum));
         }
         return typedThis;
     }
@@ -241,10 +332,11 @@ public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWr
         TableInfo info = TableInfoHelper.getTableInfo(clazz);
         Assert.notNull(info, "table can not be find -> %s", clazz);
         if (info.havePK()) {
-            selectColumns.add(SelectColumn.of(clazz, info.getKeyColumn(), null, null, info.getKeyProperty(), null));
+            selectColumns.add(SelectColumn.of(clazz, info.getKeyColumn(), null, null,
+                    info.getKeyProperty(), info.getKeyType(), null));
         }
         info.getFieldList().forEach(c ->
-                selectColumns.add(SelectColumn.of(clazz, c.getColumn(), c, null, c.getProperty(), null)));
+                selectColumns.add(SelectColumn.of(clazz, c.getColumn(), c, null, c.getProperty(), null, null)));
         return typedThis;
     }
 

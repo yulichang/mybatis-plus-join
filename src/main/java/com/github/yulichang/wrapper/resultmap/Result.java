@@ -4,8 +4,11 @@ import com.baomidou.mybatisplus.core.metadata.TableFieldInfo;
 import com.baomidou.mybatisplus.core.metadata.TableInfo;
 import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
 import com.baomidou.mybatisplus.core.toolkit.Assert;
+import com.baomidou.mybatisplus.core.toolkit.StringPool;
+import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.github.yulichang.toolkit.LambdaUtils;
+import com.github.yulichang.toolkit.UniqueObject;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
@@ -20,7 +23,7 @@ import org.apache.ibatis.type.TypeHandler;
  */
 @Getter
 @Setter(AccessLevel.PACKAGE)
-public class Result {
+public class Result implements UniqueObject {
 
     private boolean isId;
 
@@ -39,6 +42,12 @@ public class Result {
     public Result() {
     }
 
+    @Override
+    public String getUniqueKey() {
+        return String.join(StringPool.DASH, String.valueOf(isId), property, column);
+    }
+
+    @SuppressWarnings({"UnusedReturnValue", "unused"})
     public static class Builder<E, T> {
 
         private final Result result;
@@ -60,11 +69,21 @@ public class Result {
             Assert.notNull(tableInfo, "table not find by class <%s>", tableInfo);
             if (tableInfo.havePK() && tableInfo.getKeyProperty().equals(name)) {
                 result.column = tableInfo.getKeyColumn();
+                if (StringUtils.isBlank(result.property)) {
+                    result.property = tableInfo.getKeyProperty();
+                }
+                result.javaType = tableInfo.getKeyType();
             } else {
                 TableFieldInfo fieldInfo = tableInfo.getFieldList().stream().filter(i -> i.getField().getName().equals(name)).findFirst().orElse(null);
                 Assert.notNull(fieldInfo, "table <%s> not find column <%>", tableInfo.getTableName(), name);
                 result.column = fieldInfo.getColumn();
                 result.tableFieldInfo = fieldInfo;
+                if (StringUtils.isBlank(result.property)) {
+                    result.property = fieldInfo.getProperty();
+                }
+                result.jdbcType = fieldInfo.getJdbcType();
+                result.javaType = fieldInfo.getField().getType();
+                result.typeHandle = fieldInfo.getTypeHandler();
             }
             return this;
         }
@@ -80,7 +99,6 @@ public class Result {
         }
 
         public Result build() {
-            //TODO 检查数据完整性
             return result;
         }
 

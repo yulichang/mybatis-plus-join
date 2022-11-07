@@ -10,10 +10,13 @@ import com.github.yulichang.toolkit.Constant;
 import com.github.yulichang.toolkit.ReflectionKit;
 import com.github.yulichang.toolkit.support.SelectColumn;
 import com.github.yulichang.wrapper.MPJLambdaWrapper;
+import com.github.yulichang.wrapper.resultmap.MybatisLabel;
+import com.github.yulichang.wrapper.resultmap.Result;
 import org.apache.ibatis.executor.Executor;
 import org.apache.ibatis.logging.Log;
 import org.apache.ibatis.logging.LogFactory;
 import org.apache.ibatis.mapping.MappedStatement;
+import org.apache.ibatis.mapping.ResultFlag;
 import org.apache.ibatis.mapping.ResultMap;
 import org.apache.ibatis.mapping.ResultMapping;
 import org.apache.ibatis.plugin.Interceptor;
@@ -30,6 +33,7 @@ import org.apache.ibatis.type.UnknownTypeHandler;
 import java.lang.reflect.Field;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 /**
  * 连表拦截器
@@ -52,11 +56,6 @@ public class MPJInterceptor implements Interceptor {
      * 缓存MappedStatement,不需要每次都去重新构建MappedStatement
      */
     private static final Map<String, Map<Configuration, MappedStatement>> MS_CACHE = new ConcurrentHashMap<>();
-
-    /**
-     * 打印 MPJ resultMap
-     */
-    private static final boolean printResultMap = false;
 
 
     @Override
@@ -137,10 +136,7 @@ public class MPJInterceptor implements Interceptor {
         if (ms.getKeyProperties() != null && ms.getKeyProperties().length != 0) {
             builder.keyProperty(String.join(StringPool.COMMA, ms.getKeyProperties()));
         }
-        List<ResultMap> resultMaps = new ArrayList<>();
-        ResultMap resultMap = buildResultMap(ms, resultType, ew);
-        resultMaps.add(resultMap);
-        printResultMap(resultMap);
+        List<ResultMap> resultMaps = buildResultMap(ms, resultType, ew);
         builder.resultMaps(resultMaps);
         return builder.build();
     }
@@ -149,65 +145,94 @@ public class MPJInterceptor implements Interceptor {
      * 构建resultMap TODO 可以用lambda简化代码
      */
     @SuppressWarnings({"rawtypes", "unchecked"})
-    private ResultMap buildResultMap(MappedStatement ms, Class<?> resultType, Object obj) {
+    private List<ResultMap> buildResultMap(MappedStatement ms, Class<?> resultType, Object obj) {
+        List<ResultMap> result = new ArrayList<>();
         TableInfo tableInfo = TableInfoHelper.getTableInfo(resultType);
-        String currentNamespace = ms.getResource().split(StringPool.SPACE)[0];
-        String id = currentNamespace + StringPool.DOT + Constants.MYBATIS_PLUS + StringPool.UNDERSCORE + resultType.getSimpleName();
-
+        String id = ms.getId() + StringPool.DOT + Constants.MYBATIS_PLUS + StringPool.UNDERSCORE + resultType.getName();
         if (!(obj instanceof MPJLambdaWrapper) || Map.class.isAssignableFrom(resultType) ||
                 ReflectionKit.isPrimitiveOrWrapper(resultType) ||
                 Collection.class.isAssignableFrom(resultType)) {
-            return getDefaultResultMap(tableInfo, ms, resultType, id);
+            result.add(getDefaultResultMap(tableInfo, ms, resultType, id));
+            return result;
         }
         MPJLambdaWrapper wrapper = (MPJLambdaWrapper) obj;
         Map<String, Field> fieldMap = ReflectionKit.getFieldMap(resultType);
-
-        if (wrapper.isResultMap()) {
-            //TODO
-            return new ResultMap.Builder(ms.getConfiguration(), id, resultType, EMPTY_RESULT_MAPPING).build();
-        } else {
-            List<SelectColumn> columnList = wrapper.getSelectColumns();
-            List<ResultMapping> resultMappings = new ArrayList<>(columnList.size());
-            columnList.forEach(i -> {
-                TableFieldInfo info = i.getTableFieldInfo();
-                if (StringUtils.isNotBlank(i.getAlias())) {
-                    //优先别名查询 selectFunc selectAs
-                    ResultMapping.Builder builder = new ResultMapping.Builder(ms.getConfiguration(), i.getAlias(),
-                            i.getAlias(), getAliasField(resultType, fieldMap, i.getAlias()));
-                    if (i.getFuncEnum() == null || StringUtils.isBlank(i.getFuncEnum().getSql())) {
-                        if (info != null && info.getTypeHandler() != null && info.getTypeHandler() != UnknownTypeHandler.class) {
-                            Field f = fieldMap.get(i.getAlias());
-                            if (f.getType() == info.getField().getType()) {
-                                builder.typeHandler(getTypeHandler(ms, info));
-                            }
+        List<SelectColumn> columnList = wrapper.getSelectColumns();
+        List<ResultMapping> resultMappings = new ArrayList<>(columnList.size());
+        columnList.forEach(i -> {
+            TableFieldInfo info = i.getTableFieldInfo();
+            if (StringUtils.isNotBlank(i.getAlias())) {
+                //优先别名查询 selectFunc selectAs
+                ResultMapping.Builder builder = new ResultMapping.Builder(ms.getConfiguration(), i.getAlias(),
+                        i.getAlias(), getAliasField(resultType, fieldMap, i.getAlias()));
+                if (i.getFuncEnum() == null || StringUtils.isBlank(i.getFuncEnum().getSql())) {
+                    if (info != null && info.getTypeHandler() != null && info.getTypeHandler() != UnknownTypeHandler.class) {
+                        Field f = fieldMap.get(i.getAlias());
+                        if (f.getType() == info.getField().getType()) {
+                            builder.typeHandler(getTypeHandler(ms, info));
+                        }
+                    }
+                }
+                resultMappings.add(builder.build());
+            } else if (info != null) {
+                // select selectAll selectAsClass
+                if (i.getFuncEnum() == null || StringUtils.isBlank(i.getFuncEnum().getSql())) {
+                    ResultMapping.Builder builder = new ResultMapping.Builder(ms.getConfiguration(), info.getProperty(),
+                            info.getColumn(), info.getPropertyType());
+                    if (info.getTypeHandler() != null && info.getTypeHandler() != UnknownTypeHandler.class) {
+                        Field f = fieldMap.get(info.getProperty());
+                        if (f != null && f.getType() == info.getField().getType()) {
+                            builder.typeHandler(getTypeHandler(ms, info));
                         }
                     }
                     resultMappings.add(builder.build());
-                } else if (info != null) {
-                    // select selectAll selectAsClass
-                    if (i.getFuncEnum() == null || StringUtils.isBlank(i.getFuncEnum().getSql())) {
-                        ResultMapping.Builder builder = new ResultMapping.Builder(ms.getConfiguration(), info.getProperty(),
-                                info.getColumn(), info.getPropertyType());
-                        if (info.getTypeHandler() != null && info.getTypeHandler() != UnknownTypeHandler.class) {
-                            Field f = fieldMap.get(info.getProperty());
-                            if (f != null && f.getType() == info.getField().getType()) {
-                                builder.typeHandler(getTypeHandler(ms, info));
-                            }
-                        }
-                        resultMappings.add(builder.build());
-                    } else {
-                        resultMappings.add(new ResultMapping.Builder(ms.getConfiguration(), info.getProperty(), info.getColumn(), info.getPropertyType()).build());
-                    }
                 } else {
-                    // 主键列
-                    resultMappings.add(new ResultMapping.Builder(ms.getConfiguration(), i.getTagProperty(), i.getColumnName(),
-                            getAliasField(resultType, fieldMap, i.getTagProperty())).build());
+                    resultMappings.add(new ResultMapping.Builder(ms.getConfiguration(), info.getProperty(), info.getColumn(), info.getPropertyType()).build());
                 }
-            });
-            //移除result中不存在的标签
-            resultMappings.removeIf(i -> !fieldMap.containsKey(i.getProperty()));
-            return new ResultMap.Builder(ms.getConfiguration(), id, resultType, resultMappings).build();
+            } else {
+                // 主键列
+                resultMappings.add(new ResultMapping.Builder(ms.getConfiguration(), i.getTagProperty(), i.getColumnName(),
+                        i.getKeyType()).build());
+            }
+        });
+        //移除result中不存在的标签
+        Set<String> columnSet = resultMappings.stream().map(ResultMapping::getColumn).collect(Collectors.toSet());
+        resultMappings.removeIf(i -> !fieldMap.containsKey(i.getProperty()));
+        if (wrapper.isResultMap()) {
+            //先不考虑 去重 看一下能否实现
+            List<MybatisLabel<?, ?>> mybatisLabel = wrapper.getResultMapMybatisLabel();
+            for (MybatisLabel mpjColl : mybatisLabel) {
+                List<Result> list = mpjColl.getResultList();
+                if (CollectionUtils.isEmpty(list)) {
+                    continue;
+                }
+                List<ResultMapping> childMapping = new ArrayList<>(list.size());
+                for (Result r : list) {
+                    String columnName = r.getColumn();
+                    columnName = getColumn(columnSet, columnName);
+                    columnList.add(SelectColumn.of(mpjColl.getEntityClass(), r.getColumn(), null,
+                            Objects.equals(columnName, r.getColumn()) ? null : columnName, null, null, null));
+                    ResultMapping.Builder builder = new ResultMapping.Builder(ms.getConfiguration(), r.getProperty(), columnName, r.getJavaType());
+                    if (r.isId()) {
+                        builder.flags(Collections.singletonList(ResultFlag.ID));
+                    }
+                    childMapping.add(builder.build());
+                }
+                String childId = id + StringPool.UNDERSCORE + mpjColl.getEntityClass().getName() + StringPool.UNDERSCORE +
+                        mpjColl.getOfType().getName() + StringPool.UNDERSCORE + mpjColl.getLabelType() + StringPool.UNDERSCORE +
+                        childMapping.stream().map(i -> (CollectionUtils.isEmpty(i.getFlags()) ? ResultFlag.CONSTRUCTOR :
+                                i.getFlags().get(0)) + i.getProperty() + i.getColumn()).collect(Collectors.joining(StringPool.DASH));
+                resultMappings.add(new ResultMapping.Builder(ms.getConfiguration(), mpjColl.getProperty())
+                        .javaType(mpjColl.getJavaType())
+                        .nestedResultMapId(childId)
+                        .build());
+                if (!ms.getConfiguration().getResultMapNames().contains(childId)) {
+                    ms.getConfiguration().addResultMap(new ResultMap.Builder(ms.getConfiguration(), childId, mpjColl.getOfType(), childMapping).build());
+                }
+            }
         }
+        result.add(0, new ResultMap.Builder(ms.getConfiguration(), id, resultType, resultMappings).build());
+        return result;
     }
 
     /**
@@ -222,6 +247,21 @@ public class MPJInterceptor implements Interceptor {
         return typeHandler;
     }
 
+    /**
+     * 列名去重 重复的添加 mpj 前缀 再重复走递归
+     *
+     * @param pool       查询列 集合
+     * @param columnName 列明
+     * @return 唯一列名
+     */
+    private String getColumn(Set<String> pool, String columnName) {
+        if (!pool.contains(columnName)) {
+            pool.add(columnName);
+            return columnName;
+        }
+        columnName = "mpj_" + StringUtils.getTargetColumn(columnName);
+        return getColumn(pool, columnName);
+    }
 
     /**
      * 获取非lambda的resultMap
@@ -254,20 +294,5 @@ public class MPJInterceptor implements Interceptor {
         Field field = fieldMap.get(alias);
         Assert.notNull(field, "Result Class <%s> not find Field <%s>", resultType.getSimpleName(), alias);
         return field.getType();
-    }
-
-    /**
-     * 打印resultMap
-     * 先打开 mybatis plus 日志， 在设置 printResultMap = true 才会打印
-     */
-    private void printResultMap(ResultMap resultMap) {
-        if (resultMap == null || !printResultMap)
-            return;
-        logger.debug("===================== MPJ resultMap =========================");
-        List<ResultMapping> mappings = resultMap.getResultMappings();
-        logger.debug(String.format("    <resultMap id=\"%s\" type=\"%s\">", resultMap.getId(), resultMap.getType().getName()));
-        mappings.forEach(i -> logger.debug(String.format("        <result property=\"%s\" column=\"%s\" javaType=\"%s\" typeHandler=\"%s\"/>", i.getProperty(), i.getColumn(), i.getJavaType(), i.getTypeHandler())));
-        logger.debug("    </resultMap>");
-        logger.debug("=====================      end      =========================");
     }
 }

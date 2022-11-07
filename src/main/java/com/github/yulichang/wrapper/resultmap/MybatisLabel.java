@@ -3,6 +3,7 @@ package com.github.yulichang.wrapper.resultmap;
 import com.baomidou.mybatisplus.core.metadata.TableFieldInfo;
 import com.baomidou.mybatisplus.core.metadata.TableInfo;
 import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
+import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.github.yulichang.toolkit.ReflectionKit;
 import lombok.Getter;
 
@@ -20,7 +21,9 @@ import java.util.stream.Collectors;
  * @since 1.2.5
  */
 @Getter
-public class Collection<E, T> {
+public class MybatisLabel<E, T> {
+
+    private LabelType labelType;
 
     private String property;
 
@@ -33,26 +36,28 @@ public class Collection<E, T> {
     private List<Result> resultList;
 
     //collection嵌套
-//    private List<Collection> collectionList;
+    //    private List<Collection> collectionList;
 
-    private Collection() {
+    private MybatisLabel() {
     }
 
+    @SuppressWarnings("unused")
     public static class Builder<E, T> {
 
-        private final Collection<E, T> collection;
+        private final MybatisLabel<E, T> mybatisLabel;
 
         /**
          * 自动构建
          */
         @SuppressWarnings("unchecked")
-        public Builder(String property, Class<E> entityClass, Class<?> javaType) {
-            this.collection = new Collection<>();
-            collection.property = property;
-            collection.entityClass = entityClass;
-            collection.javaType = javaType;
-            collection.ofType = (Class<T>) entityClass;
-            collection.resultList = new ArrayList<>();
+        public Builder(LabelType labelType, String property, Class<E> entityClass, Class<?> javaType) {
+            this.mybatisLabel = new MybatisLabel<>();
+            mybatisLabel.labelType = labelType;
+            mybatisLabel.property = property;
+            mybatisLabel.entityClass = entityClass;
+            mybatisLabel.javaType = javaType;
+            mybatisLabel.ofType = (Class<T>) entityClass;
+            mybatisLabel.resultList = new ArrayList<>();
             autoBuild(true, entityClass, (Class<T>) entityClass);
         }
 
@@ -65,30 +70,47 @@ public class Collection<E, T> {
          * @param ofType      映射类
          * @param auto        自动映射数据库实体对应的字段
          */
-        public Builder(String property, Class<E> entityClass, Class<?> javaType, Class<T> ofType, boolean auto) {
-            this.collection = new Collection<>();
-            collection.property = property;
-            collection.entityClass = entityClass;
-            collection.javaType = javaType;
-            collection.ofType = ofType;
-            collection.resultList = new ArrayList<>();
+        public Builder(LabelType labelType, String property, Class<E> entityClass, Class<?> javaType, Class<T> ofType, boolean auto) {
+            this.mybatisLabel = new MybatisLabel<>();
+            mybatisLabel.labelType = labelType;
+            mybatisLabel.property = property;
+            mybatisLabel.entityClass = entityClass;
+            mybatisLabel.javaType = javaType;
+            mybatisLabel.ofType = ofType;
+            mybatisLabel.resultList = new ArrayList<>();
             autoBuild(auto, entityClass, ofType);
         }
 
-        public Builder<E, T> id(MFunc<Result.Builder<E, T>> result) {
-            Result r = result.apply(new Result.Builder<>(true)).build();
-            collection.resultList.add(r);
+        public Builder<E, T> id(SFunction<E, ?> entity, SFunction<T, ?> tag) {
+            Result.Builder<E, T> builder = new Result.Builder<>(true);
+            builder.column(entity).property(tag);
+            mybatisLabel.resultList.add(builder.build());
             return this;
         }
 
-        public Builder<E, T> result(MFunc<Result.Builder<E, T>> result) {
-            Result r = result.apply(new Result.Builder<>(false)).build();
-            collection.resultList.add(r);
+        public Builder<E, T> id(SFunction<E, ?> entity) {
+            Result.Builder<E, T> builder = new Result.Builder<>(true);
+            builder.column(entity);
+            mybatisLabel.resultList.add(builder.build());
             return this;
         }
 
-        public Collection<E, T> build() {
-            return collection;
+        public Builder<E, T> result(SFunction<E, ?> entity, SFunction<T, ?> tag) {
+            Result.Builder<E, T> builder = new Result.Builder<>(false);
+            builder.column(entity).property(tag);
+            mybatisLabel.resultList.add(builder.build());
+            return this;
+        }
+
+        public Builder<E, T> result(SFunction<E, ?> entity) {
+            Result.Builder<E, T> builder = new Result.Builder<>(false);
+            builder.column(entity);
+            mybatisLabel.resultList.add(builder.build());
+            return this;
+        }
+
+        public MybatisLabel<E, T> build() {
+            return mybatisLabel;
         }
 
         private void autoBuild(boolean auto, Class<E> entityClass, Class<T> tagClass) {
@@ -107,16 +129,15 @@ public class Collection<E, T> {
                 };
                 if (entityClass == tagClass) {
                     if (tableInfo.havePK()) {
-                        collection.resultList.add(pkBuild(tableInfo));
+                        mybatisLabel.resultList.add(pkBuild(tableInfo));
                     }
-                    collection.resultList.addAll(tableInfo.getFieldList().stream().map(build).collect(Collectors.toList()));
+                    mybatisLabel.resultList.addAll(tableInfo.getFieldList().stream().map(build).collect(Collectors.toList()));
                 } else {
                     if (tableInfo.havePK() && tagMap.containsKey(tableInfo.getKeyProperty())) {
-                        collection.resultList.add(pkBuild(tableInfo));
-                    } else {
-                        collection.resultList.addAll(tableInfo.getFieldList().stream().filter(i ->
-                                tagMap.containsKey(i.getProperty())).map(build).collect(Collectors.toList()));
+                        mybatisLabel.resultList.add(pkBuild(tableInfo));
                     }
+                    mybatisLabel.resultList.addAll(tableInfo.getFieldList().stream().filter(i ->
+                            tagMap.containsKey(i.getProperty())).map(build).collect(Collectors.toList()));
                 }
             }
         }

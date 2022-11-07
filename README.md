@@ -120,11 +120,13 @@ class test {
 <resultMap id="xxxxxxxx" type="com.github.yulichang.join.dto.UserDTO">
     <result property="id" column="id"/>
     <result property="name" column="name"/>
+    <!--其他属性省略-->
     <collection property="addressList" javaType="java.util.List"
                 ofType="com.github.yulichang.join.entity.UserAddressDO">
         <id property="id" column="mpj_id"/>
         <result property="address" column="address"/>
         <result property="userId" column="user_id"/>
+        <!--其他属性省略-->
     </collection>
 </resultMap>
 ```

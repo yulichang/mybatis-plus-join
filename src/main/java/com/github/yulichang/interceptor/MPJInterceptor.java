@@ -158,6 +158,8 @@ public class MPJInterceptor implements Interceptor {
         MPJLambdaWrapper wrapper = (MPJLambdaWrapper) obj;
         Map<String, Field> fieldMap = ReflectionKit.getFieldMap(resultType);
         List<SelectColumn> columnList = wrapper.getSelectColumns();
+        //移除对多查询列，为了可重复使用wrapper
+        columnList.removeIf(SelectColumn::isLabel);
         List<ResultMapping> resultMappings = new ArrayList<>(columnList.size());
         columnList.forEach(i -> {
             TableFieldInfo info = i.getTableFieldInfo();
@@ -211,7 +213,7 @@ public class MPJInterceptor implements Interceptor {
                     //列名去重
                     columnName = getColumn(columnSet, columnName);
                     columnList.add(SelectColumn.of(mpjColl.getEntityClass(), r.getColumn(), null,
-                            Objects.equals(columnName, r.getColumn()) ? null : columnName, null, null, null));
+                            Objects.equals(columnName, r.getColumn()) ? null : columnName, null, null, true, null));
                     ResultMapping.Builder builder = new ResultMapping.Builder(ms.getConfiguration(), r.getProperty(), columnName, r.getJavaType());
                     if (r.isId()) {//主键标记为id标签
                         builder.flags(Collections.singletonList(ResultFlag.ID));

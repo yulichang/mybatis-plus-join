@@ -49,25 +49,33 @@ public class SelectColumn implements UniqueObject {
     private final Class<?> keyType;
 
     /**
+     * 是否是对多的列
+     */
+    private final boolean label;
+
+    /**
      * 字段函数
      */
     private final BaseFuncEnum funcEnum;
 
 
-    private SelectColumn(Class<?> clazz, String columnName, TableFieldInfo tableFieldInfo, String alias, String tagProperty, Class<?> keyType, BaseFuncEnum funcEnum) {
+    private SelectColumn(Class<?> clazz, String columnName, TableFieldInfo tableFieldInfo, String alias,
+                         String tagProperty, Class<?> keyType, boolean label, BaseFuncEnum funcEnum) {
         this.clazz = clazz;
         this.columnName = columnName;
         this.tableFieldInfo = tableFieldInfo;
         this.alias = alias;
         this.tagProperty = tagProperty;
         this.keyType = keyType;
+        this.label = label;
         this.funcEnum = funcEnum;
     }
 
-    public static SelectColumn of(Class<?> clazz, String columnName, TableFieldInfo tableFieldInfo, String alias, String tagProperty, Class<?> keyType, BaseFuncEnum funcEnum) {
+    public static SelectColumn of(Class<?> clazz, String columnName, TableFieldInfo tableFieldInfo, String alias,
+                                  String tagProperty, Class<?> keyType, boolean label, BaseFuncEnum funcEnum) {
         if (tagProperty != null)
             tagProperty = StringUtils.getTargetColumn(tagProperty);
-        return new SelectColumn(clazz, columnName, tableFieldInfo, alias, tagProperty, keyType, funcEnum);
+        return new SelectColumn(clazz, columnName, tableFieldInfo, alias, tagProperty, keyType, label, funcEnum);
     }
 
     /**

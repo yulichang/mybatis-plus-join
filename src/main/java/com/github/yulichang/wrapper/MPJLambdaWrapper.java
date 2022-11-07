@@ -142,7 +142,8 @@ public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWr
             for (SFunction<S, ?> s : columns) {
                 ColumnCache cache = getCache(s);
                 selectColumns.add(SelectColumn.of(LambdaUtils.getEntityClass(s), cache.getColumn(), cache.getTableFieldInfo(),
-                        null, cache.getTableFieldInfo() == null ? cache.getKeyProperty() : cache.getTableFieldInfo().getProperty(), cache.getKeyType(), null));
+                        null, cache.getTableFieldInfo() == null ? cache.getKeyProperty() : cache.getTableFieldInfo().getProperty(),
+                        cache.getKeyType(), false, null));
             }
         }
         return typedThis;
@@ -282,7 +283,7 @@ public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWr
         TableInfo info = TableInfoHelper.getTableInfo(entityClass);
         Assert.notNull(info, "table not find by class <%s>", entityClass.getName());
         info.getFieldList().stream().filter(predicate).collect(Collectors.toList()).forEach(
-                i -> selectColumns.add(SelectColumn.of(entityClass, i.getColumn(), i, null, i.getProperty(), null, null)));
+                i -> selectColumns.add(SelectColumn.of(entityClass, i.getColumn(), i, null, i.getProperty(), null, false, null)));
         return typedThis;
     }
 
@@ -293,12 +294,12 @@ public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWr
         List<Field> tagFields = ReflectionKit.getFieldList(tag);
         tableInfo.getFieldList().forEach(i -> {
             if (tagFields.stream().anyMatch(f -> f.getName().equals(i.getProperty()))) {
-                selectColumns.add(SelectColumn.of(source, i.getColumn(), i, null, i.getProperty(), null, null));
+                selectColumns.add(SelectColumn.of(source, i.getColumn(), i, null, i.getProperty(), null, false, null));
             }
         });
         if (tableInfo.havePK() && tagFields.stream().anyMatch(i -> i.getName().equals(tableInfo.getKeyProperty()))) {
             selectColumns.add(SelectColumn.of(source, tableInfo.getKeyColumn(), null, null,
-                    tableInfo.getKeyProperty(), tableInfo.getKeyType(), null));
+                    tableInfo.getKeyProperty(), tableInfo.getKeyType(), false, null));
         }
         return typedThis;
     }
@@ -307,7 +308,7 @@ public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWr
     public <S> MPJLambdaWrapper<T> selectAs(SFunction<S, ?> column, String alias) {
         ColumnCache cache = getCache(column);
         selectColumns.add(SelectColumn.of(LambdaUtils.getEntityClass(column), cache.getColumn(), cache.getTableFieldInfo(),
-                alias, null, cache.getKeyType(), null));
+                alias, null, cache.getKeyType(), false, null));
         return typedThis;
     }
 
@@ -315,7 +316,7 @@ public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWr
         if (condition) {
             ColumnCache cache = getCache(column);
             selectColumns.add(SelectColumn.of(LambdaUtils.getEntityClass(column), cache.getColumn(),
-                    cache.getTableFieldInfo(), alias, alias, cache.getKeyType(), funcEnum));
+                    cache.getTableFieldInfo(), alias, alias, cache.getKeyType(), false, funcEnum));
         }
         return typedThis;
     }
@@ -323,7 +324,7 @@ public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWr
     @Override
     public MPJLambdaWrapper<T> selectFunc(boolean condition, BaseFuncEnum funcEnum, Object column, String alias) {
         if (condition) {
-            selectColumns.add(SelectColumn.of(null, column.toString(), null, alias, alias, null, funcEnum));
+            selectColumns.add(SelectColumn.of(null, column.toString(), null, alias, alias, null, false, funcEnum));
         }
         return typedThis;
     }
@@ -333,10 +334,10 @@ public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWr
         Assert.notNull(info, "table can not be find -> %s", clazz);
         if (info.havePK()) {
             selectColumns.add(SelectColumn.of(clazz, info.getKeyColumn(), null, null,
-                    info.getKeyProperty(), info.getKeyType(), null));
+                    info.getKeyProperty(), info.getKeyType(), false, null));
         }
         info.getFieldList().forEach(c ->
-                selectColumns.add(SelectColumn.of(clazz, c.getColumn(), c, null, c.getProperty(), null, null)));
+                selectColumns.add(SelectColumn.of(clazz, c.getColumn(), c, null, c.getProperty(), null, false, null)));
         return typedThis;
     }
 

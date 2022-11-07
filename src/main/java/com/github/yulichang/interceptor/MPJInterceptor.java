@@ -59,7 +59,7 @@ public class MPJInterceptor implements Interceptor {
 
 
     @Override
-    @SuppressWarnings({"Java8MapApi", "unchecked"})
+    @SuppressWarnings("Java8MapApi")
     public Object intercept(Invocation invocation) throws Throwable {
         Object[] args = invocation.getArgs();
         if (args[0] instanceof MappedStatement) {
@@ -195,11 +195,10 @@ public class MPJInterceptor implements Interceptor {
                         i.getKeyType()).build());
             }
         });
-        //移除result中不存在的标签
         Set<String> columnSet = resultMappings.stream().map(ResultMapping::getColumn).collect(Collectors.toSet());
+        //移除result中不存在的标签
         resultMappings.removeIf(i -> !fieldMap.containsKey(i.getProperty()));
         if (wrapper.isResultMap()) {
-            //先不考虑 去重 看一下能否实现
             List<MybatisLabel<?, ?>> mybatisLabel = wrapper.getResultMapMybatisLabel();
             for (MybatisLabel mpjColl : mybatisLabel) {
                 List<Result> list = mpjColl.getResultList();
@@ -209,11 +208,12 @@ public class MPJInterceptor implements Interceptor {
                 List<ResultMapping> childMapping = new ArrayList<>(list.size());
                 for (Result r : list) {
                     String columnName = r.getColumn();
+                    //列名去重
                     columnName = getColumn(columnSet, columnName);
                     columnList.add(SelectColumn.of(mpjColl.getEntityClass(), r.getColumn(), null,
                             Objects.equals(columnName, r.getColumn()) ? null : columnName, null, null, null));
                     ResultMapping.Builder builder = new ResultMapping.Builder(ms.getConfiguration(), r.getProperty(), columnName, r.getJavaType());
-                    if (r.isId()) {
+                    if (r.isId()) {//主键标记为id标签
                         builder.flags(Collections.singletonList(ResultFlag.ID));
                     }
                     childMapping.add(builder.build());
@@ -226,12 +226,14 @@ public class MPJInterceptor implements Interceptor {
                         .javaType(mpjColl.getJavaType())
                         .nestedResultMapId(childId)
                         .build());
+                //双检
                 if (!ms.getConfiguration().getResultMapNames().contains(childId)) {
-                    ms.getConfiguration().addResultMap(new ResultMap.Builder(ms.getConfiguration(), childId, mpjColl.getOfType(), childMapping).build());
+                    ResultMap build = new ResultMap.Builder(ms.getConfiguration(), childId, mpjColl.getOfType(), childMapping).build();
+                    MPJInterceptor.addResultMap(ms, childId, build);
                 }
             }
         }
-        result.add(0, new ResultMap.Builder(ms.getConfiguration(), id, resultType, resultMappings).build());
+        result.add(new ResultMap.Builder(ms.getConfiguration(), id, resultType, resultMappings).build());
         return result;
     }
 
@@ -294,5 +296,14 @@ public class MPJInterceptor implements Interceptor {
         Field field = fieldMap.get(alias);
         Assert.notNull(field, "Result Class <%s> not find Field <%s>", resultType.getSimpleName(), alias);
         return field.getType();
+    }
+
+    /**
+     * 往 Configuration 添加resultMap
+     */
+    public synchronized static void addResultMap(MappedStatement ms, String key, ResultMap resultMap) {
+        if (!ms.getConfiguration().getResultMapNames().contains(key)) {
+            ms.getConfiguration().addResultMap(resultMap);
+        }
     }
 }

@@ -105,11 +105,16 @@ class test {
     void testResultMap() {
         MPJLambdaWrapper<UserDO> wrapper = new MPJLambdaWrapper<UserDO>()
                 .selectAll(UserDO.class)
-                //一对多查询
+                //对多查询
                 .selectCollection(AddressDO.class, UesrDTO::getAddressList)
+                //对一查询
+                .selectAssociation(AddressDO.class, UesrDTO::getAddress)
                 .leftJoin(AddressDO.class, AddressDO::getUserId, UserDO::getId);
 
         List<UserDTO> dtoList = userMapper.selectJoinList(UserDTO.class, wrapper);
+
+        //关于对多分页查询
+        //由于嵌套结果方式会导致结果集被折叠，因此分页查询的结果在折叠后总数会减少，所以无法保证分页结果数量正确。
     }
 }
 ```

@@ -154,7 +154,7 @@ public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWr
      * <p>
      * 举例 UserDO UserAddressDO 为一对多关系  UserDTO 为结果类
      * <pre>
-     *     MPJLambdaQueryWrapper<UserDO> wrapper = new MPJLambdaQueryWrapper();
+     *     MPJLambdaQueryWrapper<UserDO> wrapper = new MPJLambdaQueryWrapper<UserDO>();
      *     wrapper.selectAll(UserDO.class)
      *            .selectCollection(UserAddressDO.class, UserDTO::getAddressListDTO)
      *            .leftJoin(UserAddressDO.class, ...... )

@@ -3,9 +3,11 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.github.yulichang</groupId>
-    <artifactId>mybatis-plus-join</artifactId>
+    <artifactId>mybatis-plus-join-root</artifactId>
+    <packaging>pom</packaging>
     <version>1.3.0</version>
-    <name>mybatis-plus-join</name>
+    <name>mybatis-plus-join-root</name>
+
     <description>An enhanced toolkit of Mybatis-Plus to simplify development.</description>
     <url>https://github.com/yulichang/mybatis-plus-join</url>
     <licenses>
@@ -26,6 +28,14 @@
         <developerConnection>scm:git:https://github.com/yulichang/mybatis-plus-join.git</developerConnection>
         <url>https://github.com/yulichang/mybatis-plus-join</url>
     </scm>
+
+    <modules>
+        <module>mybatis-plus-join-boot-starter</module>
+        <module>mybatis-plus-join-core</module>
+        <module>mybatis-plus-join-annotation</module>
+        <module>mybatis-plus-join-test</module>
+    </modules>
+
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <github.global.server>github</github.global.server>

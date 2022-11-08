@@ -8,6 +8,7 @@ import com.baomidou.mybatisplus.core.enums.SqlKeyword;
  * @author yulichang
  * @since 1.2.0
  */
+@SuppressWarnings("unused")
 public @interface MPJMappingCondition {
 
     /**

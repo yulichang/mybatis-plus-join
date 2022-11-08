@@ -7,6 +7,7 @@ package com.github.yulichang.annotation;
  * @author yulichang
  * @since 1.2.0
  */
+@SuppressWarnings("unused")
 public @interface MPJMappingApply {
 
     /**

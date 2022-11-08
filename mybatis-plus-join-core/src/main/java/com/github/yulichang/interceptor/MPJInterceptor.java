@@ -150,13 +150,13 @@ public class MPJInterceptor implements Interceptor {
         TableInfo tableInfo = TableInfoHelper.getTableInfo(resultType);
         String id = ms.getId() + StringPool.DOT + Constants.MYBATIS_PLUS + StringPool.UNDERSCORE + resultType.getName();
         if (!(obj instanceof MPJLambdaWrapper) || Map.class.isAssignableFrom(resultType) ||
-                ReflectionKit.isPrimitiveOrWrapper(resultType) ||
+                com.github.yulichang.toolkit.ReflectionKit.isPrimitiveOrWrapper(resultType) ||
                 Collection.class.isAssignableFrom(resultType)) {
             result.add(getDefaultResultMap(tableInfo, ms, resultType, id));
             return result;
         }
         MPJLambdaWrapper wrapper = (MPJLambdaWrapper) obj;
-        Map<String, Field> fieldMap = ReflectionKit.getFieldMap(resultType);
+        Map<String, Field> fieldMap = com.github.yulichang.toolkit.ReflectionKit.getFieldMap(resultType);
         List<SelectColumn> columnList = wrapper.getSelectColumns();
         //移除对多查询列，为了可重复使用wrapper
         columnList.removeIf(SelectColumn::isLabel);

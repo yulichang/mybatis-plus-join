@@ -2,27 +2,16 @@ package com.github.yulichang.injector;
 
 import com.baomidou.mybatisplus.core.MybatisPlusVersion;
 import com.baomidou.mybatisplus.core.injector.AbstractMethod;
-import com.baomidou.mybatisplus.core.injector.AbstractSqlInjector;
 import com.baomidou.mybatisplus.core.injector.DefaultSqlInjector;
-import com.baomidou.mybatisplus.core.injector.ISqlInjector;
 import com.baomidou.mybatisplus.core.injector.methods.*;
 import com.baomidou.mybatisplus.core.mapper.Mapper;
 import com.baomidou.mybatisplus.core.metadata.TableInfo;
 import com.baomidou.mybatisplus.core.toolkit.ClassUtils;
 import com.github.yulichang.mapper.MPJTableMapperHelper;
 import com.github.yulichang.method.*;
-import com.github.yulichang.method.mp.SelectCount;
-import com.github.yulichang.method.mp.SelectList;
-import com.github.yulichang.method.mp.SelectMaps;
-import com.github.yulichang.method.mp.SelectMapsPage;
-import com.github.yulichang.method.mp.SelectObjs;
 import com.github.yulichang.method.mp.SelectOne;
-import com.github.yulichang.method.mp.SelectPage;
 import org.apache.ibatis.builder.MapperBuilderAssistant;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.core.GenericTypeResolver;
-import org.springframework.core.Ordered;
-import org.springframework.core.annotation.Order;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -37,8 +26,8 @@ import static java.util.stream.Collectors.toList;
  * @author yulichang
  * @see DefaultSqlInjector
  */
-@Order(Ordered.HIGHEST_PRECEDENCE)
-@ConditionalOnMissingBean({DefaultSqlInjector.class, AbstractSqlInjector.class, ISqlInjector.class})
+//@Order(Ordered.HIGHEST_PRECEDENCE)
+//@ConditionalOnMissingBean({DefaultSqlInjector.class, AbstractSqlInjector.class, ISqlInjector.class})
 public class MPJSqlInjector extends DefaultSqlInjector {
 
     private static final List<String> METHOD_LIST = Arrays.asList("SelectOne", "SelectCount",
@@ -109,12 +98,12 @@ public class MPJSqlInjector extends DefaultSqlInjector {
     private List<AbstractMethod> getSelectMethod() {
         List<AbstractMethod> list = new ArrayList<>();
         list.add(new SelectOne());
-        list.add(new SelectCount());
-        list.add(new SelectMaps());
-        list.add(new SelectMapsPage());
-        list.add(new SelectObjs());
-        list.add(new SelectList());
-        list.add(new SelectPage());
+        list.add(new com.github.yulichang.method.mp.SelectCount());
+        list.add(new com.github.yulichang.method.mp.SelectMaps());
+        list.add(new com.github.yulichang.method.mp.SelectMapsPage());
+        list.add(new com.github.yulichang.method.mp.SelectObjs());
+        list.add(new com.github.yulichang.method.mp.SelectList());
+        list.add(new com.github.yulichang.method.mp.SelectPage());
         return list;
     }
 

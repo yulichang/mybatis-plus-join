@@ -8,8 +8,6 @@ import org.apache.ibatis.logging.LogFactory;
 import org.apache.ibatis.plugin.Interceptor;
 import org.apache.ibatis.plugin.InterceptorChain;
 import org.apache.ibatis.session.SqlSessionFactory;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
-import org.springframework.context.annotation.Configuration;
 
 import java.lang.reflect.Field;
 import java.util.List;
@@ -19,9 +17,9 @@ import java.util.List;
  *
  * @author yulichang
  */
-@Configuration
-@ConditionalOnBean(SqlSessionFactory.class)
-@SuppressWarnings("unused")
+//@Configuration
+//@ConditionalOnBean(SqlSessionFactory.class)
+//@SuppressWarnings("unused")
 public class InterceptorConfig {
 
 

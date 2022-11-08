@@ -4,21 +4,22 @@ package com.github.yulichang.annotation;
 import java.lang.annotation.*;
 
 /**
- * 实体类关系映射注解
+ * 字段关系映射注解
  *
  * @author yulichang
  * @since 1.2.0
  */
 @Documented
+@SuppressWarnings("unused")
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.FIELD, ElementType.ANNOTATION_TYPE})
-public @interface EntityMapping {
+public @interface FieldMapping {
 
     /**
      * 关联的数据库实体类<br/>
      * 默认获取此注解所对应的类
      */
-    Class<?> tag() default Object.class;
+    Class<?> tag();
 
     /**
      * 当前类的关联的字段名称 (是实体类字段名称而不是数据库字段名称)<br/>
@@ -40,6 +41,11 @@ public @interface EntityMapping {
     boolean isThrowExp() default true;
 
     /**
+     * 字段映射对应的属性名
+     */
+    String select();
+
+    /**
      * 针对查询结果map的时候使用<br/>
      * 默认为thisField对应的数据库列名<br/>
      * <p>
@@ -57,12 +63,6 @@ public @interface EntityMapping {
      * 并且查询出来的map的key不是thisField对应的数据库列名就需要设置<br/>
      */
     String joinMapKey() default "";
-
-    /**
-     * 映射表查询条件之 select<br/>
-     * 等效于 Wrappers.<T>query().select(xxx);
-     */
-    String select() default "";
 
     /**
      * 映射表查询条件之 first<br/>

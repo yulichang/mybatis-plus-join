@@ -1,12 +1,10 @@
 package com.github.yulichang.config;
 
 import com.baomidou.mybatisplus.core.metadata.MPJTableInfoHelper;
-import com.github.yulichang.mapper.MPJTableMapperHelper;
 import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
+import com.github.yulichang.mapper.MPJTableMapperHelper;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.ApplicationListener;
-import org.springframework.core.Ordered;
-import org.springframework.core.annotation.Order;
 
 /**
  * 关系映射配置
@@ -14,7 +12,7 @@ import org.springframework.core.annotation.Order;
  * @author yulichang
  * @since 1.2.0
  */
-@Order(Ordered.HIGHEST_PRECEDENCE)
+//@Order(Ordered.HIGHEST_PRECEDENCE)
 public class MappingConfig implements ApplicationListener<ApplicationReadyEvent> {
 
     @Override

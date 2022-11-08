@@ -133,7 +133,7 @@ public class MPJQueryWrapper<T> extends AbstractWrapper<T, String, MPJQueryWrapp
         TableInfo info = TableInfoHelper.getTableInfo(entityClass);
         Assert.notNull(info, "can not find table info");
         selectColumns.addAll(info.getFieldList().stream().filter(predicate).map(c ->
-                alias + StringPool.DOT + c.getColumn()).collect(Collectors.toList()));
+                alias + StringPool.DOT + c.getSqlSelect()).collect(Collectors.toList()));
         return typedThis;
     }
 
@@ -158,10 +158,10 @@ public class MPJQueryWrapper<T> extends AbstractWrapper<T, String, MPJQueryWrapp
         TableInfo info = TableInfoHelper.getTableInfo(clazz);
         Assert.notNull(info, "can not find table info");
         if (info.havePK()) {
-            selectColumns.add(as + StringPool.DOT + info.getKeyColumn());
+            selectColumns.add(as + StringPool.DOT + info.getKeySqlSelect());
         }
         selectColumns.addAll(info.getFieldList().stream().map(i ->
-                as + StringPool.DOT + i.getColumn()).collect(Collectors.toList()));
+                as + StringPool.DOT + i.getSqlSelect()).collect(Collectors.toList()));
         return typedThis;
     }
 

@@ -43,7 +43,8 @@ class test {
     private UserMapper userMapper;
 
     void testJoin() {
-        MPJLambdaWrapper wrapper = new MPJLambdaWrapper<UserDO>()
+        //和Mybatis plus一致，MPJLambdaWrapper的泛型必须是主表的泛型，并且要用主表的Mapper来调用
+        MPJLambdaWrapper<UserDO> wrapper = new MPJLambdaWrapper<UserDO>()
                 .selectAll(UserDO.class)//查询user表全部字段
                 .select(UserAddressDO::getTel)//查询user_address tel 字段
                 .selectAs(UserAddressDO::getAddress, UserDTO::getUserAddress)//别名 t.address AS userAddress
@@ -54,7 +55,7 @@ class test {
                 .like(UserAddressDO::getTel, "1")
                 .gt(UserDO::getId, 5);
 
-        //连表查询
+        //连表查询 返回自定义ResultType
         List<UserDTO> list = userMapper.selectJoinList(UserDTO.class, wrapper);
 
         //分页查询 （需要启用 mybatis plus 分页插件）

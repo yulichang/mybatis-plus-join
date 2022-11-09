@@ -16,12 +16,10 @@
 package com.github.yulichang.toolkit;
 
 import com.baomidou.mybatisplus.core.toolkit.Assert;
-import com.baomidou.mybatisplus.core.toolkit.ClassUtils;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.core.toolkit.ExceptionUtils;
 import org.apache.ibatis.logging.Log;
 import org.apache.ibatis.logging.LogFactory;
-import org.springframework.core.GenericTypeResolver;
 
 import java.lang.reflect.*;
 import java.util.*;
@@ -83,21 +81,6 @@ public final class ReflectionKit {
         } catch (ReflectiveOperationException e) {
             throw ExceptionUtils.mpe("Error: Cannot read field in %s.  Cause:", e, cls.getSimpleName());
         }
-    }
-
-    /**
-     * <p>
-     * 反射对象获取泛型
-     * </p>
-     *
-     * @param clazz      对象
-     * @param genericIfc 所属泛型父类
-     * @param index      泛型所在位置
-     * @return Class
-     */
-    public static Class<?> getSuperClassGenericType(final Class<?> clazz, final Class<?> genericIfc, final int index) {
-        Class<?>[] typeArguments = GenericTypeResolver.resolveTypeArguments(ClassUtils.getUserClass(clazz), genericIfc);
-        return null == typeArguments ? null : typeArguments[index];
     }
 
 

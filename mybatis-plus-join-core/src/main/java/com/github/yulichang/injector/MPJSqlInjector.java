@@ -26,8 +26,6 @@ import static java.util.stream.Collectors.toList;
  * @author yulichang
  * @see DefaultSqlInjector
  */
-//@Order(Ordered.HIGHEST_PRECEDENCE)
-//@ConditionalOnMissingBean({DefaultSqlInjector.class, AbstractSqlInjector.class, ISqlInjector.class})
 public class MPJSqlInjector extends DefaultSqlInjector {
 
     private static final List<String> METHOD_LIST = Arrays.asList("SelectOne", "SelectCount",

@@ -5,15 +5,16 @@ import lombok.experimental.Accessors;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
- * Configuration properties for MyBatis.
- *
- * @author Eddú Meléndez
- * @author Kazuki Shimizu
+ * @author yulichang
+ * @since 1.3.2
  */
 @Data
 @Accessors(chain = true)
 @ConfigurationProperties(prefix = "mybatis-plus-join")
 public class MybatisPlusJoinProperties {
 
+    /**
+     * 打印banner
+     */
     private Boolean banner = false;
 }

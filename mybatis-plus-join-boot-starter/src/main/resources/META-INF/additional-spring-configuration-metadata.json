@@ -1,0 +1,17 @@
+{
+  "groups": [
+    {
+      "sourceType": "com.github.yulichang.autoconfigure.MybatisPlusJoinProperties",
+      "name": "mybatis-plus-join",
+      "type": "com.github.yulichang.autoconfigure.MybatisPlusJoinProperties"
+    }
+  ],
+  "properties": [
+    {
+      "name": "mybatis-plus-join.banner",
+      "defaultValue": true,
+      "type": "java.lang.Boolean",
+      "description": "打印 banner."
+    }
+  ]
+}

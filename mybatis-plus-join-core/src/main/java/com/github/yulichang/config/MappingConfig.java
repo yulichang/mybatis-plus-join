@@ -12,7 +12,6 @@ import org.springframework.context.ApplicationListener;
  * @author yulichang
  * @since 1.2.0
  */
-//@Order(Ordered.HIGHEST_PRECEDENCE)
 public class MappingConfig implements ApplicationListener<ApplicationReadyEvent> {
 
     @Override

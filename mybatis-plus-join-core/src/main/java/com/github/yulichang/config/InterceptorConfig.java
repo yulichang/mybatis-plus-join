@@ -17,16 +17,19 @@ import java.util.List;
  *
  * @author yulichang
  */
-//@Configuration
-//@ConditionalOnBean(SqlSessionFactory.class)
-//@SuppressWarnings("unused")
 public class InterceptorConfig {
 
 
     private static final Log logger = LogFactory.getLog(InterceptorConfig.class);
 
-    public InterceptorConfig(List<SqlSessionFactory> sqlSessionFactoryList) {
+    public InterceptorConfig(List<SqlSessionFactory> sqlSessionFactoryList, Boolean banner) {
         replaceInterceptorChain(sqlSessionFactoryList);
+        if (banner) {
+            //打印banner
+            System.out.println(" _ _   |_  _ _|_. ___ _ |    _  .  _  .  _  \n" +
+                    "| | |\\/|_)(_| | |_\\  |_)||_|_\\  | (_) | | | \n" +
+                    "     /               |          /            1.3.0");
+        }
     }
 
     @SuppressWarnings("unchecked")

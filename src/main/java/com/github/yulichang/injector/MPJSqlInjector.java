@@ -82,10 +82,16 @@ public class MPJSqlInjector extends DefaultSqlInjector {
     private List<AbstractMethod> getJoinMethod() {
         List<AbstractMethod> list = new ArrayList<>();
 
-        String version = MybatisPlusVersion.getVersion();
-        String[] split = version.split("\\.");
-        int v1 = Integer.parseInt(split[0]);
-        int v2 = Integer.parseInt(split[1]);
+        int v1, v2;
+        try {
+            String version = MybatisPlusVersion.getVersion();
+            String[] split = version.split("\\.");
+            v1 = Integer.parseInt(split[0]);
+            v2 = Integer.parseInt(split[1]);
+        } catch (Exception e) {
+            v1 = 3;
+            v2 = 4;
+        }
         if ((v1 == 3 && v2 >= 5) || v1 > 3) {
             list.add(new SelectJoinCount(SqlMethod.SELECT_JOIN_COUNT.getMethod()));
             list.add(new SelectJoinOne(SqlMethod.SELECT_JOIN_ONE.getMethod()));

@@ -28,6 +28,10 @@ import org.springframework.core.annotation.Order;
 import javax.sql.DataSource;
 import java.util.List;
 
+/**
+ * @author yulichang
+ * @since 1.3.2
+ */
 @SuppressWarnings("unused")
 @Configuration(proxyBeanMethods = false)
 @ConditionalOnClass({SqlSessionFactory.class, SqlSessionFactoryBean.class})
@@ -47,19 +51,26 @@ public class MybatisPlusJoinAutoConfiguration {
         this.properties = properties;
     }
 
+    /**
+     * mybatis plus join 拦截器
+     */
     @Bean
-    @Order(Ordered.HIGHEST_PRECEDENCE)
     public MPJInterceptor mpjInterceptor() {
         return new MPJInterceptor();
     }
 
-
+    /**
+     * mybatis plus 拦截器配置
+     */
     @Bean
     @ConditionalOnBean(SqlSessionFactory.class)
     public InterceptorConfig interceptorConfig(List<SqlSessionFactory> sqlSessionFactoryList) {
-        return new InterceptorConfig(sqlSessionFactoryList);
+        return new InterceptorConfig(sqlSessionFactoryList, properties.getBanner());
     }
 
+    /**
+     * mybatis plus join 自定义方法
+     */
     @Bean
     @Order(Ordered.HIGHEST_PRECEDENCE)
     @ConditionalOnMissingBean({DefaultSqlInjector.class, AbstractSqlInjector.class, ISqlInjector.class})
@@ -67,12 +78,20 @@ public class MybatisPlusJoinAutoConfiguration {
         return new MPJSqlInjector();
     }
 
+    /**
+     * 多表查询注解
+     *
+     * @deprecated
+     */
     @Bean
     @Order(Ordered.HIGHEST_PRECEDENCE)
     public MappingConfig mappingConfig() {
         return new MappingConfig();
     }
 
+    /**
+     * springboot content 工具类
+     */
     @Bean
     @Order(Ordered.HIGHEST_PRECEDENCE)
     public SpringContentUtils springContentUtils() {

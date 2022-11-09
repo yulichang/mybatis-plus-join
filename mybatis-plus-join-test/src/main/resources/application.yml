@@ -8,6 +8,8 @@ spring:
     init:
       schema-locations: classpath:db/schema.sql
       data-locations: classpath:db/data.sql
+
+
 mybatis-plus:
   global-config:
     db-config:
@@ -15,8 +17,9 @@ mybatis-plus:
       logic-delete-value: true
       logic-not-delete-value: false
     banner: true
-#  configuration:
-#    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
 
+# 打印 mybatis plus join banner
 mybatis-plus-join:
-  banner: false
+  banner: true

@@ -9,6 +9,7 @@ import com.github.yulichang.test.entity.UserDO;
 import com.github.yulichang.test.mapper.UserMapper;
 import com.github.yulichang.toolkit.MPJWrappers;
 import com.github.yulichang.wrapper.MPJLambdaWrapper;
+import org.apache.ibatis.session.SqlSessionFactory;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -25,9 +26,12 @@ import java.util.Map;
  * 移除了mybatis-plus 逻辑删除支持，逻辑删除需要在连表查询时自己添加对应的条件
  */
 @SpringBootTest
+@SuppressWarnings("unused")
 class JoinTest {
     @Resource
     private UserMapper userMapper;
+    @Resource
+    private SqlSessionFactory sqlSessionFactory;
 
     /**
      * 一对多

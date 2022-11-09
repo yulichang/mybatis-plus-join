@@ -69,6 +69,7 @@
             <artifactId>mybatis-plus-join-boot-starter</artifactId>
             <version>1.3.0</version>
         </dependency>
+        <!-- PageHelper 兼容性测试 -->
         <dependency>
             <groupId>com.github.pagehelper</groupId>
             <artifactId>pagehelper-spring-boot-starter</artifactId>

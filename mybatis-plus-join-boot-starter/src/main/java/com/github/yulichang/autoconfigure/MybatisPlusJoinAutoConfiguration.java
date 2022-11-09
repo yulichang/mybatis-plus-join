@@ -55,7 +55,6 @@ public class MybatisPlusJoinAutoConfiguration {
      * mybatis plus join 拦截器
      */
     @Bean
-    @Order(Ordered.HIGHEST_PRECEDENCE)
     public MPJInterceptor mpjInterceptor() {
         return new MPJInterceptor();
     }

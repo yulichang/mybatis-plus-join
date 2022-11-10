@@ -42,7 +42,7 @@
         <dependency>
             <groupId>com.github.yulichang</groupId>
             <artifactId>mybatis-plus-join-core</artifactId>
-            <version>1.3.0</version>
+            <version>${mybaits-plus-join.version}</version>
         </dependency>
 
         <dependency>

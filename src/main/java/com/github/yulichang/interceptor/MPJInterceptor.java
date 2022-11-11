@@ -161,15 +161,18 @@ public class MPJInterceptor implements Interceptor {
         //移除对多查询列，为了可重复使用wrapper
         columnList.removeIf(SelectColumn::isLabel);
         List<ResultMapping> resultMappings = new ArrayList<>(columnList.size());
-        columnList.forEach(i -> {
+        for (SelectColumn i : columnList) {
             TableFieldInfo info = i.getTableFieldInfo();
             if (StringUtils.isNotBlank(i.getAlias())) {
                 //优先别名查询 selectFunc selectAs
                 ResultMapping.Builder builder = new ResultMapping.Builder(ms.getConfiguration(), i.getAlias(),
                         i.getAlias(), getAliasField(resultType, fieldMap, i.getAlias()));
                 if (i.getFuncEnum() == null || StringUtils.isBlank(i.getFuncEnum().getSql())) {
+                    Field f = fieldMap.get(i.getAlias());
+                    if (f == null) {
+                        continue;
+                    }
                     if (info != null && info.getTypeHandler() != null && info.getTypeHandler() != UnknownTypeHandler.class) {
-                        Field f = fieldMap.get(i.getAlias());
                         if (f.getType() == info.getField().getType()) {
                             builder.typeHandler(getTypeHandler(ms, info));
                         }
@@ -180,23 +183,28 @@ public class MPJInterceptor implements Interceptor {
                 // select selectAll selectAsClass
                 if (i.getFuncEnum() == null || StringUtils.isBlank(i.getFuncEnum().getSql())) {
                     ResultMapping.Builder builder = new ResultMapping.Builder(ms.getConfiguration(), info.getProperty(),
-                            info.getColumn(), info.getPropertyType());
-                    if (info.getTypeHandler() != null && info.getTypeHandler() != UnknownTypeHandler.class) {
-                        Field f = fieldMap.get(info.getProperty());
-                        if (f != null && f.getType() == info.getField().getType()) {
+                            StringUtils.getTargetColumn(info.getColumn()), info.getPropertyType());
+                    Field f = fieldMap.get(info.getProperty());
+                    if (f == null) {
+                        continue;
+                    }
+                    if (f.getType() == info.getField().getType()) {
+                        if (info.getTypeHandler() != null && info.getTypeHandler() != UnknownTypeHandler.class) {
                             builder.typeHandler(getTypeHandler(ms, info));
                         }
                     }
+                    builder.javaType(f.getType());
                     resultMappings.add(builder.build());
                 } else {
-                    resultMappings.add(new ResultMapping.Builder(ms.getConfiguration(), info.getProperty(), info.getColumn(), info.getPropertyType()).build());
+                    resultMappings.add(new ResultMapping.Builder(ms.getConfiguration(), info.getProperty(),
+                            StringUtils.getTargetColumn(info.getColumn()), info.getPropertyType()).build());
                 }
             } else {
                 // 主键列
-                resultMappings.add(new ResultMapping.Builder(ms.getConfiguration(), i.getTagProperty(), i.getColumnName(),
-                        i.getKeyType()).build());
+                resultMappings.add(new ResultMapping.Builder(ms.getConfiguration(), i.getTagProperty(),
+                        StringUtils.getTargetColumn(i.getColumnName()), i.getKeyType()).build());
             }
-        });
+        }
         Set<String> columnSet = resultMappings.stream().map(ResultMapping::getColumn).collect(Collectors.toSet());
         //移除result中不存在的标签
         resultMappings.removeIf(i -> !fieldMap.containsKey(i.getProperty()));
@@ -214,7 +222,8 @@ public class MPJInterceptor implements Interceptor {
                     columnName = getColumn(columnSet, columnName);
                     columnList.add(SelectColumn.of(mpjColl.getEntityClass(), r.getColumn(), null,
                             Objects.equals(columnName, r.getColumn()) ? null : columnName, null, null, true, null));
-                    ResultMapping.Builder builder = new ResultMapping.Builder(ms.getConfiguration(), r.getProperty(), columnName, r.getJavaType());
+                    ResultMapping.Builder builder = new ResultMapping.Builder(ms.getConfiguration(), r.getProperty(),
+                            StringUtils.getTargetColumn(columnName), r.getJavaType());
                     if (r.isId()) {//主键标记为id标签
                         builder.flags(Collections.singletonList(ResultFlag.ID));
                     }

@@ -28,9 +28,6 @@ import static java.util.stream.Collectors.toList;
  */
 public class MPJSqlInjector extends DefaultSqlInjector {
 
-    private static final List<String> METHOD_LIST = Arrays.asList("SelectOne", "SelectCount",
-            "SelectMaps", "SelectMapsPage", "SelectObjs", "SelectList", "SelectPage");
-
 
     /**
      * 升级到 mybatis plus 3.4.3.2 后对之前的版本兼容
@@ -59,8 +56,10 @@ public class MPJSqlInjector extends DefaultSqlInjector {
      */
     @Override
     public List<AbstractMethod> getMethodList(Class<?> mapperClass, TableInfo tableInfo) {
+        List<String> methodList = Arrays.asList("SelectOne", "SelectCount",
+                "SelectMaps", "SelectMapsPage", "SelectObjs", "SelectList", "SelectPage");
         List<AbstractMethod> list = super.getMethodList(mapperClass, tableInfo);
-        list.removeIf(i -> METHOD_LIST.contains(i.getClass().getSimpleName()));
+        list.removeIf(i -> methodList.contains(i.getClass().getSimpleName()));
         list.addAll(getSelectMethod());
         list.addAll(getJoinMethod());
         return list;

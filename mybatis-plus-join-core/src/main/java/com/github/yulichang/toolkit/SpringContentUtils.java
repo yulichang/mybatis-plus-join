@@ -1,8 +1,5 @@
 package com.github.yulichang.toolkit;
 
-import org.springframework.beans.BeansException;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
 
 /**
  * spring容器工具类
@@ -10,17 +7,20 @@ import org.springframework.context.ApplicationContextAware;
  * @author yulichang
  * @since 1.2.0
  */
-public class SpringContentUtils implements ApplicationContextAware {
+public class SpringContentUtils {
 
-    private static ApplicationContext context;
+    private static SpringContext springContext;
 
-    @Override
-    @SuppressWarnings("NullableProblems")
-    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-        context = applicationContext;
+    public SpringContentUtils(SpringContext springContext) {
+        SpringContentUtils.springContext = springContext;
     }
 
-    public static ApplicationContext getApplicationContext() {
-        return context;
+    public static <T> T getBean(Class<T> clazz) {
+        return SpringContentUtils.springContext.getBean(clazz);
+    }
+
+    public interface SpringContext {
+
+        <T> T getBean(Class<T> clazz);
     }
 }

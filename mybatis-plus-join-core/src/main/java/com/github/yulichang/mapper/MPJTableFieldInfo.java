@@ -279,7 +279,7 @@ public class MPJTableFieldInfo {
             if (joinTableInfo == null) {
                 throw new MPJException("未注册 mapper " + this.joinClass.getName());
             }
-            this.joinMapper = (BaseMapper<?>) SpringContentUtils.getApplicationContext().getBean(joinTableInfo.getMapperClass());
+            this.joinMapper = (BaseMapper<?>) SpringContentUtils.getBean(joinTableInfo.getMapperClass());
         }
         return this.joinMapper;
     }

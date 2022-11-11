@@ -150,13 +150,13 @@ public class MPJInterceptor implements Interceptor {
         TableInfo tableInfo = TableInfoHelper.getTableInfo(resultType);
         String id = ms.getId() + StringPool.DOT + Constants.MYBATIS_PLUS + StringPool.UNDERSCORE + resultType.getName();
         if (!(obj instanceof MPJLambdaWrapper) || Map.class.isAssignableFrom(resultType) ||
-                com.github.yulichang.toolkit.ReflectionKit.isPrimitiveOrWrapper(resultType) ||
+                ReflectionKit.isPrimitiveOrWrapper(resultType) ||
                 Collection.class.isAssignableFrom(resultType)) {
             result.add(getDefaultResultMap(tableInfo, ms, resultType, id));
             return result;
         }
         MPJLambdaWrapper wrapper = (MPJLambdaWrapper) obj;
-        Map<String, Field> fieldMap = com.github.yulichang.toolkit.ReflectionKit.getFieldMap(resultType);
+        Map<String, Field> fieldMap = ReflectionKit.getFieldMap(resultType);
         List<SelectColumn> columnList = wrapper.getSelectColumns();
         //移除对多查询列，为了可重复使用wrapper
         columnList.removeIf(SelectColumn::isLabel);
@@ -168,8 +168,11 @@ public class MPJInterceptor implements Interceptor {
                 ResultMapping.Builder builder = new ResultMapping.Builder(ms.getConfiguration(), i.getAlias(),
                         i.getAlias(), getAliasField(resultType, fieldMap, i.getAlias()));
                 if (i.getFuncEnum() == null || StringUtils.isBlank(i.getFuncEnum().getSql())) {
+                    Field f = fieldMap.get(i.getAlias());
+                    if (f == null) {
+                        continue;
+                    }
                     if (info != null && info.getTypeHandler() != null && info.getTypeHandler() != UnknownTypeHandler.class) {
-                        Field f = fieldMap.get(i.getAlias());
                         if (f.getType() == info.getField().getType()) {
                             builder.typeHandler(getTypeHandler(ms, info));
                         }
@@ -181,15 +184,16 @@ public class MPJInterceptor implements Interceptor {
                 if (i.getFuncEnum() == null || StringUtils.isBlank(i.getFuncEnum().getSql())) {
                     ResultMapping.Builder builder = new ResultMapping.Builder(ms.getConfiguration(), info.getProperty(),
                             StringUtils.getTargetColumn(info.getColumn()), info.getPropertyType());
-                    if (info.getTypeHandler() != null && info.getTypeHandler() != UnknownTypeHandler.class) {
-                        Field f = fieldMap.get(info.getProperty());
-                        if (f == null) {
-                            continue;
-                        }
-                        if (f.getType() == info.getField().getType()) {
+                    Field f = fieldMap.get(info.getProperty());
+                    if (f == null) {
+                        continue;
+                    }
+                    if (f.getType() == info.getField().getType()) {
+                        if (info.getTypeHandler() != null && info.getTypeHandler() != UnknownTypeHandler.class) {
                             builder.typeHandler(getTypeHandler(ms, info));
                         }
                     }
+                    builder.javaType(f.getType());
                     resultMappings.add(builder.build());
                 } else {
                     resultMappings.add(new ResultMapping.Builder(ms.getConfiguration(), info.getProperty(),

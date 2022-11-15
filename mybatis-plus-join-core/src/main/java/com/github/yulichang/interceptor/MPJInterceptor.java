@@ -246,8 +246,9 @@ public class MPJInterceptor implements Interceptor {
                 this.buildResult(ms, mpjColl.getMybatisLabels(), columnSet, childMapping, columnList);
             }
             String childId = "MPJ_" + mpjColl.getEntityClass().getName() + StringPool.UNDERSCORE + mpjColl.getOfType().getName() +
-                    StringPool.UNDERSCORE + childMapping.stream().map(i -> (CollectionUtils.isEmpty(i.getFlags()) ?
-                    ResultFlag.CONSTRUCTOR : i.getFlags().get(0)) + i.getProperty() + i.getColumn()).collect(Collectors.joining(StringPool.DASH));
+                    StringPool.UNDERSCORE + childMapping.stream().map(i -> "(" + (CollectionUtils.isEmpty(i.getFlags()) ?
+                            ResultFlag.CONSTRUCTOR : i.getFlags().get(0)) + "-" + i.getProperty() + "-" + i.getColumn() + ")")
+                    .collect(Collectors.joining(StringPool.DASH));
             parentMappings.add(new ResultMapping.Builder(ms.getConfiguration(), mpjColl.getProperty())
                     .javaType(mpjColl.getJavaType())
                     .nestedResultMapId(childId)

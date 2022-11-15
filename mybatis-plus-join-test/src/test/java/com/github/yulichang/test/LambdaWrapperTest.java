@@ -2,6 +2,7 @@ package com.github.yulichang.test;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.github.yulichang.test.dto.AddressDTO;
 import com.github.yulichang.test.dto.UserDTO;
 import com.github.yulichang.test.entity.AddressDO;
 import com.github.yulichang.test.entity.AreaDO;
@@ -27,7 +28,7 @@ import java.util.Map;
  */
 @SpringBootTest
 @SuppressWarnings("unused")
-class JoinTest {
+class LambdaWrapperTest {
     @Resource
     private UserMapper userMapper;
     @Resource
@@ -40,10 +41,11 @@ class JoinTest {
     void testJoin() {
         MPJLambdaWrapper<UserDO> wrapper = new MPJLambdaWrapper<UserDO>()
                 .selectAll(UserDO.class)
-                .selectCollection(AddressDO.class, UserDTO::getAddressList)
+                .selectCollection(AddressDO.class, UserDTO::getAddressList, addr -> addr
+                        .association(AreaDO.class, AddressDTO::getArea))
                 .leftJoin(AddressDO.class, AddressDO::getUserId, UserDO::getId)
+                .leftJoin(AreaDO.class, AreaDO::getId, AddressDO::getAreaId)
                 .orderByDesc(UserDO::getId);
-
         List<UserDTO> list = userMapper.selectJoinList(UserDTO.class, wrapper);
         list.forEach(System.out::println);
     }

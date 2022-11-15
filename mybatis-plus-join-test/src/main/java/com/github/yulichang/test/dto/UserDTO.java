@@ -1,11 +1,11 @@
 package com.github.yulichang.test.dto;
 
-import com.github.yulichang.test.entity.AddressDO;
 import com.github.yulichang.test.enums.Sex;
 import lombok.Data;
 import lombok.ToString;
 
 import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -17,7 +17,7 @@ public class UserDTO {
     /** user */
     private Integer id;
     /** user */
-    private String nameName;
+    private Map<String,String> name;
     /** user */
     private Sex sex;
     /** user */
@@ -37,5 +37,5 @@ public class UserDTO {
     /** area */
     private String area;
 
-    private List<AddressDO> addressList;
+    private List<AddressDTO> addressList;
 }

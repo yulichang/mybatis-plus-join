@@ -11,14 +11,16 @@ import com.baomidou.mybatisplus.core.toolkit.StringPool;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.github.yulichang.exception.MPJException;
-import com.github.yulichang.toolkit.*;
+import com.github.yulichang.toolkit.Constant;
+import com.github.yulichang.toolkit.LambdaUtils;
+import com.github.yulichang.toolkit.MPJWrappers;
+import com.github.yulichang.toolkit.ReflectionKit;
 import com.github.yulichang.toolkit.support.ColumnCache;
 import com.github.yulichang.toolkit.support.SelectColumn;
 import com.github.yulichang.wrapper.enums.BaseFuncEnum;
 import com.github.yulichang.wrapper.interfaces.LambdaJoin;
 import com.github.yulichang.wrapper.interfaces.Query;
 import com.github.yulichang.wrapper.interfaces.on.OnFunction;
-import com.github.yulichang.wrapper.resultmap.LabelType;
 import com.github.yulichang.wrapper.resultmap.MFunc;
 import com.github.yulichang.wrapper.resultmap.MybatisLabel;
 import lombok.Getter;
@@ -182,13 +184,13 @@ public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWr
         MybatisLabel.Builder<C, Z> builder;
         if (genericType == null || genericType.isAssignableFrom(child)) {
             //找不到集合泛型 List List<?> List<Object> ， 直接查询数据库实体
-            builder = new MybatisLabel.Builder<>(LabelType.COLLECTION, dtoFieldName, child, field.getType());
+            builder = new MybatisLabel.Builder<>(dtoFieldName, child, field.getType());
         } else {
             Class<Z> ofType = (Class<Z>) genericType;
             if (ReflectionKit.isPrimitiveOrWrapper(ofType)) {
                 throw new MPJException("collection 不支持基本数据类型");
             }
-            builder = new MybatisLabel.Builder<>(LabelType.COLLECTION, dtoFieldName, child, field.getType(), ofType, true);
+            builder = new MybatisLabel.Builder<>(dtoFieldName, child, field.getType(), ofType, true);
         }
         this.resultMapMybatisLabel.add(builder.build());
         return typedThis;
@@ -231,7 +233,7 @@ public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWr
         //获取集合泛型
         Class<?> genericType = ReflectionKit.getGenericType(field);
         Class<Z> ofType = (Class<Z>) genericType;
-        MybatisLabel.Builder<C, Z> builder = new MybatisLabel.Builder<>(LabelType.COLLECTION, dtoFieldName, child, field.getType(), ofType, false);
+        MybatisLabel.Builder<C, Z> builder = new MybatisLabel.Builder<>(dtoFieldName, child, field.getType(), ofType, false);
         this.resultMapMybatisLabel.add(collection.apply(builder).build());
         return typedThis;
     }
@@ -252,7 +254,7 @@ public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWr
         }
         this.resultMap = true;
         MybatisLabel.Builder<C, F> builder;
-        builder = new MybatisLabel.Builder<>(LabelType.ASSOCIATION, dtoFieldName, child, field.getType(), (Class<F>) field.getType(), true);
+        builder = new MybatisLabel.Builder<>(dtoFieldName, child, field.getType(), (Class<F>) field.getType(), true);
         this.resultMapMybatisLabel.add(builder.build());
         return typedThis;
     }
@@ -272,7 +274,7 @@ public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWr
         if (ReflectionKit.isPrimitiveOrWrapper(field.getType())) {
             throw new MPJException("association 不支持基本数据类型");
         }
-        MybatisLabel.Builder<C, F> builder = new MybatisLabel.Builder<>(LabelType.ASSOCIATION, dtoFieldName, child, field.getType(), (Class<F>) child, false);
+        MybatisLabel.Builder<C, F> builder = new MybatisLabel.Builder<>(dtoFieldName, child, field.getType(), (Class<F>) child, false);
         this.resultMapMybatisLabel.add(collection.apply(builder).build());
         return typedThis;
     }

@@ -33,8 +33,10 @@ import javax.sql.DataSource;
 import java.util.List;
 
 /**
+ * springboot 自动配置类
+ *
  * @author yulichang
- * @since 1.3.2
+ * @since 2.0.0
  */
 @SuppressWarnings("unused")
 @Configuration(proxyBeanMethods = false)

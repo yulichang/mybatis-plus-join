@@ -5,8 +5,10 @@ import lombok.experimental.Accessors;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
+ * 配置类
+ *
  * @author yulichang
- * @since 1.3.2
+ * @since 2.0.0
  */
 @Data
 @Accessors(chain = true)

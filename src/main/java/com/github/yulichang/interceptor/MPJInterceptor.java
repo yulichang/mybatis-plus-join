@@ -209,43 +209,55 @@ public class MPJInterceptor implements Interceptor {
         //移除result中不存在的标签
         resultMappings.removeIf(i -> !fieldMap.containsKey(i.getProperty()));
         if (wrapper.isResultMap()) {
-            List<MybatisLabel<?, ?>> mybatisLabel = wrapper.getResultMapMybatisLabel();
-            for (MybatisLabel mpjColl : mybatisLabel) {
-                List<Result> list = mpjColl.getResultList();
-                if (CollectionUtils.isEmpty(list)) {
-                    continue;
-                }
-                List<ResultMapping> childMapping = new ArrayList<>(list.size());
-                for (Result r : list) {
-                    String columnName = r.getColumn();
-                    //列名去重
-                    columnName = getColumn(columnSet, columnName);
-                    columnList.add(SelectColumn.of(mpjColl.getEntityClass(), r.getColumn(), null,
-                            Objects.equals(columnName, r.getColumn()) ? null : columnName, null, null, true, null));
-                    ResultMapping.Builder builder = new ResultMapping.Builder(ms.getConfiguration(), r.getProperty(),
-                            StringUtils.getTargetColumn(columnName), r.getJavaType());
-                    if (r.isId()) {//主键标记为id标签
-                        builder.flags(Collections.singletonList(ResultFlag.ID));
-                    }
-                    childMapping.add(builder.build());
-                }
-                String childId = id + StringPool.UNDERSCORE + mpjColl.getEntityClass().getName() + StringPool.UNDERSCORE +
-                        mpjColl.getOfType().getName() + StringPool.UNDERSCORE + mpjColl.getLabelType() + StringPool.UNDERSCORE +
-                        childMapping.stream().map(i -> (CollectionUtils.isEmpty(i.getFlags()) ? ResultFlag.CONSTRUCTOR :
-                                i.getFlags().get(0)) + i.getProperty() + i.getColumn()).collect(Collectors.joining(StringPool.DASH));
-                resultMappings.add(new ResultMapping.Builder(ms.getConfiguration(), mpjColl.getProperty())
-                        .javaType(mpjColl.getJavaType())
-                        .nestedResultMapId(childId)
-                        .build());
-                //双检
-                if (!ms.getConfiguration().getResultMapNames().contains(childId)) {
-                    ResultMap build = new ResultMap.Builder(ms.getConfiguration(), childId, mpjColl.getOfType(), childMapping).build();
-                    MPJInterceptor.addResultMap(ms, childId, build);
-                }
-            }
+            buildResult(ms, wrapper.getResultMapMybatisLabel(), columnSet, resultMappings, columnList);
         }
         result.add(new ResultMap.Builder(ms.getConfiguration(), id, resultType, resultMappings).build());
         return result;
+    }
+
+    private void buildResult(MappedStatement ms, List<MybatisLabel<?, ?>> mybatisLabel, Set<String> columnSet,
+                             List<ResultMapping> parentMappings, List<SelectColumn> columnList) {
+        for (MybatisLabel<?, ?> mpjColl : mybatisLabel) {
+            List<Result> list = mpjColl.getResultList();
+            if (CollectionUtils.isEmpty(list)) {
+                continue;
+            }
+            List<ResultMapping> childMapping = new ArrayList<>(list.size());
+            for (Result r : list) {
+                String columnName = r.getColumn();
+                //列名去重
+                columnName = getColumn(columnSet, columnName);
+                columnList.add(SelectColumn.of(mpjColl.getEntityClass(), r.getColumn(), null,
+                        Objects.equals(columnName, r.getColumn()) ? null : columnName, null, null, true, null));
+                ResultMapping.Builder builder = new ResultMapping.Builder(ms.getConfiguration(), r.getProperty(),
+                        StringUtils.getTargetColumn(columnName), r.getJavaType());
+                if (r.isId()) {//主键标记为id标签
+                    builder.flags(Collections.singletonList(ResultFlag.ID));
+                }
+                //TypeHandle
+                TableFieldInfo info = r.getTableFieldInfo();
+                if (info != null && info.getTypeHandler() != null && info.getTypeHandler() != UnknownTypeHandler.class) {
+                    builder.typeHandler(getTypeHandler(ms, info));
+                }
+                childMapping.add(builder.build());
+            }
+            //嵌套处理
+            if (CollectionUtils.isNotEmpty(mpjColl.getMybatisLabels())) {
+                this.buildResult(ms, mpjColl.getMybatisLabels(), columnSet, childMapping, columnList);
+            }
+            String childId = "MPJ_" + mpjColl.getEntityClass().getName() + StringPool.UNDERSCORE + mpjColl.getOfType().getName() +
+                    StringPool.UNDERSCORE + childMapping.stream().map(i -> (CollectionUtils.isEmpty(i.getFlags()) ?
+                    ResultFlag.CONSTRUCTOR : i.getFlags().get(0)) + i.getProperty() + i.getColumn()).collect(Collectors.joining(StringPool.DASH));
+            parentMappings.add(new ResultMapping.Builder(ms.getConfiguration(), mpjColl.getProperty())
+                    .javaType(mpjColl.getJavaType())
+                    .nestedResultMapId(childId)
+                    .build());
+            //双检
+            if (!ms.getConfiguration().getResultMapNames().contains(childId)) {
+                ResultMap build = new ResultMap.Builder(ms.getConfiguration(), childId, mpjColl.getOfType(), childMapping).build();
+                MPJInterceptor.addResultMap(ms, childId, build);
+            }
+        }
     }
 
     /**
@@ -268,12 +280,13 @@ public class MPJInterceptor implements Interceptor {
      * @return 唯一列名
      */
     private String getColumn(Set<String> pool, String columnName) {
-        if (!pool.contains(columnName)) {
-            pool.add(columnName);
-            return columnName;
+        String tagName = StringUtils.getTargetColumn(columnName);
+        if (!pool.contains(tagName)) {
+            pool.add(tagName);
+            return tagName;
         }
-        columnName = "mpj_" + StringUtils.getTargetColumn(columnName);
-        return getColumn(pool, columnName);
+        tagName = "mpj_" + tagName;
+        return getColumn(pool, tagName);
     }
 
     /**

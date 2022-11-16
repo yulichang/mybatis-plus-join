@@ -37,10 +37,6 @@
     </modules>
 
     <properties>
-        <mybaits-plus-join.version>2.0.0</mybaits-plus-join.version>
-        <mybatis-plus.version>3.5.2</mybatis-plus.version>
-        <lombok.version>1.18.24</lombok.version>
-
         <jdkVersion>1.8</jdkVersion>
         <jdkVersion.test>1.8</jdkVersion.test>
         <maven.compiler.source>1.8</maven.compiler.source>

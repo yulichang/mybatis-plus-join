@@ -71,8 +71,7 @@
         <dependency>
             <groupId>com.baomidou</groupId>
             <artifactId>mybatis-plus-boot-starter</artifactId>
-<!--            <version>${mybatis-plus.version}</version>-->
-                        <version>3.4.2</version>
+            <version>3.4.2</version>
         </dependency>
         <dependency>
             <groupId>com.github.yulichang</groupId>
@@ -80,11 +79,11 @@
             <version>2.0.0</version>
         </dependency>
         <!-- PageHelper 兼容性测试 -->
-<!--        <dependency>-->
-<!--            <groupId>com.github.pagehelper</groupId>-->
-<!--            <artifactId>pagehelper-spring-boot-starter</artifactId>-->
-<!--            <version>1.4.5</version>-->
-<!--        </dependency>-->
+        <!--        <dependency>-->
+        <!--            <groupId>com.github.pagehelper</groupId>-->
+        <!--            <artifactId>pagehelper-spring-boot-starter</artifactId>-->
+        <!--            <version>1.4.5</version>-->
+        <!--        </dependency>-->
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
@@ -95,11 +94,6 @@
             <artifactId>spring-jdbc</artifactId>
             <version>5.3.4</version>
         </dependency>
-<!--        <dependency>-->
-<!--            <groupId>jsqlparser</groupId>-->
-<!--            <artifactId>jsqlparser</artifactId>-->
-<!--            <version>0.7.0</version>-->
-<!--        </dependency>-->
     </dependencies>
 
 </project>

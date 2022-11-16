@@ -9,6 +9,7 @@
         <artifactId>mybatis-plus-join-root</artifactId>
         <version>2.0.0</version>
     </parent>
+    <version>2.0.0</version>
     <artifactId>mybatis-plus-join-core</artifactId>
     <name>mybatis-plus-join-core</name>
 
@@ -46,7 +47,7 @@
         <dependency>
             <groupId>com.github.yulichang</groupId>
             <artifactId>mybatis-plus-join-annotation</artifactId>
-            <version>${mybaits-plus-join.version}</version>
+            <version>2.0.0</version>
         </dependency>
         <dependency>
             <groupId>com.baomidou</groupId>
@@ -59,6 +60,12 @@
             <artifactId>lombok</artifactId>
             <version>${lombok.version}</version>
             <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <scope>provided</scope>
+            <version>2.0.3</version>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>

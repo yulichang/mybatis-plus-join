@@ -9,7 +9,7 @@ import lombok.Getter;
  * MPJLambdaWrapper 查询字段
  *
  * @author yulichang
- * @since 1.2.5
+ * @since 1.3.0
  */
 @Getter
 public class SelectColumn {

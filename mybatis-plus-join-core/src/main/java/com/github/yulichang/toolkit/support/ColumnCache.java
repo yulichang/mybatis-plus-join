@@ -8,7 +8,7 @@ import lombok.Getter;
  *
  * @author yulichang
  * @see com.baomidou.mybatisplus.core.toolkit.support.ColumnCache
- * @since 1.2.5
+ * @since 1.3.0
  */
 public class ColumnCache extends com.baomidou.mybatisplus.core.toolkit.support.ColumnCache {
 

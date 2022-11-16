@@ -77,3 +77,4 @@ INSERT INTO address (id, user_id, area_id, tel, address, del) VALUES (19,19, 100
 INSERT INTO address (id, user_id, area_id, tel, address, del) VALUES (20,20, 10020, '10000000020', '曹县20', false);
 INSERT INTO address (id, user_id, area_id, tel, address, del) VALUES (21,21, 10021, '10000000021', '曹县21', false);
 INSERT INTO address (id, user_id, area_id, tel, address, del) VALUES (22,22, 10022, '10000000022', '曹县22', false);
+

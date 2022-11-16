@@ -11,7 +11,6 @@ import com.github.yulichang.test.join.entity.UserDO;
 import com.github.yulichang.test.join.mapper.UserMapper;
 import com.github.yulichang.toolkit.MPJWrappers;
 import com.github.yulichang.wrapper.MPJLambdaWrapper;
-import org.apache.ibatis.session.SqlSessionFactory;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -32,16 +31,9 @@ import java.util.Map;
 class LambdaWrapperTest {
     @Resource
     private UserMapper userMapper;
-    @Resource
-    private SqlSessionFactory sqlSessionFactory;
 
-    /**
-     * 一对多
-     */
     @Test
     void testJoin() {
-        userMapper.selectListDeep(new QueryWrapper<>());
-
         MPJLambdaWrapper<UserDO> wrapper = new MPJLambdaWrapper<UserDO>()
                 .selectAll(UserDO.class)
                 .selectCollection(AddressDO.class, UserDTO::getAddressList, addr -> addr
@@ -109,6 +101,7 @@ class LambdaWrapperTest {
      */
     @Test
     void test6() {
+        userMapper.selectPage(new Page<>(1, 10),new QueryWrapper<>());
         IPage<UserDTO> page = userMapper.selectJoinPage(new Page<>(1, 10), UserDTO.class,
                 MPJWrappers.<UserDO>lambdaJoin()
                         .selectAll(UserDO.class)

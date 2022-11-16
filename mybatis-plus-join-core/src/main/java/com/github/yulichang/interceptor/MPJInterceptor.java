@@ -7,7 +7,6 @@ import com.baomidou.mybatisplus.core.toolkit.*;
 import com.github.yulichang.interfaces.MPJBaseJoin;
 import com.github.yulichang.method.MPJResultType;
 import com.github.yulichang.toolkit.Constant;
-import com.github.yulichang.toolkit.ReflectionKit;
 import com.github.yulichang.toolkit.support.SelectColumn;
 import com.github.yulichang.wrapper.MPJLambdaWrapper;
 import com.github.yulichang.wrapper.resultmap.MybatisLabel;
@@ -150,7 +149,6 @@ public class MPJInterceptor implements Interceptor {
         TableInfo tableInfo = TableInfoHelper.getTableInfo(resultType);
         String id = ms.getId() + StringPool.DOT + Constants.MYBATIS_PLUS + StringPool.UNDERSCORE + resultType.getName();
         if (!(obj instanceof MPJLambdaWrapper) || Map.class.isAssignableFrom(resultType) ||
-                ReflectionKit.isPrimitiveOrWrapper(resultType) ||
                 Collection.class.isAssignableFrom(resultType)) {
             result.add(getDefaultResultMap(tableInfo, ms, resultType, id));
             return result;
@@ -209,56 +207,86 @@ public class MPJInterceptor implements Interceptor {
         //移除result中不存在的标签
         resultMappings.removeIf(i -> !fieldMap.containsKey(i.getProperty()));
         if (wrapper.isResultMap()) {
-            buildResult(ms, wrapper.getResultMapMybatisLabel(), columnSet, resultMappings, columnList);
+            for (Object o : wrapper.getResultMapMybatisLabel()) {
+                MybatisLabel<?, ?> label = (MybatisLabel<?, ?>) o;
+                resultMappings.add(buildResult(ms, label, columnSet, columnList));
+            }
         }
         result.add(new ResultMap.Builder(ms.getConfiguration(), id, resultType, resultMappings).build());
         return result;
     }
 
-    private void buildResult(MappedStatement ms, List<MybatisLabel<?, ?>> mybatisLabel, Set<String> columnSet,
-                             List<ResultMapping> parentMappings, List<SelectColumn> columnList) {
-        for (MybatisLabel<?, ?> mpjColl : mybatisLabel) {
-            List<Result> list = mpjColl.getResultList();
-            if (CollectionUtils.isEmpty(list)) {
-                continue;
+
+    //fix 重上往下会有resultMap覆盖问题,应该从根节点开始,id向上传递
+
+    /**
+     * @return 返回节点id
+     */
+    private ResultMapping buildResult(MappedStatement ms, MybatisLabel<?, ?> mybatisLabel, Set<String> columnSet,
+                                      List<SelectColumn> columnList) {
+        List<Result> resultList = mybatisLabel.getResultList();
+        if (CollectionUtils.isEmpty(resultList)) {
+            return null;
+        }
+        List<ResultMapping> childMapping = new ArrayList<>(resultList.size());
+        for (Result r : resultList) {
+            String columnName = r.getColumn();
+            //列名去重
+            columnName = getColumn(columnSet, columnName);
+            columnList.add(SelectColumn.of(mybatisLabel.getEntityClass(), r.getColumn(), null,
+                    Objects.equals(columnName, r.getColumn()) ? null : columnName, null, null, true, null));
+            ResultMapping.Builder builder = new ResultMapping.Builder(ms.getConfiguration(), r.getProperty(),
+                    StringUtils.getTargetColumn(columnName), r.getJavaType());
+            if (r.isId()) {//主键标记为id标签
+                builder.flags(Collections.singletonList(ResultFlag.ID));
             }
-            List<ResultMapping> childMapping = new ArrayList<>(list.size());
-            for (Result r : list) {
-                String columnName = r.getColumn();
-                //列名去重
-                columnName = getColumn(columnSet, columnName);
-                columnList.add(SelectColumn.of(mpjColl.getEntityClass(), r.getColumn(), null,
-                        Objects.equals(columnName, r.getColumn()) ? null : columnName, null, null, true, null));
-                ResultMapping.Builder builder = new ResultMapping.Builder(ms.getConfiguration(), r.getProperty(),
-                        StringUtils.getTargetColumn(columnName), r.getJavaType());
-                if (r.isId()) {//主键标记为id标签
-                    builder.flags(Collections.singletonList(ResultFlag.ID));
-                }
-                //TypeHandle
-                TableFieldInfo info = r.getTableFieldInfo();
-                if (info != null && info.getTypeHandler() != null && info.getTypeHandler() != UnknownTypeHandler.class) {
-                    builder.typeHandler(getTypeHandler(ms, info));
-                }
-                childMapping.add(builder.build());
+            //TypeHandle
+            TableFieldInfo info = r.getTableFieldInfo();
+            if (info != null && info.getTypeHandler() != null && info.getTypeHandler() != UnknownTypeHandler.class) {
+                builder.typeHandler(getTypeHandler(ms, info));
             }
-            //嵌套处理
-            if (CollectionUtils.isNotEmpty(mpjColl.getMybatisLabels())) {
-                this.buildResult(ms, mpjColl.getMybatisLabels(), columnSet, childMapping, columnList);
-            }
-            String childId = "MPJ_" + mpjColl.getEntityClass().getName() + StringPool.UNDERSCORE + mpjColl.getOfType().getName() +
+            childMapping.add(builder.build());
+        }
+
+        String childId;
+        if (CollectionUtils.isEmpty(mybatisLabel.getMybatisLabels())) {
+            childId = "MPJ_" + mybatisLabel.getEntityClass().getName() + StringPool.UNDERSCORE + mybatisLabel.getOfType().getName() +
                     StringPool.UNDERSCORE + childMapping.stream().map(i -> "(" + (CollectionUtils.isEmpty(i.getFlags()) ?
                             ResultFlag.CONSTRUCTOR : i.getFlags().get(0)) + "-" + i.getProperty() + "-" + i.getColumn() + ")")
                     .collect(Collectors.joining(StringPool.DASH));
-            parentMappings.add(new ResultMapping.Builder(ms.getConfiguration(), mpjColl.getProperty())
-                    .javaType(mpjColl.getJavaType())
-                    .nestedResultMapId(childId)
-                    .build());
-            //双检
-            if (!ms.getConfiguration().getResultMapNames().contains(childId)) {
-                ResultMap build = new ResultMap.Builder(ms.getConfiguration(), childId, mpjColl.getOfType(), childMapping).build();
-                MPJInterceptor.addResultMap(ms, childId, build);
+        } else {
+            //递归调用
+            StringBuilder sb = new StringBuilder("MPJ_[");
+            for (MybatisLabel<?, ?> o : mybatisLabel.getMybatisLabels()) {
+                if (Objects.isNull(o)) {
+                    continue;
+                }
+                ResultMapping result = buildResult(ms, o, columnSet, columnList);
+                if (Objects.isNull(result)) {
+                    continue;
+                }
+                childMapping.add(result);
+                sb.append(result.getNestedResultMapId());
+                sb.append("]");
             }
+            sb.append("_MPJ_")
+                    .append(mybatisLabel.getEntityClass().getName())
+                    .append(StringPool.UNDERSCORE)
+                    .append(mybatisLabel.getOfType().getName())
+                    .append(StringPool.UNDERSCORE);
+            childId = sb + childMapping.stream().map(i -> "(" + (CollectionUtils.isEmpty(i.getFlags()) ?
+                            ResultFlag.CONSTRUCTOR : i.getFlags().get(0)) + "-" + i.getProperty() + "-" + i.getColumn() + ")")
+                    .collect(Collectors.joining(StringPool.DASH));
         }
+        //双检
+        if (!ms.getConfiguration().getResultMapNames().contains(childId)) {
+            ResultMap build = new ResultMap.Builder(ms.getConfiguration(), childId, mybatisLabel.getOfType(), childMapping).build();
+            MPJInterceptor.addResultMap(ms, childId, build);
+        }
+        return new ResultMapping.Builder(ms.getConfiguration(), mybatisLabel.getProperty())
+                .javaType(mybatisLabel.getJavaType())
+                .nestedResultMapId(childId)
+                .build();
     }
 
     /**

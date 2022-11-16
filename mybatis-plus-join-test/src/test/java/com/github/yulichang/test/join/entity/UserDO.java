@@ -24,7 +24,7 @@ public class UserDO {
     private Integer id;
 
     @TableField(value = "`name`", typeHandler = JacksonTypeHandler.class)
-    private Map<String,String> name;
+    private Map<String,String> aName;
 
     private Sex sex;
 

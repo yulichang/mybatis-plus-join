@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011-2021, baomidou (jobob@qq.com).
+ * Copyright (c) 2011-2022, baomidou (jobob@qq.com).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,15 +15,16 @@
  */
 package com.github.yulichang.toolkit;
 
-import com.baomidou.mybatisplus.core.toolkit.Assert;
-import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
-import com.baomidou.mybatisplus.core.toolkit.ExceptionUtils;
-import org.apache.ibatis.logging.Log;
-import org.apache.ibatis.logging.LogFactory;
+import com.baomidou.mybatisplus.core.toolkit.*;
+import com.baomidou.mybatisplus.core.toolkit.reflect.GenericTypeUtils;
 
-import java.lang.reflect.*;
+import java.lang.reflect.AccessibleObject;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
+import java.security.AccessController;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -37,14 +38,14 @@ import static java.util.stream.Collectors.toMap;
  * @author hcl
  * @since 2016-09-22
  */
-@SuppressWarnings("unused")
+@SuppressWarnings("All")
 public final class ReflectionKit {
-    private static final Log logger = LogFactory.getLog(ReflectionKit.class);
     /**
      * class field cache
      */
     private static final Map<Class<?>, List<Field>> CLASS_FIELD_CACHE = new ConcurrentHashMap<>();
 
+    @Deprecated
     private static final Map<Class<?>, Class<?>> PRIMITIVE_WRAPPER_TYPE_MAP = new IdentityHashMap<>(8);
 
     private static final Map<Class<?>, Class<?>> PRIMITIVE_TYPE_TO_WRAPPER_MAP = new IdentityHashMap<>(8);
@@ -83,26 +84,20 @@ public final class ReflectionKit {
         }
     }
 
-
     /**
-     * Collection字段的泛型
+     * <p>
+     * 反射对象获取泛型
+     * </p>
+     *
+     * @param clazz      对象
+     * @param genericIfc 所属泛型父类
+     * @param index      泛型所在位置
+     * @return Class
      */
-    public static Class<?> getGenericType(Field field) {
-        Type type = field.getGenericType();
-        //没有写泛型
-        if (!(type instanceof ParameterizedType)) {
-            return Object.class;
-        }
-        ParameterizedType pt = (ParameterizedType) type;
-        Type[] actualTypeArguments = pt.getActualTypeArguments();
-        Type argument = actualTypeArguments[0];
-        //通配符泛型 ? , ? extends XXX , ? super XXX
-        if (argument instanceof WildcardType) {
-            //获取上界
-            Type[] types = ((WildcardType) argument).getUpperBounds();
-            return (Class<?>) types[0];
-        }
-        return (Class<?>) argument;
+    public static Class<?> getSuperClassGenericType(final Class<?> clazz, final Class<?> genericIfc, final int index) {
+        //update by noear @2021-09-03
+        Class<?>[] typeArguments = GenericTypeUtils.resolveTypeArguments(ClassUtils.getUserClass(clazz), genericIfc);
+        return null == typeArguments ? null : typeArguments[index];
     }
 
     /**
@@ -114,7 +109,7 @@ public final class ReflectionKit {
      */
     public static Map<String, Field> getFieldMap(Class<?> clazz) {
         List<Field> fieldList = getFieldList(clazz);
-        return CollectionUtils.isNotEmpty(fieldList) ? fieldList.stream().collect(Collectors.toMap(Field::getName, field -> field)) : Collections.emptyMap();
+        return CollectionUtils.isNotEmpty(fieldList) ? fieldList.stream().collect(Collectors.toMap(Field::getName, Function.identity())) : Collections.emptyMap();
     }
 
     /**
@@ -145,11 +140,11 @@ public final class ReflectionKit {
              * 中间表实体重写父类属性 ` private transient Date createTime; `
              */
             return fieldMap.values().stream()
-                    /* 过滤静态属性 */
-                    .filter(f -> !Modifier.isStatic(f.getModifiers()))
-                    /* 过滤 transient关键字修饰的属性 */
-                    .filter(f -> !Modifier.isTransient(f.getModifiers()))
-                    .collect(Collectors.toList());
+                /* 过滤静态属性 */
+                .filter(f -> !Modifier.isStatic(f.getModifiers()))
+                /* 过滤 transient关键字修饰的属性 */
+                .filter(f -> !Modifier.isTransient(f.getModifiers()))
+                .collect(Collectors.toList());
         });
     }
 
@@ -164,12 +159,12 @@ public final class ReflectionKit {
     public static Map<String, Field> excludeOverrideSuperField(Field[] fields, List<Field> superFieldList) {
         // 子类属性
         Map<String, Field> fieldMap = Stream.of(fields).collect(toMap(Field::getName, identity(),
-                (u, v) -> {
-                    throw new IllegalStateException(String.format("Duplicate key %s", u));
-                },
-                LinkedHashMap::new));
+            (u, v) -> {
+                throw new IllegalStateException(String.format("Duplicate key %s", u));
+            },
+            LinkedHashMap::new));
         superFieldList.stream().filter(field -> !fieldMap.containsKey(field.getName()))
-                .forEach(f -> fieldMap.put(f.getName(), f));
+            .forEach(f -> fieldMap.put(f.getName(), f));
         return fieldMap;
     }
 
@@ -179,6 +174,7 @@ public final class ReflectionKit {
      * @param clazz class
      * @return 是否基本类型或基本包装类型
      */
+    @Deprecated
     public static boolean isPrimitiveOrWrapper(Class<?> clazz) {
         Assert.notNull(clazz, "Class must not be null");
         return (clazz.isPrimitive() || PRIMITIVE_WRAPPER_TYPE_MAP.containsKey(clazz));
@@ -187,4 +183,16 @@ public final class ReflectionKit {
     public static Class<?> resolvePrimitiveIfNecessary(Class<?> clazz) {
         return (clazz.isPrimitive() && clazz != void.class ? PRIMITIVE_TYPE_TO_WRAPPER_MAP.get(clazz) : clazz);
     }
+
+    /**
+     * 设置可访问对象的可访问权限为 true
+     *
+     * @param object 可访问的对象
+     * @param <T>    类型
+     * @return 返回设置后的对象
+     */
+    public static <T extends AccessibleObject> T setAccessible(T object) {
+        return AccessController.doPrivileged(new SetAccessibleAction<>(object));
+    }
+
 }

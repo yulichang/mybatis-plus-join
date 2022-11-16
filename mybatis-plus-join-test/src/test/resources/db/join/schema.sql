@@ -12,20 +12,20 @@ create table area
     city     varchar(255) null,
     area     varchar(255) null,
     postcode varchar(255) null,
-    del bit
+    del      bit
 );
 
 DROP TABLE IF EXISTS `user`;
 
 create table `user`
 (
-    id       int auto_increment
+    id           int auto_increment
         primary key,
-    `name`     varchar(255) not null,
-    `address_id`     int not null,
-    sex      tinyint      not null,
-    head_img varchar(255) not null,
-    del bit
+    `name`       varchar(255) not null,
+    `address_id` int          not null,
+    sex          tinyint      not null,
+    head_img     varchar(255) not null,
+    del          bit
 );
 
 DROP TABLE IF EXISTS address;
@@ -34,9 +34,9 @@ create table address
 (
     id      int auto_increment
         primary key,
-    user_id int          null,
-    area_id int          null,
+    user_id int null,
+    area_id int null,
     tel     varchar(255) null,
     address varchar(255) null,
-    del bit
+    del     bit
 );

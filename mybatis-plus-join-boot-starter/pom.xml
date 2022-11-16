@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--suppress ALL -->
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
@@ -8,6 +9,7 @@
         <artifactId>mybatis-plus-join-root</artifactId>
         <version>2.0.0</version>
     </parent>
+    <version>2.0.0</version>
     <artifactId>mybatis-plus-join-boot-starter</artifactId>
     <name>mybatis-plus-join-boot-starter</name>
 
@@ -45,7 +47,7 @@
         <dependency>
             <groupId>com.github.yulichang</groupId>
             <artifactId>mybatis-plus-join-core</artifactId>
-            <version>${mybaits-plus-join.version}</version>
+            <version>2.0.0</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>

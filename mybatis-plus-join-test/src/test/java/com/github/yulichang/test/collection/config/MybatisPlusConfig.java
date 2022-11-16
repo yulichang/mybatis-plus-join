@@ -1,4 +1,4 @@
-package com.github.yulichang.test.mapping.config;
+package com.github.yulichang.test.collection.config;
 
 import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.PaginationInnerInterceptor;

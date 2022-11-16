@@ -17,7 +17,7 @@ import org.apache.ibatis.type.TypeHandler;
  * result 标签
  *
  * @author yulichang
- * @since 1.2.5
+ * @since 1.3.0
  */
 @Getter
 @Setter(AccessLevel.PACKAGE)

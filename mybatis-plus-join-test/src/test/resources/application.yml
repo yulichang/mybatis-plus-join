@@ -6,6 +6,7 @@ spring:
     password: test
 
 mybatis-plus:
+  typeEnumsPackage: com.github.yulichang.test
   global-config:
     db-config:
       logic-delete-field: del

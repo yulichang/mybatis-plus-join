@@ -13,7 +13,7 @@ import java.util.function.Predicate;
  * 保证 MPJInterceptor 再最后一个（第一个执行）
  *
  * @author yulichang
- * @since 1.2.5
+ * @since 1.3.0
  */
 public class InterceptorList<E extends Interceptor> extends ArrayList<E> {
 

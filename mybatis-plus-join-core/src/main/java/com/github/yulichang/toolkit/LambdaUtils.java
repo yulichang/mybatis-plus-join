@@ -5,13 +5,13 @@ import com.baomidou.mybatisplus.core.metadata.TableInfo;
 import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
-import com.github.yulichang.toolkit.support.ColumnCache;
-import com.github.yulichang.toolkit.support.SerializedLambda;
+import com.github.yulichang.toolkit.support.*;
 import org.apache.ibatis.reflection.property.PropertyNamer;
 
-import java.lang.ref.WeakReference;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 import java.util.Map;
-import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static java.util.Locale.ENGLISH;
@@ -19,50 +19,54 @@ import static java.util.Locale.ENGLISH;
 /**
  * copy {@link com.baomidou.mybatisplus.core.toolkit.LambdaUtils}
  */
+@SuppressWarnings("unused")
 public final class LambdaUtils {
 
     /* ******* 自定义方法 *********** */
     public static <T> String getName(SFunction<T, ?> fn) {
-        return PropertyNamer.methodToProperty(resolve(fn).getImplMethodName());
+        LambdaMeta extract = extract(fn);
+        String name = PropertyNamer.methodToProperty(extract.getImplMethodName());
+        if (Character.isUpperCase(name.charAt(0))) {
+            Map<String, Field> map = MPJReflectionKit.getFieldMap(extract.getInstantiatedClass());
+            if (map.containsKey(name)) {
+                return name;
+            } else {
+                return map.keySet().stream().filter(i -> i.equalsIgnoreCase(name)).findFirst().orElse(null);
+            }
+        }
+        return name;
     }
 
 
     @SuppressWarnings("unchecked")
     public static <T> Class<T> getEntityClass(SFunction<T, ?> fn) {
-        return (Class<T>) resolve(fn).getInstantiatedType();
+        return (Class<T>) extract(fn).getInstantiatedClass();
     }
     /* ******* 自定义方法 结束 以下代码均为拷贝 *********** */
 
 
-    /**
-     * 字段映射
-     */
     private static final Map<String, Map<String, ColumnCache>> COLUMN_CACHE_MAP = new ConcurrentHashMap<>();
 
     /**
-     * SerializedLambda 反序列化缓存
-     */
-    private static final Map<String, WeakReference<SerializedLambda>> FUNC_CACHE = new ConcurrentHashMap<>();
-
-    /**
-     * 解析 lambda 表达式, 该方法只是调用了 {@link SerializedLambda#resolve(SFunction)} 中的方法，在此基础上加了缓存。
      * 该缓存可能会在任意不定的时间被清除
      *
      * @param func 需要解析的 lambda 对象
      * @param <T>  类型，被调用的 Function 对象的目标类型
      * @return 返回解析后的结果
-     * @see SerializedLambda#resolve(SFunction)
      */
-    public static <T> SerializedLambda resolve(SFunction<T, ?> func) {
-        Class<?> clazz = func.getClass();
-        String name = clazz.getName();
-        return Optional.ofNullable(FUNC_CACHE.get(name))
-                .map(WeakReference::get)
-                .orElseGet(() -> {
-                    SerializedLambda lambda = SerializedLambda.resolve(func);
-                    FUNC_CACHE.put(name, new WeakReference<>(lambda));
-                    return lambda;
-                });
+    public static <T> LambdaMeta extract(SFunction<T, ?> func) {
+        // 1. IDEA 调试模式下 lambda 表达式是一个代理
+        if (func instanceof Proxy) {
+            return new IdeaProxyLambdaMeta((Proxy) func);
+        }
+        // 2. 反射读取
+        try {
+            Method method = func.getClass().getDeclaredMethod("writeReplace");
+            return new ReflectLambdaMeta((java.lang.invoke.SerializedLambda) ReflectionKit.setAccessible(method).invoke(func));
+        } catch (Throwable e) {
+            // 3. 反射失败使用序列化的方式读取
+            return new ShadowLambdaMeta(SerializedLambda.extract(func));
+        }
     }
 
     /**
@@ -79,6 +83,14 @@ public final class LambdaUtils {
         return key.toUpperCase(ENGLISH);
     }
 
+    /**
+     * 将传入的表信息加入缓存
+     *
+     * @param tableInfo 表信息
+     */
+    public static void installCache(TableInfo tableInfo) {
+        COLUMN_CACHE_MAP.put(tableInfo.getEntityType().getName(), createColumnCacheMap(tableInfo));
+    }
 
     /**
      * 缓存实体字段 MAP 信息
@@ -115,5 +127,4 @@ public final class LambdaUtils {
             return info == null ? null : createColumnCacheMap(info);
         });
     }
-
 }

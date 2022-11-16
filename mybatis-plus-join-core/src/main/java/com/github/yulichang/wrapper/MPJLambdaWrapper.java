@@ -10,11 +10,7 @@ import com.baomidou.mybatisplus.core.toolkit.Assert;
 import com.baomidou.mybatisplus.core.toolkit.StringPool;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
-import com.github.yulichang.exception.MPJException;
-import com.github.yulichang.toolkit.Constant;
-import com.github.yulichang.toolkit.LambdaUtils;
-import com.github.yulichang.toolkit.MPJWrappers;
-import com.github.yulichang.toolkit.ReflectionKit;
+import com.github.yulichang.toolkit.*;
 import com.github.yulichang.toolkit.support.ColumnCache;
 import com.github.yulichang.toolkit.support.SelectColumn;
 import com.github.yulichang.wrapper.enums.BaseFuncEnum;
@@ -165,7 +161,7 @@ public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWr
      * <pre/>
      * 会自动将 UserAddressDO类中相同属性的字段 以mybatis<collection>的方式映射到UserDTO.addressListDTO属性中
      *
-     * @since 1.2.5
+     * @since 1.3.0
      *
      * @param child    连表数据库实体类
      * @param dtoField 包装类对应的属性
@@ -177,19 +173,16 @@ public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWr
     public <S, C, Z, F extends java.util.Collection<?>> MPJLambdaWrapper<T> selectCollection(Class<C> child, SFunction<S, F> dtoField) {
         String dtoFieldName = LambdaUtils.getName(dtoField);
         Class<S> dtoClass = LambdaUtils.getEntityClass(dtoField);
-        Map<String, Field> fieldMap = ReflectionKit.getFieldMap(dtoClass);
+        Map<String, Field> fieldMap = MPJReflectionKit.getFieldMap(dtoClass);
         Field field = fieldMap.get(dtoFieldName);
         this.resultMap = true;
-        Class<?> genericType = ReflectionKit.getGenericType(field);
+        Class<?> genericType = MPJReflectionKit.getGenericType(field);
         MybatisLabel.Builder<C, Z> builder;
         if (genericType == null || genericType.isAssignableFrom(child)) {
             //找不到集合泛型 List List<?> List<Object> ， 直接查询数据库实体
             builder = new MybatisLabel.Builder<>(dtoFieldName, child, field.getType());
         } else {
             Class<Z> ofType = (Class<Z>) genericType;
-            if (ReflectionKit.isPrimitiveOrWrapper(ofType)) {
-                throw new MPJException("collection 不支持基本数据类型");
-            }
             builder = new MybatisLabel.Builder<>(dtoFieldName, child, field.getType(), ofType, true);
         }
         this.resultMapMybatisLabel.add(builder.build());
@@ -214,7 +207,7 @@ public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWr
      *
      * 会自动将 UserAddressDO类中指定的字段 以mybatis<collection>的方式映射到UserDTO.addressListDTO属性中
      *
-     * @since 1.2.5
+     * @since 1.3.0
      *
      * @param child      连表数据库实体类
      * @param dtoField   包装类对应的属性
@@ -228,10 +221,10 @@ public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWr
     selectCollection(Class<C> child, SFunction<S, F> dtoField, MFunc<MybatisLabel.Builder<C, Z>> collection) {
         String dtoFieldName = LambdaUtils.getName(dtoField);
         Class<S> dtoClass = LambdaUtils.getEntityClass(dtoField);
-        Field field = ReflectionKit.getFieldMap(dtoClass).get(dtoFieldName);
+        Field field = MPJReflectionKit.getFieldMap(dtoClass).get(dtoFieldName);
         this.resultMap = true;
         //获取集合泛型
-        Class<?> genericType = ReflectionKit.getGenericType(field);
+        Class<?> genericType = MPJReflectionKit.getGenericType(field);
         Class<Z> ofType = (Class<Z>) genericType;
         MybatisLabel.Builder<C, Z> builder = new MybatisLabel.Builder<>(dtoFieldName, child, field.getType(), ofType, false);
         this.resultMapMybatisLabel.add(collection.apply(builder).build());
@@ -241,17 +234,14 @@ public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWr
     /**
      * 对一查询 用法参考 selectCollection
      *
-     * @since 1.2.5
+     * @since 1.3.0
      */
     public <S, C, F> MPJLambdaWrapper<T> selectAssociation(Class<C> child, SFunction<S, F> dtoField) {
         String dtoFieldName = LambdaUtils.getName(dtoField);
         Class<S> dtoClass = LambdaUtils.getEntityClass(dtoField);
-        Map<String, Field> fieldMap = ReflectionKit.getFieldMap(dtoClass);
+        Map<String, Field> fieldMap = MPJReflectionKit.getFieldMap(dtoClass);
         Field field = fieldMap.get(dtoFieldName);
         Assert.isFalse(Collection.class.isAssignableFrom(field.getType()), "association 不支持集合类");
-        if (ReflectionKit.isPrimitiveOrWrapper(field.getType())) {
-            throw new MPJException("association 不支持基本数据类型");
-        }
         this.resultMap = true;
         MybatisLabel.Builder<C, F> builder;
         builder = new MybatisLabel.Builder<>(dtoFieldName, child, field.getType(), (Class<F>) field.getType(), true);
@@ -262,18 +252,15 @@ public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWr
     /**
      * 对一查询 用法参考 selectCollection
      *
-     * @since 1.2.5
+     * @since 1.3.0
      */
     public <S, C, F> MPJLambdaWrapper<T> selectAssociation(Class<C> child, SFunction<S, F> dtoField,
                                                            MFunc<MybatisLabel.Builder<C, F>> collection) {
         String dtoFieldName = LambdaUtils.getName(dtoField);
         Class<S> dtoClass = LambdaUtils.getEntityClass(dtoField);
-        Field field = ReflectionKit.getFieldMap(dtoClass).get(dtoFieldName);
+        Field field = MPJReflectionKit.getFieldMap(dtoClass).get(dtoFieldName);
         this.resultMap = true;
         Assert.isFalse(Collection.class.isAssignableFrom(field.getType()), "association 不支持集合类");
-        if (ReflectionKit.isPrimitiveOrWrapper(field.getType())) {
-            throw new MPJException("association 不支持基本数据类型");
-        }
         MybatisLabel.Builder<C, F> builder = new MybatisLabel.Builder<>(dtoFieldName, child, field.getType(), (Class<F>) child, false);
         this.resultMapMybatisLabel.add(collection.apply(builder).build());
         return typedThis;

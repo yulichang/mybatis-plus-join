@@ -267,8 +267,9 @@ public class MPJInterceptor implements Interceptor {
                 }
                 childMapping.add(result);
                 sb.append(result.getNestedResultMapId());
-                sb.append("]");
+                sb.append("@");
             }
+            sb.append("]");
             sb.append("_MPJ_")
                     .append(mybatisLabel.getEntityClass().getName())
                     .append(StringPool.UNDERSCORE)
@@ -309,13 +310,12 @@ public class MPJInterceptor implements Interceptor {
      * @return 唯一列名
      */
     private String getColumn(Set<String> pool, String columnName) {
-        String tagName = StringUtils.getTargetColumn(columnName);
-        if (!pool.contains(tagName)) {
-            pool.add(tagName);
-            return tagName;
+        if (!pool.contains(columnName)) {
+            pool.add(columnName);
+            return columnName;
         }
-        tagName = "mpj_" + tagName;
-        return getColumn(pool, tagName);
+        columnName = "mpj_" + StringUtils.getTargetColumn(columnName);
+        return getColumn(pool, columnName);
     }
 
     /**

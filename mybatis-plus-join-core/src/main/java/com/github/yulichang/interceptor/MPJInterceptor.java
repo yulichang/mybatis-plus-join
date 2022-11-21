@@ -200,7 +200,8 @@ public class MPJInterceptor implements Interceptor {
             } else {
                 // 主键列
                 resultMappings.add(new ResultMapping.Builder(ms.getConfiguration(), i.getTagProperty(),
-                        StringUtils.getTargetColumn(i.getColumnName()), i.getKeyType()).build());
+                        StringUtils.getTargetColumn(i.getColumnName()), i.getKeyType())
+                        .flags(Collections.singletonList(ResultFlag.ID)).build());
             }
         }
         Set<String> columnSet = resultMappings.stream().map(ResultMapping::getColumn).collect(Collectors.toSet());

@@ -18,5 +18,10 @@ public class MybatisPlusJoinProperties {
     /**
      * 打印banner
      */
-    private Boolean banner = false;
+    private Boolean banner = true;
+
+    /**
+     * 连表查询副表是否启用逻辑删除(前提是MP配置了逻辑删除)
+     */
+    private Boolean subTableLogic = true;
 }

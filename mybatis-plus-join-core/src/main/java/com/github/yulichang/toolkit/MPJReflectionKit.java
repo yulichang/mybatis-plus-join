@@ -19,6 +19,7 @@ public final class MPJReflectionKit {
 
     private static final Map<Class<?>, Map<String, Field>> CLASS_FIELD_CACHE = new ConcurrentHashMap<>();
 
+    private static final Map<String, Field> EMPTY_MAP = new HashMap<>();
 
     /**
      * Collection字段的泛型
@@ -48,7 +49,7 @@ public final class MPJReflectionKit {
      */
     public static Map<String, Field> getFieldMap(Class<?> clazz) {
         if (clazz == null) {
-            return new HashMap<>();
+            return EMPTY_MAP;
         }
         Map<String, Field> fieldMap = CLASS_FIELD_CACHE.get(clazz);
         if (fieldMap != null) {

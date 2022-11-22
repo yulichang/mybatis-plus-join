@@ -315,7 +315,7 @@ public class MPJInterceptor implements Interceptor {
             pool.add(columnName);
             return columnName;
         }
-        columnName = "mpj_" + StringUtils.getTargetColumn(columnName);
+        columnName = "join_" + StringUtils.getTargetColumn(columnName);
         return getColumn(pool, columnName);
     }
 

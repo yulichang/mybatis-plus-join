@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.autoconfigure.MybatisPlusLanguageDriverAutoConfi
 import com.baomidou.mybatisplus.core.injector.AbstractSqlInjector;
 import com.baomidou.mybatisplus.core.injector.DefaultSqlInjector;
 import com.baomidou.mybatisplus.core.injector.ISqlInjector;
+import com.github.yulichang.config.ConfigProperties;
 import com.github.yulichang.config.InterceptorConfig;
 import com.github.yulichang.injector.MPJSqlInjector;
 import com.github.yulichang.interceptor.MPJInterceptor;
@@ -55,6 +56,7 @@ public class MybatisPlusJoinAutoConfiguration {
 
     public MybatisPlusJoinAutoConfiguration(MybatisPlusJoinProperties properties) {
         this.properties = properties;
+        ConfigProperties.subTableLogic = properties.getSubTableLogic();
     }
 
     /**

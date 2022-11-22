@@ -5,11 +5,11 @@ import com.baomidou.mybatisplus.core.conditions.segments.MergeSegments;
 import com.baomidou.mybatisplus.core.metadata.TableFieldInfo;
 import com.baomidou.mybatisplus.core.metadata.TableInfo;
 import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
-import com.baomidou.mybatisplus.core.toolkit.ArrayUtils;
-import com.baomidou.mybatisplus.core.toolkit.Assert;
-import com.baomidou.mybatisplus.core.toolkit.StringPool;
-import com.baomidou.mybatisplus.core.toolkit.StringUtils;
+import com.baomidou.mybatisplus.core.toolkit.*;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
+import com.github.yulichang.config.ConfigProperties;
+import com.github.yulichang.toolkit.LambdaUtils;
+import com.github.yulichang.toolkit.ReflectionKit;
 import com.github.yulichang.toolkit.*;
 import com.github.yulichang.toolkit.support.ColumnCache;
 import com.github.yulichang.toolkit.support.SelectColumn;
@@ -33,8 +33,6 @@ import java.util.stream.Collectors;
 /**
  * 参考 {@link com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper}
  * Lambda 语法使用 Wrapper
- * <p>
- * 推荐使用 MPJWrappers.<UserDO>lambdaJoin();构造
  *
  * @author yulichang
  * @see MPJWrappers
@@ -301,20 +299,16 @@ public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWr
         return typedThis;
     }
 
-    public <S> MPJLambdaWrapper<T> selectFunc(boolean condition, BaseFuncEnum funcEnum, SFunction<S, ?> column, String alias) {
-        if (condition) {
-            ColumnCache cache = getCache(column);
-            selectColumns.add(SelectColumn.of(LambdaUtils.getEntityClass(column), cache.getColumn(),
-                    cache.getTableFieldInfo(), alias, alias, cache.getKeyType(), false, funcEnum));
-        }
+    public <S> MPJLambdaWrapper<T> selectFunc(BaseFuncEnum funcEnum, SFunction<S, ?> column, String alias) {
+        ColumnCache cache = getCache(column);
+        selectColumns.add(SelectColumn.of(LambdaUtils.getEntityClass(column), cache.getColumn(),
+                cache.getTableFieldInfo(), alias, alias, cache.getKeyType(), false, funcEnum));
         return typedThis;
     }
 
     @Override
-    public MPJLambdaWrapper<T> selectFunc(boolean condition, BaseFuncEnum funcEnum, Object column, String alias) {
-        if (condition) {
-            selectColumns.add(SelectColumn.of(null, column.toString(), null, alias, alias, null, false, funcEnum));
-        }
+    public MPJLambdaWrapper<T> selectFunc(BaseFuncEnum funcEnum, Object column, String alias) {
+        selectColumns.add(SelectColumn.of(null, column.toString(), null, alias, alias, null, false, funcEnum));
         return typedThis;
     }
 
@@ -335,7 +329,7 @@ public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWr
      */
     @Override
     public String getSqlSelect() {
-        if (StringUtils.isBlank(sqlSelect.getStringValue())) {
+        if (StringUtils.isBlank(sqlSelect.getStringValue()) && CollectionUtils.isNotEmpty(selectColumns)) {
             String s = selectColumns.stream().map(i -> {
                 String str = Constant.TABLE_ALIAS + getDefault(subTable.get(i.getClazz())) + StringPool.DOT + i.getColumnName();
                 return (i.getFuncEnum() == null ? str : String.format(i.getFuncEnum().getSql(), str)) +
@@ -399,14 +393,26 @@ public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWr
         subTable.clear();
     }
 
-    @Override
-    public <R> MPJLambdaWrapper<T> join(String keyWord, boolean condition, Class<R> clazz, OnFunction function) {
-        if (condition) {
-            MPJLambdaWrapper<?> apply = function.apply(instance(keyWord, clazz));
-            onWrappers.add(apply);
-            subTable.put(clazz, tableIndex);
-            tableIndex++;
+    /**
+     * 副表部分逻辑删除支持
+     */
+    public String getLogicSql() {
+        if (ConfigProperties.subTableLogic) {
+            if (CollectionUtils.isEmpty(subTable)) {
+                return StringPool.EMPTY;
+            }
+            return "AND " + subTable.entrySet().stream().map(entry ->
+                    LogicInfoUtils.getLogicInfo(entry.getValue(), entry.getKey())).collect(Collectors.joining(" AND "));
         }
+        return StringPool.EMPTY;
+    }
+
+    @Override
+    public <R> MPJLambdaWrapper<T> join(String keyWord, Class<R> clazz, OnFunction function) {
+        MPJLambdaWrapper<?> apply = function.apply(instance(keyWord, clazz));
+        subTable.put(clazz, tableIndex);
+        onWrappers.add(apply);
+        tableIndex++;
         return typedThis;
     }
 }

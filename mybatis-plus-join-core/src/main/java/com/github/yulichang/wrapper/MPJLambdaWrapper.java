@@ -148,16 +148,16 @@ public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWr
     /**
      * 一对多查询 调用此方法发必需要调用对应的 left join / right join ... 连表方法，否则会报错
      * <p>
-     * 举例 UserDO UserAddressDO 为一对多关系  UserDTO 为结果类
+     * 举例 UserDO AddressDO 为一对多关系  UserDTO 为结果类
      * <pre>
      *     MPJLambdaQueryWrapper<UserDO> wrapper = new MPJLambdaQueryWrapper<UserDO>();
      *     wrapper.selectAll(UserDO.class)
-     *            .selectCollection(UserAddressDO.class, UserDTO::getAddressListDTO)
-     *            .leftJoin(UserAddressDO.class, ...... )
+     *            .selectCollection(AddressDO.class, UserDTO::getAddressListDTO)
+     *            .leftJoin(AddressDO.class, ...... )
      *            .eq(...)
      *            ...
      * <pre/>
-     * 会自动将 UserAddressDO类中相同属性的字段 以mybatis<collection>的方式映射到UserDTO.addressListDTO属性中
+     * 会自动将 AddressDO类中相同属性的字段 以mybatis<collection>的方式映射到UserDTO.addressListDTO属性中
      *
      * @since 1.3.0
      *
@@ -190,20 +190,20 @@ public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWr
     /**
      * 一对多查询 调用此方法发必需要调用对应的 left join / right join ... 连表方法，否则会报错
      * <p>
-     * 举例 UserDO UserAddressDO 为一对多关系  UserDTO 为结果类
+     * 举例 UserDO AddressDO 为一对多关系  UserDTO 为结果类
      * <pre>
-     *     MPJLambdaQueryWrapper<UserDO> wrapper = new MPJLambdaQueryWrapper();
-     *     wrapper.selectAll(UserDO.class)
-     *            .selectCollection(UserAddressDO.class, UserDTO::getAddressListDTO, map -> map
-     *                 .id(UserAddressDO::getId, AddressDTO::getId)                     //如果属性名一致 可以传一个
-     *                 .result(UserAddressDO::getUserId)                                //如果属性名一致 可以传一个
-     *                 .result(UserAddressDO::getAddress, AddressDTO::getAddress)))     //如果属性名一致 可以传一个
-     *            .leftJoin(UserAddressDO.class, ...... )
-     *            .eq(...)
-     *            ...
+     *   MPJLambdaQueryWrapper<UserDO> wrapper = new MPJLambdaQueryWrapper();
+     *   wrapper.selectAll(UserDO.class)
+     *      .selectCollection(AddressDO.class, UserDTO::getAddressListDTO, map -> map
+     *           .id(AddressDO::getId, AddressDTO::getId)                 //如果属性名一致 可以传一个
+     *           .result(AddressDO::getUserId)                            //如果属性名一致 可以传一个
+     *           .result(AddressDO::getAddress, AddressDTO::getAddress))) //如果属性名一致 可以传一个
+     *      .leftJoin(AddressDO.class, ...... )
+     *      .eq(...)
+     *      ...
      * <pre/>
      *
-     * 会自动将 UserAddressDO类中指定的字段 以mybatis<collection>的方式映射到UserDTO.addressListDTO属性中
+     * 会自动将 AddressDO类中指定的字段 以mybatis<collection>的方式映射到UserDTO.addressListDTO属性中
      *
      * @since 1.3.0
      *

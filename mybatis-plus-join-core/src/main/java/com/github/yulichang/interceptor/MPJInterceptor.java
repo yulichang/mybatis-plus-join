@@ -95,7 +95,7 @@ public class MPJInterceptor implements Interceptor {
     public MappedStatement getMappedStatement(MappedStatement ms, Class<?> resultType, Object ew) {
         String id = ms.getId() + StringPool.UNDERSCORE + resultType.getName();
 
-        if (ew instanceof MPJLambdaWrapper) {
+        if (ew instanceof MPJLambdaWrapper && ((MPJLambdaWrapper<?>) ew).isResultMap()) {
             //不走缓存
             return buildMappedStatement(ms, resultType, ew, id);
         }

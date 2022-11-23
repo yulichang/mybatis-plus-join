@@ -401,8 +401,8 @@ public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWr
             if (CollectionUtils.isEmpty(subTable)) {
                 return StringPool.EMPTY;
             }
-            return "AND " + subTable.entrySet().stream().map(entry ->
-                    LogicInfoUtils.getLogicInfo(entry.getValue(), entry.getKey())).collect(Collectors.joining(" AND "));
+            return subTable.entrySet().stream().map(entry -> LogicInfoUtils.getLogicInfo(entry.getValue(),
+                    entry.getKey())).collect(Collectors.joining(StringPool.SPACE));
         }
         return StringPool.EMPTY;
     }

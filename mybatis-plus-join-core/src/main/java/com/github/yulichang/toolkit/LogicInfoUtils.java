@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.metadata.TableInfo;
 import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
 import com.baomidou.mybatisplus.core.toolkit.Assert;
 import com.baomidou.mybatisplus.core.toolkit.Constants;
+import com.baomidou.mybatisplus.core.toolkit.StringPool;
 
 import java.util.Map;
 import java.util.Objects;
@@ -28,11 +29,15 @@ public class LogicInfoUtils implements Constants {
         }
         TableInfo tableInfo = TableInfoHelper.getTableInfo(clazz);
         Assert.notNull(tableInfo, "%s 不是数据库实体或没有注册到mybatis plus中", clazz.getName());
-        final String value = tableInfo.getLogicDeleteFieldInfo().getLogicNotDeleteValue();
-        if (NULL.equalsIgnoreCase(value)) {
-            logicStr = Constant.TABLE_ALIAS + tableIndex + DOT + tableInfo.getLogicDeleteFieldInfo().getColumn() + " IS NULL";
+        if (tableInfo.isWithLogicDelete() && Objects.nonNull(tableInfo.getLogicDeleteFieldInfo())) {
+            final String value = tableInfo.getLogicDeleteFieldInfo().getLogicNotDeleteValue();
+            if (NULL.equalsIgnoreCase(value)) {
+                logicStr = " AND " + Constant.TABLE_ALIAS + tableIndex + DOT + tableInfo.getLogicDeleteFieldInfo().getColumn() + " IS NULL";
+            } else {
+                logicStr = " AND " + Constant.TABLE_ALIAS + tableIndex + DOT + tableInfo.getLogicDeleteFieldInfo().getColumn() + EQUALS + String.format(tableInfo.getLogicDeleteFieldInfo().isCharSequence() ? "'%s'" : "%s", value);
+            }
         } else {
-            logicStr = Constant.TABLE_ALIAS + tableIndex + DOT + tableInfo.getLogicDeleteFieldInfo().getColumn() + EQUALS + String.format(tableInfo.getLogicDeleteFieldInfo().isCharSequence() ? "'%s'" : "%s", value);
+            logicStr = StringPool.EMPTY;
         }
         LOGIC_CACHE.put(clazz, logicStr);
         return logicStr;

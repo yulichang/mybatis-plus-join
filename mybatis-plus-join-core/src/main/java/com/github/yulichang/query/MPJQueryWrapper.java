@@ -205,6 +205,13 @@ public class MPJQueryWrapper<T> extends AbstractWrapper<T, String, MPJQueryWrapp
     }
 
     /**
+     * 逻辑删除
+     */
+    public String getLogicSql() {
+        return StringPool.EMPTY;
+    }
+
+    /**
      * 返回一个支持 lambda 函数写法的 wrapper
      */
     @Deprecated
@@ -222,6 +229,7 @@ public class MPJQueryWrapper<T> extends AbstractWrapper<T, String, MPJQueryWrapp
         return new MPJQueryWrapper<>(getEntity(), getEntityClass(), paramNameSeq, paramNameValuePairs, new MergeSegments(),
                 null, null, SharedString.emptyString(), SharedString.emptyString(), SharedString.emptyString(), null, null);
     }
+
 
     @Override
     public void clear() {

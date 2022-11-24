@@ -19,3 +19,4 @@ mybatis-plus:
 # 打印 mybatis plus join banner
 mybatis-plus-join:
   banner: true
+  sub-table-logic: true

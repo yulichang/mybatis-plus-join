@@ -40,8 +40,14 @@ class LambdaWrapperTest {
                         .association(AreaDO.class, AddressDTO::getArea))
                 .leftJoin(AddressDO.class, AddressDO::getUserId, UserDO::getId)
                 .leftJoin(AreaDO.class, AreaDO::getId, AddressDO::getAreaId)
-                .orderByDesc(UserDO::getId);
+                .orderByDesc(UserDO::getId)
+                .last("unfdjknsnnjkfd");
         List<UserDTO> list = userMapper.selectJoinList(UserDTO.class, wrapper);
+        String s = wrapper.getSqlSegment();
+        System.out.println(s);
+        if (list.size() != 1) {
+            throw new RuntimeException();
+        }
         list.forEach(System.out::println);
     }
 
@@ -57,7 +63,8 @@ class LambdaWrapperTest {
                         .select(AddressDO::getAddress)
                         .select(AreaDO::getProvince)
                         .leftJoin(AddressDO.class, AddressDO::getUserId, UserDO::getId)
-                        .leftJoin(AreaDO.class, AreaDO::getId, AddressDO::getAreaId));
+                        .leftJoin(AreaDO.class, AreaDO::getId, AddressDO::getAreaId)
+                        .last("unfdjknsnnjkfd"));
         iPage.getRecords().forEach(System.out::println);
     }
 
@@ -78,7 +85,8 @@ class LambdaWrapperTest {
                         .and(i -> i.eq(UserDO::getHeadImg, "er")
                                 .or()
                                 .eq(AddressDO::getUserId, 1))
-                        .eq(UserDO::getId, 1));
+                        .eq(UserDO::getId, 1)
+                        .last("ljfnkegrwbgejkwbenf"));
         page.getRecords().forEach(System.out::println);
     }
 
@@ -91,7 +99,7 @@ class LambdaWrapperTest {
                 .selectSum(UserDO::getId)
                 .selectMax(UserDO::getId, UserDTO::getHeadImg)
                 .leftJoin(AddressDO.class, AddressDO::getUserId, UserDO::getId)
-                .eq(UserDO::getId, 1));
+                .last("unfdjknsnnjkfd"));
         System.out.println(one);
     }
 
@@ -101,14 +109,15 @@ class LambdaWrapperTest {
      */
     @Test
     void test6() {
-        userMapper.selectPage(new Page<>(1, 10),new QueryWrapper<>());
+        userMapper.selectPage(new Page<>(1, 10), new QueryWrapper<>());
         IPage<UserDTO> page = userMapper.selectJoinPage(new Page<>(1, 10), UserDTO.class,
                 MPJWrappers.<UserDO>lambdaJoin()
                         .selectAll(UserDO.class)
                         .select(AddressDO.class, p -> true)
                         .select(AddressDO::getAddress)
                         .leftJoin(AddressDO.class, AddressDO::getUserId, UserDO::getId)
-                        .eq(UserDO::getId, 1));
+                        .eq(UserDO::getId, 1)
+                        .last("unfdjknsnnjkfd"));
         page.getRecords().forEach(System.out::println);
     }
 
@@ -122,7 +131,7 @@ class LambdaWrapperTest {
                 .selectAll(UserDO.class)
                 .select(AddressDO::getAddress)
                 .leftJoin(AddressDO.class, AddressDO::getUserId, UserDO::getId)
-                .eq(UserDO::getId, 1));
+                .last("unfdjknsnnjkfd"));
         list.forEach(System.out::println);
     }
 }

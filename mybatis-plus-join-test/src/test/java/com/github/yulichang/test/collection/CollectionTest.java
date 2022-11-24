@@ -42,6 +42,7 @@ class CollectionTest {
                 .leftJoin(TableE.class, TableE::getDid, TableD::getId);
 
         List<TableADTO> dtos = tableAMapper.selectJoinList(TableADTO.class, wrapper);
+        assert dtos.size() == 1;
         System.out.println(dtos);
     }
 }

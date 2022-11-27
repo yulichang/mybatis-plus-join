@@ -14,7 +14,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * 逻辑删除信息类
  *
  * @author yulichang
- * @since 2.0.0
+ * @since 1.3.7
  */
 public class LogicInfoUtils implements Constants {
 

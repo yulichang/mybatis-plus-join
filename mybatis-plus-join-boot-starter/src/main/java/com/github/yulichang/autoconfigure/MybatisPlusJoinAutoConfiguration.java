@@ -37,7 +37,7 @@ import java.util.List;
  * springboot 自动配置类
  *
  * @author yulichang
- * @since 2.0.0
+ * @since 1.3.7
  */
 @SuppressWarnings("unused")
 @Configuration(proxyBeanMethods = false)

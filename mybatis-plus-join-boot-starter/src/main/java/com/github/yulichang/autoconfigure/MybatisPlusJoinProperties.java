@@ -8,7 +8,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  * 配置类
  *
  * @author yulichang
- * @since 2.0.0
+ * @since 1.3.7
  */
 @Data
 @Accessors(chain = true)

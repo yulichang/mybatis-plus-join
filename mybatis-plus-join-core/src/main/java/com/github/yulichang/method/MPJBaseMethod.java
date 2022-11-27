@@ -42,9 +42,9 @@ public interface MPJBaseMethod extends Constants {
             sqlScript = SqlScriptUtils.convertIf(sqlScript, String.format("%s != null", WRAPPER_ENTITY), true);
             sqlScript += NEWLINE;
             if (ConfigProperties.subTableLogic) {
-                sqlScript += String.format("${%s.logicSql}", WRAPPER);
+                sqlScript += (String.format("${%s.logicSql}", WRAPPER) + NEWLINE);
             }
-            sqlScript += SqlScriptUtils.convertIf(String.format("${%s}", WRAPPER_SQLSEGMENT), String.format("%s != null and %s != '' and %s", WRAPPER_SQLSEGMENT, WRAPPER_SQLSEGMENT, WRAPPER_NONEMPTYOFWHERE), true);
+            sqlScript += SqlScriptUtils.convertIf(String.format("AND ${%s}", WRAPPER_SQLSEGMENT), String.format("%s != null and %s != '' and %s", WRAPPER_SQLSEGMENT, WRAPPER_SQLSEGMENT, WRAPPER_NONEMPTYOFWHERE), true);
             sqlScript = SqlScriptUtils.convertWhere(sqlScript) + NEWLINE;
             sqlScript += SqlScriptUtils.convertIf(String.format(" ${%s}", WRAPPER_SQLSEGMENT), String.format("%s != null and %s != '' and %s", WRAPPER_SQLSEGMENT, WRAPPER_SQLSEGMENT, WRAPPER_EMPTYOFWHERE), true);
             sqlScript = SqlScriptUtils.convertIf(sqlScript, String.format("%s != null", WRAPPER), true);

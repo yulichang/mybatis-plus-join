@@ -14,11 +14,7 @@
         </dependency>
     -->
     <modelVersion>4.0.0</modelVersion>
-    <parent>
-        <artifactId>mybatis-plus-join-root</artifactId>
-        <groupId>com.github.yulichang</groupId>
-        <version>1.3.8</version>
-    </parent>
+    <groupId>com.github.yulichang</groupId>
     <version>1.3.8</version>
     <artifactId>mybatis-plus-join</artifactId>
     <name>mybatis-plus-join</name>

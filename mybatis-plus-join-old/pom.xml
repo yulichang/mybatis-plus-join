@@ -2,6 +2,17 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <!--
+        这个模块啥也没有
+        和直接引入starter效果是一模一样的
+        在项目结构模块化以后保留原有的 artifactId
+        可能会在未来删除此模块,建议使用starter
+        <dependency>
+            <groupId>com.github.yulichang</groupId>
+            <artifactId>mybatis-plus-join-boot-starter</artifactId>
+            <version>1.3.8</version>
+        </dependency>
+    -->
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <artifactId>mybatis-plus-join-root</artifactId>

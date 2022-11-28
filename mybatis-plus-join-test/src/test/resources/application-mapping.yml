@@ -1,5 +1,0 @@
-spring:
-  sql:
-    init:
-      schema-locations: classpath:db/mapping/schema.sql
-      data-locations: classpath:db/mapping/data.sql

@@ -45,6 +45,20 @@ class LambdaWrapperTest {
         list.forEach(System.out::println);
     }
 
+    /**
+     * 基本数据类型测试
+     */
+    @Test
+    void testWrapper() {
+        MPJLambdaWrapper<UserDO> wrapper = new MPJLambdaWrapper<UserDO>()
+                .select(UserDO::getId)
+                .leftJoin(AddressDO.class, AddressDO::getUserId, UserDO::getId)
+                .leftJoin(AreaDO.class, AreaDO::getId, AddressDO::getAreaId);
+        List<Integer> list = userMapper.selectJoinList(Integer.class, wrapper);
+
+        System.out.println(list);
+    }
+
 
     /**
      * 简单的分页关联查询 lambda

@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.core.toolkit.*;
 import com.github.yulichang.interfaces.MPJBaseJoin;
 import com.github.yulichang.method.MPJResultType;
 import com.github.yulichang.toolkit.Constant;
+import com.github.yulichang.toolkit.MPJReflectionKit;
 import com.github.yulichang.toolkit.support.SelectColumn;
 import com.github.yulichang.wrapper.MPJLambdaWrapper;
 import com.github.yulichang.wrapper.resultmap.MybatisLabel;
@@ -148,6 +149,10 @@ public class MPJInterceptor implements Interceptor {
         List<ResultMap> result = new ArrayList<>();
         TableInfo tableInfo = TableInfoHelper.getTableInfo(resultType);
         String id = ms.getId() + StringPool.DOT + Constants.MYBATIS_PLUS + StringPool.UNDERSCORE + resultType.getName();
+        //基本数据类型
+        if (MPJReflectionKit.isPrimitiveOrWrapper(resultType)) {
+            return Collections.singletonList(new ResultMap.Builder(ms.getConfiguration(), id, resultType, EMPTY_RESULT_MAPPING).build());
+        }
         if (!(obj instanceof MPJLambdaWrapper) || Map.class.isAssignableFrom(resultType) ||
                 Collection.class.isAssignableFrom(resultType)) {
             result.add(getDefaultResultMap(tableInfo, ms, resultType, id));

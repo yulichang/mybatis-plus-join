@@ -106,7 +106,7 @@ public class MPJInterceptor implements Interceptor {
         }
         if (ew instanceof MPJQueryWrapper) {
             MPJQueryWrapper wrapper = (MPJQueryWrapper) ew;
-            return getCache(ms, id + wrapper.getSqlSelect(), resultType, ew);
+            return getCache(ms, id + StringPool.UNDERSCORE + wrapper.getSqlSelect(), resultType, ew);
         }
         return buildMappedStatement(ms, resultType, ew, id);
     }

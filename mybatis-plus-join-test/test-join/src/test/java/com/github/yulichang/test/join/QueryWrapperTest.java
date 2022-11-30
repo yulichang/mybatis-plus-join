@@ -23,8 +23,16 @@ class QueryWrapperTest {
      */
     @Test
     void test1() {
-        UserDO userDO = userMapper.selectJoinOne(UserDO.class, new MPJQueryWrapper<UserDO>()
-                .selectAll(UserDO.class).last("LIMIT 1"));
+        MPJQueryWrapper<UserDO> last = new MPJQueryWrapper<UserDO>()
+                .disableLogicDel()
+                .selectAll(UserDO.class)
+                .eq("t.id", 1)
+                .last("LIMIT 1");
+        System.out.println(last.getSqlSegment());
+        System.out.println(last.isEmptyOfNormal());
+        System.out.println(last.nonEmptyOfNormal());
+        UserDO userDO = userMapper.selectJoinOne(UserDO.class, last);
+
         System.out.println(userDO);
 
         UserDTO dto = userMapper.selectJoinOne(UserDTO.class, new MPJQueryWrapper<UserDO>()

@@ -30,12 +30,11 @@ public interface MPJBaseMethod extends Constants {
             if (ConfigProperties.subTableLogic) {
                 sqlScript += (NEWLINE + String.format("${%s.subLogicSql}", WRAPPER));
             }
-            String normalSqlScript = SqlScriptUtils.convertIf(String.format("AND ${%s}", WRAPPER_SQLSEGMENT), String.format("%s != null and %s != '' and %s", WRAPPER_SQLSEGMENT, WRAPPER_SQLSEGMENT, WRAPPER_NONEMPTYOFNORMAL), true);
-            normalSqlScript += NEWLINE;
-            normalSqlScript += SqlScriptUtils.convertIf(String.format(" ${%s}", WRAPPER_SQLSEGMENT), String.format("%s != null and %s != '' and %s", WRAPPER_SQLSEGMENT, WRAPPER_SQLSEGMENT, WRAPPER_EMPTYOFNORMAL), true);
-            sqlScript += normalSqlScript;
-            sqlScript = SqlScriptUtils.convertChoose(String.format("%s != null", WRAPPER), sqlScript, table.getLogicDeleteSql(false, true));
+            sqlScript += SqlScriptUtils.convertIf(String.format("AND ${%s}", WRAPPER_SQLSEGMENT), String.format("%s != null and %s != '' and %s", WRAPPER_SQLSEGMENT, WRAPPER_SQLSEGMENT, WRAPPER_NONEMPTYOFNORMAL), true);
+            sqlScript += NEWLINE;
             sqlScript = SqlScriptUtils.convertWhere(sqlScript);
+            sqlScript += SqlScriptUtils.convertIf(String.format(" ${%s}", WRAPPER_SQLSEGMENT), String.format("%s != null and %s != '' and %s", WRAPPER_SQLSEGMENT, WRAPPER_SQLSEGMENT, WRAPPER_EMPTYOFNORMAL), true);
+            sqlScript = SqlScriptUtils.convertChoose(String.format("%s != null", WRAPPER), sqlScript, table.getLogicDeleteSql(false, true));
             return newLine ? NEWLINE + sqlScript : sqlScript;
         } else {
             String sqlScript = getAllSqlWhere(table, false, true, WRAPPER_ENTITY_DOT);

@@ -8,7 +8,6 @@ import com.baomidou.mybatisplus.core.metadata.TableFieldInfo;
 import com.baomidou.mybatisplus.core.metadata.TableInfo;
 import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
 import com.baomidou.mybatisplus.core.toolkit.*;
-import com.github.yulichang.config.ConfigProperties;
 import com.github.yulichang.query.interfaces.MPJJoin;
 import com.github.yulichang.toolkit.Constant;
 import com.github.yulichang.toolkit.MPJWrappers;
@@ -64,7 +63,7 @@ public class MPJQueryWrapper<T> extends AbstractWrapper<T, String, MPJQueryWrapp
     /**
      * 主表逻辑删除
      */
-    private boolean logicSql = ConfigProperties.subTableLogic;
+    private boolean logicSql = true;
 
 
     public MPJQueryWrapper() {

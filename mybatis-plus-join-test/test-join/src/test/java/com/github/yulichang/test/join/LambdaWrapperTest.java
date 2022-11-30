@@ -8,7 +8,6 @@ import com.github.yulichang.test.join.dto.UserDTO;
 import com.github.yulichang.test.join.entity.AddressDO;
 import com.github.yulichang.test.join.entity.AreaDO;
 import com.github.yulichang.test.join.entity.UserDO;
-import com.github.yulichang.test.join.mapper.AddressMapper;
 import com.github.yulichang.test.join.mapper.UserMapper;
 import com.github.yulichang.toolkit.MPJWrappers;
 import com.github.yulichang.wrapper.MPJLambdaWrapper;
@@ -85,10 +84,10 @@ class LambdaWrapperTest {
      * 自连接测试
      */
     @Test
-    void testInner() throws Exception {
+    void testInner() {
         MPJLambdaWrapper<UserDO> wrapper = new MPJLambdaWrapper<UserDO>()
-                .disableSubLogicDel()
-                .disableLogicDel()
+//                .disableSubLogicDel()
+//                .disableLogicDel()
                 .selectAll(UserDO.class)
                 .selectCollection(UserDO.class, UserDO::getChildren)
                 .leftJoin(UserDO.class, UserDO::getPid, UserDO::getId);

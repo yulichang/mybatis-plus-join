@@ -16,6 +16,7 @@ import com.github.yulichang.wrapper.interfaces.Compare;
 import com.github.yulichang.wrapper.interfaces.Func;
 import com.github.yulichang.wrapper.interfaces.Join;
 import com.github.yulichang.wrapper.interfaces.on.OnCompare;
+import lombok.Getter;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -60,6 +61,10 @@ public abstract class MPJAbstractWrapper<T, Children extends MPJAbstractWrapper<
      */
     protected SharedString sqlFirst;
     /**
+     * ON sql wrapper集合
+     */
+    protected final List<MPJLambdaWrapper<T>> onWrappers = new ArrayList<>();
+    /**
      * ß
      * 数据库表映射实体类
      */
@@ -69,6 +74,11 @@ public abstract class MPJAbstractWrapper<T, Children extends MPJAbstractWrapper<
      * 实体类型(主要用于确定泛型以及取TableInfo缓存)
      */
     private Class<T> entityClass;
+    /**
+     * 连表实体类 on 条件 func 使用
+     */
+    @Getter
+    protected Class<?> joinClass;
 
     @Override
     public T getEntity() {
@@ -89,6 +99,7 @@ public abstract class MPJAbstractWrapper<T, Children extends MPJAbstractWrapper<
 
     public Children setEntityClass(Class<T> entityClass) {
         if (entityClass != null) {
+            onWrappers.forEach(i -> i.setEntityClass(entityClass));
             this.entityClass = entityClass;
         }
         return typedThis;
@@ -180,13 +191,13 @@ public abstract class MPJAbstractWrapper<T, Children extends MPJAbstractWrapper<
 
     @Override
     public <X> Children between(boolean condition, SFunction<X, ?> column, Object val1, Object val2) {
-        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(column), BETWEEN,
+        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(column, false), BETWEEN,
                 () -> formatParam(null, val1), AND, () -> formatParam(null, val2)));
     }
 
     @Override
     public <X> Children notBetween(boolean condition, SFunction<X, ?> column, Object val1, Object val2) {
-        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(column), NOT_BETWEEN,
+        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(column, false), NOT_BETWEEN,
                 () -> formatParam(null, val1), AND, () -> formatParam(null, val2)));
     }
 
@@ -258,43 +269,43 @@ public abstract class MPJAbstractWrapper<T, Children extends MPJAbstractWrapper<
 
     @Override
     public <X> Children isNull(boolean condition, SFunction<X, ?> column) {
-        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(column), IS_NULL));
+        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(column, false), IS_NULL));
     }
 
     @Override
     public <X> Children isNotNull(boolean condition, SFunction<X, ?> column) {
-        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(column), IS_NOT_NULL));
+        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(column, false), IS_NOT_NULL));
     }
 
     @Override
     public <X> Children in(boolean condition, SFunction<X, ?> column, Collection<?> coll) {
-        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(column), IN, inExpression(coll)));
+        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(column, false), IN, inExpression(coll)));
     }
 
     @Override
     public <X> Children in(boolean condition, SFunction<X, ?> column, Object... values) {
-        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(column), IN, inExpression(values)));
+        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(column, false), IN, inExpression(values)));
     }
 
     @Override
     public <X> Children notIn(boolean condition, SFunction<X, ?> column, Collection<?> coll) {
-        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(column), NOT_IN, inExpression(coll)));
+        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(column, false), NOT_IN, inExpression(coll)));
     }
 
     @Override
     public <X> Children notIn(boolean condition, SFunction<X, ?> column, Object... values) {
-        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(column), NOT_IN, inExpression(values)));
+        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(column, false), NOT_IN, inExpression(values)));
     }
 
     @Override
     public <X> Children inSql(boolean condition, SFunction<X, ?> column, String inValue) {
-        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(column), IN,
+        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(column, false), IN,
                 () -> String.format("(%s)", inValue)));
     }
 
     @Override
     public <X> Children notInSql(boolean condition, SFunction<X, ?> column, String inValue) {
-        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(column), NOT_IN,
+        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(column, false), NOT_IN,
                 () -> String.format("(%s)", inValue)));
     }
 
@@ -302,7 +313,7 @@ public abstract class MPJAbstractWrapper<T, Children extends MPJAbstractWrapper<
     public <R> Children groupBy(boolean condition, List<SFunction<R, ?>> columns) {
         return maybeDo(condition, () -> {
             if (CollectionUtils.isNotEmpty(columns)) {
-                String one = (StringPool.COMMA + columnsToString(columns));
+                String one = (StringPool.COMMA + columnsToString(false, columns));
                 final String finalOne = one;
                 appendSqlSegments(GROUP_BY, () -> finalOne);
             }
@@ -312,9 +323,9 @@ public abstract class MPJAbstractWrapper<T, Children extends MPJAbstractWrapper<
     @Override
     public <X> Children groupBy(boolean condition, SFunction<X, ?> column, SFunction<X, ?>... columns) {
         return maybeDo(condition, () -> {
-            String one = columnToString(column);
+            String one = columnToString(column, false);
             if (ArrayUtils.isNotEmpty(columns)) {
-                one += (StringPool.COMMA + columnsToString(columns));
+                one += (StringPool.COMMA + columnsToString(false, columns));
             }
             final String finalOne = one;
             appendSqlSegments(GROUP_BY, () -> finalOne);
@@ -327,7 +338,7 @@ public abstract class MPJAbstractWrapper<T, Children extends MPJAbstractWrapper<
             final SqlKeyword mode = ASC;
             if (CollectionUtils.isNotEmpty(columns)) {
                 columns.forEach(c -> appendSqlSegments(ORDER_BY,
-                        columnToSqlSegment(columnSqlInjectFilter(c)), mode));
+                        columnToSqlSegment(columnSqlInjectFilter(c), false), mode));
             }
         });
     }
@@ -338,7 +349,7 @@ public abstract class MPJAbstractWrapper<T, Children extends MPJAbstractWrapper<
             final SqlKeyword mode = DESC;
             if (CollectionUtils.isNotEmpty(columns)) {
                 columns.forEach(c -> appendSqlSegments(ORDER_BY,
-                        columnToSqlSegment(columnSqlInjectFilter(c)), mode));
+                        columnToSqlSegment(columnSqlInjectFilter(c), false), mode));
             }
         });
     }
@@ -347,10 +358,10 @@ public abstract class MPJAbstractWrapper<T, Children extends MPJAbstractWrapper<
     public <X> Children orderBy(boolean condition, boolean isAsc, SFunction<X, ?> column, SFunction<X, ?>... columns) {
         return maybeDo(condition, () -> {
             final SqlKeyword mode = isAsc ? ASC : DESC;
-            appendSqlSegments(ORDER_BY, columnToSqlSegment(column), mode);
+            appendSqlSegments(ORDER_BY, columnToSqlSegment(column, false), mode);
             if (ArrayUtils.isNotEmpty(columns)) {
                 Arrays.stream(columns).forEach(c -> appendSqlSegments(ORDER_BY,
-                        columnToSqlSegment(columnSqlInjectFilter(c)), mode));
+                        columnToSqlSegment(columnSqlInjectFilter(c), false), mode));
             }
         });
     }
@@ -397,7 +408,7 @@ public abstract class MPJAbstractWrapper<T, Children extends MPJAbstractWrapper<
      * <p>拼接 LIKE 以及 值</p>
      */
     protected <X> Children likeValue(boolean condition, SqlKeyword keyword, SFunction<X, ?> column, Object val, SqlLike sqlLike) {
-        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(column), keyword,
+        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(column, false), keyword,
                 () -> formatParam(null, SqlUtils.concatLike(val, sqlLike))));
     }
 
@@ -410,13 +421,13 @@ public abstract class MPJAbstractWrapper<T, Children extends MPJAbstractWrapper<
      * @param val        条件值
      */
     protected <X> Children addCondition(boolean condition, SFunction<X, ?> column, SqlKeyword sqlKeyword, Object val) {
-        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(column), sqlKeyword,
+        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(column, true), sqlKeyword,
                 () -> formatParam(null, val)));
     }
 
     protected <X, S> Children addCondition(boolean condition, SFunction<X, ?> column, SqlKeyword sqlKeyword, SFunction<S, ?> val) {
-        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(column), sqlKeyword,
-                columnToSqlSegment(val)));
+        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(column, false), sqlKeyword,
+                columnToSqlSegment(val, true)));
     }
 
     /**
@@ -598,14 +609,14 @@ public abstract class MPJAbstractWrapper<T, Children extends MPJAbstractWrapper<
     /**
      * 获取 columnName
      */
-    protected final <X> ISqlSegment columnToSqlSegment(SFunction<X, ?> column) {
-        return () -> columnToString(column);
+    protected final <X> ISqlSegment columnToSqlSegment(SFunction<X, ?> column, boolean isJoin) {
+        return () -> columnToString(column, isJoin);
     }
 
     /**
      * 获取 columnName
      */
-    protected <X> String columnToString(X column) {
+    protected <X> String columnToString(X column, boolean isJoin) {
         return (String) column;
     }
 
@@ -614,8 +625,8 @@ public abstract class MPJAbstractWrapper<T, Children extends MPJAbstractWrapper<
      *
      * @param columns 多字段
      */
-    protected <X> String columnsToString(X... columns) {
-        return Arrays.stream(columns).map(this::columnToString).collect(joining(StringPool.COMMA));
+    protected <X> String columnsToString(boolean isJoin, X... columns) {
+        return Arrays.stream(columns).map(i -> this.columnToString(i, isJoin)).collect(joining(StringPool.COMMA));
     }
 
     @Override
@@ -667,33 +678,33 @@ public abstract class MPJAbstractWrapper<T, Children extends MPJAbstractWrapper<
 
     @Override
     public <R, S, U> Children between(boolean condition, SFunction<R, ?> column, SFunction<S, ?> val1, SFunction<U, ?> val2) {
-        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(column), BETWEEN,
-                columnToSqlSegment(val1), AND, columnToSqlSegment(val2)));
+        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(column, false), BETWEEN,
+                columnToSqlSegment(val1, true), AND, columnToSqlSegment(val2, true)));
     }
 
     public <R, S> Children between(boolean condition, SFunction<R, ?> column, Object val1, SFunction<S, ?> val2) {
-        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(column), BETWEEN,
-                () -> formatParam(null, val1), AND, columnToSqlSegment(val2)));
+        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(column, false), BETWEEN,
+                () -> formatParam(null, val1), AND, columnToSqlSegment(val2, true)));
     }
 
     public <R, S> Children between(boolean condition, SFunction<R, ?> column, SFunction<S, ?> val1, Object val2) {
-        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(column), BETWEEN,
-                columnToSqlSegment(val1), AND, () -> formatParam(null, val2)));
+        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(column, false), BETWEEN,
+                columnToSqlSegment(val1, true), AND, () -> formatParam(null, val2)));
     }
 
     @Override
     public <R, S, U> Children notBetween(boolean condition, SFunction<R, ?> column, SFunction<S, ?> val1, SFunction<U, ?> val2) {
-        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(column), NOT_BETWEEN,
-                columnToSqlSegment(val1), AND, columnToSqlSegment(val2)));
+        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(column, false), NOT_BETWEEN,
+                columnToSqlSegment(val1, true), AND, columnToSqlSegment(val2, true)));
     }
 
     public <R, U> Children notBetween(boolean condition, SFunction<R, ?> column, Object val1, SFunction<U, ?> val2) {
-        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(column), NOT_BETWEEN,
-                () -> formatParam(null, val1), AND, columnToSqlSegment(val2)));
+        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(column, false), NOT_BETWEEN,
+                () -> formatParam(null, val1), AND, columnToSqlSegment(val2, true)));
     }
 
     public <R, S> Children notBetween(boolean condition, SFunction<R, ?> column, SFunction<S, ?> val1, Object val2) {
-        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(column), NOT_BETWEEN,
-                columnToSqlSegment(val1), AND, () -> formatParam(null, val2)));
+        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(column, false), NOT_BETWEEN,
+                columnToSqlSegment(val1, true), AND, () -> formatParam(null, val2)));
     }
 }

@@ -5,7 +5,9 @@ import com.baomidou.mybatisplus.core.metadata.TableInfo;
 import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
 import com.baomidou.mybatisplus.core.toolkit.*;
 import com.github.yulichang.interfaces.MPJBaseJoin;
+import com.github.yulichang.mapper.MPJTableMapperHelper;
 import com.github.yulichang.method.MPJResultType;
+import com.github.yulichang.query.MPJQueryWrapper;
 import com.github.yulichang.toolkit.Constant;
 import com.github.yulichang.toolkit.MPJReflectionKit;
 import com.github.yulichang.toolkit.support.SelectColumn;
@@ -93,14 +95,26 @@ public class MPJInterceptor implements Interceptor {
     /**
      * 获取MappedStatement
      */
+    @SuppressWarnings("rawtypes")
     public MappedStatement getMappedStatement(MappedStatement ms, Class<?> resultType, Object ew) {
         String id = ms.getId() + StringPool.UNDERSCORE + resultType.getName();
-
-        if (ew instanceof MPJLambdaWrapper && ((MPJLambdaWrapper<?>) ew).isResultMap()) {
+        if (ew instanceof MPJLambdaWrapper) {
+            MPJLambdaWrapper wrapper = (MPJLambdaWrapper) ew;
+            wrapper.setEntityClass(MPJTableMapperHelper.getEntity(getEntity(ms.getId())));
+            //TODO 重构缓存 -> 根据sql缓存
             //不走缓存
-            return buildMappedStatement(ms, resultType, ew, id);
         }
-        //走缓存
+        if (ew instanceof MPJQueryWrapper) {
+            MPJQueryWrapper wrapper = (MPJQueryWrapper) ew;
+            return getCache(ms, id + wrapper.getSqlSelect(), resultType, ew);
+        }
+        return buildMappedStatement(ms, resultType, ew, id);
+    }
+
+    /**
+     * 走缓存
+     */
+    private MappedStatement getCache(MappedStatement ms, String id, Class<?> resultType, Object ew) {
         Map<Configuration, MappedStatement> statementMap = MS_CACHE.get(id);
         if (CollectionUtils.isNotEmpty(statementMap)) {
             MappedStatement statement = statementMap.get(ms.getConfiguration());
@@ -238,7 +252,7 @@ public class MPJInterceptor implements Interceptor {
         for (Result r : resultList) {
             String columnName = r.getColumn();
             //列名去重
-            columnName = getColumn(columnSet, columnName);
+            columnName = getColumn(columnSet, StringUtils.getTargetColumn(columnName));
             columnList.add(SelectColumn.of(mybatisLabel.getEntityClass(), r.getColumn(), null,
                     Objects.equals(columnName, r.getColumn()) ? null : columnName, null, null, true, null));
             ResultMapping.Builder builder = new ResultMapping.Builder(ms.getConfiguration(), r.getProperty(),
@@ -320,7 +334,7 @@ public class MPJInterceptor implements Interceptor {
             pool.add(columnName);
             return columnName;
         }
-        columnName = "join_" + StringUtils.getTargetColumn(columnName);
+        columnName = "join_" + columnName;
         return getColumn(pool, columnName);
     }
 
@@ -339,8 +353,10 @@ public class MPJInterceptor implements Interceptor {
                 List<ResultMapping> resultMappingList = new ArrayList<>(resultMappings);
                 //复制不存在的resultMapping
                 for (Field i : fieldList) {
-                    resultMappingList.add(new ResultMapping.Builder(ms.getConfiguration(),
-                            i.getName(), i.getName(), i.getType()).build());
+                    if (MPJReflectionKit.isPrimitiveOrWrapper(i.getType())) {
+                        resultMappingList.add(new ResultMapping.Builder(ms.getConfiguration(),
+                                i.getName(), i.getName(), i.getType()).build());
+                    }
                 }
                 return new ResultMap.Builder(ms.getConfiguration(), id, resultType, resultMappingList).build();
             }
@@ -360,9 +376,17 @@ public class MPJInterceptor implements Interceptor {
     /**
      * 往 Configuration 添加resultMap
      */
-    public synchronized static void addResultMap(MappedStatement ms, String key, ResultMap resultMap) {
+    private synchronized static void addResultMap(MappedStatement ms, String key, ResultMap resultMap) {
         if (!ms.getConfiguration().getResultMapNames().contains(key)) {
             ms.getConfiguration().addResultMap(resultMap);
+        }
+    }
+
+    private Class<?> getEntity(String id) {
+        try {
+            return Class.forName(id.substring(0, id.lastIndexOf(StringPool.DOT)));
+        } catch (ClassNotFoundException e) {
+            return null;
         }
     }
 }

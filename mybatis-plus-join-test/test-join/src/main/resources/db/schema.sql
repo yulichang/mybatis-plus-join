@@ -21,6 +21,7 @@ create table `user`
 (
     id           int auto_increment
         primary key,
+    `pid`        int          not null,
     `name`       varchar(255) not null,
     `address_id` int          not null,
     sex          tinyint      not null,

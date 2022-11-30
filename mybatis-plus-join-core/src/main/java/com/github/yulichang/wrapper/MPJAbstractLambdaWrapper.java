@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.github.yulichang.toolkit.Constant;
 import com.github.yulichang.toolkit.LambdaUtils;
 import com.github.yulichang.toolkit.support.ColumnCache;
+import lombok.Getter;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -32,18 +33,19 @@ public abstract class MPJAbstractLambdaWrapper<T, Children extends MPJAbstractLa
     protected Map<Class<?>, Map<String, ColumnCache>> columnMap = new HashMap<>();
 
     @Override
-    protected <X> String columnToString(X column) {
-        return columnToString((SFunction<?, ?>) column);
+    protected <X> String columnToString(X column, boolean isJoin) {
+        return columnToString((SFunction<?, ?>) column, isJoin);
     }
 
     @Override
     @SafeVarargs
-    protected final <X> String columnsToString(X... columns) {
-        return Arrays.stream(columns).map(i -> columnToString((SFunction<?, ?>) i)).collect(joining(StringPool.COMMA));
+    protected final <X> String columnsToString(boolean isJoin, X... columns) {
+        return Arrays.stream(columns).map(i -> columnToString((SFunction<?, ?>) i, isJoin)).collect(joining(StringPool.COMMA));
     }
 
-    protected String columnToString(SFunction<?, ?> column) {
-        return Constant.TABLE_ALIAS + getDefault(subTable.get(LambdaUtils.getEntityClass(column))) + StringPool.DOT +
+    protected String columnToString(SFunction<?, ?> column, boolean isJoin) {
+        Class<?> entityClass = LambdaUtils.getEntityClass(column);
+        return Constant.TABLE_ALIAS + getDefault(entityClass, isJoin) + StringPool.DOT +
                 getCache(column).getColumn();
     }
 
@@ -57,9 +59,27 @@ public abstract class MPJAbstractLambdaWrapper<T, Children extends MPJAbstractLa
         return cacheMap.get(LambdaUtils.formatKey(LambdaUtils.getName(fn)));
     }
 
-    protected String getDefault(Integer i) {
-        if (Objects.nonNull(i)) {
-            return i.toString();
+    protected String getDefault(Class<?> clazz, boolean isJoin) {
+        Integer index = subTable.get(clazz);
+        if (Objects.nonNull(index)) {
+            if (getEntityClass() == null) {
+                return index.toString();
+            }
+            if (isJoin && joinClass == getEntityClass()) {
+                return StringPool.EMPTY;
+            }
+            return index.toString();
+        }
+        return StringPool.EMPTY;
+    }
+
+    protected String getDefaultSelect(Class<?> clazz, boolean myself) {
+        Integer index = subTable.get(clazz);
+        if (Objects.nonNull(index)) {
+            if (myself) {
+                return StringPool.EMPTY;
+            }
+            return index.toString();
         }
         return StringPool.EMPTY;
     }

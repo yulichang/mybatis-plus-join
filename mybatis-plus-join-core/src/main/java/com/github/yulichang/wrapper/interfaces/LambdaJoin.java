@@ -23,14 +23,14 @@ public interface LambdaJoin<Children, Entity> extends MPJBaseJoin<Entity> {
     }
 
     /**
-     * left join
+     * left join 多条件
      * <p>
      * 例 leftJoin(UserDO.class, on -> on.eq(UserDO::getId,UserAddressDO::getUserId).le().gt()...)
      *
      * @param clazz    关联实体类
      * @param function 条件
      */
-    default <T> Children leftJoin(Class<T> clazz, OnFunction function) {
+    default <T> Children leftJoin(Class<T> clazz, OnFunction<Entity> function) {
         return join(Constant.LEFT_JOIN, clazz, function);
     }
 
@@ -44,7 +44,7 @@ public interface LambdaJoin<Children, Entity> extends MPJBaseJoin<Entity> {
     /**
      * ignore 参考 left join
      */
-    default <T> Children rightJoin(Class<T> clazz, OnFunction function) {
+    default <T> Children rightJoin(Class<T> clazz, OnFunction<Entity> function) {
         return join(Constant.RIGHT_JOIN, clazz, function);
     }
 
@@ -58,7 +58,7 @@ public interface LambdaJoin<Children, Entity> extends MPJBaseJoin<Entity> {
     /**
      * ignore 参考 left join
      */
-    default <T> Children innerJoin(Class<T> clazz, OnFunction function) {
+    default <T> Children innerJoin(Class<T> clazz, OnFunction<Entity> function) {
         return join(Constant.INNER_JOIN, clazz, function);
     }
 
@@ -73,7 +73,7 @@ public interface LambdaJoin<Children, Entity> extends MPJBaseJoin<Entity> {
     /**
      * ignore 参考 left join
      */
-    default <T> Children fullJoin(Class<T> clazz, OnFunction function) {
+    default <T> Children fullJoin(Class<T> clazz, OnFunction<Entity> function) {
         return join(Constant.FULL_JOIN, clazz, function);
     }
 
@@ -84,5 +84,5 @@ public interface LambdaJoin<Children, Entity> extends MPJBaseJoin<Entity> {
      * @param clazz    连表实体类
      * @param function 关联条件
      */
-    <T> Children join(String keyWord, Class<T> clazz, OnFunction function);
+    <T> Children join(String keyWord, Class<T> clazz, OnFunction<Entity> function);
 }

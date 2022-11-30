@@ -55,10 +55,6 @@ public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWr
     @Getter
     private final List<SelectColumn> selectColumns = new ArrayList<>();
     /**
-     * ON sql wrapper集合
-     */
-    private final List<MPJLambdaWrapper<?>> onWrappers = new ArrayList<>();
-    /**
      * 映射关系
      */
     @Getter
@@ -68,6 +64,11 @@ public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWr
      */
     @Getter
     private boolean resultMap = false;
+    /**
+     * 是否自定义resultMap 自动构建不算
+     */
+    @Getter
+    private boolean customResult = false;
     /**
      * 查询字段 sql
      */
@@ -85,12 +86,14 @@ public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWr
      */
     @Getter
     private String keyWord;
-
     /**
-     * 连表实体类 on 条件 func 使用
+     * 副表逻辑删除开关
      */
-    @Getter
-    private Class<?> joinClass;
+    private boolean subLogicSql = ConfigProperties.subTableLogic;
+    /**
+     * 主表逻辑删除开关
+     */
+    private boolean logicSql = true;
 
     /**
      * 不建议直接 new 该实例，使用 MPJWrappers.<UserDO>lambdaQuery()
@@ -225,7 +228,9 @@ public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWr
         Class<?> genericType = MPJReflectionKit.getGenericType(field);
         Class<Z> ofType = (Class<Z>) genericType;
         MybatisLabel.Builder<C, Z> builder = new MybatisLabel.Builder<>(dtoFieldName, child, field.getType(), ofType, false);
-        this.resultMapMybatisLabel.add(collection.apply(builder).build());
+        MybatisLabel.Builder<C, Z> czBuilder = collection.apply(builder);
+        this.customResult = czBuilder.hasCustom();
+        this.resultMapMybatisLabel.add(czBuilder.build());
         return typedThis;
     }
 
@@ -260,7 +265,9 @@ public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWr
         this.resultMap = true;
         Assert.isFalse(Collection.class.isAssignableFrom(field.getType()), "association 不支持集合类");
         MybatisLabel.Builder<C, F> builder = new MybatisLabel.Builder<>(dtoFieldName, child, field.getType(), (Class<F>) child, false);
-        this.resultMapMybatisLabel.add(collection.apply(builder).build());
+        MybatisLabel.Builder<C, F> cfBuilder = collection.apply(builder);
+        this.customResult = cfBuilder.hasCustom();
+        this.resultMapMybatisLabel.add(cfBuilder.build());
         return typedThis;
     }
 
@@ -331,7 +338,7 @@ public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWr
     public String getSqlSelect() {
         if (StringUtils.isBlank(sqlSelect.getStringValue()) && CollectionUtils.isNotEmpty(selectColumns)) {
             String s = selectColumns.stream().map(i -> {
-                String str = Constant.TABLE_ALIAS + getDefault(subTable.get(i.getClazz())) + StringPool.DOT + i.getColumnName();
+                String str = Constant.TABLE_ALIAS + getDefaultSelect(i.getClazz(), (i.getClazz() == getEntityClass() && !i.isLabel())) + StringPool.DOT + i.getColumnName();
                 return (i.getFuncEnum() == null ? str : String.format(i.getFuncEnum().getSql(), str)) +
                         (StringUtils.isBlank(i.getAlias()) ? StringPool.EMPTY : (Constant.AS + i.getAlias()));
             }).collect(Collectors.joining(StringPool.COMMA));
@@ -394,10 +401,40 @@ public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWr
     }
 
     /**
+     * 关闭副表逻辑删除
+     * <p>
+     * 副表逻辑删除默认在where语句中
+     * 但有时候需要让它出现在on语句中, 这两种写法区别还是很大的
+     * 所以可以关闭副表逻辑删除, 通过on语句多条件, 自己实现on语句的逻辑删除
+     */
+    public MPJLambdaWrapper<T> disableSubLogicDel() {
+        this.subLogicSql = false;
+        return typedThis;
+    }
+
+    public MPJLambdaWrapper<T> enableSubLogicDel() {
+        this.subLogicSql = true;
+        return typedThis;
+    }
+
+    /**
+     * 关闭主表逻辑删除
+     */
+    public MPJLambdaWrapper<T> disableLogicDel() {
+        this.logicSql = false;
+        return typedThis;
+    }
+
+    public MPJLambdaWrapper<T> enableLogicDel() {
+        this.logicSql = true;
+        return typedThis;
+    }
+
+    /**
      * 副表部分逻辑删除支持
      */
-    public String getLogicSql() {
-        if (ConfigProperties.subTableLogic) {
+    public String getSubLogicSql() {
+        if (subLogicSql) {
             if (CollectionUtils.isEmpty(subTable)) {
                 return StringPool.EMPTY;
             }
@@ -407,9 +444,16 @@ public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWr
         return StringPool.EMPTY;
     }
 
+    /**
+     * 主表部分逻辑删除支持
+     */
+    public boolean getLogicSql() {
+        return this.logicSql;
+    }
+
     @Override
-    public <R> MPJLambdaWrapper<T> join(String keyWord, Class<R> clazz, OnFunction function) {
-        MPJLambdaWrapper<?> apply = function.apply(instance(keyWord, clazz));
+    public <R> MPJLambdaWrapper<T> join(String keyWord, Class<R> clazz, OnFunction<T> function) {
+        MPJLambdaWrapper<T> apply = function.apply(instance(keyWord, clazz));
         subTable.put(clazz, tableIndex);
         onWrappers.add(apply);
         tableIndex++;

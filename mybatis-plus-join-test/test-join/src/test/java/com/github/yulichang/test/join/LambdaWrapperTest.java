@@ -8,6 +8,7 @@ import com.github.yulichang.test.join.dto.UserDTO;
 import com.github.yulichang.test.join.entity.AddressDO;
 import com.github.yulichang.test.join.entity.AreaDO;
 import com.github.yulichang.test.join.entity.UserDO;
+import com.github.yulichang.test.join.mapper.AddressMapper;
 import com.github.yulichang.test.join.mapper.UserMapper;
 import com.github.yulichang.toolkit.MPJWrappers;
 import com.github.yulichang.wrapper.MPJLambdaWrapper;
@@ -55,6 +56,51 @@ class LambdaWrapperTest {
                 .leftJoin(AddressDO.class, AddressDO::getUserId, UserDO::getId)
                 .leftJoin(AreaDO.class, AreaDO::getId, AddressDO::getAreaId);
         List<Integer> list = userMapper.selectJoinList(Integer.class, wrapper);
+
+        System.out.println(list);
+    }
+
+    /**
+     * ms缓存测试
+     */
+    @Test
+    void testMSCache() {
+        MPJLambdaWrapper<UserDO> wrapper = new MPJLambdaWrapper<UserDO>()
+                .selectAll(UserDO.class)
+                .leftJoin(AddressDO.class, AddressDO::getUserId, UserDO::getId)
+                .leftJoin(AreaDO.class, AreaDO::getId, AddressDO::getAreaId);
+        List<UserDTO> list = userMapper.selectJoinList(UserDTO.class, wrapper);
+
+        MPJLambdaWrapper<UserDO> wrapper1 = new MPJLambdaWrapper<UserDO>()
+                .select(UserDO::getId)
+                .selectAs(UserDO::getName,UserDTO::getArea)
+                .leftJoin(AddressDO.class, AddressDO::getUserId, UserDO::getId)
+                .leftJoin(AreaDO.class, AreaDO::getId, AddressDO::getAreaId);
+        List<UserDTO> list1 = userMapper.selectJoinList(UserDTO.class, wrapper1);
+
+        assert list1.get(0).getArea() != null;
+    }
+
+    /**
+     * 自连接测试
+     */
+    @Test
+    void testInner() throws Exception {
+        MPJLambdaWrapper<UserDO> wrapper = new MPJLambdaWrapper<UserDO>()
+                .disableSubLogicDel()
+                .disableLogicDel()
+                .selectAll(UserDO.class)
+                .selectCollection(UserDO.class, UserDO::getChildren)
+                .leftJoin(UserDO.class, UserDO::getPid, UserDO::getId);
+        List<UserDO> list = userMapper.selectJoinList(UserDO.class, wrapper);
+
+        MPJLambdaWrapper<UserDO> wrapper1 = new MPJLambdaWrapper<UserDO>()
+                .disableSubLogicDel()
+                .disableLogicDel()
+                .selectAll(UserDO.class)
+                .selectCollection(UserDO.class, UserDO::getChildren)
+                .leftJoin(UserDO.class, UserDO::getPid, UserDO::getId);
+        List<UserDO> list1 = userMapper.selectJoinList(UserDO.class, wrapper1);
 
         System.out.println(list);
     }

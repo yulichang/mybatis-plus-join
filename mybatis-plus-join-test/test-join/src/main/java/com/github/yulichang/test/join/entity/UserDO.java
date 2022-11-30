@@ -11,20 +11,23 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import lombok.experimental.Accessors;
 
+import java.util.List;
 import java.util.Map;
 
 @Data
 @ToString
 @Accessors(chain = true)
 @EqualsAndHashCode
-@TableName(value = "`user`",autoResultMap = true)
+@TableName(value = "`user`", autoResultMap = true)
 public class UserDO {
 
     @TableId
     private Integer id;
 
+    private Integer pid;
+
     @TableField(value = "`name`", typeHandler = JacksonTypeHandler.class)
-    private Map<String,String> aName;
+    private Map<String, String> name;
 
     private Sex sex;
 
@@ -34,4 +37,7 @@ public class UserDO {
 
     @TableLogic
     private Boolean del;
+
+    @TableField(exist = false)
+    private List<UserDO> children;
 }

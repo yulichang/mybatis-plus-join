@@ -178,6 +178,9 @@ public class MybatisLabel<E, T> {
             return this;
         }
 
+        public boolean hasCustom(){
+            return CollectionUtils.isNotEmpty(mybatisLabel.resultList) || CollectionUtils.isNotEmpty(mybatisLabel.mybatisLabels);
+        }
 
         public MybatisLabel<E, T> build() {
             if (CollectionUtils.isEmpty(mybatisLabel.resultList)) {

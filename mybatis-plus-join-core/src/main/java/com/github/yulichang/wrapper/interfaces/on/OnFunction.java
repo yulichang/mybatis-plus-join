@@ -9,7 +9,7 @@ import com.github.yulichang.wrapper.MPJLambdaWrapper;
  * @since 1.1.8
  */
 @FunctionalInterface
-public interface OnFunction {
+public interface OnFunction<T> {
 
-    MPJLambdaWrapper<?> apply(MPJLambdaWrapper<?> wrapper);
+    MPJLambdaWrapper<T> apply(MPJLambdaWrapper<T> wrapper);
 }

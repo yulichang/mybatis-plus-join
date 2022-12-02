@@ -182,8 +182,12 @@ public class MPJInterceptor implements Interceptor {
             TableFieldInfo info = i.getTableFieldInfo();
             if (StringUtils.isNotBlank(i.getAlias())) {
                 //优先别名查询 selectFunc selectAs
+                Class<?> aliasField = fieldMap.containsKey(i.getAlias()) ? fieldMap.get(i.getAlias()).getType() : null;
+                if (aliasField == null) {
+                    continue;
+                }
                 ResultMapping.Builder builder = new ResultMapping.Builder(ms.getConfiguration(), i.getAlias(),
-                        i.getAlias(), getAliasField(resultType, fieldMap, i.getAlias()));
+                        i.getAlias(), aliasField);
                 if (i.getFuncEnum() == null || StringUtils.isBlank(i.getFuncEnum().getSql())) {
                     Field f = fieldMap.get(i.getAlias());
                     if (f == null) {
@@ -300,7 +304,7 @@ public class MPJInterceptor implements Interceptor {
                     .collect(Collectors.joining(StringPool.DASH));
         }
         //双检
-        if (!ms.getConfiguration().getResultMapNames().contains(childId)) {
+        if (!ms.getConfiguration().hasResultMap(childId)) {
             ResultMap build = new ResultMap.Builder(ms.getConfiguration(), childId, mybatisLabel.getOfType(), childMapping).build();
             MPJInterceptor.addResultMap(ms, childId, build);
         }
@@ -364,20 +368,12 @@ public class MPJInterceptor implements Interceptor {
         return new ResultMap.Builder(ms.getConfiguration(), id, resultType, EMPTY_RESULT_MAPPING).build();
     }
 
-    /**
-     * 获取result指定名称的字段
-     */
-    private Class<?> getAliasField(Class<?> resultType, Map<String, Field> fieldMap, String alias) {
-        Field field = fieldMap.get(alias);
-        Assert.notNull(field, "Result Class <%s> not find Field <%s>", resultType.getSimpleName(), alias);
-        return field.getType();
-    }
 
     /**
      * 往 Configuration 添加resultMap
      */
     private synchronized static void addResultMap(MappedStatement ms, String key, ResultMap resultMap) {
-        if (!ms.getConfiguration().getResultMapNames().contains(key)) {
+        if (!ms.getConfiguration().hasResultMap(key)) {
             ms.getConfiguration().addResultMap(resultMap);
         }
     }

@@ -1,6 +1,5 @@
 package com.github.yulichang.wrapper.resultmap;
 
-import com.baomidou.mybatisplus.core.metadata.TableFieldInfo;
 import com.baomidou.mybatisplus.core.metadata.TableInfo;
 import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
 import com.baomidou.mybatisplus.core.toolkit.Assert;
@@ -8,14 +7,12 @@ import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.github.yulichang.toolkit.LambdaUtils;
 import com.github.yulichang.toolkit.MPJReflectionKit;
+import com.github.yulichang.toolkit.support.ColumnCache;
+import com.github.yulichang.wrapper.segments.SelectNormal;
 import lombok.Getter;
 
 import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.function.Function;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -178,7 +175,7 @@ public class MybatisLabel<E, T> {
             return this;
         }
 
-        public boolean hasCustom(){
+        public boolean hasCustom() {
             return CollectionUtils.isNotEmpty(mybatisLabel.resultList) || CollectionUtils.isNotEmpty(mybatisLabel.mybatisLabels);
         }
 
@@ -193,39 +190,31 @@ public class MybatisLabel<E, T> {
             TableInfo tableInfo = TableInfoHelper.getTableInfo(entityClass);
             Map<String, Field> tagMap = MPJReflectionKit.getFieldMap(tagClass);
             if (auto && !tagMap.isEmpty()) {
-                Function<TableFieldInfo, Result> build = field -> {
-                    Result result = new Result();
-                    result.setId(false);
-                    result.setTableFieldInfo(field);
-                    result.setColumn(field.getColumn());
-                    result.setProperty(field.getProperty());
-                    result.setJavaType(field.getField().getType());
-                    result.setJdbcType(field.getJdbcType());
-                    result.setTypeHandle(field.getTypeHandler());
-                    return result;
-                };
-                if (entityClass == tagClass) {
-                    if (tableInfo.havePK()) {
-                        mybatisLabel.resultList.add(pkBuild(tableInfo));
-                    }
-                    mybatisLabel.resultList.addAll(tableInfo.getFieldList().stream().map(build).collect(Collectors.toList()));
+                List<SelectNormal> listField = ColumnCache.getListField(entityClass);
+                if (entityClass.isAssignableFrom(tagClass)) {
+                    mybatisLabel.resultList.addAll(listField.stream().map(i -> {
+                        Result result = new Result();
+                        result.setId(i.isPk());
+                        result.setProperty(i.getColumProperty());
+                        result.setJavaType(i.getColumnType());
+                        result.setJdbcType(Objects.isNull(i.getTableFieldInfo()) ? null : i.getTableFieldInfo().getJdbcType());
+                        result.setSelectNormal(i);
+                        return result;
+                    }).collect(Collectors.toList()));
                 } else {
-                    if (tableInfo.havePK() && tagMap.containsKey(tableInfo.getKeyProperty())) {
-                        mybatisLabel.resultList.add(pkBuild(tableInfo));
+                    for (SelectNormal s : listField) {
+                        Field field = tagMap.get(s.getColumProperty());
+                        if (Objects.nonNull(field)) {
+                            Result result = new Result();
+                            result.setId(s.isPk());
+                            result.setProperty(s.getColumProperty());
+                            result.setJavaType(field.getType());
+                            result.setSelectNormal(s);
+                            mybatisLabel.resultList.add(result);
+                        }
                     }
-                    mybatisLabel.resultList.addAll(tableInfo.getFieldList().stream().filter(i ->
-                            tagMap.containsKey(i.getProperty())).map(build).collect(Collectors.toList()));
                 }
             }
-        }
-
-        private Result pkBuild(TableInfo tableInfo) {
-            Result result = new Result();
-            result.setId(true);
-            result.setColumn(tableInfo.getKeyColumn());
-            result.setProperty(tableInfo.getKeyProperty());
-            result.setJavaType(tableInfo.getKeyType());
-            return result;
         }
     }
 }

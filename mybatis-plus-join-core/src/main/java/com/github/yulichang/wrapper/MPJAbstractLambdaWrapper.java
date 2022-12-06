@@ -5,7 +5,7 @@ import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.github.yulichang.toolkit.Constant;
 import com.github.yulichang.toolkit.LambdaUtils;
 import com.github.yulichang.toolkit.support.ColumnCache;
-import lombok.Getter;
+import com.github.yulichang.wrapper.segments.SelectNormal;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -27,11 +27,6 @@ public abstract class MPJAbstractLambdaWrapper<T, Children extends MPJAbstractLa
      */
     protected Map<Class<?>, Integer> subTable = new HashMap<>();
 
-    /**
-     * 缓存字段
-     */
-    protected Map<Class<?>, Map<String, ColumnCache>> columnMap = new HashMap<>();
-
     @Override
     protected <X> String columnToString(X column, boolean isJoin) {
         return columnToString((SFunction<?, ?>) column, isJoin);
@@ -46,17 +41,13 @@ public abstract class MPJAbstractLambdaWrapper<T, Children extends MPJAbstractLa
     protected String columnToString(SFunction<?, ?> column, boolean isJoin) {
         Class<?> entityClass = LambdaUtils.getEntityClass(column);
         return Constant.TABLE_ALIAS + getDefault(entityClass, isJoin) + StringPool.DOT +
-                getCache(column).getColumn();
+                getCache(column).getTagColumn();
     }
 
-    protected ColumnCache getCache(SFunction<?, ?> fn) {
+    protected SelectNormal getCache(SFunction<?, ?> fn) {
         Class<?> aClass = LambdaUtils.getEntityClass(fn);
-        Map<String, ColumnCache> cacheMap = columnMap.get(aClass);
-        if (cacheMap == null) {
-            cacheMap = LambdaUtils.getColumnMap(aClass);
-            columnMap.put(aClass, cacheMap);
-        }
-        return cacheMap.get(LambdaUtils.formatKey(LambdaUtils.getName(fn)));
+        Map<String, SelectNormal> cacheMap = ColumnCache.getMapField(aClass);
+        return cacheMap.get(LambdaUtils.getName(fn));
     }
 
     protected String getDefault(Class<?> clazz, boolean isJoin) {

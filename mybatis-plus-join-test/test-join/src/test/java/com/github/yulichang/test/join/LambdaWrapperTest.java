@@ -1,6 +1,5 @@
 package com.github.yulichang.test.join;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.github.yulichang.test.join.dto.AddressDTO;
@@ -72,7 +71,7 @@ class LambdaWrapperTest {
 
         MPJLambdaWrapper<UserDO> wrapper1 = new MPJLambdaWrapper<UserDO>()
                 .select(UserDO::getId)
-                .selectAs(UserDO::getName,UserDTO::getArea)
+                .selectAs(UserDO::getName, UserDTO::getArea)
                 .leftJoin(AddressDO.class, AddressDO::getUserId, UserDO::getId)
                 .leftJoin(AreaDO.class, AreaDO::getId, AddressDO::getAreaId);
         List<UserDTO> list1 = userMapper.selectJoinList(UserDTO.class, wrapper1);
@@ -159,14 +158,14 @@ class LambdaWrapperTest {
      */
     @Test
     void test6() {
-        userMapper.selectPage(new Page<>(1, 10), new QueryWrapper<>());
+        MPJLambdaWrapper<UserDO> wrapper = new MPJLambdaWrapper<UserDO>()
+                .selectAll(UserDO.class)
+                .select(AddressDO.class, p -> true)
+//                .select(AddressDO::getAddress)
+                .leftJoin(AddressDO.class, AddressDO::getUserId, UserDO::getId)
+                .eq(UserDO::getId, 1);
         IPage<UserDTO> page = userMapper.selectJoinPage(new Page<>(1, 10), UserDTO.class,
-                MPJWrappers.<UserDO>lambdaJoin()
-                        .selectAll(UserDO.class)
-                        .select(AddressDO.class, p -> true)
-                        .select(AddressDO::getAddress)
-                        .leftJoin(AddressDO.class, AddressDO::getUserId, UserDO::getId)
-                        .eq(UserDO::getId, 1));
+                wrapper);
         page.getRecords().forEach(System.out::println);
     }
 

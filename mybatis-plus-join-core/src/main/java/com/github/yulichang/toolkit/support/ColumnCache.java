@@ -1,45 +1,43 @@
 package com.github.yulichang.toolkit.support;
 
-import com.baomidou.mybatisplus.core.metadata.TableFieldInfo;
-import lombok.Getter;
+import com.baomidou.mybatisplus.core.metadata.TableInfo;
+import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
+import com.baomidou.mybatisplus.core.toolkit.Assert;
+import com.github.yulichang.wrapper.segments.SelectNormal;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
- * 缓存添加tableInfo信息
+ * select缓存
  *
  * @author yulichang
- * @see com.baomidou.mybatisplus.core.toolkit.support.ColumnCache
- * @since 1.3.0
+ * @since 1.3.10
  */
-public class ColumnCache extends com.baomidou.mybatisplus.core.toolkit.support.ColumnCache {
+public class ColumnCache {
 
-    @Getter
-    private TableFieldInfo tableFieldInfo;
+    private static final Map<Class<?>, List<SelectNormal>> LIST_CACHE = new ConcurrentHashMap<>();
 
-    @Getter
-    private String keyProperty;
+    private static final Map<Class<?>, Map<String, SelectNormal>> MAP_CACHE = new ConcurrentHashMap<>();
 
-    @Getter
-    private boolean isPK;
-
-    @Getter
-    private Class<?> keyType;
-
-
-    @Deprecated
-    public ColumnCache(String column, String columnSelect) {
-        super(column, columnSelect);
+    public static List<SelectNormal> getListField(Class<?> clazz) {
+        return LIST_CACHE.computeIfAbsent(clazz, c -> {
+            TableInfo tableInfo = TableInfoHelper.getTableInfo(clazz);
+            Assert.notNull(tableInfo, "table not find by class <%s>", c.getSimpleName());
+            List<SelectNormal> list = new ArrayList<>();
+            if (tableInfo.havePK()) {
+                list.add(new SelectNormal(clazz, true, tableInfo.getKeyColumn(), tableInfo.getKeyType(), tableInfo.getKeyProperty(), null));
+            }
+            list.addAll(tableInfo.getFieldList().stream().map(f -> new SelectNormal(clazz, false, f.getColumn(), f.getPropertyType(), f.getProperty(), f)).collect(Collectors.toList()));
+            return list;
+        });
     }
 
-    @Deprecated
-    public ColumnCache(String column, String columnSelect, String mapping) {
-        super(column, columnSelect, mapping);
-    }
-
-    public ColumnCache(String column, String columnSelect, TableFieldInfo tableFieldInfo, String keyProperty, boolean isPK, Class<?> keyType) {
-        super(column, columnSelect);
-        this.tableFieldInfo = tableFieldInfo;
-        this.keyProperty = keyProperty;
-        this.isPK = isPK;
-        this.keyType = keyType;
+    public static Map<String, SelectNormal> getMapField(Class<?> clazz) {
+        return MAP_CACHE.computeIfAbsent(clazz, c -> getListField(c).stream().collect(Collectors.toMap(SelectNormal::getColumProperty, Function.identity(), (i, j) -> j)));
     }
 }

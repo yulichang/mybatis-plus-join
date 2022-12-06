@@ -1,17 +1,17 @@
 package com.github.yulichang.wrapper.resultmap;
 
-import com.baomidou.mybatisplus.core.metadata.TableFieldInfo;
-import com.baomidou.mybatisplus.core.metadata.TableInfo;
-import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
-import com.baomidou.mybatisplus.core.toolkit.Assert;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.github.yulichang.toolkit.LambdaUtils;
+import com.github.yulichang.toolkit.support.ColumnCache;
+import com.github.yulichang.wrapper.segments.SelectNormal;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.ibatis.type.JdbcType;
-import org.apache.ibatis.type.TypeHandler;
+
+import java.util.Map;
+import java.util.Objects;
 
 /**
  * result 标签
@@ -25,17 +25,13 @@ public class Result {
 
     private boolean isId;
 
+    private SelectNormal selectNormal;
+
     private String property;
-
-    private String column;
-
-    private TableFieldInfo tableFieldInfo;
 
     private Class<?> javaType;
 
     private JdbcType jdbcType;
-
-    private Class<? extends TypeHandler<?>> typeHandle;
 
     public Result() {
     }
@@ -58,26 +54,18 @@ public class Result {
 
         public Builder<E, T> column(SFunction<E, ?> column) {
             Class<E> entityClass = LambdaUtils.getEntityClass(column);
+            Map<String, SelectNormal> normalMap = ColumnCache.getMapField(entityClass);
             String name = LambdaUtils.getName(column);
-            TableInfo tableInfo = TableInfoHelper.getTableInfo(entityClass);
-            Assert.notNull(tableInfo, "table not find by class <%s>", tableInfo);
-            if (tableInfo.havePK() && tableInfo.getKeyProperty().equals(name)) {
-                result.column = tableInfo.getKeyColumn();
-                if (StringUtils.isBlank(result.property)) {
-                    result.property = tableInfo.getKeyProperty();
-                }
-                result.javaType = tableInfo.getKeyType();
-            } else {
-                TableFieldInfo fieldInfo = tableInfo.getFieldList().stream().filter(i -> i.getField().getName().equals(name)).findFirst().orElse(null);
-                Assert.notNull(fieldInfo, "table <%s> not find column <%>", tableInfo.getTableName(), name);
-                result.column = fieldInfo.getColumn();
-                result.tableFieldInfo = fieldInfo;
-                if (StringUtils.isBlank(result.property)) {
-                    result.property = fieldInfo.getProperty();
-                }
-                result.jdbcType = fieldInfo.getJdbcType();
-                result.javaType = fieldInfo.getField().getType();
-                result.typeHandle = fieldInfo.getTypeHandler();
+            SelectNormal normal = normalMap.get(name);
+            result.selectNormal = normal;
+            if (StringUtils.isBlank(result.property)) {
+                result.property = normal.getColumProperty();
+            }
+            if (Objects.isNull(result.javaType)) {
+                result.javaType = normal.getColumnType();
+            }
+            if (Objects.isNull(result.jdbcType)) {
+                result.jdbcType = Objects.isNull(normal.getTableFieldInfo()) ? null : normal.getTableFieldInfo().getJdbcType();
             }
             return this;
         }

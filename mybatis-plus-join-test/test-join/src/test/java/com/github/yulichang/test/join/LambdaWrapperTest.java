@@ -14,6 +14,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import javax.annotation.Resource;
+import java.sql.Timestamp;
 import java.util.List;
 import java.util.Map;
 
@@ -41,6 +42,23 @@ class LambdaWrapperTest {
                 .leftJoin(AreaDO.class, AreaDO::getId, AddressDO::getAreaId)
                 .orderByDesc(UserDO::getId);
         List<UserDTO> list = userMapper.selectJoinList(UserDTO.class, wrapper);
+
+        assert list.get(0).getAddressList() != null && list.get(0).getAddressList().get(0).getId() != null;
+        list.forEach(System.out::println);
+    }
+
+    @Test
+    void testJoin1() {
+        MPJLambdaWrapper<UserDO> wrapper = new MPJLambdaWrapper<UserDO>()
+                .selectAll(UserDO.class)
+                .selectCollection(AddressDO.class, UserDTO::getAddressList, addr -> addr
+                        .association(AreaDO.class, AddressDTO::getArea))
+                .leftJoin(AddressDO::getUserId, UserDO::getId)
+                .leftJoin(AreaDO::getId, AddressDO::getAreaId)
+                .orderByDesc(UserDO::getId);
+        List<UserDTO> list = userMapper.selectJoinList(UserDTO.class, wrapper);
+
+        assert list.get(0).getAddressList().get(0).getId() != null;
         list.forEach(System.out::println);
     }
 
@@ -49,29 +67,39 @@ class LambdaWrapperTest {
      */
     @Test
     void testWrapper() {
+        //基本数据类型 和 String
         MPJLambdaWrapper<UserDO> wrapper = new MPJLambdaWrapper<UserDO>()
                 .select(UserDO::getId)
                 .leftJoin(AddressDO.class, AddressDO::getUserId, UserDO::getId)
                 .leftJoin(AreaDO.class, AreaDO::getId, AddressDO::getAreaId);
         List<Integer> list = userMapper.selectJoinList(Integer.class, wrapper);
 
+        assert list.get(0) != null;
+        System.out.println(list);
+
+        //java.sql包下的类
+        MPJLambdaWrapper<UserDO> wrapper1 = new MPJLambdaWrapper<UserDO>()
+                .select(UserDO::getCreateTime)
+                .leftJoin(AddressDO.class, AddressDO::getUserId, UserDO::getId)
+                .leftJoin(AreaDO.class, AreaDO::getId, AddressDO::getAreaId);
+        List<Timestamp> list1 = userMapper.selectJoinList(Timestamp.class, wrapper1);
+
+        assert list1.get(0) != null;
         System.out.println(list);
     }
 
-    /**
-     * ms缓存测试
-     */
+
     @Test
     void testMSCache() {
-        MPJLambdaWrapper<UserDO> wrapper = new MPJLambdaWrapper<UserDO>()
-                .selectAll(UserDO.class)
-                .leftJoin(AddressDO.class, AddressDO::getUserId, UserDO::getId)
-                .leftJoin(AreaDO.class, AreaDO::getId, AddressDO::getAreaId);
-        List<UserDTO> list = userMapper.selectJoinList(UserDTO.class, wrapper);
+//        MPJLambdaWrapper<UserDO> wrapper = new MPJLambdaWrapper<UserDO>()
+//                .selectAll(UserDO.class)
+//                .leftJoin(AddressDO.class, AddressDO::getUserId, UserDO::getId)
+//                .leftJoin(AreaDO.class, AreaDO::getId, AddressDO::getAreaId);
+//        List<UserDTO> list = userMapper.selectJoinList(UserDTO.class, wrapper);
 
         MPJLambdaWrapper<UserDO> wrapper1 = new MPJLambdaWrapper<UserDO>()
                 .select(UserDO::getId)
-                .selectAs(UserDO::getName, UserDTO::getArea)
+                .selectAs(UserDO::getJson, UserDTO::getArea)
                 .leftJoin(AddressDO.class, AddressDO::getUserId, UserDO::getId)
                 .leftJoin(AreaDO.class, AreaDO::getId, AddressDO::getAreaId);
         List<UserDTO> list1 = userMapper.selectJoinList(UserDTO.class, wrapper1);
@@ -85,8 +113,8 @@ class LambdaWrapperTest {
     @Test
     void testInner() {
         MPJLambdaWrapper<UserDO> wrapper = new MPJLambdaWrapper<UserDO>()
-//                .disableSubLogicDel()
-//                .disableLogicDel()
+//                .disableSubLogicDel()//关闭副表逻辑删除
+//                .disableLogicDel()//关闭主表逻辑删除
                 .selectAll(UserDO.class)
                 .selectCollection(UserDO.class, UserDO::getChildren)
                 .leftJoin(UserDO.class, UserDO::getPid, UserDO::getId);
@@ -161,11 +189,10 @@ class LambdaWrapperTest {
         MPJLambdaWrapper<UserDO> wrapper = new MPJLambdaWrapper<UserDO>()
                 .selectAll(UserDO.class)
                 .select(AddressDO.class, p -> true)
-//                .select(AddressDO::getAddress)
                 .leftJoin(AddressDO.class, AddressDO::getUserId, UserDO::getId)
                 .eq(UserDO::getId, 1);
-        IPage<UserDTO> page = userMapper.selectJoinPage(new Page<>(1, 10), UserDTO.class,
-                wrapper);
+        IPage<UserDTO> page = userMapper.selectJoinPage(new Page<>(1, 10), UserDTO.class, wrapper);
+        assert page.getRecords().get(0).getAddress() != null;
         page.getRecords().forEach(System.out::println);
     }
 
@@ -179,6 +206,7 @@ class LambdaWrapperTest {
                 .selectAll(UserDO.class)
                 .select(AddressDO::getAddress)
                 .leftJoin(AddressDO.class, AddressDO::getUserId, UserDO::getId));
+        assert list.get(0).get("ADDRESS") != null;
         list.forEach(System.out::println);
     }
 }

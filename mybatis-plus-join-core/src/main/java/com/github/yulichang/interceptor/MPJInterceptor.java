@@ -173,9 +173,6 @@ public class MPJInterceptor implements Interceptor {
         Map<String, Field> fieldMap = ReflectionKit.getFieldMap(resultType);
         List<Select> columnList = wrapper.getSelectColumns();
         //移除对多查询列，为了可重复使用wrapper
-        for (Select s : columnList) {
-            System.out.println(s);
-        }
         columnList.removeIf(Select::isLabel);
         List<ResultMapping> resultMappings = new ArrayList<>();
         for (Select i : columnList) {

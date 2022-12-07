@@ -7,6 +7,7 @@ import com.github.yulichang.test.collection.dto.TableDDTO;
 import com.github.yulichang.test.collection.entity.*;
 import com.github.yulichang.test.collection.mapper.TableAMapper;
 import com.github.yulichang.wrapper.MPJLambdaWrapper;
+import org.apache.ibatis.session.SqlSessionFactory;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -26,10 +27,28 @@ import java.util.List;
 class CollectionTest {
     @Resource
     private TableAMapper tableAMapper;
+    @Resource
+    private SqlSessionFactory sqlSessionFactory;
 
+    /**
+     * 覆盖测试
+     */
     @Test
     void testJoinCollection() {
         //4层嵌套  a对多b  b对多c  c对多d  d对多e
+        MPJLambdaWrapper<TableA> wrapper1 = new MPJLambdaWrapper<TableA>()
+                .selectAll(TableA.class)
+                .selectCollection(TableB.class, TableADTO::getBList, b -> b
+                        .collection(TableC.class, TableBDTO::getCcList, c -> c
+                                .collection(TableD.class, TableCDTO::getDList, d -> d
+                                        .collection(TableE.class, TableDDTO::getEList, e -> e
+                                                .id(TableE::getId)))))
+                .leftJoin(TableB.class, TableB::getAid, TableA::getId)
+                .leftJoin(TableC.class, TableC::getBid, TableB::getId)
+                .leftJoin(TableD.class, TableD::getCid, TableC::getId)
+                .leftJoin(TableE.class, TableE::getDid, TableD::getId);
+        List<TableADTO> dtos1 = tableAMapper.selectJoinList(TableADTO.class, wrapper1);
+
         MPJLambdaWrapper<TableA> wrapper = new MPJLambdaWrapper<TableA>()
                 .selectAll(TableA.class)
                 .selectCollection(TableB.class, TableADTO::getBList, b -> b
@@ -40,8 +59,8 @@ class CollectionTest {
                 .leftJoin(TableC.class, TableC::getBid, TableB::getId)
                 .leftJoin(TableD.class, TableD::getCid, TableC::getId)
                 .leftJoin(TableE.class, TableE::getDid, TableD::getId);
-
         List<TableADTO> dtos = tableAMapper.selectJoinList(TableADTO.class, wrapper);
-        System.out.println(dtos);
+
+        assert dtos.get(0).getBList().get(0).getCcList().get(0).getDList().get(0).getEList().get(0).getName() != null;
     }
 }

@@ -160,7 +160,7 @@ public class MPJLambdaQueryWrapper<T> extends AbstractLambdaWrapper<T, MPJLambda
     @Override
     public MPJLambdaQueryWrapper<T> select(Class<T> entityClass, Predicate<TableFieldInfo> predicate) {
         TableInfo info = TableInfoHelper.getTableInfo(entityClass);
-        Assert.notNull(info, "can not find table info");
+        Assert.notNull(info, "table not find by class <%s>", entityClass.getSimpleName());
         selectColumns.addAll(info.getFieldList().stream().filter(predicate).map(c ->
                 Constant.TABLE_ALIAS + StringPool.DOT + c.getColumn()).collect(Collectors.toList()));
         return typedThis;
@@ -185,7 +185,7 @@ public class MPJLambdaQueryWrapper<T> extends AbstractLambdaWrapper<T, MPJLambda
     @SuppressWarnings("DuplicatedCode")
     public final MPJLambdaQueryWrapper<T> selectAll(Class<?> clazz, String as) {
         TableInfo info = TableInfoHelper.getTableInfo(clazz);
-        Assert.notNull(info, "can not find table info");
+        Assert.notNull(info, "table not find by class <%s>", clazz.getSimpleName());
         if (info.havePK()) {
             selectColumns.add(as + StringPool.DOT + info.getKeyColumn());
         }

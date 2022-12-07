@@ -11,6 +11,7 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import lombok.experimental.Accessors;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -26,12 +27,17 @@ public class UserDO {
 
     private Integer pid;
 
-    @TableField(value = "`name`", typeHandler = JacksonTypeHandler.class)
-    private Map<String, String> name;
+    @TableField("`name`")
+    private String name;
+
+    @TableField(value = "`json`", typeHandler = JacksonTypeHandler.class)
+    private Map<String, String> json;
 
     private Sex sex;
 
     private String headImg;
+
+    private LocalDateTime createTime;
 
     private Integer addressId;
 

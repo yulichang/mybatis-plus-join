@@ -135,7 +135,7 @@ public class MPJQueryWrapper<T> extends AbstractWrapper<T, String, MPJQueryWrapp
     @Override
     public MPJQueryWrapper<T> select(Class<T> entityClass, Predicate<TableFieldInfo> predicate) {
         TableInfo info = TableInfoHelper.getTableInfo(entityClass);
-        Assert.notNull(info, "can not find table info");
+        Assert.notNull(info, "table not find by class <%s>", entityClass.getSimpleName());
         selectColumns.addAll(info.getFieldList().stream().filter(predicate).map(c ->
                 alias + StringPool.DOT + c.getSqlSelect()).collect(Collectors.toList()));
         return typedThis;
@@ -160,7 +160,7 @@ public class MPJQueryWrapper<T> extends AbstractWrapper<T, String, MPJQueryWrapp
     @SuppressWarnings({"DuplicatedCode", "UnusedReturnValue"})
     public final MPJQueryWrapper<T> selectAll(Class<?> clazz, String as) {
         TableInfo info = TableInfoHelper.getTableInfo(clazz);
-        Assert.notNull(info, "can not find table info");
+        Assert.notNull(info, "table not find by class <%s>", clazz);
         if (info.havePK()) {
             selectColumns.add(as + StringPool.DOT + info.getKeySqlSelect());
         }

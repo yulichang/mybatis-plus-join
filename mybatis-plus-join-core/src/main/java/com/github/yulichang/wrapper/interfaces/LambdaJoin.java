@@ -3,6 +3,7 @@ package com.github.yulichang.wrapper.interfaces;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.github.yulichang.interfaces.MPJBaseJoin;
 import com.github.yulichang.toolkit.Constant;
+import com.github.yulichang.toolkit.LambdaUtils;
 import com.github.yulichang.wrapper.interfaces.on.OnFunction;
 
 /**
@@ -20,6 +21,16 @@ public interface LambdaJoin<Children, Entity> extends MPJBaseJoin<Entity> {
      */
     default <T, X> Children leftJoin(Class<T> clazz, SFunction<T, ?> left, SFunction<X, ?> right) {
         return leftJoin(clazz, on -> on.eq(left, right));
+    }
+
+    /**
+     * left join
+     *
+     * @param left  条件
+     * @param right 条件
+     */
+    default <T, X> Children leftJoin(SFunction<T, ?> left, SFunction<X, ?> right) {
+        return leftJoin(LambdaUtils.getEntityClass(left), on -> on.eq(left, right));
     }
 
     /**
@@ -44,6 +55,13 @@ public interface LambdaJoin<Children, Entity> extends MPJBaseJoin<Entity> {
     /**
      * ignore 参考 left join
      */
+    default <T, X> Children rightJoin(SFunction<T, ?> left, SFunction<X, ?> right) {
+        return rightJoin(LambdaUtils.getEntityClass(left), on -> on.eq(left, right));
+    }
+
+    /**
+     * ignore 参考 left join
+     */
     default <T> Children rightJoin(Class<T> clazz, OnFunction<Entity> function) {
         return join(Constant.RIGHT_JOIN, clazz, function);
     }
@@ -53,6 +71,13 @@ public interface LambdaJoin<Children, Entity> extends MPJBaseJoin<Entity> {
      */
     default <T, X> Children innerJoin(Class<T> clazz, SFunction<T, ?> left, SFunction<X, ?> right) {
         return innerJoin(clazz, on -> on.eq(left, right));
+    }
+
+    /**
+     * ignore 参考 left join
+     */
+    default <T, X> Children innerJoin(SFunction<T, ?> left, SFunction<X, ?> right) {
+        return innerJoin(LambdaUtils.getEntityClass(left), on -> on.eq(left, right));
     }
 
     /**
@@ -68,6 +93,13 @@ public interface LambdaJoin<Children, Entity> extends MPJBaseJoin<Entity> {
      */
     default <T, X> Children fullJoin(Class<T> clazz, SFunction<T, ?> left, SFunction<X, ?> right) {
         return fullJoin(clazz, on -> on.eq(left, right));
+    }
+
+    /**
+     * ignore 参考 left join
+     */
+    default <T, X> Children fullJoin(SFunction<T, ?> left, SFunction<X, ?> right) {
+        return fullJoin(LambdaUtils.getEntityClass(left), on -> on.eq(left, right));
     }
 
     /**

@@ -2,6 +2,12 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>com.github.yulichang</groupId>
+        <artifactId>mybatis-plus-join-root</artifactId>
+        <version>1.3.10</version>
+    </parent>
     <!--
         这个模块啥也没有
         和直接引入starter效果是一模一样的
@@ -10,12 +16,10 @@
         <dependency>
             <groupId>com.github.yulichang</groupId>
             <artifactId>mybatis-plus-join-boot-starter</artifactId>
-            <version>1.3.8</version>
+            <version>1.3.10</version>
         </dependency>
     -->
-    <modelVersion>4.0.0</modelVersion>
-    <groupId>com.github.yulichang</groupId>
-    <version>1.3.8</version>
+    <version>1.3.10</version>
     <artifactId>mybatis-plus-join</artifactId>
     <name>mybatis-plus-join</name>
 
@@ -53,7 +57,7 @@
         <dependency>
             <groupId>com.github.yulichang</groupId>
             <artifactId>mybatis-plus-join-boot-starter</artifactId>
-            <version>1.3.8</version>
+            <version>1.3.10</version>
         </dependency>
     </dependencies>
 </project>

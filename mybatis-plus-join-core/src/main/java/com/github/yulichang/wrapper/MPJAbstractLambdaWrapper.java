@@ -21,6 +21,7 @@ import static java.util.stream.Collectors.joining;
  *
  * @author yulichang
  */
+@SuppressWarnings("DuplicatedCode")
 public abstract class MPJAbstractLambdaWrapper<T, Children extends MPJAbstractLambdaWrapper<T, Children>>
         extends MPJAbstractWrapper<T, Children> {
 
@@ -87,6 +88,14 @@ public abstract class MPJAbstractLambdaWrapper<T, Children extends MPJAbstractLa
             }
         }
         //外层select
+        if (Objects.isNull(index)) {
+            if (Objects.equals(clazz, getEntityClass())) {
+                return StringPool.EMPTY;
+            }
+            //正序
+            Table table = tableList.getPositive(clazz);
+            return Objects.isNull(table.index) ? StringPool.EMPTY : table.index;
+        }
         Table table = tableList.get(clazz, index);
         if (Objects.nonNull(table.getIndex())) {
             return table.getIndex();

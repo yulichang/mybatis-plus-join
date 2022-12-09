@@ -32,7 +32,6 @@ import org.apache.ibatis.session.RowBounds;
 import java.lang.reflect.Field;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
 
 /**
  * 连表拦截器
@@ -175,9 +174,11 @@ public class MPJInterceptor implements Interceptor {
         //移除对多查询列，为了可重复使用wrapper
         columnList.removeIf(Select::isLabel);
         List<ResultMapping> resultMappings = new ArrayList<>();
+        Set<String> columnSet = new HashSet<>();
         for (Select i : columnList) {
             if (i.isHasAlias()) {
                 Field field = fieldMap.get(i.getAlias());
+                columnSet.add(i.getAlias());
                 if (Objects.nonNull(field)) {
                     ResultMapping.Builder builder = new ResultMapping.Builder(ms.getConfiguration(), i.getAlias(),
                             i.getAlias(), field.getType());
@@ -185,6 +186,7 @@ public class MPJInterceptor implements Interceptor {
                 }
             } else {
                 Field field = fieldMap.get(i.getColumProperty());
+                columnSet.add(i.getColumProperty());
                 if (Objects.nonNull(field)) {
                     ResultMapping.Builder builder = new ResultMapping.Builder(ms.getConfiguration(), i.getColumProperty(),
                             i.getTagColumn(), field.getType());
@@ -192,7 +194,6 @@ public class MPJInterceptor implements Interceptor {
                 }
             }
         }
-        Set<String> columnSet = resultMappings.stream().map(ResultMapping::getColumn).collect(Collectors.toSet());
         if (wrapper.isResultMap()) {
             for (Object o : wrapper.getResultMapMybatisLabel()) {
                 MybatisLabel<?, ?> label = (MybatisLabel<?, ?>) o;

@@ -38,19 +38,19 @@ INSERT INTO `user` (id, pid, `name`, `json`, `address_id`, sex, head_img, create
 INSERT INTO `user` (id, pid, `name`, `json`, `address_id`, sex, head_img, create_time, del) VALUES ( 7, 1, '张三 7', '{"id": 7,"name":"张三 7"}', 1, 0, 'https://url-07', '2022-01-01 12:00:00', false);
 INSERT INTO `user` (id, pid, `name`, `json`, `address_id`, sex, head_img, create_time, del) VALUES ( 8, 1, '张三 8', '{"id": 8,"name":"张三 8"}', 1, 0, 'https://url-08', '2022-01-01 12:00:00', false);
 INSERT INTO `user` (id, pid, `name`, `json`, `address_id`, sex, head_img, create_time, del) VALUES ( 9, 1, '张三 9', '{"id": 9,"name":"张三 9"}', 1, 0, 'https://url-09', '2022-01-01 12:00:00', false);
-INSERT INTO `user` (id, pid, `name`, `json`, `address_id`, sex, head_img, create_time, del) VALUES (10, 1, '张三10', '{"id":10,"name":"张三10"}', 1, 0, 'https://url-10', '2022-01-01 12:00:00', false);
-INSERT INTO `user` (id, pid, `name`, `json`, `address_id`, sex, head_img, create_time, del) VALUES (11, 1, '张三11', '{"id":11,"name":"张三11"}', 1, 0, 'https://url-11', '2022-01-01 12:00:00', false);
-INSERT INTO `user` (id, pid, `name`, `json`, `address_id`, sex, head_img, create_time, del) VALUES (12, 1, '张三12', '{"id":12,"name":"张三12"}', 1, 0, 'https://url-12', '2022-01-01 12:00:00', false);
-INSERT INTO `user` (id, pid, `name`, `json`, `address_id`, sex, head_img, create_time, del) VALUES (13, 1, '张三13', '{"id":13,"name":"张三13"}', 1, 0, 'https://url-13', '2022-01-01 12:00:00', false);
-INSERT INTO `user` (id, pid, `name`, `json`, `address_id`, sex, head_img, create_time, del) VALUES (14, 1, '张三14', '{"id":14,"name":"张三14"}', 1, 0, 'https://url-14', '2022-01-01 12:00:00', false);
-INSERT INTO `user` (id, pid, `name`, `json`, `address_id`, sex, head_img, create_time, del) VALUES (15, 1, '张三15', '{"id":15,"name":"张三15"}', 1, 0, 'https://url-15', '2022-01-01 12:00:00', false);
-INSERT INTO `user` (id, pid, `name`, `json`, `address_id`, sex, head_img, create_time, del) VALUES (16, 1, '张三16', '{"id":16,"name":"张三16"}', 1, 0, 'https://url-16', '2022-01-01 12:00:00', false);
-INSERT INTO `user` (id, pid, `name`, `json`, `address_id`, sex, head_img, create_time, del) VALUES (17, 1, '张三17', '{"id":17,"name":"张三17"}', 1, 0, 'https://url-17', '2022-01-01 12:00:00', false);
-INSERT INTO `user` (id, pid, `name`, `json`, `address_id`, sex, head_img, create_time, del) VALUES (18, 1, '张三18', '{"id":18,"name":"张三18"}', 1, 0, 'https://url-18', '2022-01-01 12:00:00', false);
-INSERT INTO `user` (id, pid, `name`, `json`, `address_id`, sex, head_img, create_time, del) VALUES (19, 1, '张三19', '{"id":19,"name":"张三19"}', 1, 0, 'https://url-19', '2022-01-01 12:00:00', false);
-INSERT INTO `user` (id, pid, `name`, `json`, `address_id`, sex, head_img, create_time, del) VALUES (20, 1, '张三20', '{"id":20,"name":"张三20"}', 1, 0, 'https://url-20', '2022-01-01 12:00:00', false);
-INSERT INTO `user` (id, pid, `name`, `json`, `address_id`, sex, head_img, create_time, del) VALUES (21, 1, '张三21', '{"id":21,"name":"张三21"}', 1, 0, 'https://url-21', '2022-01-01 12:00:00', false);
-INSERT INTO `user` (id, pid, `name`, `json`, `address_id`, sex, head_img, create_time, del) VALUES (22, 1, '张三22', '{"id":22,"name":"张三22"}', 1, 0, 'https://url-22', '2022-01-01 12:00:00', false);
+INSERT INTO `user` (id, pid, `name`, `json`, `address_id`, sex, head_img, create_time, del) VALUES (10, 1, '张三10', '{"id":10,"name":"张三10"}', 1, 0, 'https://url-10', '2022-01-01 12:00:00', true );
+INSERT INTO `user` (id, pid, `name`, `json`, `address_id`, sex, head_img, create_time, del) VALUES (11, 1, '张三11', '{"id":11,"name":"张三11"}', 1, 0, 'https://url-11', '2022-01-01 12:00:00', true );
+INSERT INTO `user` (id, pid, `name`, `json`, `address_id`, sex, head_img, create_time, del) VALUES (12, 1, '张三12', '{"id":12,"name":"张三12"}', 1, 0, 'https://url-12', '2022-01-01 12:00:00', true );
+INSERT INTO `user` (id, pid, `name`, `json`, `address_id`, sex, head_img, create_time, del) VALUES (13, 1, '张三13', '{"id":13,"name":"张三13"}', 1, 0, 'https://url-13', '2022-01-01 12:00:00', true );
+INSERT INTO `user` (id, pid, `name`, `json`, `address_id`, sex, head_img, create_time, del) VALUES (14, 1, '张三14', '{"id":14,"name":"张三14"}', 1, 0, 'https://url-14', '2022-01-01 12:00:00', true );
+INSERT INTO `user` (id, pid, `name`, `json`, `address_id`, sex, head_img, create_time, del) VALUES (15, 1, '张三15', '{"id":15,"name":"张三15"}', 1, 0, 'https://url-15', '2022-01-01 12:00:00', true );
+INSERT INTO `user` (id, pid, `name`, `json`, `address_id`, sex, head_img, create_time, del) VALUES (16, 1, '张三16', '{"id":16,"name":"张三16"}', 1, 0, 'https://url-16', '2022-01-01 12:00:00', true );
+INSERT INTO `user` (id, pid, `name`, `json`, `address_id`, sex, head_img, create_time, del) VALUES (17, 1, '张三17', '{"id":17,"name":"张三17"}', 1, 0, 'https://url-17', '2022-01-01 12:00:00', true );
+INSERT INTO `user` (id, pid, `name`, `json`, `address_id`, sex, head_img, create_time, del) VALUES (18, 1, '张三18', '{"id":18,"name":"张三18"}', 1, 0, 'https://url-18', '2022-01-01 12:00:00', true );
+INSERT INTO `user` (id, pid, `name`, `json`, `address_id`, sex, head_img, create_time, del) VALUES (19, 1, '张三19', '{"id":19,"name":"张三19"}', 1, 0, 'https://url-19', '2022-01-01 12:00:00', true );
+INSERT INTO `user` (id, pid, `name`, `json`, `address_id`, sex, head_img, create_time, del) VALUES (20, 1, '张三20', '{"id":20,"name":"张三20"}', 1, 0, 'https://url-20', '2022-01-01 12:00:00', true );
+INSERT INTO `user` (id, pid, `name`, `json`, `address_id`, sex, head_img, create_time, del) VALUES (21, 1, '张三21', '{"id":21,"name":"张三21"}', 1, 0, 'https://url-21', '2022-01-01 12:00:00', true );
+INSERT INTO `user` (id, pid, `name`, `json`, `address_id`, sex, head_img, create_time, del) VALUES (22, 1, '张三22', '{"id":22,"name":"张三22"}', 1, 0, 'https://url-22', '2022-01-01 12:00:00', true );
 
 
 DELETE FROM address;
@@ -60,10 +60,10 @@ INSERT INTO address (id, user_id, area_id, tel, address, del) VALUES ( 2, 1, 100
 INSERT INTO address (id, user_id, area_id, tel, address, del) VALUES ( 3, 1, 10003, '10000000003', '曹县03', false);
 INSERT INTO address (id, user_id, area_id, tel, address, del) VALUES ( 4, 1, 10004, '10000000004', '曹县04', false);
 INSERT INTO address (id, user_id, area_id, tel, address, del) VALUES ( 5, 1, 10005, '10000000005', '曹县05', false);
-INSERT INTO address (id, user_id, area_id, tel, address, del) VALUES ( 6, 1, 10006, '10000000006', '曹县06', false);
-INSERT INTO address (id, user_id, area_id, tel, address, del) VALUES ( 7, 1, 10007, '10000000007', '曹县07', false);
-INSERT INTO address (id, user_id, area_id, tel, address, del) VALUES ( 8, 1, 10008, '10000000008', '曹县08', false);
-INSERT INTO address (id, user_id, area_id, tel, address, del) VALUES ( 9, 1, 10009, '10000000009', '曹县09', false);
+INSERT INTO address (id, user_id, area_id, tel, address, del) VALUES ( 6, 1, 10006, '10000000006', '曹县06', true );
+INSERT INTO address (id, user_id, area_id, tel, address, del) VALUES ( 7, 1, 10007, '10000000007', '曹县07', true );
+INSERT INTO address (id, user_id, area_id, tel, address, del) VALUES ( 8, 1, 10008, '10000000008', '曹县08', true );
+INSERT INTO address (id, user_id, area_id, tel, address, del) VALUES ( 9, 1, 10009, '10000000009', '曹县09', true );
 INSERT INTO address (id, user_id, area_id, tel, address, del) VALUES (10,10, 10010, '10000000010', '曹县10', false);
 INSERT INTO address (id, user_id, area_id, tel, address, del) VALUES (11,11, 10011, '10000000011', '曹县11', false);
 INSERT INTO address (id, user_id, area_id, tel, address, del) VALUES (12,12, 10012, '10000000012', '曹县12', false);

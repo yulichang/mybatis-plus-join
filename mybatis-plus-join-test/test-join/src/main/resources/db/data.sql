@@ -29,28 +29,29 @@ INSERT INTO area (id, province, city, area, postcode, del) VALUES (10022, '北�
 
 DELETE FROM `user`;
 
-INSERT INTO `user` (id, pid, `name`, `json`, `address_id`, sex, head_img, create_time, del) VALUES ( 1, 1, '张三 1', '{"id": 1,"name":"张三 1"}', 1, 1, 'https://url-01', '2022-01-01 12:00:00', false);
-INSERT INTO `user` (id, pid, `name`, `json`, `address_id`, sex, head_img, create_time, del) VALUES ( 2, 1, '张三 2', '{"id": 2,"name":"张三 2"}', 1, 0, 'https://url-02', '2022-01-01 12:00:00', false);
-INSERT INTO `user` (id, pid, `name`, `json`, `address_id`, sex, head_img, create_time, del) VALUES ( 3, 1, '张三 3', '{"id": 3,"name":"张三 3"}', 1, 0, 'https://url-03', '2022-01-01 12:00:00', false);
-INSERT INTO `user` (id, pid, `name`, `json`, `address_id`, sex, head_img, create_time, del) VALUES ( 4, 1, '张三 4', '{"id": 4,"name":"张三 4"}', 1, 0, 'https://url-04', '2022-01-01 12:00:00', false);
-INSERT INTO `user` (id, pid, `name`, `json`, `address_id`, sex, head_img, create_time, del) VALUES ( 5, 1, '张三 5', '{"id": 5,"name":"张三 5"}', 1, 0, 'https://url-05', '2022-01-01 12:00:00', false);
-INSERT INTO `user` (id, pid, `name`, `json`, `address_id`, sex, head_img, create_time, del) VALUES ( 6, 1, '张三 6', '{"id": 6,"name":"张三 6"}', 1, 0, 'https://url-06', '2022-01-01 12:00:00', false);
-INSERT INTO `user` (id, pid, `name`, `json`, `address_id`, sex, head_img, create_time, del) VALUES ( 7, 1, '张三 7', '{"id": 7,"name":"张三 7"}', 1, 0, 'https://url-07', '2022-01-01 12:00:00', false);
-INSERT INTO `user` (id, pid, `name`, `json`, `address_id`, sex, head_img, create_time, del) VALUES ( 8, 1, '张三 8', '{"id": 8,"name":"张三 8"}', 1, 0, 'https://url-08', '2022-01-01 12:00:00', false);
-INSERT INTO `user` (id, pid, `name`, `json`, `address_id`, sex, head_img, create_time, del) VALUES ( 9, 1, '张三 9', '{"id": 9,"name":"张三 9"}', 1, 0, 'https://url-09', '2022-01-01 12:00:00', false);
-INSERT INTO `user` (id, pid, `name`, `json`, `address_id`, sex, head_img, create_time, del) VALUES (10, 1, '张三10', '{"id":10,"name":"张三10"}', 1, 0, 'https://url-10', '2022-01-01 12:00:00', true );
-INSERT INTO `user` (id, pid, `name`, `json`, `address_id`, sex, head_img, create_time, del) VALUES (11, 1, '张三11', '{"id":11,"name":"张三11"}', 1, 0, 'https://url-11', '2022-01-01 12:00:00', true );
-INSERT INTO `user` (id, pid, `name`, `json`, `address_id`, sex, head_img, create_time, del) VALUES (12, 1, '张三12', '{"id":12,"name":"张三12"}', 1, 0, 'https://url-12', '2022-01-01 12:00:00', true );
-INSERT INTO `user` (id, pid, `name`, `json`, `address_id`, sex, head_img, create_time, del) VALUES (13, 1, '张三13', '{"id":13,"name":"张三13"}', 1, 0, 'https://url-13', '2022-01-01 12:00:00', true );
-INSERT INTO `user` (id, pid, `name`, `json`, `address_id`, sex, head_img, create_time, del) VALUES (14, 1, '张三14', '{"id":14,"name":"张三14"}', 1, 0, 'https://url-14', '2022-01-01 12:00:00', true );
-INSERT INTO `user` (id, pid, `name`, `json`, `address_id`, sex, head_img, create_time, del) VALUES (15, 1, '张三15', '{"id":15,"name":"张三15"}', 1, 0, 'https://url-15', '2022-01-01 12:00:00', true );
-INSERT INTO `user` (id, pid, `name`, `json`, `address_id`, sex, head_img, create_time, del) VALUES (16, 1, '张三16', '{"id":16,"name":"张三16"}', 1, 0, 'https://url-16', '2022-01-01 12:00:00', true );
-INSERT INTO `user` (id, pid, `name`, `json`, `address_id`, sex, head_img, create_time, del) VALUES (17, 1, '张三17', '{"id":17,"name":"张三17"}', 1, 0, 'https://url-17', '2022-01-01 12:00:00', true );
-INSERT INTO `user` (id, pid, `name`, `json`, `address_id`, sex, head_img, create_time, del) VALUES (18, 1, '张三18', '{"id":18,"name":"张三18"}', 1, 0, 'https://url-18', '2022-01-01 12:00:00', true );
-INSERT INTO `user` (id, pid, `name`, `json`, `address_id`, sex, head_img, create_time, del) VALUES (19, 1, '张三19', '{"id":19,"name":"张三19"}', 1, 0, 'https://url-19', '2022-01-01 12:00:00', true );
-INSERT INTO `user` (id, pid, `name`, `json`, `address_id`, sex, head_img, create_time, del) VALUES (20, 1, '张三20', '{"id":20,"name":"张三20"}', 1, 0, 'https://url-20', '2022-01-01 12:00:00', true );
-INSERT INTO `user` (id, pid, `name`, `json`, `address_id`, sex, head_img, create_time, del) VALUES (21, 1, '张三21', '{"id":21,"name":"张三21"}', 1, 0, 'https://url-21', '2022-01-01 12:00:00', true );
-INSERT INTO `user` (id, pid, `name`, `json`, `address_id`, sex, head_img, create_time, del) VALUES (22, 1, '张三22', '{"id":22,"name":"张三22"}', 1, 0, 'https://url-22', '2022-01-01 12:00:00', true );
+INSERT INTO `user` (id, pid, `name`, `json`, `address_id`, sex, head_img, create_time, del) VALUES
+( 1, 1, '张三 1', '{"id": 1,"name":"张三 1"}', 1, 1, 'https://url-01', '2022-01-01 12:00:00', false),
+( 2, 1, '张三 2', '{"id": 2,"name":"张三 2"}', 1, 0, 'https://url-02', '2022-01-01 12:00:00', false),
+( 3, 1, '张三 3', '{"id": 3,"name":"张三 3"}', 1, 0, 'https://url-03', '2022-01-01 12:00:00', false),
+( 4, 1, '张三 4', '{"id": 4,"name":"张三 4"}', 1, 0, 'https://url-04', '2022-01-01 12:00:00', false),
+( 5, 1, '张三 5', '{"id": 5,"name":"张三 5"}', 1, 0, 'https://url-05', '2022-01-01 12:00:00', false),
+( 6, 1, '张三 6', '{"id": 6,"name":"张三 6"}', 1, 0, 'https://url-06', '2022-01-01 12:00:00', false),
+( 7, 1, '张三 7', '{"id": 7,"name":"张三 7"}', 1, 0, 'https://url-07', '2022-01-01 12:00:00', false),
+( 8, 1, '张三 8', '{"id": 8,"name":"张三 8"}', 1, 0, 'https://url-08', '2022-01-01 12:00:00', false),
+( 9, 1, '张三 9', '{"id": 9,"name":"张三 9"}', 1, 0, 'https://url-09', '2022-01-01 12:00:00', false),
+(10, 1, '张三10', '{"id":10,"name":"张三10"}', 1, 0, 'https://url-10', '2022-01-01 12:00:00', true ),
+(11, 1, '张三11', '{"id":11,"name":"张三11"}', 1, 0, 'https://url-11', '2022-01-01 12:00:00', true ),
+(12, 1, '张三12', '{"id":12,"name":"张三12"}', 1, 0, 'https://url-12', '2022-01-01 12:00:00', true ),
+(13, 1, '张三13', '{"id":13,"name":"张三13"}', 1, 0, 'https://url-13', '2022-01-01 12:00:00', true ),
+(14, 2, '张三14', '{"id":14,"name":"张三14"}', 1, 0, 'https://url-14', '2022-01-01 12:00:00', false),
+(15, 2, '张三15', '{"id":15,"name":"张三15"}', 1, 0, 'https://url-15', '2022-01-01 12:00:00', false),
+(16, 2, '张三16', '{"id":16,"name":"张三16"}', 1, 0, 'https://url-16', '2022-01-01 12:00:00', false),
+(17, 2, '张三17', '{"id":17,"name":"张三17"}', 1, 0, 'https://url-17', '2022-01-01 12:00:00', false),
+(18, 2, '张三18', '{"id":18,"name":"张三18"}', 1, 0, 'https://url-18', '2022-01-01 12:00:00', false),
+(19, 2, '张三19', '{"id":19,"name":"张三19"}', 1, 0, 'https://url-19', '2022-01-01 12:00:00', true ),
+(20, 2, '张三20', '{"id":20,"name":"张三20"}', 1, 0, 'https://url-20', '2022-01-01 12:00:00', true ),
+(21, 2, '张三21', '{"id":21,"name":"张三21"}', 1, 0, 'https://url-21', '2022-01-01 12:00:00', true ),
+(22, 2, '张三22', '{"id":22,"name":"张三22"}', 1, 0, 'https://url-22', '2022-01-01 12:00:00', true );
 
 
 DELETE FROM address;

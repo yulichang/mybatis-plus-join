@@ -46,5 +46,8 @@ public class UserDO {
     private Boolean del;
 
     @TableField(exist = false)
+    private String alias;
+
+    @TableField(exist = false)
     private List<UserDO> children;
 }

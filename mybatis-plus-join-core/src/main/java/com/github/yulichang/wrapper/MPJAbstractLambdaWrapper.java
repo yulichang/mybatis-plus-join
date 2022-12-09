@@ -5,11 +5,11 @@ import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.github.yulichang.toolkit.Constant;
 import com.github.yulichang.toolkit.LambdaUtils;
 import com.github.yulichang.toolkit.support.ColumnCache;
+import com.github.yulichang.wrapper.segments.Select;
 import com.github.yulichang.wrapper.segments.SelectCache;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.Getter;
 
 import java.util.*;
 import java.util.stream.Stream;
@@ -28,27 +28,22 @@ public abstract class MPJAbstractLambdaWrapper<T, Children extends MPJAbstractLa
      * 关联的表
      */
     protected TableList tableList = new TableList();
-    /**
-     * 表别名
-     */
-    @Getter
-    protected String index;
 
 
     @Override
-    protected <X> String columnToString(X column, boolean isJoin) {
-        return columnToString((SFunction<?, ?>) column, isJoin);
+    protected <X> String columnToString(String index, X column, boolean isJoin) {
+        return columnToString(index, (SFunction<?, ?>) column, isJoin);
     }
 
     @Override
     @SafeVarargs
-    protected final <X> String columnsToString(boolean isJoin, X... columns) {
-        return Arrays.stream(columns).map(i -> columnToString((SFunction<?, ?>) i, isJoin)).collect(joining(StringPool.COMMA));
+    protected final <X> String columnsToString(String index, boolean isJoin, X... columns) {
+        return Arrays.stream(columns).map(i -> columnToString(index, (SFunction<?, ?>) i, isJoin)).collect(joining(StringPool.COMMA));
     }
 
-    protected String columnToString(SFunction<?, ?> column, boolean isJoin) {
+    protected String columnToString(String index, SFunction<?, ?> column, boolean isJoin) {
         Class<?> entityClass = LambdaUtils.getEntityClass(column);
-        return Constant.TABLE_ALIAS + getDefault(entityClass, isJoin) + StringPool.DOT +
+        return Constant.TABLE_ALIAS + getDefault(index, entityClass, isJoin) + StringPool.DOT +
                 getCache(column).getTagColumn();
     }
 
@@ -58,26 +53,42 @@ public abstract class MPJAbstractLambdaWrapper<T, Children extends MPJAbstractLa
         return cacheMap.get(LambdaUtils.getName(fn));
     }
 
-    protected String getDefault(Class<?> clazz, boolean isJoin) {
+    protected String getDefault(String index, Class<?> clazz, boolean isJoin) {
+        if (Objects.isNull(index)) {
+            if (Objects.equals(clazz, getEntityClass())) {
+                return StringPool.EMPTY;
+            }
+            //正序
+            Table table = tableList.getPositive(clazz);
+            return Objects.isNull(table.index) ? StringPool.EMPTY : table.index;
+        }
         Table table = tableList.get(clazz, index);
         if (Objects.nonNull(table.getIndex())) {
-            if (getEntityClass() == null) {
-                return table.getIndex();
-            }
-            if (isJoin && joinClass == getEntityClass()) {
-                return StringPool.EMPTY;
+            if (isJoin) {
+                //除自己以外的倒序第一个
+                Table t = tableList.getOrElse(clazz, index);
+                if (Objects.isNull(t.getIndex())) {
+                    return StringPool.EMPTY;
+                }
+                return t.getIndex();
             }
             return table.getIndex();
         }
         return StringPool.EMPTY;
     }
 
-    protected String getDefaultSelect(Class<?> clazz, boolean myself) {
+    protected String getDefaultSelect(String index, Class<?> clazz, Select s) {
+        if (s.isLabel()) {
+            if (Objects.nonNull(s.getIndex())) {
+                return s.getIndex();
+            } else {
+                Table table = tableList.get(s.getClazz());
+                return Objects.isNull(table.index) ? StringPool.EMPTY : table.index;
+            }
+        }
+        //外层select
         Table table = tableList.get(clazz, index);
         if (Objects.nonNull(table.getIndex())) {
-            if (myself) {
-                return StringPool.EMPTY;
-            }
             return table.getIndex();
         }
         return StringPool.EMPTY;
@@ -85,7 +96,7 @@ public abstract class MPJAbstractLambdaWrapper<T, Children extends MPJAbstractLa
 
     public static class TableList {
 
-        private static final Table DEFAULT_TABLE = new Table(null, null);
+        private static final Table DEFAULT_TABLE = new Table(null, StringPool.EMPTY);
 
         private final List<Table> list = new ArrayList<>();
 
@@ -93,8 +104,12 @@ public abstract class MPJAbstractLambdaWrapper<T, Children extends MPJAbstractLa
             this.list.add(new Table(clazz, index));
         }
 
-        private Table get(Class<?> clazz) {
-            for (Table t : list) {
+        public Table get(Class<?> clazz) {
+            if (list.isEmpty()) {
+                return DEFAULT_TABLE;
+            }
+            for (int i = list.size() - 1; i >= 0; i--) {
+                Table t = list.get(i);
                 if (clazz == t.clazz) {
                     return t;
                 }
@@ -102,12 +117,46 @@ public abstract class MPJAbstractLambdaWrapper<T, Children extends MPJAbstractLa
             return DEFAULT_TABLE;
         }
 
+
         public Table get(Class<?> clazz, String index) {
             if (Objects.isNull(index)) {
                 return get(clazz);
             }
+            if (list.isEmpty()) {
+                return DEFAULT_TABLE;
+            }
+            //倒序
+            for (int i = list.size() - 1; i >= 0; i--) {
+                Table t = list.get(i);
+                if (clazz == t.clazz && Objects.equals(index, t.getIndex())) {
+                    return t;
+                }
+            }
+            return get(clazz);
+        }
+
+        @SuppressWarnings("unused")
+        public Table getPositive(Class<?> clazz, String index) {
+            if (Objects.isNull(index)) {
+                return get(clazz);
+            }
+            if (list.isEmpty()) {
+                return DEFAULT_TABLE;
+            }
             for (Table t : list) {
                 if (clazz == t.clazz && Objects.equals(index, t.getIndex())) {
+                    return t;
+                }
+            }
+            return getPositive(clazz);
+        }
+
+        public Table getPositive(Class<?> clazz) {
+            if (list.isEmpty()) {
+                return DEFAULT_TABLE;
+            }
+            for (Table t : list) {
+                if (clazz == t.clazz) {
                     return t;
                 }
             }
@@ -125,14 +174,33 @@ public abstract class MPJAbstractLambdaWrapper<T, Children extends MPJAbstractLa
         public boolean isEmpty() {
             return list.isEmpty();
         }
+
+        public Table getOrElse(Class<?> clazz, String index) {
+            if (Objects.isNull(index)) {
+                return get(clazz);
+            }
+            //倒序
+            for (int i = list.size() - 1; i >= 0; i--) {
+                Table t = list.get(i);
+                if (clazz == t.clazz) {
+                    if (Objects.equals(index, t.getIndex())) {
+                        continue;
+                    }
+                    if (Integer.parseInt(t.getIndex()) < Integer.parseInt(index)) {
+                        return t;
+                    }
+                }
+            }
+            return DEFAULT_TABLE;
+        }
     }
 
     @Data
     @EqualsAndHashCode
     @AllArgsConstructor
     public static class Table {
-        private Class<?> clazz;
+        private final Class<?> clazz;
 
-        private String index;
+        private final String index;
     }
 }

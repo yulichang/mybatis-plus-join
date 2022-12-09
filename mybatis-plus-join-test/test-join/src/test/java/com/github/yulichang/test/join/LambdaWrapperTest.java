@@ -114,21 +114,27 @@ class LambdaWrapperTest {
     void testInner() {
         MPJLambdaWrapper<UserDO> wrapper = new MPJLambdaWrapper<UserDO>()
 //                .disableSubLogicDel()//关闭副表逻辑删除
-//                .disableLogicDel()//关闭主表逻辑删除
+                .disableLogicDel()//关闭主表逻辑删除
                 .selectAll(UserDO.class)
                 .selectCollection(UserDO.class, UserDO::getChildren)
                 .leftJoin(UserDO.class, UserDO::getPid, UserDO::getId);
         List<UserDO> list = userMapper.selectJoinList(UserDO.class, wrapper);
+        System.out.println(list);
 
         MPJLambdaWrapper<UserDO> wrapper1 = new MPJLambdaWrapper<UserDO>()
                 .disableSubLogicDel()
-                .disableLogicDel()
                 .selectAll(UserDO.class)
-                .selectCollection(UserDO.class, UserDO::getChildren)
-                .leftJoin(UserDO.class, UserDO::getPid, UserDO::getId);
+                .selectCollection(1, UserDO.class, UserDO::getChildren, c -> c
+                        .collection(2, UserDO.class, UserDO::getChildren))
+                .leftJoin(UserDO.class, UserDO::getPid, UserDO::getId, ext -> ext
+                        .selectAs(UserDO::getName, UserDO::getAlias)
+                        .leftJoin(UserDO.class, UserDO::getPid, UserDO::getId)
+                        .le(UserDO::getId, 5))
+                .le(UserDO::getId, 4);
         List<UserDO> list1 = userMapper.selectJoinList(UserDO.class, wrapper1);
-
-        System.out.println(list);
+        System.out.println(wrapper1.getSqlSegment());
+        assert "(t1.id <= #{ew.paramNameValuePairs.MPGENVAL1} AND t.id <= #{ew.paramNameValuePairs.MPGENVAL2})".equals(wrapper1.getSqlSegment());
+        System.out.println(list1);
     }
 
     /**
@@ -137,13 +143,13 @@ class LambdaWrapperTest {
     @Test
     void testLogicDel() {
         List<UserDTO> l1 = userMapper.selectJoinList(UserDTO.class, new MPJLambdaWrapper<>());
-        assert l1.size() < 10;
+        assert l1.size() < 15;
 
         List<UserDTO> l2 = userMapper.selectJoinList(UserDTO.class, new MPJLambdaWrapper<UserDO>()
                 .selectAll(UserDO.class)
                 .select(AddressDO::getAddress)
                 .leftJoin(AddressDO.class, AddressDO::getUserId, UserDO::getId));
-        assert l2.size() <= 5;
+        assert l2.size() < 11;
 
         List<UserDTO> l3 = userMapper.selectJoinList(UserDTO.class, new MPJLambdaWrapper<UserDO>()
                 .disableSubLogicDel()
@@ -207,8 +213,8 @@ class LambdaWrapperTest {
                         .selectAll(UserDO.class)
                         .select(AddressDO::getAddress)
                         .leftJoin(AddressDO.class, on -> on
-                                .eq(UserDO::getId, AddressDO::getUserId)
-                                .eq(UserDO::getId, AddressDO::getUserId))
+                                .eq(AddressDO::getUserId, UserDO::getId)
+                                .eq(AddressDO::getUserId, UserDO::getId))
                         .eq(UserDO::getId, 1)
                         .and(i -> i.eq(UserDO::getImg, "er")
                                 .or()

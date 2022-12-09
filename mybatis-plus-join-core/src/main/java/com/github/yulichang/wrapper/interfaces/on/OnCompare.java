@@ -115,40 +115,4 @@ public interface OnCompare<Children> extends Serializable {
      * @return children
      */
     <R, S> Children le(boolean condition, SFunction<R, ?> column, SFunction<S, ?> val);
-
-    /**
-     * ignore
-     */
-    default <R, S, T> Children between(SFunction<R, ?> column, SFunction<S, ?> val1, SFunction<T, ?> val2) {
-        return between(true, column, val1, val2);
-    }
-
-    /**
-     * BETWEEN 值1 AND 值2
-     *
-     * @param condition 执行条件
-     * @param column    字段
-     * @param val1      值1
-     * @param val2      值2
-     * @return children
-     */
-    <R, S, T> Children between(boolean condition, SFunction<R, ?> column, SFunction<S, ?> val1, SFunction<T, ?> val2);
-
-    /**
-     * ignore
-     */
-    default <R, S, T> Children notBetween(SFunction<R, ?> column, SFunction<S, ?> val1, SFunction<T, ?> val2) {
-        return notBetween(true, column, val1, val2);
-    }
-
-    /**
-     * NOT BETWEEN 值1 AND 值2
-     *
-     * @param condition 执行条件
-     * @param column    字段
-     * @param val1      值1
-     * @param val2      值2
-     * @return children
-     */
-    <R, S, T> Children notBetween(boolean condition, SFunction<R, ?> column, SFunction<S, ?> val1, SFunction<T, ?> val2);
 }

@@ -17,7 +17,7 @@ import com.github.yulichang.toolkit.support.ColumnCache;
 import com.github.yulichang.wrapper.interfaces.Query;
 import com.github.yulichang.wrapper.interfaces.QueryJoin;
 import com.github.yulichang.wrapper.interfaces.QueryLabel;
-import com.github.yulichang.wrapper.interfaces.on.OnFunction;
+import com.github.yulichang.wrapper.interfaces.on.WrapperFunction;
 import com.github.yulichang.wrapper.resultmap.MybatisLabel;
 import com.github.yulichang.wrapper.segments.Select;
 import com.github.yulichang.wrapper.segments.SelectCache;
@@ -27,6 +27,7 @@ import lombok.Getter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
@@ -104,7 +105,7 @@ public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWr
     MPJLambdaWrapper(T entity, Class<T> entityClass, SharedString sqlSelect, AtomicInteger paramNameSeq,
                      Map<String, Object> paramNameValuePairs, MergeSegments mergeSegments,
                      SharedString lastSql, SharedString sqlComment, SharedString sqlFirst,
-                     TableList tableList, String keyWord, Class<?> joinClass) {
+                     TableList tableList, String index, String keyWord, Class<?> joinClass) {
         super.setEntity(entity);
         super.setEntityClass(entityClass);
         this.paramNameSeq = paramNameSeq;
@@ -115,6 +116,7 @@ public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWr
         this.sqlComment = sqlComment;
         this.sqlFirst = sqlFirst;
         this.tableList = tableList;
+        this.index = index;
         this.keyWord = keyWord;
         this.joinClass = joinClass;
     }
@@ -173,7 +175,7 @@ public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWr
     public String getSqlSelect() {
         if (StringUtils.isBlank(sqlSelect.getStringValue()) && CollectionUtils.isNotEmpty(selectColumns)) {
             String s = selectColumns.stream().map(i -> {
-                String str = Constant.TABLE_ALIAS + getDefaultSelect(i.getClazz(), (i.getClazz() == getEntityClass() && !i.isLabel())) + StringPool.DOT + i.getColumn();
+                String str = Constant.TABLE_ALIAS + getDefaultSelect(i.getIndex(), i.getClazz(), i) + StringPool.DOT + i.getColumn();
                 return i.isFunc() ? (String.format(i.getFunc().getSql(), str) + Constant.AS + i.getAlias()) : (i.isHasAlias() ? (str + Constant.AS + i.getAlias()) : str);
             }).collect(Collectors.joining(StringPool.COMMA));
             sqlSelect.setStringValue(s);
@@ -216,13 +218,13 @@ public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWr
      */
     @Override
     protected MPJLambdaWrapper<T> instance() {
-        return instance(null, null);
+        return instance(index, null, null);
     }
 
-    protected MPJLambdaWrapper<T> instance(String keyWord, Class<?> joinClass) {
+    protected MPJLambdaWrapper<T> instance(String index, String keyWord, Class<?> joinClass) {
         return new MPJLambdaWrapper<>(getEntity(), getEntityClass(), null, paramNameSeq, paramNameValuePairs,
                 new MergeSegments(), SharedString.emptyString(), SharedString.emptyString(), SharedString.emptyString(),
-                this.tableList, keyWord, joinClass);
+                this.tableList, index, keyWord, joinClass);
     }
 
     @Override
@@ -285,12 +287,21 @@ public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWr
         return this.logicSql;
     }
 
+    /**
+     * 调用此方法 keyword 前后需要带空格 比如 " LEFT JOIN "  " RIGHT JOIN "
+     */
     @Override
-    public <R> MPJLambdaWrapper<T> join(String keyWord, Class<R> clazz, OnFunction<T> function) {
-        MPJLambdaWrapper<T> apply = function.apply(instance(keyWord, clazz));
-        tableList.add(clazz, String.valueOf(tableIndex));
+    public <R> MPJLambdaWrapper<T> join(String keyWord, Class<R> clazz, WrapperFunction<T> function, WrapperFunction<T> ext) {
+        String name = String.valueOf(tableIndex);
+        MPJLambdaWrapper<T> apply = function.apply(instance(name, keyWord, clazz));
+        tableList.add(clazz, name);
         onWrappers.add(apply);
         tableIndex++;
+        if (Objects.nonNull(ext)) {
+            this.index = name;
+            MPJLambdaWrapper<T> wrapper = ext.apply(typedThis);
+            wrapper.index = null;
+        }
         return typedThis;
     }
 }

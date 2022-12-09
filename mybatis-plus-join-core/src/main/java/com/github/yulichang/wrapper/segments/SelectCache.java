@@ -14,7 +14,7 @@ import org.apache.ibatis.type.UnknownTypeHandler;
 import java.util.Objects;
 
 /**
- * 缓存列, 普通列
+ * 缓存
  *
  * @author yulichang
  * @since 1.3.10

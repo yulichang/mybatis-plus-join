@@ -91,9 +91,25 @@ public interface Query<Children> extends Serializable {
     default <S> Children selectAs(SFunction<S, ?> column, String alias) {
         Class<?> aClass = LambdaUtils.getEntityClass(column);
         Map<String, SelectCache> cacheMap = ColumnCache.getMapField(aClass);
+        String index = getIndex();
         getSelectColum().add(new SelectAlias(cacheMap.get(LambdaUtils.getName(column)), getIndex(), alias));
         return getChildren();
     }
+
+
+    /**
+     * 查询实体类全部字段
+     */
+    default Children selectAll(Class<?> clazz) {
+        getSelectColum().addAll(ColumnCache.getListField(clazz).stream().map(i ->
+                new SelectNormal(i, getIndex())).collect(Collectors.toList()));
+        return getChildren();
+    }
+
+    /**
+     * select sql 片段
+     */
+    String getSqlSelect();
 
     /**
      * 聚合函数查询
@@ -131,19 +147,6 @@ public interface Query<Children> extends Serializable {
         return selectFunc(funcEnum, column, LambdaUtils.getName(alias));
     }
 
-    /**
-     * 查询实体类全部字段
-     */
-    default Children selectAll(Class<?> clazz) {
-        getSelectColum().addAll(ColumnCache.getListField(clazz).stream().map(i ->
-                new SelectNormal(i, getIndex())).collect(Collectors.toList()));
-        return getChildren();
-    }
-
-    /**
-     * select sql 片段
-     */
-    String getSqlSelect();
 
     /* 默认聚合函数扩展 */
 

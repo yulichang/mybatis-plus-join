@@ -24,7 +24,7 @@ import java.util.stream.Collectors;
 @Getter
 public class MybatisLabel<E, T> {
 
-    private final String index = null;
+    private String index;
 
     private String property;
 
@@ -53,9 +53,10 @@ public class MybatisLabel<E, T> {
          * 自动构建
          */
         @SuppressWarnings("unchecked")
-        public Builder(String property, Class<E> entityClass, Class<?> javaType) {
+        public Builder(String index, String property, Class<E> entityClass, Class<?> javaType) {
             this.mybatisLabel = new MybatisLabel<>();
             mybatisLabel.property = property;
+            mybatisLabel.index = index;
             mybatisLabel.entityClass = entityClass;
             mybatisLabel.javaType = javaType;
             mybatisLabel.ofType = (Class<T>) entityClass;
@@ -73,9 +74,10 @@ public class MybatisLabel<E, T> {
          * @param ofType      映射类
          * @param auto        自动映射数据库实体对应的字段
          */
-        public Builder(String property, Class<E> entityClass, Class<?> javaType, Class<T> ofType, boolean auto) {
+        public Builder(String index, String property, Class<E> entityClass, Class<?> javaType, Class<T> ofType, boolean auto) {
             this.mybatisLabel = new MybatisLabel<>();
             mybatisLabel.property = property;
+            mybatisLabel.index = index;
             mybatisLabel.entityClass = entityClass;
             mybatisLabel.javaType = javaType;
             mybatisLabel.ofType = ofType;
@@ -112,67 +114,91 @@ public class MybatisLabel<E, T> {
             return this;
         }
 
+        public <A, R, B extends Collection<R>> Builder<E, T> collection(Class<A> entityClass, SFunction<T, B> func) {
+            return collection(null, entityClass, func);
+        }
+
         /**
          * 嵌套
          */
-        public <A, R, B extends Collection<R>> Builder<E, T> collection(Class<A> entityClass, SFunction<T, B> func) {
+        public <A, R, B extends Collection<R>> Builder<E, T> collection(Integer index, Class<A> entityClass, SFunction<T, B> func) {
             String dtoFieldName = LambdaUtils.getName(func);
             Class<T> dtoClass = LambdaUtils.getEntityClass(func);
             Map<String, Field> fieldMap = MPJReflectionKit.getFieldMap(dtoClass);
             Field field = fieldMap.get(dtoFieldName);
             Class<?> genericType = MPJReflectionKit.getGenericType(field);
             MybatisLabel.Builder<A, R> builder;
+            String s = Objects.isNull(index) ? null : index.toString();
             if (genericType == null || genericType.isAssignableFrom(entityClass)) {
                 //找不到集合泛型 List List<?> List<Object> ， 直接查询数据库实体
-                builder = new Builder<>(dtoFieldName, entityClass, field.getType());
+                builder = new Builder<>(s, dtoFieldName, entityClass, field.getType());
             } else {
                 Class<R> ofType = (Class<R>) genericType;
-                builder = new Builder<>(dtoFieldName, entityClass, field.getType(), ofType, true);
+                builder = new Builder<>(s, dtoFieldName, entityClass, field.getType(), ofType, true);
             }
             mybatisLabel.mybatisLabels.add(builder.build());
             return this;
         }
 
+        public <A, R, B extends Collection<R>> Builder<E, T> collection(Class<A> entityClass, SFunction<T, B> func, MFunc<Builder<A, R>> mFunc) {
+            return collection(null, entityClass, func, mFunc);
+        }
+
         /**
          * 嵌套
          */
-        public <A, R, B extends Collection<R>> Builder<E, T> collection(Class<A> entityClass, SFunction<T, B> func, MFunc<Builder<A, R>> mFunc) {
+        public <A, R, B extends Collection<R>> Builder<E, T> collection(Integer index,
+                                                                        Class<A> entityClass,
+                                                                        SFunction<T, B> func,
+                                                                        MFunc<Builder<A, R>> mFunc) {
             String dtoFieldName = LambdaUtils.getName(func);
             Class<T> dtoClass = LambdaUtils.getEntityClass(func);
             Field field = MPJReflectionKit.getFieldMap(dtoClass).get(dtoFieldName);
             //获取集合泛型
             Class<?> genericType = MPJReflectionKit.getGenericType(field);
             Class<R> ofType = (Class<R>) genericType;
-            MybatisLabel.Builder<A, R> builder = new MybatisLabel.Builder<>(dtoFieldName, entityClass, field.getType(), ofType, false);
+            MybatisLabel.Builder<A, R> builder = new MybatisLabel.Builder<>(Objects.isNull(index) ? null : index.toString(),
+                    dtoFieldName, entityClass, field.getType(), ofType, false);
             mybatisLabel.mybatisLabels.add(mFunc.apply(builder).build());
             return this;
+        }
+
+        public <A, B> Builder<E, T> association(Class<A> child, SFunction<T, B> dtoField) {
+            return association(null, child, dtoField);
         }
 
         /**
          * 嵌套
          */
-        public <A, B> Builder<E, T> association(Class<A> child, SFunction<T, B> dtoField) {
+        public <A, B> Builder<E, T> association(Integer index, Class<A> child, SFunction<T, B> dtoField) {
             Class<T> dtoClass = LambdaUtils.getEntityClass(dtoField);
             Map<String, Field> fieldMap = MPJReflectionKit.getFieldMap(dtoClass);
             String dtoFieldName = LambdaUtils.getName(dtoField);
             Field field = fieldMap.get(dtoFieldName);
             Assert.isFalse(Collection.class.isAssignableFrom(field.getType()), "association 不支持集合类");
             MybatisLabel.Builder<A, B> builder;
-            builder = new MybatisLabel.Builder<>(dtoFieldName, child, field.getType(), (Class<B>) field.getType(), true);
+            builder = new MybatisLabel.Builder<>(Objects.isNull(index) ? null : index.toString(),
+                    dtoFieldName, child, field.getType(), (Class<B>) field.getType(), true);
             mybatisLabel.mybatisLabels.add(builder.build());
             return this;
+        }
+
+        public <A, B> Builder<E, T> selectAssociation(Class<A> child, SFunction<T, B> dtoField,
+                                                      MFunc<MybatisLabel.Builder<A, B>> collection) {
+            return selectAssociation(null, child, dtoField, collection);
         }
 
         /**
          * 嵌套
          */
-        public <A, B> Builder<E, T> selectAssociation(Class<A> child, SFunction<T, B> dtoField,
+        public <A, B> Builder<E, T> selectAssociation(Integer index, Class<A> child, SFunction<T, B> dtoField,
                                                       MFunc<MybatisLabel.Builder<A, B>> collection) {
             String dtoFieldName = LambdaUtils.getName(dtoField);
             Class<T> dtoClass = LambdaUtils.getEntityClass(dtoField);
             Field field = MPJReflectionKit.getFieldMap(dtoClass).get(dtoFieldName);
             Assert.isFalse(Collection.class.isAssignableFrom(field.getType()), "association 不支持集合类");
-            MybatisLabel.Builder<A, B> builder = new MybatisLabel.Builder<>(dtoFieldName, child, field.getType(), (Class<B>) child, false);
+            MybatisLabel.Builder<A, B> builder = new MybatisLabel.Builder<>(Objects.isNull(index) ? null : index.toString(),
+                    dtoFieldName, child, field.getType(), (Class<B>) child, false);
             mybatisLabel.mybatisLabels.add(collection.apply(builder).build());
             return this;
         }

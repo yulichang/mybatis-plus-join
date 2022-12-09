@@ -186,7 +186,7 @@ public class MPJInterceptor implements Interceptor {
                 }
             } else {
                 Field field = fieldMap.get(i.getColumProperty());
-                columnSet.add(i.getColumProperty());
+                columnSet.add(i.getTagColumn());
                 if (Objects.nonNull(field)) {
                     ResultMapping.Builder builder = new ResultMapping.Builder(ms.getConfiguration(), i.getColumProperty(),
                             i.getTagColumn(), field.getType());

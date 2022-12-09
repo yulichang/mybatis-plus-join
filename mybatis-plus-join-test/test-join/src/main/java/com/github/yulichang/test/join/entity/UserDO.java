@@ -35,7 +35,8 @@ public class UserDO {
 
     private Sex sex;
 
-    private String headImg;
+    @TableField("head_img")
+    private String img;
 
     private LocalDateTime createTime;
 

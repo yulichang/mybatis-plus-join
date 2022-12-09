@@ -1,21 +1,12 @@
 package com.github.yulichang.wrapper.segments;
 
 import com.baomidou.mybatisplus.core.metadata.TableFieldInfo;
-import com.baomidou.mybatisplus.core.metadata.TableInfo;
-import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
-import com.baomidou.mybatisplus.core.toolkit.Assert;
-import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.github.yulichang.wrapper.enums.BaseFuncEnum;
 import lombok.Getter;
-import org.apache.ibatis.session.Configuration;
 import org.apache.ibatis.type.TypeHandler;
-import org.apache.ibatis.type.TypeHandlerRegistry;
-import org.apache.ibatis.type.UnknownTypeHandler;
-
-import java.util.Objects;
 
 /**
- * 缓存列, 普通列
+ * 缓存列
  *
  * @author yulichang
  * @since 1.3.10
@@ -23,55 +14,54 @@ import java.util.Objects;
 @Getter
 public class SelectNormal implements Select {
 
-    private final Class<?> clazz;
+    private final String index;
 
-    private final boolean isPk;
+    private final SelectCache cache;
 
-    private final String column;
+    public SelectNormal(SelectCache cache, String index) {
+        this.cache = cache;
+        this.index = index;
+    }
 
-    private final Class<?> columnType;
 
-    private final String tagColumn;
+    @Override
+    public Class<?> getClazz() {
+        return cache.getClazz();
+    }
 
-    private final String columProperty;
+    @Override
+    public boolean isPk() {
+        return cache.isPk();
+    }
 
-    private final TableFieldInfo tableFieldInfo;
+    @Override
+    public String getColumn() {
+        return cache.getColumn();
+    }
 
-    private final boolean hasTypeHandle;
+    @Override
+    public Class<?> getColumnType() {
+        return cache.getColumnType();
+    }
 
-    private final TypeHandler<?> typeHandler;
+    @Override
+    public String getTagColumn() {
+        return cache.getTagColumn();
+    }
 
-    public SelectNormal(Class<?> clazz, boolean isPk, String column, Class<?> columnType, String columProperty, TableFieldInfo tableFieldInfo) {
-        this.clazz = clazz;
-        this.isPk = isPk;
-        this.column = column;
-        this.columnType = columnType;
-        this.columProperty = columProperty;
-        this.tagColumn = StringUtils.getTargetColumn(column);
-        this.tableFieldInfo = tableFieldInfo;
-        if (Objects.isNull(tableFieldInfo)) {
-            this.hasTypeHandle = false;
-            this.typeHandler = null;
-        } else {
-            this.hasTypeHandle = this.tableFieldInfo.getTypeHandler() != null && tableFieldInfo.getTypeHandler() != UnknownTypeHandler.class;
-            if (this.hasTypeHandle) {
-                TableInfo info = TableInfoHelper.getTableInfo(clazz);
-                Assert.notNull(info, "table not find by class <%s>", clazz.getSimpleName());
-                this.typeHandler = getTypeHandler(info.getConfiguration(), tableFieldInfo);
-            } else {
-                this.typeHandler = null;
-            }
-        }
+    @Override
+    public String getColumProperty() {
+        return cache.getColumProperty();
     }
 
     @Override
     public boolean hasTypeHandle() {
-        return hasTypeHandle;
+        return cache.isHasTypeHandle();
     }
 
     @Override
     public TypeHandler<?> getTypeHandle() {
-        return typeHandler;
+        return cache.getTypeHandler();
     }
 
     @Override
@@ -82,6 +72,11 @@ public class SelectNormal implements Select {
     @Override
     public String getAlias() {
         return null;
+    }
+
+    @Override
+    public TableFieldInfo getTableFieldInfo() {
+        return cache.getTableFieldInfo();
     }
 
     @Override
@@ -97,15 +92,5 @@ public class SelectNormal implements Select {
     @Override
     public boolean isLabel() {
         return false;
-    }
-
-
-    private TypeHandler<?> getTypeHandler(Configuration configuration, TableFieldInfo info) {
-        TypeHandlerRegistry registry = configuration.getTypeHandlerRegistry();
-        TypeHandler<?> typeHandler = registry.getMappingTypeHandler(info.getTypeHandler());
-        if (typeHandler == null) {
-            typeHandler = registry.getInstance(info.getPropertyType(), info.getTypeHandler());
-        }
-        return typeHandler;
     }
 }

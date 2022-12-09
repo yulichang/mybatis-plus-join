@@ -133,6 +133,24 @@ class LambdaWrapperTest {
 
 
     /**
+     * 别名测试
+     */
+    @Test
+    void testAlias() {
+        MPJLambdaWrapper<UserDO> wrapper = new MPJLambdaWrapper<UserDO>()
+//                .disableSubLogicDel()//关闭副表逻辑删除
+//                .disableLogicDel()//关闭主表逻辑删除
+                .selectAll(UserDO.class)
+                .selectCollection(UserDO.class, UserDO::getChildren)
+                .leftJoin(UserDO.class, UserDO::getPid, UserDO::getId);
+        List<UserDO> list = userMapper.selectJoinList(UserDO.class, wrapper);
+        assert list.get(0).getName() != null && list.get(0).getChildren().get(0).getName() != null;
+        assert list.get(0).getImg() != null && list.get(0).getChildren().get(0).getImg() != null;
+        System.out.println(list);
+    }
+
+
+    /**
      * 简单的分页关联查询 lambda
      */
     @Test
@@ -161,7 +179,7 @@ class LambdaWrapperTest {
                                 .eq(UserDO::getId, AddressDO::getUserId)
                                 .eq(UserDO::getId, AddressDO::getUserId))
                         .eq(UserDO::getId, 1)
-                        .and(i -> i.eq(UserDO::getHeadImg, "er")
+                        .and(i -> i.eq(UserDO::getImg, "er")
                                 .or()
                                 .eq(AddressDO::getUserId, 1))
                         .eq(UserDO::getId, 1));

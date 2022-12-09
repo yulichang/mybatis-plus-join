@@ -17,10 +17,11 @@ import java.util.Objects;
 @Getter
 public class SelectFunc implements Select {
 
+    private final String index;
 
-    private final SelectNormal selectNormal;
+    private final SelectCache cache;
 
-    private final String coloum;
+    private final String column;
 
     private final boolean hasAlias;
 
@@ -31,18 +32,20 @@ public class SelectFunc implements Select {
     private final BaseFuncEnum func;
 
 
-    public SelectFunc(SelectNormal selectNormal, String alias, BaseFuncEnum func) {
-        this.selectNormal = selectNormal;
-        this.coloum = selectNormal.getColumn();
+    public SelectFunc(SelectCache cache, String index, String alias, BaseFuncEnum func) {
+        this.index = index;
+        this.cache = cache;
+        this.column = cache.getColumn();
         this.hasAlias = true;
         this.alias = alias;
         this.isFunc = true;
         this.func = func;
     }
 
-    public SelectFunc(String alias, BaseFuncEnum func, String column) {
-        this.coloum = column;
-        this.selectNormal = null;
+    public SelectFunc(String alias, String index, BaseFuncEnum func, String column) {
+        this.index = index;
+        this.column = column;
+        this.cache = null;
         this.hasAlias = true;
         this.alias = alias;
         this.isFunc = true;
@@ -51,47 +54,44 @@ public class SelectFunc implements Select {
 
     @Override
     public Class<?> getClazz() {
-        return selectNormal.getClazz();
+        return Objects.isNull(cache) ? null : cache.getClazz();
     }
+
 
     @Override
     public boolean isPk() {
         return false;
     }
 
-    @Override
-    public String getColumn() {
-        return coloum;
-    }
 
     @Override
     public Class<?> getColumnType() {
-        return Objects.isNull(selectNormal) ? null : selectNormal.getColumnType();
+        return Objects.isNull(cache) ? null : cache.getColumnType();
     }
 
     @Override
     public String getTagColumn() {
-        return Objects.isNull(selectNormal) ? null : selectNormal.getTagColumn();
+        return Objects.isNull(cache) ? null : cache.getTagColumn();
     }
 
     @Override
     public String getColumProperty() {
-        return Objects.isNull(selectNormal) ? null : selectNormal.getColumProperty();
+        return Objects.isNull(cache) ? null : cache.getColumProperty();
     }
 
     @Override
     public boolean hasTypeHandle() {
-        return !Objects.isNull(selectNormal) && selectNormal.isHasTypeHandle();
+        return !Objects.isNull(cache) && cache.isHasTypeHandle();
     }
 
     @Override
     public TypeHandler<?> getTypeHandle() {
-        return Objects.isNull(selectNormal) ? null : selectNormal.getTypeHandle();
+        return Objects.isNull(cache) ? null : cache.getTypeHandler();
     }
 
     @Override
     public TableFieldInfo getTableFieldInfo() {
-        return Objects.isNull(selectNormal) ? null : selectNormal.getTableFieldInfo();
+        return Objects.isNull(cache) ? null : cache.getTableFieldInfo();
     }
 
     @Override

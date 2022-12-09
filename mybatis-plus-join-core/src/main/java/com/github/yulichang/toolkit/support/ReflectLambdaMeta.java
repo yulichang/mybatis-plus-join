@@ -20,7 +20,6 @@ import com.baomidou.mybatisplus.core.exceptions.MybatisPlusException;
 import com.baomidou.mybatisplus.core.toolkit.StringPool;
 import com.github.yulichang.toolkit.ClassUtils;
 import com.github.yulichang.toolkit.ReflectionKit;
-import lombok.extern.slf4j.Slf4j;
 
 import java.lang.invoke.SerializedLambda;
 import java.lang.reflect.Field;
@@ -28,7 +27,6 @@ import java.lang.reflect.Field;
 /**
  * Created by hcl at 2021/5/14
  */
-@Slf4j
 public class ReflectLambdaMeta implements LambdaMeta {
     private static final Field FIELD_CAPTURING_CLASS;
 
@@ -39,7 +37,6 @@ public class ReflectLambdaMeta implements LambdaMeta {
             fieldCapturingClass = ReflectionKit.setAccessible(aClass.getDeclaredField("capturingClass"));
         } catch (Throwable e) {
             // 解决高版本 jdk 的问题 gitee: https://gitee.com/baomidou/mybatis-plus/issues/I4A7I5
-            log.warn(e.getMessage());
             fieldCapturingClass = null;
         }
         FIELD_CAPTURING_CLASS = fieldCapturingClass;

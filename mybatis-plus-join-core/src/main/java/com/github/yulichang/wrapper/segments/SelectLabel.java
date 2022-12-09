@@ -17,7 +17,9 @@ import java.lang.reflect.Field;
 @Getter
 public class SelectLabel implements Select {
 
-    private final SelectNormal selectNormal;
+    private final String index;
+
+    private final SelectCache cache;
 
     private final Class<?> tagClass;
 
@@ -27,16 +29,18 @@ public class SelectLabel implements Select {
 
     private final String alias;
 
-    public SelectLabel(SelectNormal selectNormal, Class<?> tagClass, Field tagField) {
-        this.selectNormal = selectNormal;
+    public SelectLabel(SelectCache cache, String index, Class<?> tagClass, Field tagField) {
+        this.cache = cache;
+        this.index = index;
         this.tagClass = tagClass;
         this.tagField = tagField;
         this.hasAlias = false;
         this.alias = null;
     }
 
-    public SelectLabel(SelectNormal selectNormal, Class<?> tagClass, Field tagField, String column) {
-        this.selectNormal = selectNormal;
+    public SelectLabel(SelectCache cache, String index, Class<?> tagClass, Field tagField, String column) {
+        this.cache = cache;
+        this.index = index;
         this.tagClass = tagClass;
         this.tagField = tagField;
         this.hasAlias = true;
@@ -45,42 +49,42 @@ public class SelectLabel implements Select {
 
     @Override
     public Class<?> getClazz() {
-        return selectNormal.getClazz();
+        return cache.getClazz();
     }
 
     @Override
     public boolean isPk() {
-        return selectNormal.isPk();
+        return cache.isPk();
     }
 
     @Override
     public String getColumn() {
-        return selectNormal.getColumn();
+        return cache.getColumn();
     }
 
     @Override
     public Class<?> getColumnType() {
-        return selectNormal.getColumnType();
+        return cache.getColumnType();
     }
 
     @Override
     public String getTagColumn() {
-        return selectNormal.getTagColumn();
+        return cache.getTagColumn();
     }
 
     @Override
     public String getColumProperty() {
-        return selectNormal.getColumProperty();
+        return cache.getColumProperty();
     }
 
     @Override
     public boolean hasTypeHandle() {
-        return selectNormal.isHasTypeHandle();
+        return cache.isHasTypeHandle();
     }
 
     @Override
     public TypeHandler<?> getTypeHandle() {
-        return selectNormal.getTypeHandle();
+        return cache.getTypeHandler();
     }
 
     @Override
@@ -95,7 +99,7 @@ public class SelectLabel implements Select {
 
     @Override
     public TableFieldInfo getTableFieldInfo() {
-        return selectNormal.getTableFieldInfo();
+        return cache.getTableFieldInfo();
     }
 
     @Override

@@ -240,9 +240,9 @@ public class MPJInterceptor implements Interceptor {
             Field field = ofTypeField.get(r.getProperty());
             if (columnSet.contains(columnName)) {
                 columnName = getColumn(columnSet, columnName);
-                label = new SelectLabel(r.getSelectNormal(), mybatisLabel.getOfType(), field, columnName);
+                label = new SelectLabel(r.getSelectNormal(), mybatisLabel.getIndex(), mybatisLabel.getOfType(), field, columnName);
             } else {
-                label = new SelectLabel(r.getSelectNormal(), mybatisLabel.getOfType(), field);
+                label = new SelectLabel(r.getSelectNormal(), mybatisLabel.getIndex(), mybatisLabel.getOfType(), field);
             }
             columnList.add(label);
             ResultMapping.Builder builder = new ResultMapping.Builder(ms.getConfiguration(), r.getProperty(), columnName, r.getJavaType());

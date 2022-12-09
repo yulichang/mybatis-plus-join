@@ -1,13 +1,22 @@
 package com.github.yulichang.wrapper.interfaces;
 
 import com.baomidou.mybatisplus.core.metadata.TableFieldInfo;
+import com.baomidou.mybatisplus.core.metadata.TableInfo;
+import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.github.yulichang.toolkit.LambdaUtils;
+import com.github.yulichang.toolkit.MPJReflectionKit;
+import com.github.yulichang.toolkit.support.ColumnCache;
 import com.github.yulichang.wrapper.enums.BaseFuncEnum;
 import com.github.yulichang.wrapper.enums.DefaultFuncEnum;
+import com.github.yulichang.wrapper.segments.*;
 
 import java.io.Serializable;
+import java.lang.reflect.Field;
+import java.util.List;
+import java.util.Map;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 /**
  * 参考 {@link com.baomidou.mybatisplus.core.conditions.query.Query}
@@ -17,14 +26,13 @@ import java.util.function.Predicate;
 @SuppressWarnings("unused")
 public interface Query<Children> extends Serializable {
 
-    /**
-     * 设置查询字段
-     *
-     * @param columns 字段数组
-     * @return children
-     */
-    @SuppressWarnings("unchecked")
-    <E> Children select(SFunction<E, ?>... columns);
+
+    List<Select> getSelectColum();
+
+    Children getChildren();
+
+    String getIndex();
+
 
     /**
      * 过滤查询的字段信息(主键除外!)
@@ -37,7 +45,17 @@ public interface Query<Children> extends Serializable {
      * @param predicate 过滤方式
      * @return children
      */
-    <E> Children select(Class<E> entityClass, Predicate<TableFieldInfo> predicate);
+    default <E> Children select(Class<E> entityClass, Predicate<TableFieldInfo> predicate) {
+        TableInfo info = TableInfoHelper.getTableInfo(entityClass);
+        Map<String, SelectCache> cacheMap = ColumnCache.getMapField(entityClass);
+        info.getFieldList().stream().filter(predicate).collect(Collectors.toList()).forEach(
+                i -> getSelectColum().add(new SelectNormal(cacheMap.get(i.getProperty()), getIndex())));
+        return getChildren();
+    }
+
+
+    @SuppressWarnings("unchecked")
+    <E> Children select(SFunction<E, ?>... columns);
 
     /**
      * 说明：
@@ -49,7 +67,16 @@ public interface Query<Children> extends Serializable {
      * @param tag    目标类
      * @return children
      */
-    <E> Children selectAsClass(Class<E> source, Class<?> tag);
+    default <E> Children selectAsClass(Class<E> source, Class<?> tag) {
+        List<SelectCache> normalList = ColumnCache.getListField(source);
+        Map<String, Field> fieldMap = MPJReflectionKit.getFieldMap(tag);
+        for (SelectCache cache : normalList) {
+            if (fieldMap.containsKey(cache.getColumProperty())) {
+                getSelectColum().add(new SelectNormal(cache, getIndex()));
+            }
+        }
+        return getChildren();
+    }
 
     /**
      * ignore
@@ -61,7 +88,12 @@ public interface Query<Children> extends Serializable {
     /**
      * 别名查询
      */
-    <S> Children selectAs(SFunction<S, ?> column, String alias);
+    default <S> Children selectAs(SFunction<S, ?> column, String alias) {
+        Class<?> aClass = LambdaUtils.getEntityClass(column);
+        Map<String, SelectCache> cacheMap = ColumnCache.getMapField(aClass);
+        getSelectColum().add(new SelectAlias(cacheMap.get(LambdaUtils.getName(column)), getIndex(), alias));
+        return getChildren();
+    }
 
     /**
      * 聚合函数查询
@@ -75,9 +107,17 @@ public interface Query<Children> extends Serializable {
      * @param column   函数作用的字段
      * @param alias    别名
      */
-    Children selectFunc(BaseFuncEnum funcEnum, Object column, String alias);
+    default Children selectFunc(BaseFuncEnum funcEnum, Object column, String alias) {
+        getSelectColum().add(new SelectFunc(alias, getIndex(), funcEnum, column.toString()));
+        return getChildren();
+    }
 
-    <S> Children selectFunc(BaseFuncEnum funcEnum, SFunction<S, ?> column, String alias);
+    default <S> Children selectFunc(BaseFuncEnum funcEnum, SFunction<S, ?> column, String alias) {
+        Class<?> aClass = LambdaUtils.getEntityClass(column);
+        Map<String, SelectCache> cacheMap = ColumnCache.getMapField(aClass);
+        getSelectColum().add(new SelectFunc(cacheMap.get(LambdaUtils.getName(column)), getIndex(), alias, funcEnum));
+        return getChildren();
+    }
 
     default <S, X> Children selectFunc(BaseFuncEnum funcEnum, SFunction<S, ?> column, SFunction<X, ?> alias) {
         return selectFunc(funcEnum, column, LambdaUtils.getName(alias));
@@ -94,7 +134,11 @@ public interface Query<Children> extends Serializable {
     /**
      * 查询实体类全部字段
      */
-    Children selectAll(Class<?> clazz);
+    default Children selectAll(Class<?> clazz) {
+        getSelectColum().addAll(ColumnCache.getListField(clazz).stream().map(i ->
+                new SelectNormal(i, getIndex())).collect(Collectors.toList()));
+        return getChildren();
+    }
 
     /**
      * select sql 片段

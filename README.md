@@ -59,7 +59,7 @@ class test {
         List<UserDTO> list = userMapper.selectJoinList(UserDTO.class, wrapper);
 
         //分页查询 （需要启用 mybatis plus 分页插件）
-        List<UserDTO> listPage = userMapper.selectJoinPage(new Page<>(2, 10), UserDTO.class, wrapper);
+        Page<UserDTO> listPage = userMapper.selectJoinPage(new Page<>(2, 10), UserDTO.class, wrapper);
     }
 }
 ```
@@ -165,7 +165,7 @@ class test {
         List<UserDTO> list = userMapper.selectJoinList(UserDTO.class, wrapper);
 
         //分页查询 （需要启用 mybatis plus 分页插件）
-        List<UserDTO> listPage = userMapper.selectJoinPage(new Page<>(1, 10), UserDTO.class, wrapper);
+        Page<UserDTO> listPage = userMapper.selectJoinPage(new Page<>(1, 10), UserDTO.class, wrapper);
     }
 }
 ```

@@ -10,7 +10,7 @@ import com.github.yulichang.wrapper.interfaces.on.OnFunction;
  * @author yulichang
  */
 @SuppressWarnings("unused")
-public interface LambdaJoin<Children, Entity> extends MPJBaseJoin<Entity> {
+public interface QueryJoin<Children, Entity> extends MPJBaseJoin<Entity> {
 
     /**
      * left join

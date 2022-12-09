@@ -39,7 +39,7 @@ import java.util.List;
  * @author yulichang
  * @since 1.3.7
  */
-@SuppressWarnings("unused")
+@SuppressWarnings("ALL")
 @Configuration(proxyBeanMethods = false)
 @ConditionalOnClass({SqlSessionFactory.class, SqlSessionFactoryBean.class})
 @ConditionalOnSingleCandidate(DataSource.class)
@@ -83,6 +83,7 @@ public class MybatisPlusJoinAutoConfiguration {
     @Order(Ordered.HIGHEST_PRECEDENCE)
     @ConditionalOnMissingBean({DefaultSqlInjector.class, AbstractSqlInjector.class, ISqlInjector.class})
     public MPJSqlInjector mpjSqlInjector() {
+        logger.info("MPJSqlInjector init");
         return new MPJSqlInjector();
     }
 
@@ -91,7 +92,6 @@ public class MybatisPlusJoinAutoConfiguration {
      */
     @Bean
     @Order(Ordered.HIGHEST_PRECEDENCE)
-    @SuppressWarnings("InstantiationOfUtilityClass")
     public SpringContentUtils springContentUtils(SpringContext springContext) {
         return new SpringContentUtils(springContext);
     }
@@ -119,7 +119,6 @@ public class MybatisPlusJoinAutoConfiguration {
         }
 
         @Override
-        @SuppressWarnings("NullableProblems")
         public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
             this.applicationContext = applicationContext;
         }

@@ -8,7 +8,7 @@ import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.github.yulichang.toolkit.LambdaUtils;
 import com.github.yulichang.toolkit.MPJReflectionKit;
 import com.github.yulichang.toolkit.support.ColumnCache;
-import com.github.yulichang.wrapper.segments.SelectNormal;
+import com.github.yulichang.wrapper.segments.SelectCache;
 import lombok.Getter;
 
 import java.lang.reflect.Field;
@@ -23,6 +23,8 @@ import java.util.stream.Collectors;
  */
 @Getter
 public class MybatisLabel<E, T> {
+
+    private final String index = null;
 
     private String property;
 
@@ -175,10 +177,6 @@ public class MybatisLabel<E, T> {
             return this;
         }
 
-        public boolean hasCustom() {
-            return CollectionUtils.isNotEmpty(mybatisLabel.resultList) || CollectionUtils.isNotEmpty(mybatisLabel.mybatisLabels);
-        }
-
         public MybatisLabel<E, T> build() {
             if (CollectionUtils.isEmpty(mybatisLabel.resultList)) {
                 autoBuild(true, mybatisLabel.entityClass, mybatisLabel.ofType);
@@ -190,7 +188,7 @@ public class MybatisLabel<E, T> {
             TableInfo tableInfo = TableInfoHelper.getTableInfo(entityClass);
             Map<String, Field> tagMap = MPJReflectionKit.getFieldMap(tagClass);
             if (auto && !tagMap.isEmpty()) {
-                List<SelectNormal> listField = ColumnCache.getListField(entityClass);
+                List<SelectCache> listField = ColumnCache.getListField(entityClass);
                 if (entityClass.isAssignableFrom(tagClass)) {
                     mybatisLabel.resultList.addAll(listField.stream().map(i -> {
                         Result result = new Result();
@@ -202,7 +200,7 @@ public class MybatisLabel<E, T> {
                         return result;
                     }).collect(Collectors.toList()));
                 } else {
-                    for (SelectNormal s : listField) {
+                    for (SelectCache s : listField) {
                         Field field = tagMap.get(s.getColumProperty());
                         if (Objects.nonNull(field)) {
                             Result result = new Result();

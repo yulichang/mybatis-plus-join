@@ -18,15 +18,20 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class LogicInfoUtils implements Constants {
 
-    private static final Map<Class<?>, String> LOGIC_CACHE = new ConcurrentHashMap<>();
+    private static final Map<Class<?>, Map<String, String>> LOGIC_CACHE = new ConcurrentHashMap<>();
 
 
-    @SuppressWarnings("ConstantConditions")
-    public static String getLogicInfo(int tableIndex, Class<?> clazz) {
-        String logicStr = LOGIC_CACHE.get(clazz);
-        if (Objects.nonNull(logicStr)) {
-            return logicStr;
+    public static String getLogicInfo(String tableIndex, Class<?> clazz) {
+        Map<String, String> absent = LOGIC_CACHE.get(clazz);
+        if (absent == null) {
+            absent = new ConcurrentHashMap<>();
+            LOGIC_CACHE.put(clazz, absent);
         }
+        return absent.computeIfAbsent(tableIndex, key -> getLogicStr(key, clazz));
+    }
+
+    private static String getLogicStr(String tableIndex, Class<?> clazz) {
+        String logicStr;
         TableInfo tableInfo = TableInfoHelper.getTableInfo(clazz);
         Assert.notNull(tableInfo, "%s 不是数据库实体或没有注册到mybatis plus中", clazz.getName());
         if (tableInfo.isWithLogicDelete() && Objects.nonNull(tableInfo.getLogicDeleteFieldInfo())) {
@@ -39,7 +44,6 @@ public class LogicInfoUtils implements Constants {
         } else {
             logicStr = StringPool.EMPTY;
         }
-        LOGIC_CACHE.put(clazz, logicStr);
         return logicStr;
     }
 }

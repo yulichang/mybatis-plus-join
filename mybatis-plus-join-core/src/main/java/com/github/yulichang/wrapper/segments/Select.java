@@ -14,6 +14,8 @@ public interface Select {
 
     Class<?> getClazz();
 
+    String getIndex();
+
     boolean isPk();
 
     String getColumn();

@@ -4,7 +4,7 @@ import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.github.yulichang.toolkit.LambdaUtils;
 import com.github.yulichang.toolkit.support.ColumnCache;
-import com.github.yulichang.wrapper.segments.SelectNormal;
+import com.github.yulichang.wrapper.segments.SelectCache;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
@@ -25,7 +25,9 @@ public class Result {
 
     private boolean isId;
 
-    private SelectNormal selectNormal;
+    private String index;
+
+    private SelectCache selectNormal;
 
     private String property;
 
@@ -54,9 +56,9 @@ public class Result {
 
         public Builder<E, T> column(SFunction<E, ?> column) {
             Class<E> entityClass = LambdaUtils.getEntityClass(column);
-            Map<String, SelectNormal> normalMap = ColumnCache.getMapField(entityClass);
+            Map<String, SelectCache> normalMap = ColumnCache.getMapField(entityClass);
             String name = LambdaUtils.getName(column);
-            SelectNormal normal = normalMap.get(name);
+            SelectCache normal = normalMap.get(name);
             result.selectNormal = normal;
             if (StringUtils.isBlank(result.property)) {
                 result.property = normal.getColumProperty();

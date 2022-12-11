@@ -4,7 +4,8 @@
 * [演示工程](https://gitee.com/best_handsome/mybatis-plus-join-demo)
 * 点个Star支持一下吧 :)
 
-QQ群:1022221898
+QQ群:1022221898  
+[加入微信群](https://gitee.com/best_handsome/mybatis-plus-join/issues/I65N2M)
 
 ## 使用方法
 

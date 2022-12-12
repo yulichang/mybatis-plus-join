@@ -7,6 +7,7 @@ import org.apache.ibatis.logging.Log;
 import org.apache.ibatis.logging.LogFactory;
 import org.apache.ibatis.plugin.Interceptor;
 import org.apache.ibatis.plugin.InterceptorChain;
+import org.apache.ibatis.session.Configuration;
 import org.apache.ibatis.session.SqlSessionFactory;
 
 import java.lang.reflect.Field;
@@ -28,7 +29,7 @@ public class InterceptorConfig {
             //打印banner
             System.out.println(" _ _   |_  _ _|_. ___ _ |    _  .  _  .  _  \n" +
                     "| | |\\/|_)(_| | |_\\  |_)||_|_\\  | (_) | | | \n" +
-                    "     /               |          /            1.3.8");
+                    "     /               |          /            1.3.10");
         }
     }
 
@@ -39,7 +40,7 @@ public class InterceptorConfig {
         }
         for (SqlSessionFactory factory : sqlSessionFactoryList) {
             try {
-                Field interceptorChain = org.apache.ibatis.session.Configuration.class.getDeclaredField("interceptorChain");
+                Field interceptorChain = Configuration.class.getDeclaredField("interceptorChain");
                 interceptorChain.setAccessible(true);
                 InterceptorChain chain = (InterceptorChain) interceptorChain.get(factory.getConfiguration());
                 Field interceptors = InterceptorChain.class.getDeclaredField("interceptors");

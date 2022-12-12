@@ -143,20 +143,20 @@ class LambdaWrapperTest {
     @Test
     void testLogicDel() {
         List<UserDTO> l1 = userMapper.selectJoinList(UserDTO.class, new MPJLambdaWrapper<>());
-        assert l1.size() < 15;
+        assert l1.size() == 14;
 
         List<UserDTO> l2 = userMapper.selectJoinList(UserDTO.class, new MPJLambdaWrapper<UserDO>()
                 .selectAll(UserDO.class)
                 .select(AddressDO::getAddress)
                 .leftJoin(AddressDO.class, AddressDO::getUserId, UserDO::getId));
-        assert l2.size() < 11;
+        assert l2.size() == 10;
 
         List<UserDTO> l3 = userMapper.selectJoinList(UserDTO.class, new MPJLambdaWrapper<UserDO>()
                 .disableSubLogicDel()
                 .selectAll(UserDO.class)
                 .selectCollection(AddressDO.class, UserDTO::getAddressList)
                 .leftJoin(AddressDO.class, AddressDO::getUserId, UserDO::getId));
-        assert l3.size() > 5 && l3.get(0).getAddressList().size() > 5;
+        assert l3.size() == 14 && l3.get(0).getAddressList().size() == 9;
 
         List<UserDTO> l4 = userMapper.selectJoinList(UserDTO.class, new MPJLambdaWrapper<UserDO>()
                 .disableSubLogicDel()
@@ -165,7 +165,7 @@ class LambdaWrapperTest {
                 .leftJoin(AddressDO.class, on -> on
                         .eq(AddressDO::getUserId, UserDO::getId)
                         .eq(AddressDO::getDel, false)));
-        assert l4.size() > 5 && l4.get(0).getAddressList().size() <= 5;
+        assert l4.size() == 14 && l4.get(0).getAddressList().size() == 5;
     }
 
 

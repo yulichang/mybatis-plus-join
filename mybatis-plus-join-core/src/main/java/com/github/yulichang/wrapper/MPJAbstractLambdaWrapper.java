@@ -65,7 +65,7 @@ public abstract class MPJAbstractLambdaWrapper<T, Children extends MPJAbstractLa
         }
         Table table = tableList.get(clazz, index);
         if (Objects.nonNull(table.getIndex())) {
-            if (isJoin) {
+            if (isJoin && clazz == getEntityClass()) {
                 //除自己以外的倒序第一个
                 Table t = tableList.getOrElse(clazz, index);
                 if (Objects.isNull(t.getIndex())) {

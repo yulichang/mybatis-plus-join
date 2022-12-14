@@ -191,7 +191,9 @@ public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWr
             StringBuilder value = new StringBuilder();
             for (MPJLambdaWrapper<?> wrapper : onWrappers) {
                 String tableName = TableInfoHelper.getTableInfo(wrapper.getJoinClass()).getTableName();
-                value.append(wrapper.getKeyWord())
+                value.append(StringPool.SPACE)
+                        .append(wrapper.getKeyWord())
+                        .append(StringPool.SPACE)
                         .append(tableName)
                         .append(Constant.SPACE_TABLE_ALIAS)
                         .append(tableList.get(wrapper.getJoinClass(), wrapper.getIndex()).getIndex())

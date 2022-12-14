@@ -33,19 +33,19 @@ public interface Constant {
     String LEFT_JOIN = StringPool.SPACE + LEFT + StringPool.SPACE + JOIN + StringPool.SPACE;
 
     /**
-     * " RIGHT JOIN "
+     * "RIGHT JOIN"
      */
-    String RIGHT_JOIN = StringPool.SPACE + RIGHT + StringPool.SPACE + JOIN + StringPool.SPACE;
+    String RIGHT_JOIN = RIGHT + StringPool.SPACE + JOIN;
 
     /**
-     * " INNER JOIN "
+     * "INNER JOIN"
      */
-    String INNER_JOIN = StringPool.SPACE + INNER + StringPool.SPACE + JOIN + StringPool.SPACE;
+    String INNER_JOIN = INNER + StringPool.SPACE + JOIN;
 
     /**
-     * " FULL JOIN "
+     * "FULL JOIN"
      */
-    String FULL_JOIN = StringPool.SPACE + FULL + StringPool.SPACE + JOIN + StringPool.SPACE;
+    String FULL_JOIN = FULL + StringPool.SPACE + JOIN;
 
     /**
      * " t"

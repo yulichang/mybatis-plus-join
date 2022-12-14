@@ -1,5 +1,6 @@
 package com.github.yulichang.test.join;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.github.yulichang.test.join.dto.AddressDTO;
@@ -263,5 +264,16 @@ class LambdaWrapperTest {
                 .leftJoin(AddressDO.class, AddressDO::getUserId, UserDO::getId));
         assert list.get(0).get("ADDRESS") != null;
         list.forEach(System.out::println);
+    }
+
+    /**
+     * 关联查询返回map
+     */
+    @Test
+    void testMP() {
+        List<UserDO> dos = userMapper.selectList(new LambdaQueryWrapper<UserDO>()
+                .gt(UserDO::getId, 3)
+                .lt(UserDO::getId, 8));
+        assert dos.size() == 4;
     }
 }

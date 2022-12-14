@@ -270,7 +270,7 @@ public class MPJQueryWrapper<T> extends AbstractWrapper<T, String, MPJQueryWrapp
     @Override
     public MPJQueryWrapper<T> join(String keyWord, boolean condition, String joinSql) {
         if (condition) {
-            from.setStringValue(from.getStringValue() + keyWord + joinSql);
+            from.setStringValue(from.getStringValue() + StringPool.EMPTY + keyWord + StringPool.EMPTY + joinSql);
         }
         return typedThis;
     }

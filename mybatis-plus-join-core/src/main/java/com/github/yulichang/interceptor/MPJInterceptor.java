@@ -3,7 +3,6 @@ package com.github.yulichang.interceptor;
 import com.baomidou.mybatisplus.core.metadata.TableInfo;
 import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
 import com.baomidou.mybatisplus.core.toolkit.*;
-import com.github.yulichang.interfaces.MPJBaseJoin;
 import com.github.yulichang.mapper.MPJTableMapperHelper;
 import com.github.yulichang.method.MPJResultType;
 import com.github.yulichang.query.MPJQueryWrapper;
@@ -15,8 +14,6 @@ import com.github.yulichang.wrapper.resultmap.Result;
 import com.github.yulichang.wrapper.segments.Select;
 import com.github.yulichang.wrapper.segments.SelectLabel;
 import org.apache.ibatis.executor.Executor;
-import org.apache.ibatis.logging.Log;
-import org.apache.ibatis.logging.LogFactory;
 import org.apache.ibatis.mapping.MappedStatement;
 import org.apache.ibatis.mapping.ResultFlag;
 import org.apache.ibatis.mapping.ResultMap;
@@ -46,8 +43,6 @@ import java.util.concurrent.ConcurrentHashMap;
 public class MPJInterceptor implements Interceptor {
 
 
-    private static final Log logger = LogFactory.getLog(MPJInterceptor.class);
-
     private static final List<ResultMapping> EMPTY_RESULT_MAPPING = new ArrayList<>(0);
 
     /**
@@ -65,11 +60,6 @@ public class MPJInterceptor implements Interceptor {
             if (args[1] instanceof Map) {
                 Map<String, Object> map = (Map<String, Object>) args[1];
                 Object ew = map.containsKey(Constants.WRAPPER) ? map.get(Constants.WRAPPER) : null;
-                if (!map.containsKey(Constant.PARAM_TYPE)) {
-                    map.put(Constant.PARAM_TYPE, Objects.nonNull(ew) && (ew instanceof MPJBaseJoin));
-                } else {
-                    logger.warn(String.format("请不要使用MPJ预留参数名 %s", Constant.PARAM_TYPE));
-                }
                 if (CollectionUtils.isNotEmpty(map) && map.containsKey(Constant.CLAZZ)) {
                     Class<?> clazz = (Class<?>) map.get(Constant.CLAZZ);
                     if (Objects.nonNull(clazz)) {

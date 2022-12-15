@@ -28,6 +28,8 @@ create table `user`
     sex          tinyint      not null,
     head_img     varchar(255) not null,
     create_time  datetime not null,
+    create_by  int not null,
+    update_by  int not null,
     del          bit
 );
 

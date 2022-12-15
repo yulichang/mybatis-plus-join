@@ -1,4 +1,4 @@
-package com.github.yulichang.wrapper.interfaces.on;
+package com.github.yulichang.wrapper.interfaces;
 
 import com.github.yulichang.wrapper.MPJLambdaWrapper;
 

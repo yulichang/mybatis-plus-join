@@ -113,14 +113,30 @@ class LambdaWrapperTest {
      */
     @Test
     void testInner() {
-        MPJLambdaWrapper<UserDO> wrapper = new MPJLambdaWrapper<UserDO>()
+//        //自连接
+//        MPJLambdaWrapper<UserDO> wrapper = new MPJLambdaWrapper<UserDO>()
 //                .disableSubLogicDel()//关闭副表逻辑删除
-                .disableLogicDel()//关闭主表逻辑删除
+////                .disableLogicDel()//关闭主表逻辑删除
+//                .selectAll(UserDO.class)
+//                .selectCollection(UserDO.class, UserDO::getChildren)
+//                .leftJoin(UserDO.class, UserDO::getPid, UserDO::getId);
+//        List<UserDO> list = userMapper.selectJoinList(UserDO.class, wrapper);
+////        assert list.size() == 2 && list.get(0).getChildren().size() == 9;
+//        System.out.println(list);
+
+        //关联一张表多次
+        MPJLambdaWrapper<UserDO> w = new MPJLambdaWrapper<UserDO>()
+                .disableLogicDel()
+                .disableSubLogicDel()
                 .selectAll(UserDO.class)
-                .selectCollection(UserDO.class, UserDO::getChildren)
-                .leftJoin(UserDO.class, UserDO::getPid, UserDO::getId);
-        List<UserDO> list = userMapper.selectJoinList(UserDO.class, wrapper);
-        System.out.println(list);
+                .leftJoin(UserDO.class, UserDO::getId, UserDO::getCreateBy, ext -> ext.selectAs(UserDO::getName, UserDO::getCreateName))
+                .leftJoin(UserDO.class, (on, ext) -> {
+                    on.eq(UserDO::getId, UserDO::getUpdateBy);
+                    ext.selectAs(UserDO::getName, UserDO::getUpdateName);
+                })
+                .eq(UserDO::getId, UserDO::getId);
+        List<UserDO> dos = userMapper.selectJoinList(UserDO.class, w);
+        assert dos.get(0).getCreateName() != null && dos.get(0).getUpdateName() != null;
 
         MPJLambdaWrapper<UserDO> wrapper1 = new MPJLambdaWrapper<UserDO>()
                 .disableSubLogicDel()
@@ -134,6 +150,7 @@ class LambdaWrapperTest {
                 .le(UserDO::getId, 4);
         List<UserDO> list1 = userMapper.selectJoinList(UserDO.class, wrapper1);
         System.out.println(wrapper1.getSqlSegment());
+        System.out.println(wrapper1.getSqlSelect());
         assert "(t1.id <= #{ew.paramNameValuePairs.MPGENVAL1} AND t.id <= #{ew.paramNameValuePairs.MPGENVAL2})".equals(wrapper1.getSqlSegment());
         System.out.println(list1);
     }
@@ -267,7 +284,7 @@ class LambdaWrapperTest {
     }
 
     /**
-     * 关联查询返回map
+     * 原生查询
      */
     @Test
     void testMP() {
@@ -275,5 +292,17 @@ class LambdaWrapperTest {
                 .gt(UserDO::getId, 3)
                 .lt(UserDO::getId, 8));
         assert dos.size() == 4;
+    }
+
+    /**
+     * 函数测试
+     */
+    @Test
+    void testFunc() {
+        MPJLambdaWrapper<UserDO> wrapper = new MPJLambdaWrapper<UserDO>()
+                .selectAll(UserDO.class);
+
+        List<UserDO> dos = userMapper.selectJoinList(UserDO.class, wrapper);
+        System.out.println(1);
     }
 }

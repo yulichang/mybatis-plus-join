@@ -15,7 +15,9 @@ import com.github.yulichang.toolkit.sql.SqlScriptUtils;
 import com.github.yulichang.wrapper.interfaces.Compare;
 import com.github.yulichang.wrapper.interfaces.Func;
 import com.github.yulichang.wrapper.interfaces.Join;
-import com.github.yulichang.wrapper.interfaces.on.OnCompare;
+import com.github.yulichang.wrapper.interfaces.OnCompare;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.Getter;
 
 import java.util.*;
@@ -36,6 +38,8 @@ import static java.util.stream.Collectors.joining;
 @SuppressWarnings("ALL")
 public abstract class MPJAbstractWrapper<T, Children extends MPJAbstractWrapper<T, Children>> extends Wrapper<T>
         implements Compare<Children>, Nested<Children, Children>, Join<Children>, Func<Children>, OnCompare<Children> {
+
+    protected static final Node ROOT_NODE = new Node(null, 0, null);
 
     /**
      * 占位符
@@ -84,6 +88,11 @@ public abstract class MPJAbstractWrapper<T, Children extends MPJAbstractWrapper<
      */
     @Getter
     protected Class<?> joinClass;
+
+    /**
+     * 寻路
+     */
+    protected Node node;
 
     @Override
     public T getEntity() {
@@ -318,7 +327,7 @@ public abstract class MPJAbstractWrapper<T, Children extends MPJAbstractWrapper<
     public <R> Children groupBy(boolean condition, List<SFunction<R, ?>> columns) {
         return maybeDo(condition, () -> {
             if (CollectionUtils.isNotEmpty(columns)) {
-                String one = (StringPool.COMMA + columnsToString(index, false, columns));
+                String one = (StringPool.COMMA + columnsToString(index, getByClass(node, joinClass), false, columns));
                 final String finalOne = one;
                 appendSqlSegments(GROUP_BY, () -> finalOne);
             }
@@ -328,9 +337,9 @@ public abstract class MPJAbstractWrapper<T, Children extends MPJAbstractWrapper<
     @Override
     public <X> Children groupBy(boolean condition, SFunction<X, ?> column, SFunction<X, ?>... columns) {
         return maybeDo(condition, () -> {
-            String one = columnToString(index, column, false);
+            String one = columnToString(index, getByClass(node, joinClass), column, false);
             if (ArrayUtils.isNotEmpty(columns)) {
-                one += (StringPool.COMMA + columnsToString(index, false, columns));
+                one += (StringPool.COMMA + columnsToString(index, getByClass(node, joinClass), false, columns));
             }
             final String finalOne = one;
             appendSqlSegments(GROUP_BY, () -> finalOne);
@@ -431,6 +440,7 @@ public abstract class MPJAbstractWrapper<T, Children extends MPJAbstractWrapper<
     }
 
     protected <X, S> Children addCondition(boolean condition, SFunction<X, ?> column, SqlKeyword sqlKeyword, SFunction<S, ?> val) {
+        Node nnnn = this.node;
         return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(index, column, false), sqlKeyword,
                 columnToSqlSegment(index, val, true)));
     }
@@ -541,6 +551,7 @@ public abstract class MPJAbstractWrapper<T, Children extends MPJAbstractWrapper<
         lastSql = SharedString.emptyString();
         sqlComment = SharedString.emptyString();
         sqlFirst = SharedString.emptyString();
+        node = ROOT_NODE;
     }
 
     @Override
@@ -615,13 +626,13 @@ public abstract class MPJAbstractWrapper<T, Children extends MPJAbstractWrapper<
      * 获取 columnName
      */
     protected final <X> ISqlSegment columnToSqlSegment(String index, SFunction<X, ?> column, boolean isJoin) {
-        return () -> columnToString(index, column, isJoin);
+        return () -> columnToString(index, getByClass(node, joinClass), column, isJoin);
     }
 
     /**
      * 获取 columnName
      */
-    protected <X> String columnToString(String index, X column, boolean isJoin) {
+    protected <X> String columnToString(String index, int node, X column, boolean isJoin) {
         return (String) column;
     }
 
@@ -630,8 +641,8 @@ public abstract class MPJAbstractWrapper<T, Children extends MPJAbstractWrapper<
      *
      * @param columns 多字段
      */
-    protected <X> String columnsToString(String index, boolean isJoin, X... columns) {
-        return Arrays.stream(columns).map(i -> this.columnToString(index, i, isJoin)).collect(joining(StringPool.COMMA));
+    protected <X> String columnsToString(String index, int node, boolean isJoin, X... columns) {
+        return Arrays.stream(columns).map(i -> this.columnToString(index, node, i, isJoin)).collect(joining(StringPool.COMMA));
     }
 
     @Override
@@ -679,5 +690,39 @@ public abstract class MPJAbstractWrapper<T, Children extends MPJAbstractWrapper<
     @Override
     public <R, S> Children le(boolean condition, SFunction<R, ?> column, SFunction<S, ?> val) {
         return addCondition(condition, column, LE, val);
+    }
+
+
+    @Data
+    @AllArgsConstructor
+    public static class Node {
+
+        private Class<?> clazz;
+
+        private int index;
+
+        private Node parent;
+    }
+
+
+    private int getByClass(Node node, Class<?> joinClass) {
+        if (joinClass == null) {
+            return 0;
+        }
+        if (node.parent != null) {
+            return dg(node.parent, joinClass);
+        }
+        return 0;
+    }
+
+    private int dg(Node node, Class<?> joinClass) {
+
+        if (node.clazz != null && node.clazz == joinClass) {
+            return node.index;
+        }
+        if (node.parent == null) {
+            return joinClass == getEntityClass() ? -1 : 0;
+        }
+        return getByClass(node.parent, joinClass);
     }
 }

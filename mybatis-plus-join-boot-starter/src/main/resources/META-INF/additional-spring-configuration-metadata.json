@@ -18,6 +18,12 @@
       "defaultValue": true,
       "type": "java.lang.Boolean",
       "description": "连表查询副表是否启用逻辑删除(前提是MP配置了逻辑删除)."
+    },
+    {
+      "name": "mybatis-plus-join.ms-cache",
+      "defaultValue": true,
+      "type": "java.lang.Boolean",
+      "description": "MappedStatement缓存开关."
     }
   ]
 }

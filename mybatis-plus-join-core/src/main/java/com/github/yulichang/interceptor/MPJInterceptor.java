@@ -3,6 +3,7 @@ package com.github.yulichang.interceptor;
 import com.baomidou.mybatisplus.core.metadata.TableInfo;
 import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
 import com.baomidou.mybatisplus.core.toolkit.*;
+import com.github.yulichang.config.ConfigProperties;
 import com.github.yulichang.mapper.MPJTableMapperHelper;
 import com.github.yulichang.method.MPJResultType;
 import com.github.yulichang.query.MPJQueryWrapper;
@@ -92,7 +93,9 @@ public class MPJInterceptor implements Interceptor {
         }
         if (ew instanceof MPJQueryWrapper) {
             MPJQueryWrapper wrapper = (MPJQueryWrapper) ew;
-            return getCache(ms, id + StringPool.UNDERSCORE + wrapper.getSqlSelect(), resultType, ew);
+            if (ConfigProperties.msCache) {
+                return getCache(ms, id + StringPool.UNDERSCORE + wrapper.getSqlSelect(), resultType, ew);
+            }
         }
         return buildMappedStatement(ms, resultType, ew, id);
     }

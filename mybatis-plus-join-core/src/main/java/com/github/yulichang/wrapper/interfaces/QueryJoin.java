@@ -4,7 +4,6 @@ import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.github.yulichang.interfaces.MPJBaseJoin;
 import com.github.yulichang.toolkit.Constant;
 import com.github.yulichang.toolkit.LambdaUtils;
-import com.github.yulichang.wrapper.interfaces.on.WrapperFunction;
 
 /**
  * @author yulichang
@@ -20,7 +19,7 @@ public interface QueryJoin<Children, Entity> extends MPJBaseJoin<Entity> {
      * @param right 条件
      */
     default <T, X> Children leftJoin(Class<T> clazz, SFunction<T, ?> left, SFunction<X, ?> right) {
-        return leftJoin(clazz, on -> on.eq(left, right));
+        return join(Constant.LEFT_JOIN, clazz, left, right);
     }
 
     /**
@@ -30,7 +29,7 @@ public interface QueryJoin<Children, Entity> extends MPJBaseJoin<Entity> {
      * @param right 条件
      */
     default <T, X> Children leftJoin(SFunction<T, ?> left, SFunction<X, ?> right) {
-        return leftJoin(LambdaUtils.getEntityClass(left), on -> on.eq(left, right));
+        return join(Constant.LEFT_JOIN, left, right);
     }
 
     /**
@@ -42,7 +41,7 @@ public interface QueryJoin<Children, Entity> extends MPJBaseJoin<Entity> {
      * @param function 条件
      */
     default <T> Children leftJoin(Class<T> clazz, WrapperFunction<Entity> function) {
-        return join(Constant.LEFT_JOIN, clazz, function, null);
+        return join(Constant.LEFT_JOIN, clazz, function);
     }
 
     /**
@@ -53,7 +52,7 @@ public interface QueryJoin<Children, Entity> extends MPJBaseJoin<Entity> {
      * @param right 条件
      */
     default <T, X> Children leftJoin(Class<T> clazz, SFunction<T, ?> left, SFunction<X, ?> right, WrapperFunction<Entity> ext) {
-        return leftJoin(clazz, on -> on.eq(left, right), ext);
+        return join(Constant.LEFT_JOIN, clazz, left, right, ext);
     }
 
     /**
@@ -63,7 +62,7 @@ public interface QueryJoin<Children, Entity> extends MPJBaseJoin<Entity> {
      * @param right 条件
      */
     default <T, X> Children leftJoin(SFunction<T, ?> left, SFunction<X, ?> right, WrapperFunction<Entity> ext) {
-        return leftJoin(LambdaUtils.getEntityClass(left), on -> on.eq(left, right), ext);
+        return join(Constant.LEFT_JOIN, left, right, ext);
     }
 
     /**
@@ -72,94 +71,95 @@ public interface QueryJoin<Children, Entity> extends MPJBaseJoin<Entity> {
      * 例 leftJoin(UserDO.class, on -> on.eq(UserDO::getId,UserAddressDO::getUserId).le().gt()...)
      *
      * @param clazz    关联实体类
-     * @param function 条件
+     * @param consumer 条件
      */
-    default <T> Children leftJoin(Class<T> clazz, WrapperFunction<Entity> function, WrapperFunction<Entity> ext) {
-        return join(Constant.LEFT_JOIN, clazz, function, ext);
+    default <T> Children leftJoin(Class<T> clazz, WrapperBiConsumer<Entity> consumer) {
+        return join(Constant.LEFT_JOIN, clazz, consumer);
     }
 
     /**
      * ignore 参考 left join
      */
     default <T, X> Children rightJoin(Class<T> clazz, SFunction<T, ?> left, SFunction<X, ?> right) {
-        return rightJoin(clazz, on -> on.eq(left, right));
+        return join(Constant.RIGHT_JOIN, clazz, left, right);
     }
 
     /**
      * ignore 参考 left join
      */
     default <T, X> Children rightJoin(SFunction<T, ?> left, SFunction<X, ?> right) {
-        return rightJoin(LambdaUtils.getEntityClass(left), on -> on.eq(left, right));
+        return join(Constant.RIGHT_JOIN, left, right);
     }
 
     /**
      * ignore 参考 left join
      */
     default <T> Children rightJoin(Class<T> clazz, WrapperFunction<Entity> function) {
-        return join(Constant.RIGHT_JOIN, clazz, function, null);
+        return join(Constant.RIGHT_JOIN, clazz, function);
     }
 
     /**
      * ignore 参考 left join
      */
     default <T, X> Children rightJoin(Class<T> clazz, SFunction<T, ?> left, SFunction<X, ?> right, WrapperFunction<Entity> ext) {
-        return rightJoin(clazz, on -> on.eq(left, right), ext);
+        return join(Constant.RIGHT_JOIN, clazz, left, right, ext);
     }
 
     /**
      * ignore 参考 left join
      */
     default <T, X> Children rightJoin(SFunction<T, ?> left, SFunction<X, ?> right, WrapperFunction<Entity> ext) {
-        return rightJoin(LambdaUtils.getEntityClass(left), on -> on.eq(left, right), ext);
+        return join(Constant.RIGHT_JOIN, left, right, ext);
     }
 
     /**
      * ignore 参考 left join
      */
-    default <T> Children rightJoin(Class<T> clazz, WrapperFunction<Entity> function, WrapperFunction<Entity> ext) {
-        return join(Constant.RIGHT_JOIN, clazz, function, ext);
+    default <T, X> Children rightJoin(Class<T> clazz, WrapperBiConsumer<Entity> consumer) {
+        return join(Constant.RIGHT_JOIN, clazz, consumer);
     }
+
 
     /**
      * ignore 参考 left join
      */
     default <T, X> Children innerJoin(Class<T> clazz, SFunction<T, ?> left, SFunction<X, ?> right) {
-        return innerJoin(clazz, on -> on.eq(left, right));
+        return join(Constant.INNER_JOIN, clazz, on -> on.eq(left, right));
     }
 
     /**
      * ignore 参考 left join
      */
     default <T, X> Children innerJoin(SFunction<T, ?> left, SFunction<X, ?> right) {
-        return innerJoin(LambdaUtils.getEntityClass(left), on -> on.eq(left, right));
+        return join(Constant.INNER_JOIN, LambdaUtils.getEntityClass(left), on -> on.eq(left, right));
     }
 
     /**
      * ignore 参考 left join
      */
     default <T> Children innerJoin(Class<T> clazz, WrapperFunction<Entity> function) {
-        return join(Constant.INNER_JOIN, clazz, function, null);
+        return join(Constant.INNER_JOIN, clazz, function);
     }
 
     /**
      * ignore 参考 left join
      */
     default <T, X> Children innerJoin(Class<T> clazz, SFunction<T, ?> left, SFunction<X, ?> right, WrapperFunction<Entity> ext) {
-        return innerJoin(clazz, on -> on.eq(left, right), ext);
+        return join(Constant.INNER_JOIN, clazz, left, right, ext);
     }
 
     /**
      * ignore 参考 left join
      */
     default <T, X> Children innerJoin(SFunction<T, ?> left, SFunction<X, ?> right, WrapperFunction<Entity> ext) {
-        return innerJoin(LambdaUtils.getEntityClass(left), on -> on.eq(left, right), ext);
+        return join(Constant.INNER_JOIN, left, right, ext);
     }
 
     /**
      * ignore 参考 left join
      */
-    default <T> Children innerJoin(Class<T> clazz, WrapperFunction<Entity> function, WrapperFunction<Entity> ext) {
-        return join(Constant.INNER_JOIN, clazz, function, ext);
+    default <T> Children innerJoin(Class<T> clazz, WrapperBiConsumer<Entity> consumer) {
+        return join(Constant.INNER_JOIN, clazz, consumer);
     }
 
 
@@ -167,42 +167,42 @@ public interface QueryJoin<Children, Entity> extends MPJBaseJoin<Entity> {
      * ignore 参考 left join
      */
     default <T, X> Children fullJoin(Class<T> clazz, SFunction<T, ?> left, SFunction<X, ?> right) {
-        return fullJoin(clazz, on -> on.eq(left, right));
+        return join(Constant.FULL_JOIN, clazz, left, right);
     }
 
     /**
      * ignore 参考 left join
      */
     default <T, X> Children fullJoin(SFunction<T, ?> left, SFunction<X, ?> right) {
-        return fullJoin(LambdaUtils.getEntityClass(left), on -> on.eq(left, right));
+        return join(Constant.FULL_JOIN, left, right);
     }
 
     /**
      * ignore 参考 left join
      */
     default <T> Children fullJoin(Class<T> clazz, WrapperFunction<Entity> function) {
-        return join(Constant.FULL_JOIN, clazz, function, null);
+        return join(Constant.FULL_JOIN, clazz, function);
     }
 
     /**
      * ignore 参考 left join
      */
     default <T, X> Children fullJoin(Class<T> clazz, SFunction<T, ?> left, SFunction<X, ?> right, WrapperFunction<Entity> ext) {
-        return fullJoin(clazz, on -> on.eq(left, right), ext);
+        return join(Constant.FULL_JOIN, clazz, left, right, ext);
     }
 
     /**
      * ignore 参考 left join
      */
     default <T, X> Children fullJoin(SFunction<T, ?> left, SFunction<X, ?> right, WrapperFunction<Entity> ext) {
-        return fullJoin(LambdaUtils.getEntityClass(left), on -> on.eq(left, right), ext);
+        return join(Constant.FULL_JOIN, left, right, ext);
     }
 
     /**
      * ignore 参考 left join
      */
-    default <T> Children fullJoin(Class<T> clazz, WrapperFunction<Entity> function, WrapperFunction<Entity> ext) {
-        return join(Constant.FULL_JOIN, clazz, function, ext);
+    default <T> Children fullJoin(Class<T> clazz, WrapperBiConsumer<Entity> consumer) {
+        return join(Constant.FULL_JOIN, clazz, consumer);
     }
 
     /**
@@ -239,7 +239,7 @@ public interface QueryJoin<Children, Entity> extends MPJBaseJoin<Entity> {
      * @param function 条件
      */
     default <T> Children join(String keyWord, Class<T> clazz, WrapperFunction<Entity> function) {
-        return join(keyWord, clazz, function, null);
+        return join(keyWord, clazz, (on, e) -> function.apply(on));
     }
 
     /**
@@ -250,7 +250,10 @@ public interface QueryJoin<Children, Entity> extends MPJBaseJoin<Entity> {
      * @param right 条件
      */
     default <T, X> Children join(String keyWord, Class<T> clazz, SFunction<T, ?> left, SFunction<X, ?> right, WrapperFunction<Entity> ext) {
-        return join(keyWord, clazz, on -> on.eq(left, right), ext);
+        return join(keyWord, clazz, (on, e) -> {
+            on.eq(left, right);
+            ext.apply(e);
+        });
     }
 
     /**
@@ -260,11 +263,11 @@ public interface QueryJoin<Children, Entity> extends MPJBaseJoin<Entity> {
      * @param right 条件
      */
     default <T, X> Children join(String keyWord, SFunction<T, ?> left, SFunction<X, ?> right, WrapperFunction<Entity> ext) {
-        return join(keyWord, LambdaUtils.getEntityClass(left), on -> on.eq(left, right), ext);
+        return join(keyWord, LambdaUtils.getEntityClass(left), left, right, ext);
     }
 
     /**
      * 内部使用, 不建议直接调用
      */
-    <T> Children join(String keyWord, Class<T> clazz, WrapperFunction<Entity> function, WrapperFunction<Entity> ext);
+    <T> Children join(String keyWord, Class<T> clazz, WrapperBiConsumer<Entity> consumer);
 }

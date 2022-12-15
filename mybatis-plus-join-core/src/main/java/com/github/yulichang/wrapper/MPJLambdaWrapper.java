@@ -17,7 +17,7 @@ import com.github.yulichang.toolkit.support.ColumnCache;
 import com.github.yulichang.wrapper.interfaces.Query;
 import com.github.yulichang.wrapper.interfaces.QueryJoin;
 import com.github.yulichang.wrapper.interfaces.QueryLabel;
-import com.github.yulichang.wrapper.interfaces.on.WrapperFunction;
+import com.github.yulichang.wrapper.interfaces.WrapperBiConsumer;
 import com.github.yulichang.wrapper.resultmap.MybatisLabel;
 import com.github.yulichang.wrapper.segments.Select;
 import com.github.yulichang.wrapper.segments.SelectCache;
@@ -92,10 +92,18 @@ public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWr
     private boolean logicSql = true;
 
     /**
-     * 不建议直接 new 该实例，使用 MPJWrappers.<UserDO>lambdaQuery()
+     * 推荐使用 带 class 的构造方法
      */
     public MPJLambdaWrapper() {
         super.initNeed();
+    }
+
+    /**
+     * 推荐使用此构造方法
+     */
+    public MPJLambdaWrapper(Class<T> clazz) {
+        super.initNeed();
+        setEntityClass(clazz);
     }
 
 
@@ -105,7 +113,7 @@ public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWr
     MPJLambdaWrapper(T entity, Class<T> entityClass, SharedString sqlSelect, AtomicInteger paramNameSeq,
                      Map<String, Object> paramNameValuePairs, MergeSegments mergeSegments,
                      SharedString lastSql, SharedString sqlComment, SharedString sqlFirst,
-                     TableList tableList, String index, String keyWord, Class<?> joinClass) {
+                     TableList tableList, String index, String keyWord, Class<?> joinClass, Node node) {
         super.setEntity(entity);
         super.setEntityClass(entityClass);
         this.paramNameSeq = paramNameSeq;
@@ -119,6 +127,7 @@ public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWr
         this.index = index;
         this.keyWord = keyWord;
         this.joinClass = joinClass;
+        this.node = node;
     }
 
 
@@ -220,13 +229,13 @@ public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWr
      */
     @Override
     protected MPJLambdaWrapper<T> instance() {
-        return instance(index, null, null);
+        return instance(index, null, null, this.node);
     }
 
-    protected MPJLambdaWrapper<T> instance(String index, String keyWord, Class<?> joinClass) {
+    protected MPJLambdaWrapper<T> instance(String index, String keyWord, Class<?> joinClass, Node node) {
         return new MPJLambdaWrapper<>(getEntity(), getEntityClass(), null, paramNameSeq, paramNameValuePairs,
                 new MergeSegments(), SharedString.emptyString(), SharedString.emptyString(), SharedString.emptyString(),
-                this.tableList, index, keyWord, joinClass);
+                this.tableList, index, keyWord, joinClass, node);
     }
 
     @Override
@@ -293,17 +302,19 @@ public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWr
      * 调用此方法 keyword 前后需要带空格 比如 " LEFT JOIN "  " RIGHT JOIN "
      */
     @Override
-    public <R> MPJLambdaWrapper<T> join(String keyWord, Class<R> clazz, WrapperFunction<T> function, WrapperFunction<T> ext) {
-        String name = String.valueOf(tableIndex);
-        MPJLambdaWrapper<T> apply = function.apply(instance(name, keyWord, clazz));
-        tableList.add(clazz, name);
-        onWrappers.add(apply);
+    public <R> MPJLambdaWrapper<T> join(String keyWord, Class<R> clazz, WrapperBiConsumer<T> consumer) {
+        Node nnnnn = this.node;
+        String oldIndex = this.getIndex();
+        String newIndex = String.valueOf(tableIndex);
+        Node n = Objects.isNull(oldIndex) ? new Node(clazz, tableIndex, ROOT_NODE) : new Node(clazz, tableIndex, this.node);
+        MPJLambdaWrapper<T> instance = instance(newIndex, keyWord, clazz, n);
+        this.node = n;
+        tableList.add(clazz, newIndex);
+        onWrappers.add(instance);
         tableIndex++;
-        if (Objects.nonNull(ext)) {
-            this.index = name;
-            MPJLambdaWrapper<T> wrapper = ext.apply(typedThis);
-            wrapper.index = null;
-        }
+        this.index = newIndex;
+        consumer.accept(instance, typedThis);
+        this.index = oldIndex;
         return typedThis;
     }
 }

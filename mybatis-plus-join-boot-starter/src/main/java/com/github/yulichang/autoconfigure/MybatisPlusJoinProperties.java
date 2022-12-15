@@ -24,4 +24,9 @@ public class MybatisPlusJoinProperties {
      * 连表查询副表是否启用逻辑删除(前提是MP配置了逻辑删除)
      */
     private Boolean subTableLogic = true;
+
+    /**
+     * MappedStatement缓存
+     */
+    private boolean msCache = true;
 }

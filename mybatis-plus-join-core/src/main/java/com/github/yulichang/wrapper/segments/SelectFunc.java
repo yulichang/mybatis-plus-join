@@ -98,4 +98,9 @@ public class SelectFunc implements Select {
     public boolean isLabel() {
         return false;
     }
+
+    @Override
+    public boolean isStr() {
+        return false;
+    }
 }

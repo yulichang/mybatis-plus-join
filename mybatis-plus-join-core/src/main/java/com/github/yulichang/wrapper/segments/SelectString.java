@@ -1,87 +1,86 @@
 package com.github.yulichang.wrapper.segments;
 
-
 import com.baomidou.mybatisplus.core.metadata.TableFieldInfo;
 import com.github.yulichang.wrapper.enums.BaseFuncEnum;
-import lombok.Getter;
 import org.apache.ibatis.type.TypeHandler;
 
 /**
- * 别名列
+ * 自定义字符串列
  *
  * @author yulichang
- * @since 1.3.10
+ * @since 1.3.12
  */
-@Getter
-public class SelectAlias implements Select {
+public class SelectString implements Select {
+    private final String column;
 
-    private final SelectCache cache;
-
-    private final String index;
-
-    private final boolean hasAlias;
-
-    private final String alias;
-
-    public SelectAlias(SelectCache cache, String index, String alias) {
-        this.cache = cache;
-        this.index = index;
-        this.hasAlias = true;
-        this.alias = alias;
+    public SelectString(String column) {
+        this.column = column;
     }
-
 
     @Override
     public Class<?> getClazz() {
-        return cache.getClazz();
+        return null;
     }
 
+    @Override
+    public String getIndex() {
+        return null;
+    }
 
     @Override
     public boolean isPk() {
-        return cache.isPk();
+        return false;
     }
 
     @Override
     public String getColumn() {
-        return cache.getColumn();
+        return column;
     }
 
     @Override
     public Class<?> getColumnType() {
-        return cache.getColumnType();
+        return null;
     }
 
     @Override
     public String getTagColumn() {
-        return cache.getTagColumn();
+        return null;
     }
 
     @Override
     public String getColumProperty() {
-        return cache.getColumProperty();
+        return null;
     }
 
     @Override
     public boolean hasTypeHandle() {
-        return cache.isHasTypeHandle();
+        return false;
     }
 
     @Override
     public TypeHandler<?> getTypeHandle() {
-        return cache.getTypeHandler();
+        return null;
+    }
+
+    @Override
+    public boolean isHasAlias() {
+        return false;
+    }
+
+    @Override
+    public String getAlias() {
+        return null;
     }
 
     @Override
     public TableFieldInfo getTableFieldInfo() {
-        return cache.getTableFieldInfo();
+        return null;
     }
 
     @Override
     public boolean isFunc() {
         return false;
     }
-
 
     @Override
     public BaseFuncEnum getFunc() {
@@ -95,6 +94,6 @@ public class SelectAlias implements Select {
 
     @Override
     public boolean isStr() {
-        return false;
+        return true;
     }
 }

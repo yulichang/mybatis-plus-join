@@ -13,6 +13,7 @@ import com.github.yulichang.wrapper.segments.*;
 
 import java.io.Serializable;
 import java.lang.reflect.Field;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
@@ -56,6 +57,16 @@ public interface Query<Children> extends Serializable {
 
     @SuppressWarnings("unchecked")
     <E> Children select(SFunction<E, ?>... columns);
+
+    /**
+     * String 查询
+     *
+     * @param columns 列
+     */
+    default Children select(String... columns) {
+        getSelectColum().addAll(Arrays.stream(columns).map(SelectString::new).collect(Collectors.toList()));
+        return getChildren();
+    }
 
     /**
      * 说明：

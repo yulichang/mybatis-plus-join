@@ -93,4 +93,9 @@ public class SelectNormal implements Select {
     public boolean isLabel() {
         return false;
     }
+
+    @Override
+    public boolean isStr() {
+        return false;
+    }
 }

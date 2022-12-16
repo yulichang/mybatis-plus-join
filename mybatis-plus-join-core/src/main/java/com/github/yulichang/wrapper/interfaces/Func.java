@@ -12,7 +12,7 @@ import java.util.function.Consumer;
  * <p>
  * copy {@link com.baomidou.mybatisplus.core.conditions.interfaces.Func}
  */
-@SuppressWarnings({"unchecked", "unused"})
+@SuppressWarnings({"unchecked", "unused", "JavadocDeclaration"})
 public interface Func<Children> extends Serializable {
 
     /**
@@ -167,6 +167,83 @@ public interface Func<Children> extends Serializable {
      * @return children
      */
     <R> Children notInSql(boolean condition, SFunction<R, ?> column, String inValue);
+
+
+    /**
+     * 字段 &gt; ( sql语句 )
+     * <p>例1: gtSql("id", "1, 2, 3, 4, 5, 6")</p>
+     * <p>例1: gtSql("id", "select id from table where name = 'JunJun'")</p>
+     *
+     * @param condition
+     * @param column
+     * @param inValue
+     * @return
+     */
+    <R> Children gtSql(boolean condition, SFunction<R, ?> column, String inValue);
+
+    /**
+     * ignore
+     */
+    default <R> Children gtSql(SFunction<R, ?> column, String inValue) {
+        return gtSql(true, column, inValue);
+    }
+
+    /**
+     * 字段 >= ( sql语句 )
+     * <p>例1: geSql("id", "1, 2, 3, 4, 5, 6")</p>
+     * <p>例1: geSql("id", "select id from table where name = 'JunJun'")</p>
+     *
+     * @param condition
+     * @param column
+     * @param inValue
+     * @return
+     */
+    <R> Children geSql(boolean condition, SFunction<R, ?> column, String inValue);
+
+    /**
+     * ignore
+     */
+    default <R> Children geSql(SFunction<R, ?> column, String inValue) {
+        return geSql(true, column, inValue);
+    }
+
+    /**
+     * 字段 &lt; ( sql语句 )
+     * <p>例1: ltSql("id", "1, 2, 3, 4, 5, 6")</p>
+     * <p>例1: ltSql("id", "select id from table where name = 'JunJun'")</p>
+     *
+     * @param condition
+     * @param column
+     * @param inValue
+     * @return
+     */
+    <R> Children ltSql(boolean condition, SFunction<R, ?> column, String inValue);
+
+    /**
+     * ignore
+     */
+    default <R> Children ltSql(SFunction<R, ?> column, String inValue) {
+        return ltSql(true, column, inValue);
+    }
+
+    /**
+     * 字段 <= ( sql语句 )
+     * <p>例1: leSql("id", "1, 2, 3, 4, 5, 6")</p>
+     * <p>例1: leSql("id", "select id from table where name = 'JunJun'")</p>
+     *
+     * @param condition
+     * @param column
+     * @param inValue
+     * @return
+     */
+    <R> Children leSql(boolean condition, SFunction<R, ?> column, String inValue);
+
+    /**
+     * ignore
+     */
+    default <R> Children leSql(SFunction<R, ?> column, String inValue) {
+        return leSql(true, column, inValue);
+    }
 
     /**
      * ignore

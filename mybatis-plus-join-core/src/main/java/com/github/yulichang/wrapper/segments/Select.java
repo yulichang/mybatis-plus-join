@@ -41,4 +41,6 @@ public interface Select {
     BaseFuncEnum getFunc();
 
     boolean isLabel();
+
+    boolean isStr();
 }

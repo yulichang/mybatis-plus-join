@@ -1,7 +1,5 @@
 package com.github.yulichang.wrapper.interfaces;
 
-import com.github.yulichang.wrapper.MPJLambdaWrapper;
-
 /**
  * on function
  *
@@ -11,5 +9,5 @@ import com.github.yulichang.wrapper.MPJLambdaWrapper;
 @FunctionalInterface
 public interface WrapperFunction<T> {
 
-    MPJLambdaWrapper<T> apply(MPJLambdaWrapper<T> wrapper);
+    T apply(T wrapper);
 }

@@ -12,12 +12,8 @@ import com.baomidou.mybatisplus.core.toolkit.sql.SqlUtils;
 import com.baomidou.mybatisplus.core.toolkit.sql.StringEscape;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.github.yulichang.toolkit.sql.SqlScriptUtils;
-import com.github.yulichang.wrapper.interfaces.Compare;
-import com.github.yulichang.wrapper.interfaces.Func;
-import com.github.yulichang.wrapper.interfaces.Join;
-import com.github.yulichang.wrapper.interfaces.OnCompare;
+import com.github.yulichang.wrapper.interfaces.*;
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.Getter;
 
 import java.util.*;
@@ -37,7 +33,8 @@ import static java.util.stream.Collectors.joining;
  */
 @SuppressWarnings("ALL")
 public abstract class MPJAbstractWrapper<T, Children extends MPJAbstractWrapper<T, Children>> extends Wrapper<T>
-        implements Compare<Children>, Nested<Children, Children>, Join<Children>, Func<Children>, OnCompare<Children> {
+        implements Compare<Children>, Nested<Children, Children>, Join<Children>, Func<Children>, OnCompare<Children>,
+        CompareStr<Children, String>, FuncStr<Children, String> {
 
     protected static final Node ROOT_NODE = new Node(null, 0, null);
 
@@ -323,11 +320,36 @@ public abstract class MPJAbstractWrapper<T, Children extends MPJAbstractWrapper<
                 () -> String.format("(%s)", inValue)));
     }
 
+
+    @Override
+    public <X> Children gtSql(boolean condition, SFunction<X, ?> column, String inValue) {
+        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(index, column, false), GT,
+                () -> String.format("(%s)", inValue)));
+    }
+
+    @Override
+    public <X> Children geSql(boolean condition, SFunction<X, ?> column, String inValue) {
+        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(index, column, false), GE,
+                () -> String.format("(%s)", inValue)));
+    }
+
+    @Override
+    public <X> Children ltSql(boolean condition, SFunction<X, ?> column, String inValue) {
+        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(index, column, false), LT,
+                () -> String.format("(%s)", inValue)));
+    }
+
+    @Override
+    public <X> Children leSql(boolean condition, SFunction<X, ?> column, String inValue) {
+        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(index, column, false), LE,
+                () -> String.format("(%s)", inValue)));
+    }
+
     @Override
     public <R> Children groupBy(boolean condition, List<SFunction<R, ?>> columns) {
         return maybeDo(condition, () -> {
             if (CollectionUtils.isNotEmpty(columns)) {
-                String one = (StringPool.COMMA + columnsToString(index, getByClass(node, joinClass), false, columns));
+                String one = (StringPool.COMMA + columnsToString(index, getByClass(node, joinClass), false, parentClass(node), columns));
                 final String finalOne = one;
                 appendSqlSegments(GROUP_BY, () -> finalOne);
             }
@@ -337,9 +359,9 @@ public abstract class MPJAbstractWrapper<T, Children extends MPJAbstractWrapper<
     @Override
     public <X> Children groupBy(boolean condition, SFunction<X, ?> column, SFunction<X, ?>... columns) {
         return maybeDo(condition, () -> {
-            String one = columnToString(index, getByClass(node, joinClass), column, false);
+            String one = columnToString(index, getByClass(node, joinClass), column, false, parentClass(node));
             if (ArrayUtils.isNotEmpty(columns)) {
-                one += (StringPool.COMMA + columnsToString(index, getByClass(node, joinClass), false, columns));
+                one += (StringPool.COMMA + columnsToString(index, getByClass(node, joinClass), false, parentClass(node), columns));
             }
             final String finalOne = one;
             appendSqlSegments(GROUP_BY, () -> finalOne);
@@ -426,6 +448,11 @@ public abstract class MPJAbstractWrapper<T, Children extends MPJAbstractWrapper<
                 () -> formatParam(null, SqlUtils.concatLike(val, sqlLike))));
     }
 
+    protected Children likeValue(boolean condition, SqlKeyword keyword, String column, Object val, SqlLike sqlLike) {
+        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(column), keyword,
+                () -> formatParam(null, SqlUtils.concatLike(val, sqlLike))));
+    }
+
     /**
      * 普通查询条件
      *
@@ -440,9 +467,13 @@ public abstract class MPJAbstractWrapper<T, Children extends MPJAbstractWrapper<
     }
 
     protected <X, S> Children addCondition(boolean condition, SFunction<X, ?> column, SqlKeyword sqlKeyword, SFunction<S, ?> val) {
-        Node nnnn = this.node;
         return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(index, column, false), sqlKeyword,
                 columnToSqlSegment(index, val, true)));
+    }
+
+    protected Children addCondition(boolean condition, String column, SqlKeyword sqlKeyword, Object val) {
+        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(column), sqlKeyword,
+                () -> formatParam(null, val)));
     }
 
     /**
@@ -626,23 +657,40 @@ public abstract class MPJAbstractWrapper<T, Children extends MPJAbstractWrapper<
      * 获取 columnName
      */
     protected final <X> ISqlSegment columnToSqlSegment(String index, SFunction<X, ?> column, boolean isJoin) {
-        return () -> columnToString(index, getByClass(node, joinClass), column, isJoin);
+        return () -> columnToString(index, getByClass(node, joinClass), column, isJoin, parentClass(node));
+    }
+
+    protected final <X> ISqlSegment columnToSqlSegment(String column) {
+        return () -> (String) column;
     }
 
     /**
      * 获取 columnName
      */
-    protected <X> String columnToString(String index, int node, X column, boolean isJoin) {
+    protected <X> String columnToString(String index, int node, X column, boolean isJoin, Class<?> parent) {
         return (String) column;
     }
+
+    protected String columnToString(String column) {
+        return column;
+    }
+
+    protected String columnsToString(List<String> columns) {
+        return columns.stream().map(this::columnToString).collect(joining(StringPool.COMMA));
+    }
+
+    protected String columnsToString(String... columns) {
+        return Arrays.stream(columns).map(this::columnToString).collect(joining(StringPool.COMMA));
+    }
+
 
     /**
      * 多字段转换为逗号 "," 分割字符串
      *
      * @param columns 多字段
      */
-    protected <X> String columnsToString(String index, int node, boolean isJoin, X... columns) {
-        return Arrays.stream(columns).map(i -> this.columnToString(index, node, i, isJoin)).collect(joining(StringPool.COMMA));
+    protected <X> String columnsToString(String index, int node, boolean isJoin, Class<?> parent, X... columns) {
+        return Arrays.stream(columns).map(i -> this.columnToString(index, node, i, isJoin, parent)).collect(joining(StringPool.COMMA));
     }
 
     @Override
@@ -692,8 +740,7 @@ public abstract class MPJAbstractWrapper<T, Children extends MPJAbstractWrapper<
         return addCondition(condition, column, LE, val);
     }
 
-
-    @Data
+    @Getter
     @AllArgsConstructor
     public static class Node {
 
@@ -715,6 +762,13 @@ public abstract class MPJAbstractWrapper<T, Children extends MPJAbstractWrapper<
         return 0;
     }
 
+    private Class<?> parentClass(Node node) {
+        if (node == null || node.parent == null) {
+            return null;
+        }
+        return node.parent.clazz;
+    }
+
     private int dg(Node node, Class<?> joinClass) {
 
         if (node.clazz != null && node.clazz == joinClass) {
@@ -725,4 +779,225 @@ public abstract class MPJAbstractWrapper<T, Children extends MPJAbstractWrapper<
         }
         return getByClass(node.parent, joinClass);
     }
+
+    /* ****************************************** **/
+
+
+    @Override
+    public <V> Children allEqStr(boolean condition, Map<String, V> params, boolean null2IsNull) {
+        if (condition && CollectionUtils.isNotEmpty(params)) {
+            params.forEach((k, v) -> {
+                if (StringUtils.checkValNotNull(v)) {
+                    eq(k, v);
+                } else {
+                    if (null2IsNull) {
+                        isNull(k);
+                    }
+                }
+            });
+        }
+        return typedThis;
+    }
+
+    @Override
+    public <V> Children allEqStr(boolean condition, BiPredicate<String, V> filter, Map<String, V> params, boolean null2IsNull) {
+        if (condition && CollectionUtils.isNotEmpty(params)) {
+            params.forEach((k, v) -> {
+                if (filter.test(k, v)) {
+                    if (StringUtils.checkValNotNull(v)) {
+                        eq(k, v);
+                    } else {
+                        if (null2IsNull) {
+                            isNull(k);
+                        }
+                    }
+                }
+            });
+        }
+        return typedThis;
+    }
+
+    @Override
+    public Children eq(boolean condition, String column, Object val) {
+        return addCondition(condition, column, EQ, val);
+    }
+
+    @Override
+    public Children ne(boolean condition, String column, Object val) {
+        return addCondition(condition, column, NE, val);
+    }
+
+    @Override
+    public Children gt(boolean condition, String column, Object val) {
+        return addCondition(condition, column, GT, val);
+    }
+
+    @Override
+    public Children ge(boolean condition, String column, Object val) {
+        return addCondition(condition, column, GE, val);
+    }
+
+    @Override
+    public Children lt(boolean condition, String column, Object val) {
+        return addCondition(condition, column, LT, val);
+    }
+
+    @Override
+    public Children le(boolean condition, String column, Object val) {
+        return addCondition(condition, column, LE, val);
+    }
+
+    @Override
+    public Children like(boolean condition, String column, Object val) {
+        return likeValue(condition, LIKE, column, val, SqlLike.DEFAULT);
+    }
+
+    @Override
+    public Children notLike(boolean condition, String column, Object val) {
+        return likeValue(condition, NOT_LIKE, column, val, SqlLike.DEFAULT);
+    }
+
+    @Override
+    public Children likeLeft(boolean condition, String column, Object val) {
+        return likeValue(condition, LIKE, column, val, SqlLike.LEFT);
+    }
+
+    @Override
+    public Children likeRight(boolean condition, String column, Object val) {
+        return likeValue(condition, LIKE, column, val, SqlLike.RIGHT);
+    }
+
+    @Override
+    public Children between(boolean condition, String column, Object val1, Object val2) {
+        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(column), BETWEEN,
+                () -> formatParam(null, val1), AND, () -> formatParam(null, val2)));
+    }
+
+    @Override
+    public Children notBetween(boolean condition, String column, Object val1, Object val2) {
+        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(column), NOT_BETWEEN,
+                () -> formatParam(null, val1), AND, () -> formatParam(null, val2)));
+    }
+
+
+    /* ****************************************** **/
+
+
+    @Override
+    public Children isNull(boolean condition, String column) {
+        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(column), IS_NULL));
+    }
+
+    @Override
+    public Children isNotNull(boolean condition, String column) {
+        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(column), IS_NOT_NULL));
+    }
+
+    @Override
+    public Children in(boolean condition, String column, Collection<?> coll) {
+        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(column), IN, inExpression(coll)));
+    }
+
+    @Override
+    public Children in(boolean condition, String column, Object... values) {
+        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(column), IN, inExpression(values)));
+    }
+
+    @Override
+    public Children notIn(boolean condition, String column, Collection<?> coll) {
+        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(column), NOT_IN, inExpression(coll)));
+    }
+
+    @Override
+    public Children notIn(boolean condition, String column, Object... values) {
+        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(column), NOT_IN, inExpression(values)));
+    }
+
+    @Override
+    public Children inSql(boolean condition, String column, String inValue) {
+        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(column), IN,
+                () -> String.format("(%s)", inValue)));
+    }
+
+    @Override
+    public Children gtSql(boolean condition, String column, String inValue) {
+        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(column), GT,
+                () -> String.format("(%s)", inValue)));
+    }
+
+    @Override
+    public Children geSql(boolean condition, String column, String inValue) {
+        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(column), GE,
+                () -> String.format("(%s)", inValue)));
+    }
+
+    @Override
+    public Children ltSql(boolean condition, String column, String inValue) {
+        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(column), LT,
+                () -> String.format("(%s)", inValue)));
+    }
+
+    @Override
+    public Children leSql(boolean condition, String column, String inValue) {
+        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(column), LE,
+                () -> String.format("(%s)", inValue)));
+    }
+
+    @Override
+    public Children notInSql(boolean condition, String column, String inValue) {
+        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(column), NOT_IN,
+                () -> String.format("(%s)", inValue)));
+    }
+
+    @Override
+    public Children groupBy(boolean condition, String column, String... columns) {
+        return maybeDo(condition, () -> {
+            String one = columnToString(column);
+            if (ArrayUtils.isNotEmpty(columns)) {
+                one += (StringPool.COMMA + columnsToString(columns));
+            }
+            final String finalOne = one;
+            appendSqlSegments(GROUP_BY, () -> finalOne);
+        });
+    }
+
+    @Override
+    public final Children orderBy(boolean condition, boolean isAsc, String column, String... columns) {
+        return maybeDo(condition, () -> {
+            final SqlKeyword mode = isAsc ? ASC : DESC;
+            appendSqlSegments(ORDER_BY, columnToSqlSegment(columnSqlInjectFilter(column)), mode);
+            if (ArrayUtils.isNotEmpty(columns)) {
+                Arrays.stream(columns).forEach(c -> appendSqlSegments(ORDER_BY,
+                        columnToSqlSegment(columnSqlInjectFilter(c)), mode));
+            }
+        });
+    }
+
+    protected String columnSqlInjectFilter(String column) {
+        return StringUtils.sqlInjectionReplaceBlank(column);
+    }
+
+    @Override
+    public Children groupBy(boolean condition, String column) {
+        return maybeDo(condition, () -> appendSqlSegments(GROUP_BY, () -> columnToString(column)));
+    }
+
+    @Override
+    public Children groupByStr(boolean condition, List<String> columns) {
+        return maybeDo(condition, () -> appendSqlSegments(GROUP_BY, () -> columnsToString(columns)));
+    }
+
+    @Override
+    public Children orderBy(boolean condition, boolean isAsc, String column) {
+        return maybeDo(condition, () -> appendSqlSegments(ORDER_BY, columnToSqlSegment(columnSqlInjectFilter(column)),
+                isAsc ? ASC : DESC));
+    }
+
+    @Override
+    public Children orderByStr(boolean condition, boolean isAsc, List<String> columns) {
+        return maybeDo(condition, () -> columns.forEach(c -> appendSqlSegments(ORDER_BY,
+                columnToSqlSegment(columnSqlInjectFilter(c)), isAsc ? ASC : DESC)));
+    }
+
+
 }

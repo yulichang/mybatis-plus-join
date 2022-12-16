@@ -116,4 +116,9 @@ public class SelectLabel implements Select {
     public boolean isLabel() {
         return true;
     }
+
+    @Override
+    public boolean isStr() {
+        return false;
+    }
 }

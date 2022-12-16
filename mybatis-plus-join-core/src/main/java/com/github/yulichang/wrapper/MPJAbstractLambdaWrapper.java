@@ -32,19 +32,19 @@ public abstract class MPJAbstractLambdaWrapper<T, Children extends MPJAbstractLa
 
 
     @Override
-    protected <X> String columnToString(String index, int node, X column, boolean isJoin) {
-        return columnToString(index, node, (SFunction<?, ?>) column, isJoin);
+    protected <X> String columnToString(String index, int node, X column, boolean isJoin, Class<?> parent) {
+        return columnToString(index, node, (SFunction<?, ?>) column, isJoin, parent);
     }
 
     @Override
     @SafeVarargs
-    protected final <X> String columnsToString(String index, int node, boolean isJoin, X... columns) {
-        return Arrays.stream(columns).map(i -> columnToString(index, node, (SFunction<?, ?>) i, isJoin)).collect(joining(StringPool.COMMA));
+    protected final <X> String columnsToString(String index, int node, boolean isJoin, Class<?> parent, X... columns) {
+        return Arrays.stream(columns).map(i -> columnToString(index, node, (SFunction<?, ?>) i, isJoin, parent)).collect(joining(StringPool.COMMA));
     }
 
-    protected String columnToString(String index, int node, SFunction<?, ?> column, boolean isJoin) {
+    protected String columnToString(String index, int node, SFunction<?, ?> column, boolean isJoin, Class<?> parent) {
         Class<?> entityClass = LambdaUtils.getEntityClass(column);
-        return Constant.TABLE_ALIAS + getDefault(index, node, entityClass, isJoin) + StringPool.DOT +
+        return Constant.TABLE_ALIAS + getDefault(index, node, entityClass, isJoin, parent) + StringPool.DOT +
                 getCache(column).getTagColumn();
     }
 
@@ -54,7 +54,7 @@ public abstract class MPJAbstractLambdaWrapper<T, Children extends MPJAbstractLa
         return cacheMap.get(LambdaUtils.getName(fn));
     }
 
-    protected String getDefault(String index, int node, Class<?> clazz, boolean isJoin) {
+    protected String getDefault(String index, int node, Class<?> clazz, boolean isJoin, Class<?> parent) {
         if (Objects.isNull(index)) {
             if (!isJoin && Objects.equals(clazz, getEntityClass())) {
                 return StringPool.EMPTY;
@@ -65,7 +65,7 @@ public abstract class MPJAbstractLambdaWrapper<T, Children extends MPJAbstractLa
         }
         Table table = tableList.get(clazz, index);
         if (Objects.nonNull(table.getIndex())) {
-            if (isJoin && clazz == getEntityClass()) {
+            if (isJoin && (Objects.equals(clazz, getEntityClass()) || Objects.equals(parent, clazz))) {
                 if (node == -1) {
                     return StringPool.EMPTY;
                 } else if (node == 0) {
@@ -218,4 +218,6 @@ public abstract class MPJAbstractLambdaWrapper<T, Children extends MPJAbstractLa
 
         private final String index;
     }
+
+
 }

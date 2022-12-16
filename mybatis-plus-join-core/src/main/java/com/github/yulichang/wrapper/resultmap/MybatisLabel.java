@@ -212,6 +212,7 @@ public class MybatisLabel<E, T> {
 
         private void autoBuild(boolean auto, Class<E> entityClass, Class<T> tagClass) {
             TableInfo tableInfo = TableInfoHelper.getTableInfo(entityClass);
+            Assert.notNull(tableInfo, "table not find by class <%s>", entityClass.getSimpleName());
             Map<String, Field> tagMap = MPJReflectionKit.getFieldMap(tagClass);
             if (auto && !tagMap.isEmpty()) {
                 List<SelectCache> listField = ColumnCache.getListField(entityClass);

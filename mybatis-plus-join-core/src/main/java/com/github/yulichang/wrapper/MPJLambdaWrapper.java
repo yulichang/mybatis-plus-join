@@ -2,11 +2,9 @@ package com.github.yulichang.wrapper;
 
 import com.baomidou.mybatisplus.core.conditions.SharedString;
 import com.baomidou.mybatisplus.core.conditions.segments.MergeSegments;
+import com.baomidou.mybatisplus.core.metadata.TableInfo;
 import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
-import com.baomidou.mybatisplus.core.toolkit.ArrayUtils;
-import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
-import com.baomidou.mybatisplus.core.toolkit.StringPool;
-import com.baomidou.mybatisplus.core.toolkit.StringUtils;
+import com.baomidou.mybatisplus.core.toolkit.*;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.github.yulichang.config.ConfigProperties;
 import com.github.yulichang.toolkit.Constant;
@@ -202,7 +200,9 @@ public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWr
         if (StringUtils.isBlank(from.getStringValue())) {
             StringBuilder value = new StringBuilder();
             for (MPJLambdaWrapper<?> wrapper : onWrappers) {
-                String tableName = TableInfoHelper.getTableInfo(wrapper.getJoinClass()).getTableName();
+                TableInfo info = TableInfoHelper.getTableInfo(wrapper.getJoinClass());
+                Assert.notNull(info, "table not find by class <%s>", wrapper.getJoinClass().getSimpleName());
+                String tableName = info.getTableName();
                 value.append(StringPool.SPACE)
                         .append(wrapper.getKeyWord())
                         .append(StringPool.SPACE)

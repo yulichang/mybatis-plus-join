@@ -33,7 +33,7 @@ public class LogicInfoUtils implements Constants {
     private static String getLogicStr(String tableIndex, Class<?> clazz) {
         String logicStr;
         TableInfo tableInfo = TableInfoHelper.getTableInfo(clazz);
-        Assert.notNull(tableInfo, "%s 不是数据库实体或没有注册到mybatis plus中", clazz.getName());
+        Assert.notNull(tableInfo, "table not find by class <%s>", clazz.getSimpleName());
         if (tableInfo.isWithLogicDelete() && Objects.nonNull(tableInfo.getLogicDeleteFieldInfo())) {
             final String value = tableInfo.getLogicDeleteFieldInfo().getLogicNotDeleteValue();
             if (NULL.equalsIgnoreCase(value)) {

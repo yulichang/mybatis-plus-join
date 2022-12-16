@@ -3,6 +3,7 @@ package com.github.yulichang.wrapper.interfaces;
 import com.baomidou.mybatisplus.core.metadata.TableFieldInfo;
 import com.baomidou.mybatisplus.core.metadata.TableInfo;
 import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
+import com.baomidou.mybatisplus.core.toolkit.Assert;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.github.yulichang.toolkit.LambdaUtils;
 import com.github.yulichang.toolkit.MPJReflectionKit;
@@ -48,6 +49,7 @@ public interface Query<Children> extends Serializable {
      */
     default <E> Children select(Class<E> entityClass, Predicate<TableFieldInfo> predicate) {
         TableInfo info = TableInfoHelper.getTableInfo(entityClass);
+        Assert.notNull(info, "table not find by class <%s>", entityClass.getSimpleName());
         Map<String, SelectCache> cacheMap = ColumnCache.getMapField(entityClass);
         info.getFieldList().stream().filter(predicate).collect(Collectors.toList()).forEach(
                 i -> getSelectColum().add(new SelectNormal(cacheMap.get(i.getProperty()), getIndex())));

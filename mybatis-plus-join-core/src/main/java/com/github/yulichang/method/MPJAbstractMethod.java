@@ -4,7 +4,7 @@ import com.baomidou.mybatisplus.core.injector.AbstractMethod;
 import com.baomidou.mybatisplus.core.metadata.TableInfo;
 import com.baomidou.mybatisplus.core.toolkit.StringPool;
 import com.baomidou.mybatisplus.core.toolkit.sql.SqlScriptUtils;
-import com.github.yulichang.toolkit.Constant;
+import com.github.yulichang.config.ConfigProperties;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -43,7 +43,7 @@ public abstract class MPJAbstractMethod extends AbstractMethod implements MPJBas
             String[] columns = selectColumns.split(StringPool.COMMA);
             List<String> selectColumnList = new ArrayList<>();
             for (String c : columns) {
-                selectColumnList.add(Constant.TABLE_ALIAS + StringPool.DOT + c);
+                selectColumnList.add(ConfigProperties.tableAlias + StringPool.DOT + c);
             }
             selectColumns = String.join(StringPool.COMMA, selectColumnList);
         }

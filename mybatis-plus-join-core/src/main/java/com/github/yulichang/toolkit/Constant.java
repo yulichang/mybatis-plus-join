@@ -6,10 +6,6 @@ import com.baomidou.mybatisplus.core.toolkit.StringPool;
  * @author yulichang
  */
 public interface Constant {
-    /**
-     * 表别名
-     */
-    String TABLE_ALIAS = "t";
 
     String AS = " AS ";
 
@@ -28,9 +24,9 @@ public interface Constant {
     String CLAZZ = "resultTypeClass_Eg1sG";
 
     /**
-     * " LEFT JOIN "
+     * "LEFT JOIN"
      */
-    String LEFT_JOIN = StringPool.SPACE + LEFT + StringPool.SPACE + JOIN + StringPool.SPACE;
+    String LEFT_JOIN = LEFT + StringPool.SPACE + JOIN;
 
     /**
      * "RIGHT JOIN"
@@ -46,9 +42,4 @@ public interface Constant {
      * "FULL JOIN"
      */
     String FULL_JOIN = FULL + StringPool.SPACE + JOIN;
-
-    /**
-     * " t"
-     */
-    String SPACE_TABLE_ALIAS = StringPool.SPACE + Constant.TABLE_ALIAS;
 }

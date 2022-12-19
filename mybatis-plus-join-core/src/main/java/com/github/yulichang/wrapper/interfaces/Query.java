@@ -17,6 +17,7 @@ import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -160,6 +161,16 @@ public interface Query<Children> extends Serializable {
         return selectFunc(funcEnum, column, LambdaUtils.getName(alias));
     }
 
+
+    default <X> Children selectFunc(String sql, Function<SelectFunc.Func, SFunction<?, ?>[]> column, String alias) {
+        getSelectColum().add(new SelectFunc(alias, getIndex(), () -> sql, column.apply(new SelectFunc.Func())));
+        return getChildren();
+    }
+
+    default <X, S> Children selectFunc(String sql, Function<SelectFunc.Func, SFunction<?, ?>[]> column, SFunction<S, ?> alias) {
+        getSelectColum().add(new SelectFunc(LambdaUtils.getName(alias), getIndex(), () -> sql, column.apply(new SelectFunc.Func())));
+        return getChildren();
+    }
 
     /* 默认聚合函数扩展 */
 

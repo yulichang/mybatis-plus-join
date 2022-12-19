@@ -1,8 +1,10 @@
 package com.github.yulichang.wrapper;
 
+import com.baomidou.mybatisplus.core.conditions.SharedString;
+import com.baomidou.mybatisplus.core.conditions.segments.MergeSegments;
 import com.baomidou.mybatisplus.core.toolkit.StringPool;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
-import com.github.yulichang.toolkit.Constant;
+import com.github.yulichang.config.ConfigProperties;
 import com.github.yulichang.toolkit.LambdaUtils;
 import com.github.yulichang.toolkit.support.ColumnCache;
 import com.github.yulichang.wrapper.segments.Select;
@@ -10,8 +12,10 @@ import com.github.yulichang.wrapper.segments.SelectCache;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.joining;
@@ -26,9 +30,22 @@ public abstract class MPJAbstractLambdaWrapper<T, Children extends MPJAbstractLa
         extends MPJAbstractWrapper<T, Children> {
 
     /**
+     * 主表别名
+     */
+    protected String alias = ConfigProperties.tableAlias;
+    /**
+     * 是否构建是否存在一对多
+     */
+    @Getter
+    protected boolean resultMap = false;
+    /**
+     * 表序号
+     */
+    protected int tableIndex = 1;
+    /**
      * 关联的表
      */
-    protected TableList tableList = new TableList();
+    protected TableList tableList;
 
 
     @Override
@@ -44,7 +61,7 @@ public abstract class MPJAbstractLambdaWrapper<T, Children extends MPJAbstractLa
 
     protected String columnToString(String index, int node, SFunction<?, ?> column, boolean isJoin, Class<?> parent) {
         Class<?> entityClass = LambdaUtils.getEntityClass(column);
-        return Constant.TABLE_ALIAS + getDefault(index, node, entityClass, isJoin, parent) + StringPool.DOT +
+        return getDefault(index, node, entityClass, isJoin, parent) + StringPool.DOT +
                 getCache(column).getTagColumn();
     }
 
@@ -54,34 +71,41 @@ public abstract class MPJAbstractLambdaWrapper<T, Children extends MPJAbstractLa
         return cacheMap.get(LambdaUtils.getName(fn));
     }
 
+    /**
+     * 返回前缀
+     */
     protected String getDefault(String index, int node, Class<?> clazz, boolean isJoin, Class<?> parent) {
+        //外层where条件
         if (Objects.isNull(index)) {
             if (!isJoin && Objects.equals(clazz, getEntityClass())) {
-                return StringPool.EMPTY;
+                return this.alias;
             }
             //正序
             Table table = tableList.getPositive(clazz);
-            return Objects.isNull(table.index) ? StringPool.EMPTY : table.index;
+            return table.hasAlias ? table.alias : (table.alias + (Objects.isNull(table.index) ? StringPool.EMPTY : table.index));
         }
         Table table = tableList.get(clazz, index);
+        if (table.hasAlias) {
+            return table.alias;
+        }
         if (Objects.nonNull(table.getIndex())) {
             if (isJoin && (Objects.equals(clazz, getEntityClass()) || Objects.equals(parent, clazz))) {
                 if (node == -1) {
-                    return StringPool.EMPTY;
+                    return table.alias;
                 } else if (node == 0) {
                     //除自己以外的倒序第一个
                     Table t = tableList.getOrElse(clazz, index);
                     if (Objects.isNull(t.getIndex())) {
-                        return StringPool.EMPTY;
+                        return t.alias;
                     }
-                    return t.getIndex();
+                    return t.alias + t.getIndex();
                 } else {
-                    return String.valueOf(node);
+                    return table.alias + node;
                 }
             }
-            return table.getIndex();
+            return table.alias + table.getIndex();
         }
-        return StringPool.EMPTY;
+        return table.alias;
     }
 
     protected String getDefaultSelect(String index, Class<?> clazz, Select s) {
@@ -111,12 +135,16 @@ public abstract class MPJAbstractLambdaWrapper<T, Children extends MPJAbstractLa
 
     public static class TableList {
 
-        private static final Table DEFAULT_TABLE = new Table(null, StringPool.EMPTY);
+        private final Table DEFAULT_TABLE;
+
+        public TableList(Class<?> clazz, String index, String alias) {
+            DEFAULT_TABLE = new Table(clazz, index, false, alias);
+        }
 
         private final List<Table> list = new ArrayList<>();
 
-        public void add(Class<?> clazz, String index) {
-            this.list.add(new Table(clazz, index));
+        public void add(Class<?> clazz, String index, boolean hasAlias, String alias) {
+            this.list.add(new Table(clazz, index, hasAlias, alias));
         }
 
         public Table get(Class<?> clazz) {
@@ -217,7 +245,24 @@ public abstract class MPJAbstractLambdaWrapper<T, Children extends MPJAbstractLa
         private final Class<?> clazz;
 
         private final String index;
+
+        private boolean hasAlias;
+
+        private final String alias;
     }
 
 
+    /**
+     * 必要的初始化
+     */
+    protected void initNeed() {
+        paramNameSeq = new AtomicInteger(0);
+        paramNameValuePairs = new HashMap<>(16);
+        expression = new MergeSegments();
+        lastSql = SharedString.emptyString();
+        sqlComment = SharedString.emptyString();
+        sqlFirst = SharedString.emptyString();
+        node = ROOT_NODE;
+        tableList = new TableList(getEntityClass(), null, alias);
+    }
 }

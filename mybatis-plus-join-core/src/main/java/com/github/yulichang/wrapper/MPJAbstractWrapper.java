@@ -572,19 +572,6 @@ public abstract class MPJAbstractWrapper<T, Children extends MPJAbstractWrapper<
                 .collect(joining(StringPool.COMMA, StringPool.LEFT_BRACKET, StringPool.RIGHT_BRACKET));
     }
 
-    /**
-     * 必要的初始化
-     */
-    protected void initNeed() {
-        paramNameSeq = new AtomicInteger(0);
-        paramNameValuePairs = new HashMap<>(16);
-        expression = new MergeSegments();
-        lastSql = SharedString.emptyString();
-        sqlComment = SharedString.emptyString();
-        sqlFirst = SharedString.emptyString();
-        node = ROOT_NODE;
-    }
-
     @Override
     public void clear() {
         entity = null;

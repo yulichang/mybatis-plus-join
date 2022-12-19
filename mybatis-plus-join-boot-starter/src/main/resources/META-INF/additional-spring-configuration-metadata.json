@@ -24,6 +24,12 @@
       "defaultValue": true,
       "type": "java.lang.Boolean",
       "description": "MappedStatement缓存开关."
+    },
+    {
+      "name": "mybatis-plus-join.table-alias",
+      "defaultValue": "t",
+      "type": "java.lang.String",
+      "description": "表别名."
     }
   ]
 }

@@ -21,6 +21,11 @@ public class MybatisPlusJoinProperties {
     private Boolean banner = true;
 
     /**
+     * 表别名
+     */
+    private String tableAlias = "t";
+
+    /**
      * 连表查询副表是否启用逻辑删除(前提是MP配置了逻辑删除)
      */
     private Boolean subTableLogic = true;

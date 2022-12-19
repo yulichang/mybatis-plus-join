@@ -4,7 +4,8 @@
 * [演示工程](https://gitee.com/best_handsome/mybatis-plus-join-demo)
 * 点个Star支持一下吧 :)
 
-QQ群:1022221898
+QQ群:1022221898  
+[加入微信群](https://gitee.com/best_handsome/mybatis-plus-join/issues/I65N2M)
 
 ## 使用方法
 
@@ -15,12 +16,12 @@ QQ群:1022221898
   <dependency>
       <groupId>com.github.yulichang</groupId>
       <artifactId>mybatis-plus-join-boot-starter</artifactId>
-      <version>1.3.8</version>
+      <version>1.3.11</version>
   </dependency>
   ```
 - Gradle
   ```
-   implementation 'com.github.yulichang:mybatis-plus-join-boot-starter:1.3.8'
+   implementation 'com.github.yulichang:mybatis-plus-join-boot-starter:1.3.11'
   ```
   或者clone代码到本地执行 mvn install, 再引入以上依赖  
   <br>

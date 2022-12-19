@@ -7,7 +7,7 @@ import com.github.yulichang.toolkit.Constant;
  * @author yulichang
  */
 @SuppressWarnings("unused")
-public interface MPJJoin<Children, T> extends MPJBaseJoin<T> {
+public interface StringJoin<Children, T> extends MPJBaseJoin<T> {
 
     /**
      * left join

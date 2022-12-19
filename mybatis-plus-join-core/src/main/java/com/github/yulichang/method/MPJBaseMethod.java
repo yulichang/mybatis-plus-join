@@ -7,7 +7,6 @@ import com.baomidou.mybatisplus.core.toolkit.Constants;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.core.toolkit.sql.SqlScriptUtils;
 import com.github.yulichang.config.ConfigProperties;
-import com.github.yulichang.toolkit.Constant;
 
 import java.util.Objects;
 
@@ -69,7 +68,7 @@ public interface MPJBaseMethod extends Constants {
             return filedSqlScript;
         }
         String newKeyProperty = newPrefix + tableInfo.getKeyProperty();
-        String keySqlScript = Constant.TABLE_ALIAS + DOT + tableInfo.getKeyColumn() + EQUALS + SqlScriptUtils.safeParam(newKeyProperty);
+        String keySqlScript = ConfigProperties.tableAlias + DOT + tableInfo.getKeyColumn() + EQUALS + SqlScriptUtils.safeParam(newKeyProperty);
         return SqlScriptUtils.convertIf(keySqlScript, String.format("%s != null", newKeyProperty), false)
                 + NEWLINE + filedSqlScript;
     }
@@ -77,7 +76,7 @@ public interface MPJBaseMethod extends Constants {
     default String getSqlWhere(TableFieldInfo tableFieldInfo, final String prefix) {
         final String newPrefix = prefix == null ? EMPTY : prefix;
         // 默认:  AND column=#{prefix + el}
-        String sqlScript = " AND " + String.format(tableFieldInfo.getCondition(), Constant.TABLE_ALIAS + DOT + tableFieldInfo.getColumn(), newPrefix + tableFieldInfo.getEl());
+        String sqlScript = " AND " + String.format(tableFieldInfo.getCondition(), ConfigProperties.tableAlias + DOT + tableFieldInfo.getColumn(), newPrefix + tableFieldInfo.getEl());
         // 查询的时候只判非空
         return convertIf(tableFieldInfo, sqlScript, convertIfProperty(newPrefix, tableFieldInfo.getProperty()), tableFieldInfo.getWhereStrategy());
     }

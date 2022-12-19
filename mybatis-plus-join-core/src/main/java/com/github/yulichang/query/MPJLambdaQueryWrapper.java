@@ -9,8 +9,8 @@ import com.baomidou.mybatisplus.core.metadata.TableInfo;
 import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
 import com.baomidou.mybatisplus.core.toolkit.*;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
-import com.github.yulichang.query.interfaces.MPJJoin;
-import com.github.yulichang.toolkit.Constant;
+import com.github.yulichang.config.ConfigProperties;
+import com.github.yulichang.query.interfaces.StringJoin;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -31,7 +31,7 @@ import java.util.stream.Collectors;
 @Deprecated
 @SuppressWarnings("unused")
 public class MPJLambdaQueryWrapper<T> extends AbstractLambdaWrapper<T, MPJLambdaQueryWrapper<T>>
-        implements Query<MPJLambdaQueryWrapper<T>, T, SFunction<T, ?>>, MPJJoin<MPJLambdaQueryWrapper<T>, T> {
+        implements Query<MPJLambdaQueryWrapper<T>, T, SFunction<T, ?>>, StringJoin<MPJLambdaQueryWrapper<T>, T> {
 
     /**
      * 查询字段
@@ -46,7 +46,7 @@ public class MPJLambdaQueryWrapper<T> extends AbstractLambdaWrapper<T, MPJLambda
     /**
      * 主表别名
      */
-    private final SharedString alias = new SharedString(Constant.TABLE_ALIAS);
+    private final String alias = ConfigProperties.tableAlias;
 
     /**
      * 查询的列
@@ -126,7 +126,7 @@ public class MPJLambdaQueryWrapper<T> extends AbstractLambdaWrapper<T, MPJLambda
     public final MPJLambdaQueryWrapper<T> selectIgnore(SFunction<T, ?>... columns) {
         if (ArrayUtils.isNotEmpty(columns)) {
             for (SFunction<T, ?> s : columns) {
-                ignoreColumns.add(Constant.TABLE_ALIAS + StringPool.DOT + columnToString(s));
+                ignoreColumns.add(alias + StringPool.DOT + columnToString(s));
             }
         }
         return typedThis;
@@ -134,7 +134,7 @@ public class MPJLambdaQueryWrapper<T> extends AbstractLambdaWrapper<T, MPJLambda
 
     @Override
     protected String columnToString(SFunction<T, ?> column, boolean onlyColumn) {
-        return Constant.TABLE_ALIAS + StringPool.DOT + super.columnToString(column, onlyColumn);
+        return alias + StringPool.DOT + super.columnToString(column, onlyColumn);
     }
 
     public MPJLambdaQueryWrapper<T> select(String... columns) {
@@ -162,7 +162,7 @@ public class MPJLambdaQueryWrapper<T> extends AbstractLambdaWrapper<T, MPJLambda
         TableInfo info = TableInfoHelper.getTableInfo(entityClass);
         Assert.notNull(info, "table not find by class <%s>", entityClass.getSimpleName());
         selectColumns.addAll(info.getFieldList().stream().filter(predicate).map(c ->
-                Constant.TABLE_ALIAS + StringPool.DOT + c.getColumn()).collect(Collectors.toList()));
+                alias + StringPool.DOT + c.getColumn()).collect(Collectors.toList()));
         return typedThis;
     }
 
@@ -173,7 +173,7 @@ public class MPJLambdaQueryWrapper<T> extends AbstractLambdaWrapper<T, MPJLambda
      * @param clazz 主表class
      */
     public final MPJLambdaQueryWrapper<T> selectAll(Class<T> clazz) {
-        return selectAll(clazz, Constant.TABLE_ALIAS);
+        return selectAll(clazz, alias);
     }
 
     /**
@@ -219,7 +219,7 @@ public class MPJLambdaQueryWrapper<T> extends AbstractLambdaWrapper<T, MPJLambda
 
 
     public String getAlias() {
-        return alias.getStringValue();
+        return alias;
     }
 
     /**

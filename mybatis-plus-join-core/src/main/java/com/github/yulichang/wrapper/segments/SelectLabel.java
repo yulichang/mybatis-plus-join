@@ -2,6 +2,7 @@ package com.github.yulichang.wrapper.segments;
 
 
 import com.baomidou.mybatisplus.core.metadata.TableFieldInfo;
+import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.github.yulichang.wrapper.enums.BaseFuncEnum;
 import lombok.Getter;
 import org.apache.ibatis.type.TypeHandler;
@@ -108,6 +109,11 @@ public class SelectLabel implements Select {
     }
 
     @Override
+    public SFunction<?, ?>[] getArgs() {
+        return null;
+    }
+
+    @Override
     public BaseFuncEnum getFunc() {
         return null;
     }
@@ -115,5 +121,10 @@ public class SelectLabel implements Select {
     @Override
     public boolean isLabel() {
         return true;
+    }
+
+    @Override
+    public boolean isStr() {
+        return false;
     }
 }

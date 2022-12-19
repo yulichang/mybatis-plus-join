@@ -45,6 +45,17 @@ public class UserDO {
     @TableLogic
     private Boolean del;
 
+    private Integer createBy;
+
+    @TableField(exist = false)
+    private String createName;
+
+    private Integer updateBy;
+
+    @TableField(exist = false)
+    private String updateName;
+
+
     @TableField(exist = false)
     private String alias;
 

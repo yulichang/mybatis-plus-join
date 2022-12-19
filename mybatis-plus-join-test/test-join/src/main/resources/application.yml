@@ -24,3 +24,4 @@ mybatis-plus:
 mybatis-plus-join:
   banner: true
   sub-table-logic: true
+  ms-cache: true

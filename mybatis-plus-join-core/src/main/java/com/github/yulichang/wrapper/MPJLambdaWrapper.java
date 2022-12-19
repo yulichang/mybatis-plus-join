@@ -2,33 +2,27 @@ package com.github.yulichang.wrapper;
 
 import com.baomidou.mybatisplus.core.conditions.SharedString;
 import com.baomidou.mybatisplus.core.conditions.segments.MergeSegments;
+import com.baomidou.mybatisplus.core.metadata.TableInfo;
 import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
-import com.baomidou.mybatisplus.core.toolkit.ArrayUtils;
-import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
-import com.baomidou.mybatisplus.core.toolkit.StringPool;
-import com.baomidou.mybatisplus.core.toolkit.StringUtils;
+import com.baomidou.mybatisplus.core.toolkit.*;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.github.yulichang.config.ConfigProperties;
 import com.github.yulichang.toolkit.Constant;
 import com.github.yulichang.toolkit.LambdaUtils;
 import com.github.yulichang.toolkit.LogicInfoUtils;
-import com.github.yulichang.toolkit.MPJWrappers;
 import com.github.yulichang.toolkit.support.ColumnCache;
 import com.github.yulichang.wrapper.interfaces.Query;
 import com.github.yulichang.wrapper.interfaces.QueryJoin;
 import com.github.yulichang.wrapper.interfaces.QueryLabel;
-import com.github.yulichang.wrapper.interfaces.on.WrapperFunction;
 import com.github.yulichang.wrapper.resultmap.MybatisLabel;
 import com.github.yulichang.wrapper.segments.Select;
 import com.github.yulichang.wrapper.segments.SelectCache;
 import com.github.yulichang.wrapper.segments.SelectNormal;
 import lombok.Getter;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 
 /**
@@ -36,7 +30,6 @@ import java.util.stream.Collectors;
  * Lambda 语法使用 Wrapper
  *
  * @author yulichang
- * @see MPJWrappers
  */
 @SuppressWarnings({"unused"})
 public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWrapper<T>>
@@ -46,10 +39,6 @@ public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWr
      * 查询表
      */
     private final SharedString from = new SharedString();
-    /**
-     * 主表别名
-     */
-    private final SharedString alias = new SharedString(Constant.TABLE_ALIAS);
     /**
      * 查询的字段
      */
@@ -61,10 +50,9 @@ public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWr
     @Getter
     private final List<MybatisLabel<?, ?>> resultMapMybatisLabel = new ArrayList<>();
     /**
-     * 是否构建是否存在一对多
+     * 是否有表别名
      */
-    @Getter
-    private boolean resultMap = false;
+    private boolean hasAlias;
     /**
      * 查询字段 sql
      */
@@ -73,10 +61,6 @@ public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWr
      * 是否 select distinct
      */
     private boolean selectDistinct = false;
-    /**
-     * 表序号
-     */
-    private int tableIndex = 1;
     /**
      * 连表关键字 on 条件 func 使用
      */
@@ -92,9 +76,34 @@ public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWr
     private boolean logicSql = true;
 
     /**
-     * 不建议直接 new 该实例，使用 MPJWrappers.<UserDO>lambdaQuery()
+     * 推荐使用 带 class 的构造方法
      */
     public MPJLambdaWrapper() {
+        super.initNeed();
+    }
+
+    /**
+     * 推荐使用此构造方法
+     */
+    public MPJLambdaWrapper(Class<T> clazz) {
+        super.initNeed();
+        setEntityClass(clazz);
+    }
+
+    /**
+     * 自定义主表别名
+     */
+    public MPJLambdaWrapper(String alias) {
+        this.alias = alias;
+        super.initNeed();
+    }
+
+    /**
+     * 推荐使用此构造方法
+     */
+    public MPJLambdaWrapper(Class<T> clazz, String alias) {
+        this.alias = alias;
+        setEntityClass(clazz);
         super.initNeed();
     }
 
@@ -105,7 +114,7 @@ public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWr
     MPJLambdaWrapper(T entity, Class<T> entityClass, SharedString sqlSelect, AtomicInteger paramNameSeq,
                      Map<String, Object> paramNameValuePairs, MergeSegments mergeSegments,
                      SharedString lastSql, SharedString sqlComment, SharedString sqlFirst,
-                     TableList tableList, String index, String keyWord, Class<?> joinClass) {
+                     TableList tableList, String index, String keyWord, Class<?> joinClass, Node node) {
         super.setEntity(entity);
         super.setEntityClass(entityClass);
         this.paramNameSeq = paramNameSeq;
@@ -119,6 +128,7 @@ public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWr
         this.index = index;
         this.keyWord = keyWord;
         this.joinClass = joinClass;
+        this.node = node;
     }
 
 
@@ -175,8 +185,37 @@ public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWr
     public String getSqlSelect() {
         if (StringUtils.isBlank(sqlSelect.getStringValue()) && CollectionUtils.isNotEmpty(selectColumns)) {
             String s = selectColumns.stream().map(i -> {
-                String str = Constant.TABLE_ALIAS + getDefaultSelect(i.getIndex(), i.getClazz(), i) + StringPool.DOT + i.getColumn();
-                return i.isFunc() ? (String.format(i.getFunc().getSql(), str) + Constant.AS + i.getAlias()) : (i.isHasAlias() ? (str + Constant.AS + i.getAlias()) : str);
+                if (i.isStr()) {
+                    return i.getColumn();
+                }
+                Table t = tableList.get(i.getClazz());
+                String str;
+                if (t.isHasAlias()) {
+                    str = t.getAlias() + StringPool.DOT + i.getColumn();
+                } else {
+                    if (i.isLabel() && Objects.nonNull(i.getIndex())) {
+                        str = i.getIndex() + StringPool.DOT + i.getColumn();
+                    } else {
+                        str = t.getAlias() + getDefaultSelect(i.getIndex(), i.getClazz(), i) + StringPool.DOT + i.getColumn();
+                    }
+                }
+                if (i.isFunc()) {
+                    SFunction<?, ?>[] args = i.getArgs();
+                    if (Objects.isNull(args) || args.length == 0) {
+                        return String.format(i.getFunc().getSql(), str) + Constant.AS + i.getAlias();
+                    } else {
+                        return String.format(i.getFunc().getSql(), Arrays.stream(args).map(arg -> {
+                            Class<?> entityClass = LambdaUtils.getEntityClass(arg);
+                            Table table = tableList.getPositive(entityClass);
+                            Assert.notNull(table, "table not find by class <%s>", entityClass.getSimpleName());
+                            Map<String, SelectCache> mapField = ColumnCache.getMapField(entityClass);
+                            SelectCache cache = mapField.get(LambdaUtils.getName(arg));
+                            return tableList.get(cache.getClazz()).getAlias() + (Objects.isNull(table.getIndex()) ? StringPool.EMPTY : table.getIndex()) + StringPool.DOT + cache.getColumn();
+                        }).toArray()) + Constant.AS + i.getAlias();
+                    }
+                } else {
+                    return i.isHasAlias() ? (str + Constant.AS + i.getAlias()) : str;
+                }
             }).collect(Collectors.joining(StringPool.COMMA));
             sqlSelect.setStringValue(s);
         }
@@ -190,13 +229,25 @@ public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWr
         if (StringUtils.isBlank(from.getStringValue())) {
             StringBuilder value = new StringBuilder();
             for (MPJLambdaWrapper<?> wrapper : onWrappers) {
-                String tableName = TableInfoHelper.getTableInfo(wrapper.getJoinClass()).getTableName();
-                value.append(wrapper.getKeyWord())
-                        .append(tableName)
-                        .append(Constant.SPACE_TABLE_ALIAS)
-                        .append(tableList.get(wrapper.getJoinClass(), wrapper.getIndex()).getIndex())
-                        .append(Constant.ON)
-                        .append(wrapper.getExpression().getNormal().getSqlSegment());
+                if (StringUtils.isBlank(wrapper.from.getStringValue())) {
+                    TableInfo info = TableInfoHelper.getTableInfo(wrapper.getJoinClass());
+                    Assert.notNull(info, "table not find by class <%s>", wrapper.getJoinClass().getSimpleName());
+                    String tableName = info.getTableName();
+                    value.append(StringPool.SPACE)
+                            .append(wrapper.getKeyWord())
+                            .append(StringPool.SPACE)
+                            .append(tableName)
+                            .append(StringPool.SPACE)
+                            .append(wrapper.hasAlias ? wrapper.alias : (wrapper.alias + (tableList.get(wrapper.getJoinClass(), wrapper.getIndex()).getIndex())))
+                            .append(Constant.ON)
+                            .append(wrapper.getExpression().getNormal().getSqlSegment());
+                } else {
+                    value.append(StringPool.EMPTY)
+                            .append(wrapper.getKeyWord())
+                            .append(StringPool.EMPTY)
+                            .append(wrapper.from.getStringValue())
+                            .append(StringPool.EMPTY);
+                }
             }
             from.setStringValue(value.toString());
         }
@@ -204,7 +255,7 @@ public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWr
     }
 
     public String getAlias() {
-        return alias.getStringValue();
+        return alias;
     }
 
 
@@ -218,13 +269,13 @@ public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWr
      */
     @Override
     protected MPJLambdaWrapper<T> instance() {
-        return instance(index, null, null);
+        return instance(index, null, null, this.node);
     }
 
-    protected MPJLambdaWrapper<T> instance(String index, String keyWord, Class<?> joinClass) {
+    protected MPJLambdaWrapper<T> instance(String index, String keyWord, Class<?> joinClass, Node node) {
         return new MPJLambdaWrapper<>(getEntity(), getEntityClass(), null, paramNameSeq, paramNameValuePairs,
                 new MergeSegments(), SharedString.emptyString(), SharedString.emptyString(), SharedString.emptyString(),
-                this.tableList, index, keyWord, joinClass);
+                this.tableList, index, keyWord, joinClass, node);
     }
 
     @Override
@@ -275,7 +326,7 @@ public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWr
                 return StringPool.EMPTY;
             }
             return tableList.stream().map(t -> LogicInfoUtils.getLogicInfo(t.getIndex(),
-                    t.getClazz())).collect(Collectors.joining(StringPool.SPACE));
+                    t.getClazz(), t.isHasAlias(), t.getAlias())).collect(Collectors.joining(StringPool.SPACE));
         }
         return StringPool.EMPTY;
     }
@@ -288,19 +339,47 @@ public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWr
     }
 
     /**
-     * 调用此方法 keyword 前后需要带空格 比如 " LEFT JOIN "  " RIGHT JOIN "
+     * 内部调用, 不建议使用
      */
     @Override
-    public <R> MPJLambdaWrapper<T> join(String keyWord, Class<R> clazz, WrapperFunction<T> function, WrapperFunction<T> ext) {
-        String name = String.valueOf(tableIndex);
-        MPJLambdaWrapper<T> apply = function.apply(instance(name, keyWord, clazz));
-        tableList.add(clazz, name);
-        onWrappers.add(apply);
-        tableIndex++;
-        if (Objects.nonNull(ext)) {
-            this.index = name;
-            MPJLambdaWrapper<T> wrapper = ext.apply(typedThis);
-            wrapper.index = null;
+    public <R> MPJLambdaWrapper<T> join(String keyWord, Class<R> clazz, String tableAlias, BiConsumer<MPJAbstractLambdaWrapper<T, ?>, MPJLambdaWrapper<T>> consumer) {
+        String oldIndex = this.getIndex();
+        String newIndex = String.valueOf(tableIndex);
+        Node n = Objects.isNull(oldIndex) ? new Node(clazz, tableIndex, ROOT_NODE) : new Node(clazz, tableIndex, this.node);
+        MPJLambdaWrapper<T> instance = instance(newIndex, keyWord, clazz, n);
+        this.node = n;
+        onWrappers.add(instance);
+        if (StringUtils.isBlank(tableAlias)) {
+            tableList.add(clazz, newIndex, false, ConfigProperties.tableAlias);
+            instance.alias = ConfigProperties.tableAlias;
+            instance.hasAlias = false;
+            tableIndex++;
+        } else {
+            tableList.add(clazz, null, true, tableAlias);
+            instance.alias = tableAlias;
+            instance.hasAlias = true;
+        }
+        this.index = newIndex;
+        consumer.accept(instance, typedThis);
+        this.index = oldIndex;
+        return typedThis;
+    }
+
+
+    /**
+     * 自定义关键词连接
+     *
+     * @param keyWord   连表关键词
+     * @param condition 条件
+     * @param joinSql   sql
+     */
+    @Override
+    public MPJLambdaWrapper<T> join(String keyWord, boolean condition, String joinSql) {
+        if (condition) {
+            MPJLambdaWrapper<T> wrapper = new MPJLambdaWrapper<>();
+            wrapper.from.setStringValue(joinSql);
+            wrapper.keyWord = StringPool.SPACE + keyWord + StringPool.SPACE;
+            onWrappers.add(wrapper);
         }
         return typedThis;
     }

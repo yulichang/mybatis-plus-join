@@ -46,20 +46,19 @@ public interface QueryLabel<Children> {
         return selectCollection(null, child, dtoField);
     }
 
-    default <S, C, Z, F extends java.util.Collection<?>> Children selectCollection(Integer index, Class<C> child, SFunction<S, F> dtoField) {
+    default <S, C, Z, F extends java.util.Collection<?>> Children selectCollection(String prefix, Class<C> child, SFunction<S, F> dtoField) {
         String dtoFieldName = LambdaUtils.getName(dtoField);
         Class<S> dtoClass = LambdaUtils.getEntityClass(dtoField);
         Map<String, Field> fieldMap = MPJReflectionKit.getFieldMap(dtoClass);
         Field field = fieldMap.get(dtoFieldName);
         Class<?> genericType = MPJReflectionKit.getGenericType(field);
         MybatisLabel.Builder<C, Z> builder;
-        String s = Objects.isNull(index) ? null : index.toString();
         if (genericType == null || genericType.isAssignableFrom(child)) {
             //找不到集合泛型 List List<?> List<Object> ， 直接查询数据库实体
-            builder = new MybatisLabel.Builder<>(s, dtoFieldName, child, field.getType());
+            builder = new MybatisLabel.Builder<>(prefix, dtoFieldName, child, field.getType());
         } else {
             Class<Z> ofType = (Class<Z>) genericType;
-            builder = new MybatisLabel.Builder<>(s, dtoFieldName, child, field.getType(), ofType, true);
+            builder = new MybatisLabel.Builder<>(prefix, dtoFieldName, child, field.getType(), ofType, true);
         }
         addLabel(builder.build());
         return getChildren();
@@ -99,7 +98,7 @@ public interface QueryLabel<Children> {
         return selectCollection(null, child, dtoField, collection);
     }
 
-    default <S, C, Z, F extends java.util.Collection<Z>> Children selectCollection(Integer index,
+    default <S, C, Z, F extends java.util.Collection<Z>> Children selectCollection(String prefix,
                                                                                    Class<C> child,
                                                                                    SFunction<S, F> dtoField,
                                                                                    MFunc<MybatisLabel.Builder<C, Z>> collection) {
@@ -109,8 +108,7 @@ public interface QueryLabel<Children> {
         //获取集合泛型
         Class<?> genericType = MPJReflectionKit.getGenericType(field);
         Class<Z> ofType = (Class<Z>) genericType;
-        MybatisLabel.Builder<C, Z> builder = new MybatisLabel.Builder<>(Objects.isNull(index) ? null : index.toString(),
-                dtoFieldName, child, field.getType(), ofType, false);
+        MybatisLabel.Builder<C, Z> builder = new MybatisLabel.Builder<>(prefix, dtoFieldName, child, field.getType(), ofType, false);
         MybatisLabel.Builder<C, Z> czBuilder = collection.apply(builder);
         addLabel(czBuilder.build());
         return getChildren();

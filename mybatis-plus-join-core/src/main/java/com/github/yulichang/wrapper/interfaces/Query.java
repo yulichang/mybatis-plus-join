@@ -3,6 +3,7 @@ package com.github.yulichang.wrapper.interfaces;
 import com.baomidou.mybatisplus.core.metadata.TableFieldInfo;
 import com.baomidou.mybatisplus.core.metadata.TableInfo;
 import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
+import com.baomidou.mybatisplus.core.toolkit.Assert;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.github.yulichang.toolkit.LambdaUtils;
 import com.github.yulichang.toolkit.MPJReflectionKit;
@@ -13,8 +14,10 @@ import com.github.yulichang.wrapper.segments.*;
 
 import java.io.Serializable;
 import java.lang.reflect.Field;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -47,6 +50,7 @@ public interface Query<Children> extends Serializable {
      */
     default <E> Children select(Class<E> entityClass, Predicate<TableFieldInfo> predicate) {
         TableInfo info = TableInfoHelper.getTableInfo(entityClass);
+        Assert.notNull(info, "table not find by class <%s>", entityClass.getSimpleName());
         Map<String, SelectCache> cacheMap = ColumnCache.getMapField(entityClass);
         info.getFieldList().stream().filter(predicate).collect(Collectors.toList()).forEach(
                 i -> getSelectColum().add(new SelectNormal(cacheMap.get(i.getProperty()), getIndex())));
@@ -56,6 +60,16 @@ public interface Query<Children> extends Serializable {
 
     @SuppressWarnings("unchecked")
     <E> Children select(SFunction<E, ?>... columns);
+
+    /**
+     * String 查询
+     *
+     * @param columns 列
+     */
+    default Children select(String... columns) {
+        getSelectColum().addAll(Arrays.stream(columns).map(SelectString::new).collect(Collectors.toList()));
+        return getChildren();
+    }
 
     /**
      * 说明：
@@ -147,6 +161,16 @@ public interface Query<Children> extends Serializable {
         return selectFunc(funcEnum, column, LambdaUtils.getName(alias));
     }
 
+
+    default <X> Children selectFunc(String sql, Function<SelectFunc.Func, SFunction<?, ?>[]> column, String alias) {
+        getSelectColum().add(new SelectFunc(alias, getIndex(), () -> sql, column.apply(new SelectFunc.Func())));
+        return getChildren();
+    }
+
+    default <X, S> Children selectFunc(String sql, Function<SelectFunc.Func, SFunction<?, ?>[]> column, SFunction<S, ?> alias) {
+        getSelectColum().add(new SelectFunc(LambdaUtils.getName(alias), getIndex(), () -> sql, column.apply(new SelectFunc.Func())));
+        return getChildren();
+    }
 
     /* 默认聚合函数扩展 */
 

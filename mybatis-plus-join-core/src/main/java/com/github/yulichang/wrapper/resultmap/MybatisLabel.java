@@ -121,20 +121,19 @@ public class MybatisLabel<E, T> {
         /**
          * 嵌套
          */
-        public <A, R, B extends Collection<R>> Builder<E, T> collection(Integer index, Class<A> entityClass, SFunction<T, B> func) {
+        public <A, R, B extends Collection<R>> Builder<E, T> collection(String prefix, Class<A> entityClass, SFunction<T, B> func) {
             String dtoFieldName = LambdaUtils.getName(func);
             Class<T> dtoClass = LambdaUtils.getEntityClass(func);
             Map<String, Field> fieldMap = MPJReflectionKit.getFieldMap(dtoClass);
             Field field = fieldMap.get(dtoFieldName);
             Class<?> genericType = MPJReflectionKit.getGenericType(field);
             MybatisLabel.Builder<A, R> builder;
-            String s = Objects.isNull(index) ? null : index.toString();
             if (genericType == null || genericType.isAssignableFrom(entityClass)) {
                 //找不到集合泛型 List List<?> List<Object> ， 直接查询数据库实体
-                builder = new Builder<>(s, dtoFieldName, entityClass, field.getType());
+                builder = new Builder<>(prefix, dtoFieldName, entityClass, field.getType());
             } else {
                 Class<R> ofType = (Class<R>) genericType;
-                builder = new Builder<>(s, dtoFieldName, entityClass, field.getType(), ofType, true);
+                builder = new Builder<>(prefix, dtoFieldName, entityClass, field.getType(), ofType, true);
             }
             mybatisLabel.mybatisLabels.add(builder.build());
             return this;
@@ -147,7 +146,7 @@ public class MybatisLabel<E, T> {
         /**
          * 嵌套
          */
-        public <A, R, B extends Collection<R>> Builder<E, T> collection(Integer index,
+        public <A, R, B extends Collection<R>> Builder<E, T> collection(String prefix,
                                                                         Class<A> entityClass,
                                                                         SFunction<T, B> func,
                                                                         MFunc<Builder<A, R>> mFunc) {
@@ -157,8 +156,7 @@ public class MybatisLabel<E, T> {
             //获取集合泛型
             Class<?> genericType = MPJReflectionKit.getGenericType(field);
             Class<R> ofType = (Class<R>) genericType;
-            MybatisLabel.Builder<A, R> builder = new MybatisLabel.Builder<>(Objects.isNull(index) ? null : index.toString(),
-                    dtoFieldName, entityClass, field.getType(), ofType, false);
+            MybatisLabel.Builder<A, R> builder = new MybatisLabel.Builder<>(prefix, dtoFieldName, entityClass, field.getType(), ofType, false);
             mybatisLabel.mybatisLabels.add(mFunc.apply(builder).build());
             return this;
         }
@@ -212,6 +210,7 @@ public class MybatisLabel<E, T> {
 
         private void autoBuild(boolean auto, Class<E> entityClass, Class<T> tagClass) {
             TableInfo tableInfo = TableInfoHelper.getTableInfo(entityClass);
+            Assert.notNull(tableInfo, "table not find by class <%s>", entityClass.getSimpleName());
             Map<String, Field> tagMap = MPJReflectionKit.getFieldMap(tagClass);
             if (auto && !tagMap.isEmpty()) {
                 List<SelectCache> listField = ColumnCache.getListField(entityClass);

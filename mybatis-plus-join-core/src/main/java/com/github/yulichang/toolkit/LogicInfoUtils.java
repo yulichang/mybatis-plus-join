@@ -21,25 +21,26 @@ public class LogicInfoUtils implements Constants {
     private static final Map<Class<?>, Map<String, String>> LOGIC_CACHE = new ConcurrentHashMap<>();
 
 
-    public static String getLogicInfo(String tableIndex, Class<?> clazz) {
+    public static String getLogicInfo(String tableIndex, Class<?> clazz, boolean hasAlias, String alias) {
         Map<String, String> absent = LOGIC_CACHE.get(clazz);
         if (absent == null) {
             absent = new ConcurrentHashMap<>();
             LOGIC_CACHE.put(clazz, absent);
         }
-        return absent.computeIfAbsent(tableIndex, key -> getLogicStr(key, clazz));
+        return absent.computeIfAbsent(hasAlias ? alias : (alias + tableIndex), key -> getLogicStr(key, clazz));
     }
 
-    private static String getLogicStr(String tableIndex, Class<?> clazz) {
+    private static String getLogicStr(String prefix, Class<?> clazz) {
+
         String logicStr;
         TableInfo tableInfo = TableInfoHelper.getTableInfo(clazz);
-        Assert.notNull(tableInfo, "%s 不是数据库实体或没有注册到mybatis plus中", clazz.getName());
+        Assert.notNull(tableInfo, "table not find by class <%s>", clazz.getSimpleName());
         if (tableInfo.isWithLogicDelete() && Objects.nonNull(tableInfo.getLogicDeleteFieldInfo())) {
             final String value = tableInfo.getLogicDeleteFieldInfo().getLogicNotDeleteValue();
             if (NULL.equalsIgnoreCase(value)) {
-                logicStr = " AND " + Constant.TABLE_ALIAS + tableIndex + DOT + tableInfo.getLogicDeleteFieldInfo().getColumn() + " IS NULL";
+                logicStr = " AND " + prefix + DOT + tableInfo.getLogicDeleteFieldInfo().getColumn() + " IS NULL";
             } else {
-                logicStr = " AND " + Constant.TABLE_ALIAS + tableIndex + DOT + tableInfo.getLogicDeleteFieldInfo().getColumn() + EQUALS + String.format(tableInfo.getLogicDeleteFieldInfo().isCharSequence() ? "'%s'" : "%s", value);
+                logicStr = " AND " + prefix + DOT + tableInfo.getLogicDeleteFieldInfo().getColumn() + EQUALS + String.format(tableInfo.getLogicDeleteFieldInfo().isCharSequence() ? "'%s'" : "%s", value);
             }
         } else {
             logicStr = StringPool.EMPTY;

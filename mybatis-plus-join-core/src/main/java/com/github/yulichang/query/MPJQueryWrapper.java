@@ -8,8 +8,8 @@ import com.baomidou.mybatisplus.core.metadata.TableFieldInfo;
 import com.baomidou.mybatisplus.core.metadata.TableInfo;
 import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
 import com.baomidou.mybatisplus.core.toolkit.*;
-import com.github.yulichang.query.interfaces.MPJJoin;
-import com.github.yulichang.toolkit.Constant;
+import com.github.yulichang.config.ConfigProperties;
+import com.github.yulichang.query.interfaces.StringJoin;
 import com.github.yulichang.toolkit.MPJWrappers;
 
 import java.util.ArrayList;
@@ -29,7 +29,7 @@ import java.util.stream.Collectors;
  */
 @SuppressWarnings("unused")
 public class MPJQueryWrapper<T> extends AbstractWrapper<T, String, MPJQueryWrapper<T>>
-        implements Query<MPJQueryWrapper<T>, T, String>, MPJJoin<MPJQueryWrapper<T>, T> {
+        implements Query<MPJQueryWrapper<T>, T, String>, StringJoin<MPJQueryWrapper<T>, T> {
 
     /**
      * 查询字段
@@ -44,7 +44,7 @@ public class MPJQueryWrapper<T> extends AbstractWrapper<T, String, MPJQueryWrapp
     /**
      * 主表别名
      */
-    private String alias = Constant.TABLE_ALIAS;
+    private String alias = ConfigProperties.tableAlias;
 
     /**
      * 查询的列
@@ -270,7 +270,7 @@ public class MPJQueryWrapper<T> extends AbstractWrapper<T, String, MPJQueryWrapp
     @Override
     public MPJQueryWrapper<T> join(String keyWord, boolean condition, String joinSql) {
         if (condition) {
-            from.setStringValue(from.getStringValue() + keyWord + joinSql);
+            from.setStringValue(from.getStringValue() + StringPool.SPACE + keyWord + StringPool.SPACE + joinSql);
         }
         return typedThis;
     }

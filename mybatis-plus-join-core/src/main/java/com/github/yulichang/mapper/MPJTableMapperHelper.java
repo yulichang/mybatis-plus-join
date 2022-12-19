@@ -16,10 +16,8 @@ public class MPJTableMapperHelper {
 
 
     public static void init(Class<?> clazz, Class<?> mapper) {
-        if (clazz != null) {
+        if (clazz != null && mapper != null) {
             CACHE.put(clazz, mapper);
-        }
-        if (mapper != null) {
             CACHE_REVERSE.put(mapper, clazz);
         }
     }

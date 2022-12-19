@@ -6,4 +6,7 @@ package com.github.yulichang.config;
  */
 public class ConfigProperties {
     public static boolean subTableLogic = true;
+    public static boolean msCache = true;
+
+    public static String tableAlias = "t";
 }

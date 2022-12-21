@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.metadata.TableFieldInfo;
 import com.baomidou.mybatisplus.core.metadata.TableInfo;
 import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
 import com.baomidou.mybatisplus.core.toolkit.Assert;
+import com.baomidou.mybatisplus.core.toolkit.Constants;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.github.yulichang.toolkit.LambdaUtils;
 import com.github.yulichang.toolkit.MPJReflectionKit;
@@ -68,6 +69,28 @@ public interface Query<Children> extends Serializable {
      */
     default Children select(String... columns) {
         getSelectColum().addAll(Arrays.stream(columns).map(SelectString::new).collect(Collectors.toList()));
+        return getChildren();
+    }
+
+    /**
+     * String 查询
+     *
+     * @param column 列
+     */
+    default <E> Children select(String column, SFunction<E, ?> alias) {
+        getSelectColum().add(new SelectString(column + Constants.AS + LambdaUtils.getName(alias)));
+        return getChildren();
+    }
+
+    /**
+     * String 查询
+     *
+     * @param column 列
+     */
+    default <E> Children select(String index, SFunction<E, ?> column, SFunction<E, ?> alias) {
+        Map<String, SelectCache> cacheMap = ColumnCache.getMapField(LambdaUtils.getEntityClass(column));
+        SelectCache cache = cacheMap.get(LambdaUtils.getName(column));
+        getSelectColum().add(new SelectString(index + Constants.DOT + cache.getColumn() + Constants.AS + LambdaUtils.getName(alias)));
         return getChildren();
     }
 

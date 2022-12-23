@@ -30,6 +30,12 @@
       "defaultValue": "t",
       "type": "java.lang.String",
       "description": "表别名."
+    },
+    {
+      "name": "mybatis-plus-join.join-prefix",
+      "defaultValue": "t",
+      "type": "java.lang.String",
+      "description": "重复字段前缀."
     }
   ]
 }

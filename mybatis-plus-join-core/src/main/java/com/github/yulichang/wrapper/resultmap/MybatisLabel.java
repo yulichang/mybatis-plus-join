@@ -181,22 +181,22 @@ public class MybatisLabel<E, T> {
             return this;
         }
 
-        public <A, B> Builder<E, T> selectAssociation(Class<A> child, SFunction<T, B> dtoField,
-                                                      MFunc<MybatisLabel.Builder<A, B>> collection) {
-            return selectAssociation(null, child, dtoField, collection);
+        public <A, B> Builder<E, T> association(Class<A> child, SFunction<T, B> dtoField,
+                                                MFunc<MybatisLabel.Builder<A, B>> collection) {
+            return association(null, child, dtoField, collection);
         }
 
         /**
          * 嵌套
          */
-        public <A, B> Builder<E, T> selectAssociation(Integer index, Class<A> child, SFunction<T, B> dtoField,
-                                                      MFunc<MybatisLabel.Builder<A, B>> collection) {
+        public <A, B> Builder<E, T> association(Integer index, Class<A> child, SFunction<T, B> dtoField,
+                                                MFunc<MybatisLabel.Builder<A, B>> collection) {
             String dtoFieldName = LambdaUtils.getName(dtoField);
             Class<T> dtoClass = LambdaUtils.getEntityClass(dtoField);
             Field field = MPJReflectionKit.getFieldMap(dtoClass).get(dtoFieldName);
             Assert.isFalse(Collection.class.isAssignableFrom(field.getType()), "association 不支持集合类");
             MybatisLabel.Builder<A, B> builder = new MybatisLabel.Builder<>(Objects.isNull(index) ? null : index.toString(),
-                    dtoFieldName, child, field.getType(), (Class<B>) child, false);
+                    dtoFieldName, child, field.getType(), (Class<B>) field.getType(), false);
             mybatisLabel.mybatisLabels.add(collection.apply(builder).build());
             return this;
         }

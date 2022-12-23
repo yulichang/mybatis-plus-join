@@ -153,7 +153,7 @@ public interface QueryLabel<Children> {
         Field field = MPJReflectionKit.getFieldMap(dtoClass).get(dtoFieldName);
         Assert.isFalse(Collection.class.isAssignableFrom(field.getType()), "association 不支持集合类");
         MybatisLabel.Builder<C, F> builder = new MybatisLabel.Builder<>(Objects.isNull(index) ? null : index.toString(),
-                dtoFieldName, child, field.getType(), (Class<F>) child, false);
+                dtoFieldName, child, field.getType(), (Class<F>) field.getType(), false);
         MybatisLabel.Builder<C, F> cfBuilder = collection.apply(builder);
         addLabel(cfBuilder.build());
         return getChildren();

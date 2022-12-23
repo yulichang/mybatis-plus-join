@@ -223,6 +223,8 @@ public class MPJInterceptor implements Interceptor {
                 .append(mybatisLabel.getEntityClass().getName())
                 .append(StringPool.UNDERSCORE)
                 .append(mybatisLabel.getOfType().getName())
+                .append(StringPool.UNDERSCORE)
+                .append(mybatisLabel.getProperty())
                 .append(StringPool.UNDERSCORE);
         List<ResultMapping> childMapping = new ArrayList<>(resultList.size());
         for (Result r : resultList) {
@@ -298,7 +300,7 @@ public class MPJInterceptor implements Interceptor {
      * @return 唯一列名
      */
     private String getColumn(Set<String> pool, String columnName) {
-        columnName = "join_" + columnName;
+        columnName = ConfigProperties.joinPrefix + columnName;
         if (!pool.contains(columnName)) {
             pool.add(columnName);
             return columnName;

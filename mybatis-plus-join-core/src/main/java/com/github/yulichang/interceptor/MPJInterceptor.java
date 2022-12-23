@@ -235,7 +235,7 @@ public class MPJInterceptor implements Interceptor {
             SelectLabel label;
             Field field = ofTypeField.get(r.getProperty());
             if (columnSet.contains(columnName)) {
-                columnName = getColumn(columnSet, columnName);
+                columnName = getColumn(columnSet, columnName, 0);
                 label = new SelectLabel(r.getSelectNormal(), mybatisLabel.getIndex(), mybatisLabel.getOfType(), field, columnName);
             } else {
                 label = new SelectLabel(r.getSelectNormal(), mybatisLabel.getIndex(), mybatisLabel.getOfType(), field);
@@ -299,13 +299,23 @@ public class MPJInterceptor implements Interceptor {
      * @param columnName 列明
      * @return 唯一列名
      */
-    private String getColumn(Set<String> pool, String columnName) {
-        columnName = ConfigProperties.joinPrefix + columnName;
-        if (!pool.contains(columnName)) {
-            pool.add(columnName);
-            return columnName;
+    private String getColumn(Set<String> pool, String columnName, int num) {
+        String newName = ConfigProperties.joinPrefix + getPrefix(num) + StringPool.UNDERSCORE + columnName;
+        if (!pool.contains(newName)) {
+            pool.add(newName);
+            return newName;
         }
-        return getColumn(pool, columnName);
+        return getColumn(pool, columnName, ++num);
+    }
+
+    private String getPrefix(int num) {
+        String s = Integer.toString(num, 25);
+        char[] array = s.toCharArray();
+        char[] chars = new char[s.length()];
+        for (int i = 0; i < array.length; i++) {
+            chars[i] = (char) (array[i] < 58 ? (array[i] + 49) : (array[i] + 10));
+        }
+        return new String(chars);
     }
 
     /**

@@ -59,7 +59,7 @@ public class MybatisPlusJoinAutoConfiguration {
         ConfigProperties.subTableLogic = properties.getSubTableLogic();
         ConfigProperties.msCache = properties.isMsCache();
         ConfigProperties.tableAlias = properties.getTableAlias();
-        ConfigProperties.tableAlias = properties.getJoinPrefix();
+        ConfigProperties.joinPrefix = properties.getJoinPrefix();
     }
 
     /**

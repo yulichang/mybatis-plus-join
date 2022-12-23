@@ -38,5 +38,5 @@ public class MybatisPlusJoinProperties {
     /**
      * 连表查询重复字段名前缀
      */
-    private String joinPrefix = "t";
+    private String joinPrefix = "join";
 }

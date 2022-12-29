@@ -6,6 +6,7 @@ import com.github.yulichang.annotation.EntityMapping;
 import com.github.yulichang.annotation.FieldMapping;
 import com.github.yulichang.exception.MPJException;
 import com.github.yulichang.mapper.MPJTableInfo;
+import org.apache.ibatis.session.Configuration;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -129,7 +130,12 @@ public class MPJTableInfoHelper {
      */
     public static TableInfo copyAndSetTableName(TableInfo tableInfo, String tableName) {
         try {
-            TableInfo table = new TableInfo(tableInfo.getEntityType());
+            TableInfo table;
+            try {
+                table = TableInfo.class.getDeclaredConstructor(Class.class).newInstance(tableInfo.getEntityType());
+            } catch (Exception e) {
+                table = TableInfo.class.getDeclaredConstructor(Configuration.class, Class.class).newInstance(tableInfo.getConfiguration(), tableInfo.getEntityType());
+            }
             //反射拷贝对象
             Field[] fields = TableInfo.class.getDeclaredFields();
             for (Field f : fields) {

@@ -13,8 +13,9 @@ import java.util.Map;
  */
 public class SelectJoinMaps extends MPJAbstractMethod {
 
+    @SuppressWarnings("deprecation")
     public SelectJoinMaps() {
-        super(SqlMethod.SELECT_JOIN_MAPS.getMethod());
+        super();
     }
 
     @SuppressWarnings("unused")

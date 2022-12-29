@@ -22,9 +22,9 @@ public abstract class MPJAbstractMethod extends AbstractMethod implements MPJBas
         super();
     }
 
-    @SuppressWarnings({"unused", "deprecation"})
+    @SuppressWarnings({"unused"})
     protected MPJAbstractMethod(String methodName) {
-        super();
+        super(methodName);
     }
 
     /**

@@ -29,7 +29,7 @@ public class InterceptorConfig {
             //打印banner
             System.out.println(" _ _   |_  _ _|_. ___ _ |    _  .  _  .  _  \n" +
                     "| | |\\/|_)(_| | |_\\  |_)||_|_\\  | (_) | | | \n" +
-                    "     /               |          /            1.4.0");
+                    "     /               |          /            1.4.2");
         }
     }
 

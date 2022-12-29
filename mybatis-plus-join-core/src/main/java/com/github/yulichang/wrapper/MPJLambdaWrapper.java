@@ -242,11 +242,11 @@ public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWr
                             .append(Constant.ON)
                             .append(wrapper.getExpression().getNormal().getSqlSegment());
                 } else {
-                    value.append(StringPool.EMPTY)
+                    value.append(StringPool.SPACE)
                             .append(wrapper.getKeyWord())
-                            .append(StringPool.EMPTY)
+                            .append(StringPool.SPACE)
                             .append(wrapper.from.getStringValue())
-                            .append(StringPool.EMPTY);
+                            .append(StringPool.SPACE);
                 }
             }
             from.setStringValue(value.toString());
@@ -378,7 +378,7 @@ public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWr
         if (condition) {
             MPJLambdaWrapper<T> wrapper = new MPJLambdaWrapper<>();
             wrapper.from.setStringValue(joinSql);
-            wrapper.keyWord = StringPool.SPACE + keyWord + StringPool.SPACE;
+            wrapper.keyWord = keyWord;
             onWrappers.add(wrapper);
         }
         return typedThis;

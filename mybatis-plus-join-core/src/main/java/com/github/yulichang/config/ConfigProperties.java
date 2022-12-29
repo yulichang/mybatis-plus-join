@@ -8,5 +8,5 @@ public class ConfigProperties {
     public static boolean subTableLogic = true;
     public static boolean msCache = true;
     public static String tableAlias = "t";
-    public static String joinPrefix = "t";
+    public static String joinPrefix = "join";
 }

@@ -7,6 +7,8 @@
 QQ群:1022221898  
 [加入微信群](https://gitee.com/best_handsome/mybatis-plus-join/issues/I65N2M)
 
+### [文档](https://ylctmh.com)
+
 ## 使用方法
 
 ### 安装
@@ -249,7 +251,7 @@ ORDER BY
     addr.id DESC
 ```
 
-# [wiki](https://gitee.com/best_handsome/mybatis-plus-join/wikis)
+# [wiki](https://ylctmh.com)
 
 
 

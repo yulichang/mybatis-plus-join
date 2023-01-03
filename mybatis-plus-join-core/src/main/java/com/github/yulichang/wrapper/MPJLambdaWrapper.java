@@ -3,13 +3,13 @@ package com.github.yulichang.wrapper;
 import com.baomidou.mybatisplus.core.conditions.SharedString;
 import com.baomidou.mybatisplus.core.conditions.segments.MergeSegments;
 import com.baomidou.mybatisplus.core.metadata.TableInfo;
-import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
 import com.baomidou.mybatisplus.core.toolkit.*;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.github.yulichang.config.ConfigProperties;
 import com.github.yulichang.toolkit.Constant;
 import com.github.yulichang.toolkit.LambdaUtils;
 import com.github.yulichang.toolkit.LogicInfoUtils;
+import com.github.yulichang.toolkit.TableHelper;
 import com.github.yulichang.toolkit.support.ColumnCache;
 import com.github.yulichang.wrapper.interfaces.Query;
 import com.github.yulichang.wrapper.interfaces.QueryJoin;
@@ -230,7 +230,7 @@ public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWr
             StringBuilder value = new StringBuilder();
             for (MPJLambdaWrapper<?> wrapper : onWrappers) {
                 if (StringUtils.isBlank(wrapper.from.getStringValue())) {
-                    TableInfo info = TableInfoHelper.getTableInfo(wrapper.getJoinClass());
+                    TableInfo info = TableHelper.get(wrapper.getJoinClass());
                     Assert.notNull(info, "table not find by class <%s>", wrapper.getJoinClass().getSimpleName());
                     String tableName = info.getTableName();
                     value.append(StringPool.SPACE)

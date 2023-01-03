@@ -2,9 +2,9 @@ package com.github.yulichang.wrapper.segments;
 
 import com.baomidou.mybatisplus.core.metadata.TableFieldInfo;
 import com.baomidou.mybatisplus.core.metadata.TableInfo;
-import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
 import com.baomidou.mybatisplus.core.toolkit.Assert;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
+import com.github.yulichang.toolkit.TableHelper;
 import lombok.Getter;
 import org.apache.ibatis.session.Configuration;
 import org.apache.ibatis.type.TypeHandler;
@@ -54,7 +54,7 @@ public class SelectCache {
         } else {
             this.hasTypeHandle = this.tableFieldInfo.getTypeHandler() != null && tableFieldInfo.getTypeHandler() != UnknownTypeHandler.class;
             if (this.hasTypeHandle) {
-                TableInfo info = TableInfoHelper.getTableInfo(clazz);
+                TableInfo info = TableHelper.get(clazz);
                 Assert.notNull(info, "table not find by class <%s>", clazz.getSimpleName());
                 this.typeHandler = getTypeHandler(info.getConfiguration(), tableFieldInfo);
             } else {

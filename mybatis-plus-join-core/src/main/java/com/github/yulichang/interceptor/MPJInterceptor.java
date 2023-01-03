@@ -1,7 +1,6 @@
 package com.github.yulichang.interceptor;
 
 import com.baomidou.mybatisplus.core.metadata.TableInfo;
-import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
 import com.baomidou.mybatisplus.core.toolkit.*;
 import com.github.yulichang.config.ConfigProperties;
 import com.github.yulichang.mapper.MPJTableMapperHelper;
@@ -9,6 +8,7 @@ import com.github.yulichang.method.MPJResultType;
 import com.github.yulichang.query.MPJQueryWrapper;
 import com.github.yulichang.toolkit.Constant;
 import com.github.yulichang.toolkit.MPJReflectionKit;
+import com.github.yulichang.toolkit.TableHelper;
 import com.github.yulichang.wrapper.MPJLambdaWrapper;
 import com.github.yulichang.wrapper.resultmap.MybatisLabel;
 import com.github.yulichang.wrapper.resultmap.Result;
@@ -84,7 +84,7 @@ public class MPJInterceptor implements Interceptor {
      */
     @SuppressWarnings("rawtypes")
     public MappedStatement getMappedStatement(MappedStatement ms, Class<?> resultType, Object ew) {
-        String id = ms.getId() + StringPool.UNDERSCORE + resultType.getName();
+        String id = ms.getId() + StringPool.DASH + (resultType.getName().replaceAll("\\.", StringPool.DASH));
         if (ew instanceof MPJLambdaWrapper) {
             MPJLambdaWrapper wrapper = (MPJLambdaWrapper) ew;
             wrapper.setEntityClass(MPJTableMapperHelper.getEntity(getEntity(ms.getId())));
@@ -94,11 +94,12 @@ public class MPJInterceptor implements Interceptor {
         if (ew instanceof MPJQueryWrapper) {
             MPJQueryWrapper wrapper = (MPJQueryWrapper) ew;
             if (ConfigProperties.msCache) {
-                return getCache(ms, id + StringPool.UNDERSCORE + wrapper.getSqlSelect(), resultType, ew);
+                return getCache(ms, id + StringPool.UNDERSCORE + removeDot(wrapper.getSqlSelect()), resultType, ew);
             }
         }
         return buildMappedStatement(ms, resultType, ew, id);
     }
+
 
     /**
      * 走缓存
@@ -150,7 +151,7 @@ public class MPJInterceptor implements Interceptor {
     @SuppressWarnings({"rawtypes", "unchecked"})
     private List<ResultMap> buildResultMap(MappedStatement ms, Class<?> resultType, Object obj) {
         List<ResultMap> result = new ArrayList<>();
-        TableInfo tableInfo = TableInfoHelper.getTableInfo(resultType);
+        TableInfo tableInfo = TableHelper.get(resultType);
         String id = ms.getId() + StringPool.DOT + Constants.MYBATIS_PLUS + StringPool.UNDERSCORE + resultType.getName();
         //基本数据类型
         if (MPJReflectionKit.isPrimitiveOrWrapper(resultType)) {
@@ -244,9 +245,9 @@ public class MPJInterceptor implements Interceptor {
             ResultMapping.Builder builder = new ResultMapping.Builder(ms.getConfiguration(), r.getProperty(), columnName, r.getJavaType());
             if (r.isId()) {//主键标记为id标签
                 builder.flags(Collections.singletonList(ResultFlag.ID));
-                childId.append(ResultFlag.ID);
+                childId.append("i");
             } else {
-                childId.append(ResultFlag.CONSTRUCTOR);
+                childId.append("c");
             }
             //TypeHandle
             if (label.hasTypeHandle() && label.getColumnType().isAssignableFrom(field.getType())) {
@@ -359,6 +360,14 @@ public class MPJInterceptor implements Interceptor {
             return Class.forName(id.substring(0, id.lastIndexOf(StringPool.DOT)));
         } catch (ClassNotFoundException e) {
             return null;
+        }
+    }
+
+    private String removeDot(String str) {
+        if (StringUtils.isBlank(str)) {
+            return str;
+        } else {
+            return str.replaceAll("\\.", StringPool.DASH);
         }
     }
 }

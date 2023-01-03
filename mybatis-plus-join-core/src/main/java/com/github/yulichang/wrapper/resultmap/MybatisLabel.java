@@ -1,12 +1,12 @@
 package com.github.yulichang.wrapper.resultmap;
 
 import com.baomidou.mybatisplus.core.metadata.TableInfo;
-import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
 import com.baomidou.mybatisplus.core.toolkit.Assert;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.github.yulichang.toolkit.LambdaUtils;
 import com.github.yulichang.toolkit.MPJReflectionKit;
+import com.github.yulichang.toolkit.TableHelper;
 import com.github.yulichang.toolkit.support.ColumnCache;
 import com.github.yulichang.wrapper.segments.SelectCache;
 import lombok.Getter;
@@ -209,7 +209,7 @@ public class MybatisLabel<E, T> {
         }
 
         private void autoBuild(boolean auto, Class<E> entityClass, Class<T> tagClass) {
-            TableInfo tableInfo = TableInfoHelper.getTableInfo(entityClass);
+            TableInfo tableInfo = TableHelper.get(entityClass);
             Assert.notNull(tableInfo, "table not find by class <%s>", entityClass.getSimpleName());
             Map<String, Field> tagMap = MPJReflectionKit.getFieldMap(tagClass);
             if (auto && !tagMap.isEmpty()) {

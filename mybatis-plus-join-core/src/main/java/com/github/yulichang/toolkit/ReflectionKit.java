@@ -15,8 +15,10 @@
  */
 package com.github.yulichang.toolkit;
 
-import com.baomidou.mybatisplus.core.toolkit.*;
-import com.baomidou.mybatisplus.core.toolkit.reflect.GenericTypeUtils;
+import com.baomidou.mybatisplus.core.toolkit.Assert;
+import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
+import com.baomidou.mybatisplus.core.toolkit.ExceptionUtils;
+import com.github.yulichang.toolkit.reflect.GenericTypeUtils;
 
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Field;

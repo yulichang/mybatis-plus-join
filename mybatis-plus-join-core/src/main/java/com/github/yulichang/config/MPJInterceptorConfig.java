@@ -18,12 +18,12 @@ import java.util.List;
  *
  * @author yulichang
  */
-public class InterceptorConfig {
+public class MPJInterceptorConfig {
 
 
-    private static final Log logger = LogFactory.getLog(InterceptorConfig.class);
+    private static final Log logger = LogFactory.getLog(MPJInterceptorConfig.class);
 
-    public InterceptorConfig(List<SqlSessionFactory> sqlSessionFactoryList, Boolean banner) {
+    public MPJInterceptorConfig(List<SqlSessionFactory> sqlSessionFactoryList, Boolean banner) {
         replaceInterceptorChain(sqlSessionFactoryList);
         if (banner) {
             //打印banner

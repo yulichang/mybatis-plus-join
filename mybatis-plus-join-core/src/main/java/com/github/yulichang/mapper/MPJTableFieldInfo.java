@@ -4,12 +4,12 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.MPJTableInfoHelper;
 import com.baomidou.mybatisplus.core.metadata.TableFieldInfo;
 import com.baomidou.mybatisplus.core.metadata.TableInfo;
-import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
 import com.baomidou.mybatisplus.core.toolkit.*;
 import com.github.yulichang.annotation.EntityMapping;
 import com.github.yulichang.annotation.FieldMapping;
 import com.github.yulichang.exception.MPJException;
 import com.github.yulichang.toolkit.SpringContentUtils;
+import com.github.yulichang.toolkit.TableHelper;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
@@ -164,7 +164,8 @@ public class MPJTableFieldInfo {
     }
 
     private void initBindField(String bindName) {
-        TableInfo info = TableInfoHelper.getTableInfo(this.joinClass);
+        TableInfo info = TableHelper.get(this.joinClass);
+        Assert.notNull(info, "未注册的实体类 <%s>", this.joinClass.getSimpleName());
         Field field = info.getFieldList().stream()
                 .filter(i -> i.getColumn().equals(bindName))
                 .map(TableFieldInfo::getField).findFirst().orElse(null);
@@ -285,7 +286,7 @@ public class MPJTableFieldInfo {
     }
 
     private TableInfo getTableInfo(Class<?> clazz) {
-        TableInfo tableInfo = TableInfoHelper.getTableInfo(clazz);
+        TableInfo tableInfo = TableHelper.get(clazz);
         if (tableInfo == null) {
             throw new MPJException("未注册 mapper " + clazz.getName());
         }

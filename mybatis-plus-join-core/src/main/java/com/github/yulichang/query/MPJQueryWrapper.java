@@ -6,11 +6,11 @@ import com.baomidou.mybatisplus.core.conditions.query.Query;
 import com.baomidou.mybatisplus.core.conditions.segments.MergeSegments;
 import com.baomidou.mybatisplus.core.metadata.TableFieldInfo;
 import com.baomidou.mybatisplus.core.metadata.TableInfo;
-import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
 import com.baomidou.mybatisplus.core.toolkit.*;
 import com.github.yulichang.config.ConfigProperties;
 import com.github.yulichang.query.interfaces.StringJoin;
 import com.github.yulichang.toolkit.MPJWrappers;
+import com.github.yulichang.toolkit.TableHelper;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -134,7 +134,7 @@ public class MPJQueryWrapper<T> extends AbstractWrapper<T, String, MPJQueryWrapp
      */
     @Override
     public MPJQueryWrapper<T> select(Class<T> entityClass, Predicate<TableFieldInfo> predicate) {
-        TableInfo info = TableInfoHelper.getTableInfo(entityClass);
+        TableInfo info = TableHelper.get(entityClass);
         Assert.notNull(info, "table not find by class <%s>", entityClass.getSimpleName());
         selectColumns.addAll(info.getFieldList().stream().filter(predicate).map(c ->
                 alias + StringPool.DOT + c.getSqlSelect()).collect(Collectors.toList()));
@@ -159,7 +159,7 @@ public class MPJQueryWrapper<T> extends AbstractWrapper<T, String, MPJQueryWrapp
      */
     @SuppressWarnings({"DuplicatedCode", "UnusedReturnValue"})
     public final MPJQueryWrapper<T> selectAll(Class<?> clazz, String as) {
-        TableInfo info = TableInfoHelper.getTableInfo(clazz);
+        TableInfo info = TableHelper.get(clazz);
         Assert.notNull(info, "table not find by class <%s>", clazz);
         if (info.havePK()) {
             selectColumns.add(as + StringPool.DOT + info.getKeySqlSelect());

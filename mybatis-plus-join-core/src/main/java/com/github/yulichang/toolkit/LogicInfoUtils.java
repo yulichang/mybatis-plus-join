@@ -1,7 +1,6 @@
 package com.github.yulichang.toolkit;
 
 import com.baomidou.mybatisplus.core.metadata.TableInfo;
-import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
 import com.baomidou.mybatisplus.core.toolkit.Assert;
 import com.baomidou.mybatisplus.core.toolkit.Constants;
 import com.baomidou.mybatisplus.core.toolkit.StringPool;
@@ -33,7 +32,7 @@ public class LogicInfoUtils implements Constants {
     private static String getLogicStr(String prefix, Class<?> clazz) {
 
         String logicStr;
-        TableInfo tableInfo = TableInfoHelper.getTableInfo(clazz);
+        TableInfo tableInfo = TableHelper.get(clazz);
         Assert.notNull(tableInfo, "table not find by class <%s>", clazz.getSimpleName());
         if (tableInfo.isWithLogicDelete() && Objects.nonNull(tableInfo.getLogicDeleteFieldInfo())) {
             final String value = tableInfo.getLogicDeleteFieldInfo().getLogicNotDeleteValue();

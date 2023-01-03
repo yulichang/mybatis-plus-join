@@ -6,6 +6,7 @@ import com.github.yulichang.annotation.EntityMapping;
 import com.github.yulichang.annotation.FieldMapping;
 import com.github.yulichang.exception.MPJException;
 import com.github.yulichang.mapper.MPJTableInfo;
+import com.github.yulichang.toolkit.TableHelper;
 import org.apache.ibatis.session.Configuration;
 
 import java.lang.reflect.Field;
@@ -75,7 +76,7 @@ public class MPJTableInfoHelper {
         }
         MPJTableInfo mpjTableInfo = new MPJTableInfo();
         mpjTableInfo.setMapperClass(mapperClass);
-        TableInfo tableInfo = TableInfoHelper.getTableInfo(clazz);
+        TableInfo tableInfo = TableHelper.get(clazz);
         if (tableInfo == null) {
             return;
         }

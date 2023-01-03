@@ -6,13 +6,19 @@ import com.baomidou.mybatisplus.core.injector.DefaultSqlInjector;
 import com.baomidou.mybatisplus.core.injector.methods.*;
 import com.baomidou.mybatisplus.core.mapper.Mapper;
 import com.baomidou.mybatisplus.core.metadata.TableInfo;
+import com.baomidou.mybatisplus.core.toolkit.ArrayUtils;
 import com.baomidou.mybatisplus.core.toolkit.ClassUtils;
 import com.github.yulichang.mapper.MPJTableMapperHelper;
 import com.github.yulichang.method.*;
 import com.github.yulichang.method.mp.SelectOne;
+import com.github.yulichang.toolkit.TableHelper;
+import com.github.yulichang.toolkit.reflect.GenericTypeUtils;
 import org.apache.ibatis.builder.MapperBuilderAssistant;
-import org.springframework.core.GenericTypeResolver;
 
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import java.lang.reflect.TypeVariable;
+import java.lang.reflect.WildcardType;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -116,10 +122,33 @@ public class MPJSqlInjector extends DefaultSqlInjector {
         Class<?> modelClass = getSuperClassGenericType(mapperClass, Mapper.class, 0);
         super.inspectInject(builderAssistant, mapperClass);
         MPJTableMapperHelper.init(modelClass, mapperClass);
+        TableHelper.init(modelClass, extractModelClassOld(mapperClass));
     }
 
     public static Class<?> getSuperClassGenericType(final Class<?> clazz, final Class<?> genericIfc, final int index) {
-        Class<?>[] typeArguments = GenericTypeResolver.resolveTypeArguments(ClassUtils.getUserClass(clazz), genericIfc);
+        Class<?>[] typeArguments = GenericTypeUtils.resolveTypeArguments(ClassUtils.getUserClass(clazz), genericIfc);
         return null == typeArguments ? null : typeArguments[index];
+    }
+
+    protected Class<?> extractModelClassOld(Class<?> mapperClass) {
+        Type[] types = mapperClass.getGenericInterfaces();
+        ParameterizedType target = null;
+        for (Type type : types) {
+            if (type instanceof ParameterizedType) {
+                Type[] typeArray = ((ParameterizedType) type).getActualTypeArguments();
+                if (ArrayUtils.isNotEmpty(typeArray)) {
+                    for (Type t : typeArray) {
+                        if (t instanceof TypeVariable || t instanceof WildcardType) {
+                            break;
+                        } else {
+                            target = (ParameterizedType) type;
+                            break;
+                        }
+                    }
+                }
+                break;
+            }
+        }
+        return target == null ? null : (Class<?>) target.getActualTypeArguments()[0];
     }
 }

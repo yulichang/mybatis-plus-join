@@ -1,8 +1,8 @@
 package com.github.yulichang.toolkit.support;
 
 import com.baomidou.mybatisplus.core.metadata.TableInfo;
-import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
 import com.baomidou.mybatisplus.core.toolkit.Assert;
+import com.github.yulichang.toolkit.TableHelper;
 import com.github.yulichang.wrapper.segments.SelectCache;
 
 import java.util.ArrayList;
@@ -26,7 +26,7 @@ public class ColumnCache {
 
     public static List<SelectCache> getListField(Class<?> clazz) {
         return LIST_CACHE.computeIfAbsent(clazz, c -> {
-            TableInfo tableInfo = TableInfoHelper.getTableInfo(clazz);
+            TableInfo tableInfo = TableHelper.get(clazz);
             Assert.notNull(tableInfo, "table not find by class <%s>", c.getSimpleName());
             List<SelectCache> list = new ArrayList<>();
             if (tableInfo.havePK()) {

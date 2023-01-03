@@ -5,7 +5,7 @@ import com.baomidou.mybatisplus.core.injector.AbstractSqlInjector;
 import com.baomidou.mybatisplus.core.injector.DefaultSqlInjector;
 import com.baomidou.mybatisplus.core.injector.ISqlInjector;
 import com.github.yulichang.config.ConfigProperties;
-import com.github.yulichang.config.InterceptorConfig;
+import com.github.yulichang.config.MPJInterceptorConfig;
 import com.github.yulichang.injector.MPJSqlInjector;
 import com.github.yulichang.interceptor.MPJInterceptor;
 import com.github.yulichang.toolkit.SpringContentUtils;
@@ -75,8 +75,8 @@ public class MybatisPlusJoinAutoConfiguration {
      */
     @Bean
     @ConditionalOnBean(SqlSessionFactory.class)
-    public InterceptorConfig interceptorConfig(List<SqlSessionFactory> sqlSessionFactoryList) {
-        return new InterceptorConfig(sqlSessionFactoryList, properties.getBanner());
+    public MPJInterceptorConfig mpjInterceptorConfig(List<SqlSessionFactory> sqlSessionFactoryList) {
+        return new MPJInterceptorConfig(sqlSessionFactoryList, properties.getBanner());
     }
 
     /**

@@ -168,15 +168,14 @@ public class MybatisLabel<E, T> {
         /**
          * 嵌套
          */
-        public <A, B> Builder<E, T> association(Integer index, Class<A> child, SFunction<T, B> dtoField) {
+        public <A, B> Builder<E, T> association(String index, Class<A> child, SFunction<T, B> dtoField) {
             Class<T> dtoClass = LambdaUtils.getEntityClass(dtoField);
             Map<String, Field> fieldMap = MPJReflectionKit.getFieldMap(dtoClass);
             String dtoFieldName = LambdaUtils.getName(dtoField);
             Field field = fieldMap.get(dtoFieldName);
             Assert.isFalse(Collection.class.isAssignableFrom(field.getType()), "association 不支持集合类");
             MybatisLabel.Builder<A, B> builder;
-            builder = new MybatisLabel.Builder<>(Objects.isNull(index) ? null : index.toString(),
-                    dtoFieldName, child, field.getType(), (Class<B>) field.getType(), true);
+            builder = new MybatisLabel.Builder<>(index, dtoFieldName, child, field.getType(), (Class<B>) field.getType(), true);
             mybatisLabel.mybatisLabels.add(builder.build());
             return this;
         }
@@ -189,14 +188,13 @@ public class MybatisLabel<E, T> {
         /**
          * 嵌套
          */
-        public <A, B> Builder<E, T> association(Integer index, Class<A> child, SFunction<T, B> dtoField,
+        public <A, B> Builder<E, T> association(String index, Class<A> child, SFunction<T, B> dtoField,
                                                 MFunc<MybatisLabel.Builder<A, B>> collection) {
             String dtoFieldName = LambdaUtils.getName(dtoField);
             Class<T> dtoClass = LambdaUtils.getEntityClass(dtoField);
             Field field = MPJReflectionKit.getFieldMap(dtoClass).get(dtoFieldName);
             Assert.isFalse(Collection.class.isAssignableFrom(field.getType()), "association 不支持集合类");
-            MybatisLabel.Builder<A, B> builder = new MybatisLabel.Builder<>(Objects.isNull(index) ? null : index.toString(),
-                    dtoFieldName, child, field.getType(), (Class<B>) field.getType(), false);
+            MybatisLabel.Builder<A, B> builder = new MybatisLabel.Builder<>(index, dtoFieldName, child, field.getType(), (Class<B>) field.getType(), false);
             mybatisLabel.mybatisLabels.add(collection.apply(builder).build());
             return this;
         }

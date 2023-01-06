@@ -18,7 +18,7 @@ import java.lang.reflect.Field;
 @Getter
 public class SelectLabel implements Select {
 
-    private final String index;
+    private final Integer index;
 
     private final SelectCache cache;
 
@@ -30,22 +30,30 @@ public class SelectLabel implements Select {
 
     private final String alias;
 
-    public SelectLabel(SelectCache cache, String index, Class<?> tagClass, Field tagField) {
+    private final boolean hasTableAlias;
+
+    private final String tableAlias;
+
+    public SelectLabel(SelectCache cache, Integer index, Class<?> tagClass, Field tagField, boolean hasTableAlias, String tableAlias) {
         this.cache = cache;
         this.index = index;
         this.tagClass = tagClass;
         this.tagField = tagField;
         this.hasAlias = false;
         this.alias = null;
+        this.hasTableAlias = hasTableAlias;
+        this.tableAlias = tableAlias;
     }
 
-    public SelectLabel(SelectCache cache, String index, Class<?> tagClass, Field tagField, String column) {
+    public SelectLabel(SelectCache cache, Integer index, Class<?> tagClass, Field tagField, String column, boolean hasTableAlias, String tableAlias) {
         this.cache = cache;
         this.index = index;
         this.tagClass = tagClass;
         this.tagField = tagField;
         this.hasAlias = true;
         this.alias = column;
+        this.hasTableAlias = hasTableAlias;
+        this.tableAlias = tableAlias;
     }
 
     @Override

@@ -1,10 +1,12 @@
 package com.github.yulichang.toolkit;
 
+import com.baomidou.mybatisplus.core.toolkit.StringPool;
 import lombok.Data;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Data
 public class TableList {
@@ -18,6 +20,11 @@ public class TableList {
      * 主表类型
      */
     private Class<?> rootClass;
+
+    /**
+     * 主表别名
+     */
+    private String alias;
 
     /**
      * 关联表
@@ -45,17 +52,125 @@ public class TableList {
         }
     }
 
-    public String getPrefix(int index) {
-        return null;
+    public String getPrefix(Integer index, Class<?> clazz, boolean isLabel) {
+        if (Objects.isNull(index)) {
+            if (!isLabel) {
+                if (rootClass == clazz) {
+                    return alias;
+                }
+            }
+            Node node = getByClassFirst(clazz);
+            if (Objects.isNull(node)) {
+                return alias;
+            }
+            return node.isHasAlias() ? node.getAlias() : (node.getAlias() + node.getIndex());
+        }
+        Node node = getByIndex(index);
+        if (node.getClazz() != clazz) {
+            Node dg = dg(node, clazz);
+            if (Objects.nonNull(dg)) {
+                node = dg;
+            } else {
+                if (rootClass != clazz) {
+                    List<Node> list = getByClass(clazz);
+                    for (int i = list.size() - 1; i >= 0; i--) {
+                        Node n = list.get(i);
+                        if (n.getClazz() == clazz) {
+                            return n.hasAlias ? n.getAlias() : (n.getAlias() + n.getIndex());
+                        }
+                    }
+                }
+                return alias;
+            }
+        }
+        if (node.hasAlias) {
+            return node.getAlias();
+        } else {
+            return node.getAlias() + node.getIndex();
+        }
     }
 
-    public String getPrefixOther(int index) {
-        return null;
+    public String getPrefixOther(Integer index, Class<?> clazz) {
+        if (Objects.isNull(index)) {
+            List<Node> list = getByClass(clazz);
+            if (list.size() == 1 && list.get(0).getClazz() == clazz) {
+                return alias;
+            } else if (list.size() > 1) {
+                for (Node n : list) {
+                    if (n.getClazz() == clazz) {
+                        return n.isHasAlias() ? n.getAlias() : (n.getAlias() + n.getIndex());
+                    }
+                }
+                return alias;
+            } else {
+                return alias;
+            }
+        }
+        Node node = getByIndex(index);
+        Node dg = dg(node, node.getClazz());
+        if (Objects.nonNull(dg)) {
+            return dg.hasAlias ? dg.alias : (dg.alias + dg.getIndex());
+        }
+        if (Objects.equals(rootClass, node.getClazz())) {
+            return alias;
+        } else {
+            List<Node> list = getByClass(node.getClazz());
+            if (list.size() == 1) {
+                Node n = list.get(0);
+                if (n.getClazz() == node.getClazz()) {
+                    return alias;
+                } else {
+                    return n.isHasAlias() ? n.getAlias() : (n.getAlias() + n.getIndex());
+                }
+            } else if (list.size() > 1) {
+                for (Node n : list) {
+                    if (n.getClazz() != node.getClazz()) {
+                        return n.isHasAlias() ? n.getAlias() : (n.getAlias() + n.getIndex());
+                    }
+                }
+                return alias;
+            } else {
+                return alias;
+            }
+        }
     }
 
+    private Node dg(Node node, Class<?> clazz) {
+        if (Objects.isNull(node.getPIndex())) {
+            return null;
+        } else {
+            Node pNode = getByIndex(node.getPIndex());
+            if (pNode.getClazz() == clazz) {
+                return pNode;
+            }
+            return dg(pNode, clazz);
+        }
+    }
+
+    public String getPrefixByClass(Class<?> clazz) {
+        Node node = getByClassFirst(clazz);
+        if (Objects.isNull(node)) {
+            return alias;
+        } else {
+            return node.hasAlias ? node.getAlias() : (node.getAlias() + StringPool.DOT + node.getIndex());
+        }
+    }
 
     private Node getByIndex(int index) {
         return all.stream().filter(i -> i.getIndex() == index).findFirst().orElse(null);
+    }
+
+    private Node getByClassFirst(Class<?> clazz) {
+        return all.stream().filter(i -> i.getClazz() == clazz).findFirst().orElse(null);
+    }
+
+    private List<Node> getByClass(Class<?> clazz) {
+        return all.stream().filter(i -> i.getClazz() == clazz).collect(Collectors.toList());
+    }
+
+    public void clear() {
+        this.all.clear();
+        this.child.clear();
     }
 
     @Data

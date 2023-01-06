@@ -45,3 +45,14 @@ create table address
     address varchar(255) null,
     del     bit
 );
+
+create table user_dto
+(
+    id        int auto_increment
+        primary key,
+    user_id   int not null,
+    create_by int not null,
+    update_by int not null,
+    version   int not null,
+    del       bit null
+);

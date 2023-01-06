@@ -11,9 +11,11 @@ import com.baomidou.mybatisplus.core.toolkit.*;
 import com.baomidou.mybatisplus.core.toolkit.sql.SqlUtils;
 import com.baomidou.mybatisplus.core.toolkit.sql.StringEscape;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
+import com.github.yulichang.toolkit.LambdaUtils;
+import com.github.yulichang.toolkit.TableList;
 import com.github.yulichang.toolkit.sql.SqlScriptUtils;
+import com.github.yulichang.wrapper.enums.PrefixEnum;
 import com.github.yulichang.wrapper.interfaces.*;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import java.util.*;
@@ -36,8 +38,6 @@ public abstract class MPJAbstractWrapper<T, Children extends MPJAbstractWrapper<
         implements Compare<Children>, Nested<Children, Children>, Join<Children>, Func<Children>, OnCompare<Children>,
         CompareStr<Children, String>, FuncStr<Children, String> {
 
-    protected static final Node ROOT_NODE = new Node(null, 0, null);
-
     /**
      * 占位符
      */
@@ -46,7 +46,7 @@ public abstract class MPJAbstractWrapper<T, Children extends MPJAbstractWrapper<
      * 表别名
      */
     @Getter
-    protected String index;
+    protected Integer index;
     /**
      * 必要度量
      */
@@ -85,11 +85,19 @@ public abstract class MPJAbstractWrapper<T, Children extends MPJAbstractWrapper<
      */
     @Getter
     protected Class<?> joinClass;
+    /**
+     * 主表wrapper
+     */
+    protected boolean isMain = true;
+    /**
+     * 是否是OnWrapper
+     */
+    protected boolean isNo = false;
 
     /**
-     * 寻路
+     * 关联的表
      */
-    protected Node node;
+    protected TableList tableList;
 
     @Override
     public T getEntity() {
@@ -112,6 +120,9 @@ public abstract class MPJAbstractWrapper<T, Children extends MPJAbstractWrapper<
         if (entityClass != null) {
             onWrappers.forEach(i -> i.setEntityClass(entityClass));
             this.entityClass = entityClass;
+        }
+        if (tableList != null) {
+            tableList.setRootClass(entityClass);
         }
         return typedThis;
     }
@@ -349,7 +360,7 @@ public abstract class MPJAbstractWrapper<T, Children extends MPJAbstractWrapper<
     public <R> Children groupBy(boolean condition, List<SFunction<R, ?>> columns) {
         return maybeDo(condition, () -> {
             if (CollectionUtils.isNotEmpty(columns)) {
-                String one = (StringPool.COMMA + columnsToString(index, getByClass(node, joinClass), false, parentClass(node), columns));
+                String one = (StringPool.COMMA + columnsToString(index, false, isNo ? PrefixEnum.ON_FIRST : PrefixEnum.CD_FIRST, columns));
                 final String finalOne = one;
                 appendSqlSegments(GROUP_BY, () -> finalOne);
             }
@@ -359,9 +370,9 @@ public abstract class MPJAbstractWrapper<T, Children extends MPJAbstractWrapper<
     @Override
     public <X> Children groupBy(boolean condition, SFunction<X, ?> column, SFunction<X, ?>... columns) {
         return maybeDo(condition, () -> {
-            String one = columnToString(index, getByClass(node, joinClass), column, false, parentClass(node));
+            String one = columnToString(index, column, false, isNo ? PrefixEnum.ON_FIRST : PrefixEnum.CD_FIRST);
             if (ArrayUtils.isNotEmpty(columns)) {
-                one += (StringPool.COMMA + columnsToString(index, getByClass(node, joinClass), false, parentClass(node), columns));
+                one += (StringPool.COMMA + columnsToString(index, false, isNo ? PrefixEnum.ON_FIRST : PrefixEnum.CD_FIRST, columns));
             }
             final String finalOne = one;
             appendSqlSegments(GROUP_BY, () -> finalOne);
@@ -467,8 +478,13 @@ public abstract class MPJAbstractWrapper<T, Children extends MPJAbstractWrapper<
     }
 
     protected <X, S> Children addCondition(boolean condition, SFunction<X, ?> column, SqlKeyword sqlKeyword, SFunction<S, ?> val) {
+        Class<X> c = LambdaUtils.getEntityClass(column);
+        Class<S> v = LambdaUtils.getEntityClass(val);
         return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(index, column, false), sqlKeyword,
-                columnToSqlSegment(index, val, true)));
+                isNo ?
+                        columnToSqlSegmentS(index, val, v == c && v == joinClass) :
+                        columnToSqlSegmentS(index, val, v == c)
+        ));
     }
 
     protected Children addCondition(boolean condition, String column, SqlKeyword sqlKeyword, Object val) {
@@ -643,8 +659,24 @@ public abstract class MPJAbstractWrapper<T, Children extends MPJAbstractWrapper<
     /**
      * 获取 columnName
      */
-    protected final <X> ISqlSegment columnToSqlSegment(String index, SFunction<X, ?> column, boolean isJoin) {
-        return () -> columnToString(index, getByClass(node, joinClass), column, isJoin, parentClass(node));
+    protected final <X> ISqlSegment columnToSqlSegment(Integer index, SFunction<X, ?> column, boolean isJoin) {
+        PrefixEnum prefixEnum;
+        if (isMain) {
+            prefixEnum = isNo ? PrefixEnum.ON_FIRST /* 理论上不可能有这种情况 */ : PrefixEnum.CD_FIRST;
+        } else {
+            prefixEnum = isNo ? PrefixEnum.ON_FIRST : PrefixEnum.CD_ON_FIRST;
+        }
+        return () -> columnToString(index, column, isJoin, isNo ? PrefixEnum.ON_FIRST : PrefixEnum.CD_FIRST);
+    }
+
+    protected final <X> ISqlSegment columnToSqlSegmentS(Integer index, SFunction<X, ?> column, boolean isJoin) {
+        PrefixEnum prefixEnum;
+        if (isMain) {
+            prefixEnum = isNo ? PrefixEnum.ON_SECOND /* 理论上不可能有这种情况 */ : PrefixEnum.CD_SECOND;
+        } else {
+            prefixEnum = isNo ? PrefixEnum.ON_SECOND : PrefixEnum.CD_ON_SECOND;
+        }
+        return () -> columnToString(index, column, isJoin, prefixEnum);
     }
 
     protected final <X> ISqlSegment columnToSqlSegment(String column) {
@@ -654,7 +686,7 @@ public abstract class MPJAbstractWrapper<T, Children extends MPJAbstractWrapper<
     /**
      * 获取 columnName
      */
-    protected <X> String columnToString(String index, int node, X column, boolean isJoin, Class<?> parent) {
+    protected <X> String columnToString(Integer index, X column, boolean isJoin, PrefixEnum prefixEnum) {
         return (String) column;
     }
 
@@ -676,8 +708,8 @@ public abstract class MPJAbstractWrapper<T, Children extends MPJAbstractWrapper<
      *
      * @param columns 多字段
      */
-    protected <X> String columnsToString(String index, int node, boolean isJoin, Class<?> parent, X... columns) {
-        return Arrays.stream(columns).map(i -> this.columnToString(index, node, i, isJoin, parent)).collect(joining(StringPool.COMMA));
+    protected <X> String columnsToString(Integer index, boolean isJoin, PrefixEnum prefixEnum, X... columns) {
+        return Arrays.stream(columns).map(i -> this.columnToString(index, i, isJoin, prefixEnum)).collect(joining(StringPool.COMMA));
     }
 
     @Override
@@ -725,46 +757,6 @@ public abstract class MPJAbstractWrapper<T, Children extends MPJAbstractWrapper<
     @Override
     public <R, S> Children le(boolean condition, SFunction<R, ?> column, SFunction<S, ?> val) {
         return addCondition(condition, column, LE, val);
-    }
-
-    @Getter
-    @AllArgsConstructor
-    public static class Node {
-
-        private Class<?> clazz;
-
-        private int index;
-
-        private Node parent;
-    }
-
-
-    private int getByClass(Node node, Class<?> joinClass) {
-        if (joinClass == null) {
-            return 0;
-        }
-        if (node.parent != null) {
-            return dg(node.parent, joinClass);
-        }
-        return 0;
-    }
-
-    private Class<?> parentClass(Node node) {
-        if (node == null || node.parent == null) {
-            return null;
-        }
-        return node.parent.clazz;
-    }
-
-    private int dg(Node node, Class<?> joinClass) {
-
-        if (node.clazz != null && node.clazz == joinClass) {
-            return node.index;
-        }
-        if (node.parent == null) {
-            return joinClass == getEntityClass() ? -1 : 0;
-        }
-        return getByClass(node.parent, joinClass);
     }
 
     /* ****************************************** **/

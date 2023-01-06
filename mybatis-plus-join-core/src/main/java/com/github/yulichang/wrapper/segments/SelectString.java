@@ -14,8 +14,14 @@ import org.apache.ibatis.type.TypeHandler;
 public class SelectString implements Select {
     private final String column;
 
-    public SelectString(String column) {
+    private final boolean hasTableAlias;
+
+    private final String tableAlias;
+
+    public SelectString(String column, boolean hasTableAlias, String tableAlias) {
         this.column = column;
+        this.hasTableAlias = hasTableAlias;
+        this.tableAlias = tableAlias;
     }
 
     @Override
@@ -24,8 +30,18 @@ public class SelectString implements Select {
     }
 
     @Override
-    public String getIndex() {
+    public Integer getIndex() {
         return null;
+    }
+
+    @Override
+    public boolean isHasTableAlias() {
+        return this.hasTableAlias;
+    }
+
+    @Override
+    public String getTableAlias() {
+        return this.tableAlias;
     }
 
     @Override

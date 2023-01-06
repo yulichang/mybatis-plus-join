@@ -35,7 +35,11 @@ public interface Query<Children> extends Serializable {
 
     Children getChildren();
 
-    String getIndex();
+    Integer getIndex();
+
+    boolean isHasAlias();
+
+    String getAlias();
 
 
     /**
@@ -54,7 +58,7 @@ public interface Query<Children> extends Serializable {
         Assert.notNull(info, "table not find by class <%s>", entityClass.getSimpleName());
         Map<String, SelectCache> cacheMap = ColumnCache.getMapField(entityClass);
         info.getFieldList().stream().filter(predicate).collect(Collectors.toList()).forEach(
-                i -> getSelectColum().add(new SelectNormal(cacheMap.get(i.getProperty()), getIndex())));
+                i -> getSelectColum().add(new SelectNormal(cacheMap.get(i.getProperty()), getIndex(), isHasAlias(), getAlias())));
         return getChildren();
     }
 
@@ -68,7 +72,7 @@ public interface Query<Children> extends Serializable {
      * @param columns 列
      */
     default Children select(String... columns) {
-        getSelectColum().addAll(Arrays.stream(columns).map(SelectString::new).collect(Collectors.toList()));
+        getSelectColum().addAll(Arrays.stream(columns).map(i -> new SelectString(i, isHasAlias(), getAlias())).collect(Collectors.toList()));
         return getChildren();
     }
 
@@ -78,7 +82,7 @@ public interface Query<Children> extends Serializable {
      * @param column 列
      */
     default <E> Children select(String column, SFunction<E, ?> alias) {
-        getSelectColum().add(new SelectString(column + Constants.AS + LambdaUtils.getName(alias)));
+        getSelectColum().add(new SelectString(column + Constants.AS + LambdaUtils.getName(alias), isHasAlias(), getAlias()));
         return getChildren();
     }
 
@@ -90,7 +94,9 @@ public interface Query<Children> extends Serializable {
     default <E> Children select(String index, SFunction<E, ?> column, SFunction<E, ?> alias) {
         Map<String, SelectCache> cacheMap = ColumnCache.getMapField(LambdaUtils.getEntityClass(column));
         SelectCache cache = cacheMap.get(LambdaUtils.getName(column));
-        getSelectColum().add(new SelectString(index + Constants.DOT + cache.getColumn() + Constants.AS + LambdaUtils.getName(alias)));
+        getSelectColum().add(new SelectString(
+                index + Constants.DOT + cache.getColumn() + Constants.AS + LambdaUtils.getName(alias),
+                isHasAlias(), getAlias()));
         return getChildren();
     }
 
@@ -109,7 +115,7 @@ public interface Query<Children> extends Serializable {
         Map<String, Field> fieldMap = MPJReflectionKit.getFieldMap(tag);
         for (SelectCache cache : normalList) {
             if (fieldMap.containsKey(cache.getColumProperty())) {
-                getSelectColum().add(new SelectNormal(cache, getIndex()));
+                getSelectColum().add(new SelectNormal(cache, getIndex(), isHasAlias(), getAlias()));
             }
         }
         return getChildren();
@@ -128,8 +134,7 @@ public interface Query<Children> extends Serializable {
     default <S> Children selectAs(SFunction<S, ?> column, String alias) {
         Class<?> aClass = LambdaUtils.getEntityClass(column);
         Map<String, SelectCache> cacheMap = ColumnCache.getMapField(aClass);
-        String index = getIndex();
-        getSelectColum().add(new SelectAlias(cacheMap.get(LambdaUtils.getName(column)), getIndex(), alias));
+        getSelectColum().add(new SelectAlias(cacheMap.get(LambdaUtils.getName(column)), getIndex(), alias, isHasAlias(), getAlias()));
         return getChildren();
     }
 
@@ -139,7 +144,7 @@ public interface Query<Children> extends Serializable {
      */
     default Children selectAll(Class<?> clazz) {
         getSelectColum().addAll(ColumnCache.getListField(clazz).stream().map(i ->
-                new SelectNormal(i, getIndex())).collect(Collectors.toList()));
+                new SelectNormal(i, getIndex(), isHasAlias(), getAlias())).collect(Collectors.toList()));
         return getChildren();
     }
 
@@ -161,14 +166,14 @@ public interface Query<Children> extends Serializable {
      * @param alias    别名
      */
     default Children selectFunc(BaseFuncEnum funcEnum, Object column, String alias) {
-        getSelectColum().add(new SelectFunc(alias, getIndex(), funcEnum, column.toString()));
+        getSelectColum().add(new SelectFunc(alias, getIndex(), funcEnum, column.toString(), isHasAlias(), getAlias()));
         return getChildren();
     }
 
     default <S> Children selectFunc(BaseFuncEnum funcEnum, SFunction<S, ?> column, String alias) {
         Class<?> aClass = LambdaUtils.getEntityClass(column);
         Map<String, SelectCache> cacheMap = ColumnCache.getMapField(aClass);
-        getSelectColum().add(new SelectFunc(cacheMap.get(LambdaUtils.getName(column)), getIndex(), alias, funcEnum));
+        getSelectColum().add(new SelectFunc(cacheMap.get(LambdaUtils.getName(column)), getIndex(), alias, funcEnum, isHasAlias(), getAlias()));
         return getChildren();
     }
 
@@ -186,12 +191,14 @@ public interface Query<Children> extends Serializable {
 
 
     default <X> Children selectFunc(String sql, Function<SelectFunc.Func, SFunction<?, ?>[]> column, String alias) {
-        getSelectColum().add(new SelectFunc(alias, getIndex(), () -> sql, column.apply(new SelectFunc.Func())));
+        getSelectColum().add(new SelectFunc(alias, getIndex(), () -> sql, column.apply(new SelectFunc.Func()),
+                isHasAlias(), getAlias()));
         return getChildren();
     }
 
     default <X, S> Children selectFunc(String sql, Function<SelectFunc.Func, SFunction<?, ?>[]> column, SFunction<S, ?> alias) {
-        getSelectColum().add(new SelectFunc(LambdaUtils.getName(alias), getIndex(), () -> sql, column.apply(new SelectFunc.Func())));
+        getSelectColum().add(new SelectFunc(LambdaUtils.getName(alias), getIndex(), () -> sql,
+                column.apply(new SelectFunc.Func()), isHasAlias(), getAlias()));
         return getChildren();
     }
 

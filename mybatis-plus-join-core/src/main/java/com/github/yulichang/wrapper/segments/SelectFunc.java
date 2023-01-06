@@ -18,7 +18,7 @@ import java.util.Objects;
 @Getter
 public class SelectFunc implements Select {
 
-    private final String index;
+    private final Integer index;
 
     private final SelectCache cache;
 
@@ -34,8 +34,12 @@ public class SelectFunc implements Select {
 
     private final BaseFuncEnum func;
 
+    private final boolean hasTableAlias;
 
-    public SelectFunc(SelectCache cache, String index, String alias, BaseFuncEnum func) {
+    private final String tableAlias;
+
+
+    public SelectFunc(SelectCache cache, Integer index, String alias, BaseFuncEnum func, boolean hasTableAlias, String tableAlias) {
         this.index = index;
         this.cache = cache;
         this.column = cache.getColumn();
@@ -44,9 +48,11 @@ public class SelectFunc implements Select {
         this.alias = alias;
         this.isFunc = true;
         this.func = func;
+        this.hasTableAlias = hasTableAlias;
+        this.tableAlias = tableAlias;
     }
 
-    public SelectFunc(String alias, String index, BaseFuncEnum func, String column) {
+    public SelectFunc(String alias, Integer index, BaseFuncEnum func, String column, boolean hasTableAlias, String tableAlias) {
         this.index = index;
         this.column = column;
         this.args = null;
@@ -55,9 +61,11 @@ public class SelectFunc implements Select {
         this.alias = alias;
         this.isFunc = true;
         this.func = func;
+        this.hasTableAlias = hasTableAlias;
+        this.tableAlias = tableAlias;
     }
 
-    public SelectFunc(String alias, String index, BaseFuncEnum func, SFunction<?, ?>[] args) {
+    public SelectFunc(String alias, Integer index, BaseFuncEnum func, SFunction<?, ?>[] args, boolean hasTableAlias, String tableAlias) {
         this.index = index;
         this.column = null;
         this.args = args;
@@ -66,6 +74,8 @@ public class SelectFunc implements Select {
         this.alias = alias;
         this.isFunc = true;
         this.func = func;
+        this.hasTableAlias = hasTableAlias;
+        this.tableAlias = tableAlias;
     }
 
     @Override

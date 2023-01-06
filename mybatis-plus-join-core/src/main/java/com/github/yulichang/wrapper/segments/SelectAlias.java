@@ -18,17 +18,23 @@ public class SelectAlias implements Select {
 
     private final SelectCache cache;
 
-    private final String index;
+    private final Integer index;
 
     private final boolean hasAlias;
 
     private final String alias;
 
-    public SelectAlias(SelectCache cache, String index, String alias) {
+    private final boolean hasTableAlias;
+
+    private final String tableAlias;
+
+    public SelectAlias(SelectCache cache, Integer index, String alias, boolean hasTableAlias, String tableAlias) {
         this.cache = cache;
         this.index = index;
         this.hasAlias = true;
         this.alias = alias;
+        this.hasTableAlias = hasTableAlias;
+        this.tableAlias = tableAlias;
     }
 
 

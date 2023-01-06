@@ -20,7 +20,7 @@ public class LogicInfoUtils implements Constants {
     private static final Map<Class<?>, Map<String, String>> LOGIC_CACHE = new ConcurrentHashMap<>();
 
 
-    public static String getLogicInfo(String tableIndex, Class<?> clazz, boolean hasAlias, String alias) {
+    public static String getLogicInfo(Integer tableIndex, Class<?> clazz, boolean hasAlias, String alias) {
         Map<String, String> absent = LOGIC_CACHE.get(clazz);
         if (absent == null) {
             absent = new ConcurrentHashMap<>();

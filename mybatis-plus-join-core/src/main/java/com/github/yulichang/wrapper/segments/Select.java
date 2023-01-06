@@ -15,7 +15,11 @@ public interface Select {
 
     Class<?> getClazz();
 
-    String getIndex();
+    Integer getIndex();
+
+    boolean isHasTableAlias();
+
+    String getTableAlias();
 
     boolean isPk();
 
@@ -39,7 +43,7 @@ public interface Select {
 
     boolean isFunc();
 
-    SFunction<?,?>[] getArgs();
+    SFunction<?, ?>[] getArgs();
 
     BaseFuncEnum getFunc();
 

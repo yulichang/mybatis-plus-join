@@ -235,11 +235,12 @@ public class MPJInterceptor implements Interceptor {
             String columnName = StringUtils.getTargetColumn(r.getSelectNormal().getColumn());
             SelectLabel label;
             Field field = ofTypeField.get(r.getProperty());
+            String index = mybatisLabel.getIndex();
             if (columnSet.contains(columnName)) {
                 columnName = getColumn(columnSet, columnName, 0);
-                label = new SelectLabel(r.getSelectNormal(), mybatisLabel.getIndex(), mybatisLabel.getOfType(), field, columnName);
+                label = new SelectLabel(r.getSelectNormal(), null, mybatisLabel.getOfType(), field, columnName, StringUtils.isNotBlank(index), index);
             } else {
-                label = new SelectLabel(r.getSelectNormal(), mybatisLabel.getIndex(), mybatisLabel.getOfType(), field);
+                label = new SelectLabel(r.getSelectNormal(), null, mybatisLabel.getOfType(), field, StringUtils.isNotBlank(index), index);
             }
             columnList.add(label);
             ResultMapping.Builder builder = new ResultMapping.Builder(ms.getConfiguration(), r.getProperty(), columnName, r.getJavaType());

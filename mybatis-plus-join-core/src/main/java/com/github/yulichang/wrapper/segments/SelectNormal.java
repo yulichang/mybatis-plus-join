@@ -15,13 +15,19 @@ import org.apache.ibatis.type.TypeHandler;
 @Getter
 public class SelectNormal implements Select {
 
-    private final String index;
+    private final Integer index;
 
     private final SelectCache cache;
 
-    public SelectNormal(SelectCache cache, String index) {
+    private final boolean hasTableAlias;
+
+    private final String tableAlias;
+
+    public SelectNormal(SelectCache cache, Integer index, boolean hasTableAlias, String tableAlias) {
         this.cache = cache;
         this.index = index;
+        this.hasTableAlias = hasTableAlias;
+        this.tableAlias = tableAlias;
     }
 
 

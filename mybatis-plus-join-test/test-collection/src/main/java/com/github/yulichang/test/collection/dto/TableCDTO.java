@@ -16,4 +16,6 @@ public class TableCDTO {
     private String name;
 
     private List<TableDDTO> dList;
+
+    private TableDDTO d;
 }

@@ -35,11 +35,12 @@ class CollectionTest {
      */
     @Test
     void testJoinCollection() {
+        testAA();
         //4层嵌套  a对多b  b对多c  c对多d  d对多e
         MPJLambdaWrapper<TableA> wrapper1 = new MPJLambdaWrapper<TableA>()
                 .selectAll(TableA.class)
                 .selectCollection(TableB.class, TableADTO::getBList, b -> b
-                        .collection(TableC.class, TableBDTO::getCcList, c -> c
+                        .collection(TableC.class, TableBDTO::getCList, c -> c
                                 .collection(TableD.class, TableCDTO::getDList, d -> d
                                         .collection(TableE.class, TableDDTO::getEList, e -> e
                                                 .id(TableE::getId)))))
@@ -52,7 +53,7 @@ class CollectionTest {
         MPJLambdaWrapper<TableA> wrapper = new MPJLambdaWrapper<TableA>()
                 .selectAll(TableA.class)
                 .selectCollection(TableB.class, TableADTO::getBList, b -> b
-                        .collection(TableC.class, TableBDTO::getCcList, c -> c
+                        .collection(TableC.class, TableBDTO::getCList, c -> c
                                 .collection(TableD.class, TableCDTO::getDList, d -> d
                                         .collection(TableE.class, TableDDTO::getEList))))
                 .leftJoin(TableB.class, TableB::getAid, TableA::getId)
@@ -61,6 +62,24 @@ class CollectionTest {
                 .leftJoin(TableE.class, TableE::getDid, TableD::getId);
         List<TableADTO> dtos = tableAMapper.selectJoinList(TableADTO.class, wrapper);
 
-        assert dtos.get(0).getBList().get(0).getCcList().get(0).getDList().get(0).getEList().get(0).getName() != null;
+        assert dtos.get(0).getBList().get(0).getCList().get(0).getDList().get(0).getEList().get(0).getName() != null;
+    }
+
+    @Test
+    void testAA() {
+        MPJLambdaWrapper<TableA> wrapper1 = new MPJLambdaWrapper<TableA>()
+                .selectAll(TableA.class)
+                .selectAssociation(TableB.class, TableADTO::getB, b -> b
+                        .association(TableC.class, TableBDTO::getC, c -> c
+                                .association(TableD.class, TableCDTO::getD, d -> d
+                                        .association(TableE.class, TableDDTO::getE, e -> e
+                                                .id(TableE::getId)))))
+                .leftJoin(TableB.class, TableB::getAid, TableA::getId)
+                .leftJoin(TableC.class, TableC::getBid, TableB::getId)
+                .leftJoin(TableD.class, TableD::getCid, TableC::getId)
+                .leftJoin(TableE.class, TableE::getDid, TableD::getId)
+                .last("LIMIT 1");
+        List<TableADTO> dtos1 = tableAMapper.selectJoinList(TableADTO.class, wrapper1);
+        System.out.println(1);
     }
 }

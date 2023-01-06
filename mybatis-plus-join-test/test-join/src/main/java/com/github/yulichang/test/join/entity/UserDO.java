@@ -42,6 +42,8 @@ public class UserDO {
 
     private Integer addressId;
 
+    private Integer addressId2;
+
     @TableLogic
     private Boolean del;
 
@@ -61,4 +63,10 @@ public class UserDO {
 
     @TableField(exist = false)
     private List<UserDO> children;
+
+    @TableField(exist = false)
+    private List<AddressDO> addressList;
+
+    @TableField(exist = false)
+    private List<AddressDO> addressList2;
 }

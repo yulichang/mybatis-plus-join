@@ -191,14 +191,18 @@ public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWr
                     return i.getColumn();
                 }
                 String prefix;
-                if (i.isLabel()) {
-                    if (i.isHasTableAlias()) {
-                        prefix = i.getTableAlias();
-                    } else {
-                        prefix = tableList.getPrefix(i.getIndex(), i.getClazz(), true);
-                    }
+                if (i.isHasTableAlias()) {
+                    prefix = i.getTableAlias();
                 } else {
-                    prefix = tableList.getPrefix(i.getIndex(), i.getClazz(), false);
+                    if (i.isLabel()) {
+                        if (i.isHasTableAlias()) {
+                            prefix = i.getTableAlias();
+                        } else {
+                            prefix = tableList.getPrefix(i.getIndex(), i.getClazz(), true);
+                        }
+                    } else {
+                        prefix = tableList.getPrefix(i.getIndex(), i.getClazz(), false);
+                    }
                 }
                 String str = prefix + StringPool.DOT + i.getColumn();
                 if (i.isFunc()) {

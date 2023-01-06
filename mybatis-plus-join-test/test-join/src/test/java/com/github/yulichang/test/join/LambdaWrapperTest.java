@@ -53,6 +53,7 @@ class LambdaWrapperTest {
         list.forEach(System.out::println);
     }
 
+
     @Test
     void testJoin1() {
         MPJLambdaWrapper<UserDO> wrapper = new MPJLambdaWrapper<UserDO>()
@@ -96,6 +97,7 @@ class LambdaWrapperTest {
 
 
     @Test
+    @SuppressWarnings("unchecked")
     void testMSCache() {
 //        PageHelper.startPage(1, 10);
         MPJLambdaWrapper<UserDO> wrapper = new MPJLambdaWrapper<UserDO>()
@@ -237,6 +239,33 @@ class LambdaWrapperTest {
         List<UserDO> list = userMapper.selectJoinList(UserDO.class, wrapper);
         assert list.get(0).getName() != null && list.get(0).getChildren().get(0).getName() != null;
         assert list.get(0).getImg() != null && list.get(0).getChildren().get(0).getImg() != null;
+        System.out.println(list);
+    }
+
+    @Test
+    void testTableAlias() {
+        MPJLambdaWrapper<UserDO> wrapper = new MPJLambdaWrapper<UserDO>()
+//                .disableLogicDel()//关闭主表逻辑删除
+                .selectAll(UserDO.class)
+                .selectAll(AddressDO.class, "aa")
+//                .selectCollection(UserDO.class, UserDO::getChildren)
+                .leftJoin(AddressDO.class, "aa", AddressDO::getUserId, UserDO::getId);
+        List<UserDO> list = userMapper.selectJoinList(UserDO.class, wrapper);
+
+        System.out.println(list);
+    }
+
+    @Test
+    void testLabel() {
+        MPJLambdaWrapper<UserDO> wrapper = new MPJLambdaWrapper<UserDO>()
+                .disableSubLogicDel()
+                .selectAll(UserDO.class)
+                .selectCollection("t1", AddressDO.class, UserDO::getAddressList)
+                .selectCollection("t2", AddressDO.class, UserDO::getAddressList2)
+                .leftJoin(AddressDO.class, AddressDO::getId, UserDO::getAddressId)
+                .leftJoin(AddressDO.class, AddressDO::getId, UserDO::getAddressId2);
+        List<UserDO> list = userMapper.selectJoinList(UserDO.class, wrapper);
+
         System.out.println(list);
     }
 

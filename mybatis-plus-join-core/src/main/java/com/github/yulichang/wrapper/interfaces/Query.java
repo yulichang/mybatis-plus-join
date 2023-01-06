@@ -149,6 +149,15 @@ public interface Query<Children> extends Serializable {
     }
 
     /**
+     * 查询实体类全部字段
+     */
+    default Children selectAll(Class<?> clazz, String prefix) {
+        getSelectColum().addAll(ColumnCache.getListField(clazz).stream().map(i ->
+                new SelectNormal(i, getIndex(), true, prefix)).collect(Collectors.toList()));
+        return getChildren();
+    }
+
+    /**
      * select sql 片段
      */
     String getSqlSelect();

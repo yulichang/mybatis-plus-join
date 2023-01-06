@@ -25,6 +25,7 @@ create table `user`
     `name`       varchar(255) not null,
     `json`       varchar(255) not null,
     `address_id` int          not null,
+    `address_id2` int          not null,
     sex          tinyint      not null,
     head_img     varchar(255) not null,
     create_time  datetime not null,

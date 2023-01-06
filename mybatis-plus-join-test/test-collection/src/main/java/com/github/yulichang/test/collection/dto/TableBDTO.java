@@ -15,5 +15,7 @@ public class TableBDTO {
 
     private String name;
 
-    private List<TableCDTO> ccList;
+    private List<TableCDTO> cList;
+
+    private TableCDTO c;
 }

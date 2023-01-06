@@ -240,6 +240,7 @@ public class MPJInterceptor implements Interceptor {
                 columnName = getColumn(columnSet, columnName, 0);
                 label = new SelectLabel(r.getSelectNormal(), null, mybatisLabel.getOfType(), field, columnName, StringUtils.isNotBlank(index), index);
             } else {
+                columnSet.add(columnName);
                 label = new SelectLabel(r.getSelectNormal(), null, mybatisLabel.getOfType(), field, StringUtils.isNotBlank(index), index);
             }
             columnList.add(label);

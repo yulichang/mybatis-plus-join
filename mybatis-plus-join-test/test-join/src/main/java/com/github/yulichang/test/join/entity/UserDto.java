@@ -14,6 +14,9 @@ public class UserDto {
 
     private Integer userId;
 
+    @TableField(exist = false)
+    private String userName;
+
     private Integer createBy;
 
     @TableField(exist = false)

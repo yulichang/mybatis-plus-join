@@ -79,3 +79,13 @@ INSERT INTO address (id, user_id, area_id, tel, address, del) VALUES (20,20, 100
 INSERT INTO address (id, user_id, area_id, tel, address, del) VALUES (21,21, 10021, '10000000021', '朝阳21', false);
 INSERT INTO address (id, user_id, area_id, tel, address, del) VALUES (22,22, 10022, '10000000022', '朝阳22', false);
 
+DELETE FROM user_dto;
+INSERT INTO user_dto (id, user_id, create_by, update_by, del) VALUES
+(1,1, 2, 3, false),
+(2,1, 2, 3, false),
+(3,1, 2, 3, false),
+(4,1, 2, 3, false),
+(5,1, 2, 3, false),
+(6,1, 2, 3, false),
+(7,1, 2, 3, false),
+(8,1, 2, 3, false);

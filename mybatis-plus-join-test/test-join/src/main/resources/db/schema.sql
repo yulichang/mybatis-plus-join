@@ -54,6 +54,5 @@ create table user_dto
     user_id   int not null,
     create_by int not null,
     update_by int not null,
-    version   int not null,
     del       bit null
 );

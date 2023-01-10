@@ -481,8 +481,8 @@ class LambdaWrapperTest {
                 .leftJoin(AddressDO.class, AddressDO::getId, UserDO::getAddressId2);
         List<UserDO> list = userMapper.selectJoinList(UserDO.class, wrapper);
 
-        assert list.get(0).getAddressList().get(0).getAddress()!= null;
-        assert list.get(0).getAddressList2().get(0).getAddress()!= null;
+        assert list.get(0).getAddressList().get(0).getAddress() != null;
+        assert list.get(0).getAddressList2().get(0).getAddress() != null;
         System.out.println(list);
     }
 

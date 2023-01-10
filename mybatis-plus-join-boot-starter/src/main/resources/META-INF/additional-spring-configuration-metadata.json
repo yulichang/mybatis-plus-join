@@ -33,7 +33,7 @@
     },
     {
       "name": "mybatis-plus-join.join-prefix",
-      "defaultValue": "t",
+      "defaultValue": "join",
       "type": "java.lang.String",
       "description": "重复字段前缀."
     }

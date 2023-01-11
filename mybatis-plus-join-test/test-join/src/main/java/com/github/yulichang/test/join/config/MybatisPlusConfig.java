@@ -61,7 +61,6 @@ public class MybatisPlusConfig {
             sql = sql.replaceAll("\n", "");
             sql = sql.replaceAll("\r", "");
             sql = sql.replaceAll("\t", "");
-            sql = sql.replaceAll("\s", "");
             return dg(sql);
         }
 

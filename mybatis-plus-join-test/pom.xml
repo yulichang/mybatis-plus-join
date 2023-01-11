@@ -45,11 +45,11 @@
     <properties>
         <springboot.version>2.5.4</springboot.version>
 
-        <jdkVersion>17</jdkVersion>
-        <jdkVersion.test>17</jdkVersion.test>
+        <jdkVersion>15</jdkVersion>
+        <jdkVersion.test>15</jdkVersion.test>
         <maven.deploy.skip>true</maven.deploy.skip>
-        <maven.compiler.source>17</maven.compiler.source>
-        <maven.compiler.target>17</maven.compiler.target>
+        <maven.compiler.source>15</maven.compiler.source>
+        <maven.compiler.target>15</maven.compiler.target>
         <github.global.server>github</github.global.server>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>

@@ -42,14 +42,38 @@ class LambdaWrapperTest {
 
     @Test
     void testJoin() {
-        ThreadLocalUtils.set(""" 
-                SELECT t.id,t.pid,t.`name`,t.`json`,t.sex,t.head_img,t.create_time,t.address_id,t.address_id2,t.del,t.create_by,t.update_by,
-                  t1.id AS joina_id,t1.user_id,t1.area_id,t1.tel,t1.address,t1.del AS joina_del,t2.id AS joinb_id,t2.province,t2.city,t2.area,t2.postcode,t2.del AS joinb_del
-                FROM `user` t LEFT JOIN address t1 ON (t1.user_id = t.id)
-                    LEFT JOIN area t2 ON (t2.id = t1.area_id)
-                WHERE t.del=false AND t1.del=false AND t2.del=false AND (t.id <= ?)
-                ORDER BY t.id DESC
-                """);
+        ThreadLocalUtils.set("SELECT t.id,\n" +
+                "       t.pid,\n" +
+                "       t.`name`,\n" +
+                "       t.`json`,\n" +
+                "       t.sex,\n" +
+                "       t.head_img,\n" +
+                "       t.create_time,\n" +
+                "       t.address_id,\n" +
+                "       t.address_id2,\n" +
+                "       t.del,\n" +
+                "       t.create_by,\n" +
+                "       t.update_by,\n" +
+                "       t1.id  AS joina_id,\n" +
+                "       t1.user_id,\n" +
+                "       t1.area_id,\n" +
+                "       t1.tel,\n" +
+                "       t1.address,\n" +
+                "       t1.del AS joina_del,\n" +
+                "       t2.id  AS joinb_id,\n" +
+                "       t2.province,\n" +
+                "       t2.city,\n" +
+                "       t2.area,\n" +
+                "       t2.postcode,\n" +
+                "       t2.del AS joinb_del\n" +
+                "FROM `user` t\n" +
+                "         LEFT JOIN address t1 ON (t1.user_id = t.id)\n" +
+                "         LEFT JOIN area t2 ON (t2.id = t1.area_id)\n" +
+                "WHERE t.del = false\n" +
+                "  AND t1.del = false\n" +
+                "  AND t2.del = false\n" +
+                "  AND (t.id <= ?)\n" +
+                "ORDER BY t.id DESC");
 
         MPJLambdaWrapper<UserDO> wrapper = new MPJLambdaWrapper<UserDO>()
                 .selectAll(UserDO.class)
@@ -68,16 +92,37 @@ class LambdaWrapperTest {
 
     @Test
     void testJoin1() {
-        ThreadLocalUtils.set(""" 
-                SELECT t.id,t.pid,t.`name`,t.`json`,t.sex,t.head_img,t.create_time,t.address_id,t.address_id2,t.del,t.create_by,t.update_by,
-                    t1.id AS joina_id,t1.user_id,t1.area_id,t1.tel,t1.address,t1.del AS joina_del,
-                    t2.id AS joinb_id,t2.province,t2.city,t2.area,t2.postcode,t2.del AS joinb_del
-                FROM `user` t
-                    LEFT JOIN address t1 ON (t1.user_id = t.id)
-                    LEFT JOIN area t2 ON (t2.id = t1.area_id)
-                WHERE t.del=false AND t1.del=false AND t2.del=false
-                ORDER BY t.id DESC
-                """);
+        ThreadLocalUtils.set("SELECT t.id,\n" +
+                "       t.pid,\n" +
+                "       t.`name`,\n" +
+                "       t.`json`,\n" +
+                "       t.sex,\n" +
+                "       t.head_img,\n" +
+                "       t.create_time,\n" +
+                "       t.address_id,\n" +
+                "       t.address_id2,\n" +
+                "       t.del,\n" +
+                "       t.create_by,\n" +
+                "       t.update_by,\n" +
+                "       t1.id  AS joina_id,\n" +
+                "       t1.user_id,\n" +
+                "       t1.area_id,\n" +
+                "       t1.tel,\n" +
+                "       t1.address,\n" +
+                "       t1.del AS joina_del,\n" +
+                "       t2.id  AS joinb_id,\n" +
+                "       t2.province,\n" +
+                "       t2.city,\n" +
+                "       t2.area,\n" +
+                "       t2.postcode,\n" +
+                "       t2.del AS joinb_del\n" +
+                "FROM `user` t\n" +
+                "         LEFT JOIN address t1 ON (t1.user_id = t.id)\n" +
+                "         LEFT JOIN area t2 ON (t2.id = t1.area_id)\n" +
+                "WHERE t.del = false\n" +
+                "  AND t1.del = false\n" +
+                "  AND t2.del = false\n" +
+                "ORDER BY t.id DESC");
         MPJLambdaWrapper<UserDO> wrapper = new MPJLambdaWrapper<UserDO>()
                 .selectAll(UserDO.class)
                 .selectCollection(AddressDO.class, UserDTO::getAddressList, addr -> addr
@@ -96,15 +141,13 @@ class LambdaWrapperTest {
      */
     @Test
     void testWrapper() {
-        ThreadLocalUtils.set("""
-                SELECT t.id
-                FROM `user` t
-                         LEFT JOIN address t1 ON (t1.user_id = t.id)
-                         LEFT JOIN area t2 ON (t2.id = t1.area_id)
-                WHERE t.del = false
-                  AND t1.del = false
-                  AND t2.del = false
-                """);
+        ThreadLocalUtils.set("SELECT t.id\n" +
+                "FROM `user` t\n" +
+                "         LEFT JOIN address t1 ON (t1.user_id = t.id)\n" +
+                "         LEFT JOIN area t2 ON (t2.id = t1.area_id)\n" +
+                "WHERE t.del = false\n" +
+                "  AND t1.del = false\n" +
+                "  AND t2.del = false");
         //基本数据类型 和 String
         MPJLambdaWrapper<UserDO> wrapper = new MPJLambdaWrapper<UserDO>()
                 .select(UserDO::getId)
@@ -116,15 +159,13 @@ class LambdaWrapperTest {
         System.out.println(list);
 
 
-        ThreadLocalUtils.set("""
-                SELECT t.create_time
-                FROM `user` t
-                         LEFT JOIN address t1 ON (t1.user_id = t.id)
-                         LEFT JOIN area t2 ON (t2.id = t1.area_id)
-                WHERE t.del = false
-                  AND t1.del = false
-                  AND t2.del = false
-                """);
+        ThreadLocalUtils.set("SELECT t.create_time\n" +
+                "FROM `user` t\n" +
+                "         LEFT JOIN address t1 ON (t1.user_id = t.id)\n" +
+                "         LEFT JOIN area t2 ON (t2.id = t1.area_id)\n" +
+                "WHERE t.del = false\n" +
+                "  AND t1.del = false\n" +
+                "  AND t2.del = false");
         //java.sql包下的类
         MPJLambdaWrapper<UserDO> wrapper1 = new MPJLambdaWrapper<UserDO>()
                 .select(UserDO::getCreateTime)
@@ -140,25 +181,23 @@ class LambdaWrapperTest {
     @Test
     @SuppressWarnings("unchecked")
     void testMSCache() {
-        ThreadLocalUtils.set("""
-                SELECT t.id,
-                       t.pid,
-                       t.`name`,
-                       t.`json`,
-                       t.sex,
-                       t.head_img,
-                       t.create_time,
-                       t.address_id,
-                       t.address_id2,
-                       t.del,
-                       t.create_by,
-                       t.update_by
-                FROM `user` t
-                WHERE t.id = ?
-                  AND t.del = false
-                  AND (t.id <= ?)
-                ORDER BY t.id ASC, t.name ASC
-                """);
+        ThreadLocalUtils.set("SELECT t.id,\n" +
+                "       t.pid,\n" +
+                "       t.`name`,\n" +
+                "       t.`json`,\n" +
+                "       t.sex,\n" +
+                "       t.head_img,\n" +
+                "       t.create_time,\n" +
+                "       t.address_id,\n" +
+                "       t.address_id2,\n" +
+                "       t.del,\n" +
+                "       t.create_by,\n" +
+                "       t.update_by\n" +
+                "FROM `user` t\n" +
+                "WHERE t.id = ?\n" +
+                "  AND t.del = false\n" +
+                "  AND (t.id <= ?)\n" +
+                "ORDER BY t.id ASC, t.name ASC");
         MPJLambdaWrapper<UserDO> wrapper = new MPJLambdaWrapper<UserDO>()
                 .selectAll(UserDO.class)
                 .setEntity(new UserDO() {{
@@ -173,23 +212,21 @@ class LambdaWrapperTest {
 
     @Test
     void testTableAliasR() {
-        ThreadLocalUtils.set("""
-                SELECT tt.id,
-                       tt.user_id,
-                       tt.create_by,
-                       tt.update_by,
-                       ua.`name` AS userName,
-                       ub.`name` AS createName,
-                       uc.`name` AS updateName
-                FROM user_dto tt
-                         LEFT JOIN `user` ua ON (ua.id = tt.user_id)
-                         LEFT JOIN `user` ub ON (ub.id = tt.create_by)
-                         LEFT JOIN `user` uc ON (uc.id = tt.update_by)
-                WHERE ua.del = false
-                  AND ub.del = false
-                  AND uc.del = false
-                  AND (ua.id <= ? AND ub.id >= ?)
-                """);
+        ThreadLocalUtils.set("SELECT tt.id,\n" +
+                "       tt.user_id,\n" +
+                "       tt.create_by,\n" +
+                "       tt.update_by,\n" +
+                "       ua.`name` AS userName,\n" +
+                "       ub.`name` AS createName,\n" +
+                "       uc.`name` AS updateName\n" +
+                "FROM user_dto tt\n" +
+                "         LEFT JOIN `user` ua ON (ua.id = tt.user_id)\n" +
+                "         LEFT JOIN `user` ub ON (ub.id = tt.create_by)\n" +
+                "         LEFT JOIN `user` uc ON (uc.id = tt.update_by)\n" +
+                "WHERE ua.del = false\n" +
+                "  AND ub.del = false\n" +
+                "  AND uc.del = false\n" +
+                "  AND (ua.id <= ? AND ub.id >= ?)");
         MPJLambdaWrapper<UserDto> wrapper = new MPJLambdaWrapper<UserDto>("tt")
                 .selectAll(UserDto.class)
                 .leftJoin(UserDO.class, "ua", UserDO::getId, UserDto::getUserId, ext -> ext
@@ -206,31 +243,29 @@ class LambdaWrapperTest {
         assert StringUtils.isNotBlank(userDtos.get(0).getUpdateName());
 
 
-        ThreadLocalUtils.set("""
-                SELECT tt.id,
-                       tt.pid,
-                       tt.`name`,
-                       tt.`json`,
-                       tt.sex,
-                       tt.head_img,
-                       tt.create_time,
-                       tt.address_id,
-                       tt.address_id2,
-                       tt.del,
-                       tt.create_by,
-                       tt.update_by,
-                       ua.id,
-                       ub.head_img
-                FROM `user` tt
-                         LEFT JOIN `user` ua ON (ua.id = tt.pid)
-                         LEFT JOIN `user` ub ON (ub.id = tt.create_by)
-                         LEFT JOIN `user` uc ON (uc.id = tt.update_by)
-                WHERE tt.del = false
-                  AND ua.del = false
-                  AND ub.del = false
-                  AND uc.del = false
-                  AND (ua.head_img = tt.name AND tt.id = ua.id)
-                """);
+        ThreadLocalUtils.set("SELECT tt.id,\n" +
+                "       tt.pid,\n" +
+                "       tt.`name`,\n" +
+                "       tt.`json`,\n" +
+                "       tt.sex,\n" +
+                "       tt.head_img,\n" +
+                "       tt.create_time,\n" +
+                "       tt.address_id,\n" +
+                "       tt.address_id2,\n" +
+                "       tt.del,\n" +
+                "       tt.create_by,\n" +
+                "       tt.update_by,\n" +
+                "       ua.id,\n" +
+                "       ub.head_img\n" +
+                "FROM `user` tt\n" +
+                "         LEFT JOIN `user` ua ON (ua.id = tt.pid)\n" +
+                "         LEFT JOIN `user` ub ON (ub.id = tt.create_by)\n" +
+                "         LEFT JOIN `user` uc ON (uc.id = tt.update_by)\n" +
+                "WHERE tt.del = false\n" +
+                "  AND ua.del = false\n" +
+                "  AND ub.del = false\n" +
+                "  AND uc.del = false\n" +
+                "  AND (ua.head_img = tt.name AND tt.id = ua.id)");
         MPJLambdaWrapper<UserDO> w = new MPJLambdaWrapper<UserDO>("tt")
                 .selectAll(UserDO.class)
                 .leftJoin(UserDO.class, "ua", UserDO::getId, UserDO::getPid, ext -> ext
@@ -249,36 +284,34 @@ class LambdaWrapperTest {
      */
     @Test
     void testInner() {
-        ThreadLocalUtils.set("""
-                SELECT t.id,
-                       t.pid,
-                       t.`name`,
-                       t.`json`,
-                       t.sex,
-                       t.head_img,
-                       t.create_time,
-                       t.address_id,
-                       t.address_id2,
-                       t.del,
-                       t.create_by,
-                       t.update_by,
-                       t1.id          AS joina_id,
-                       t1.pid         AS joina_pid,
-                       t1.`name`      AS joina_name,
-                       t1.`json`      AS joina_json,
-                       t1.sex         AS joina_sex,
-                       t1.head_img    AS joina_head_img,
-                       t1.create_time AS joina_create_time,
-                       t1.address_id  AS joina_address_id,
-                       t1.address_id2 AS joina_address_id2,
-                       t1.del         AS joina_del,
-                       t1.create_by   AS joina_create_by,
-                       t1.update_by   AS joina_update_by
-                FROM `user` t
-                         LEFT JOIN `user` t1 ON (t1.pid = t.id)
-                WHERE t.del = false
-                  AND (t.id > ?)
-                """);
+        ThreadLocalUtils.set("SELECT t.id,\n" +
+                "       t.pid,\n" +
+                "       t.`name`,\n" +
+                "       t.`json`,\n" +
+                "       t.sex,\n" +
+                "       t.head_img,\n" +
+                "       t.create_time,\n" +
+                "       t.address_id,\n" +
+                "       t.address_id2,\n" +
+                "       t.del,\n" +
+                "       t.create_by,\n" +
+                "       t.update_by,\n" +
+                "       t1.id          AS joina_id,\n" +
+                "       t1.pid         AS joina_pid,\n" +
+                "       t1.`name`      AS joina_name,\n" +
+                "       t1.`json`      AS joina_json,\n" +
+                "       t1.sex         AS joina_sex,\n" +
+                "       t1.head_img    AS joina_head_img,\n" +
+                "       t1.create_time AS joina_create_time,\n" +
+                "       t1.address_id  AS joina_address_id,\n" +
+                "       t1.address_id2 AS joina_address_id2,\n" +
+                "       t1.del         AS joina_del,\n" +
+                "       t1.create_by   AS joina_create_by,\n" +
+                "       t1.update_by   AS joina_update_by\n" +
+                "FROM `user` t\n" +
+                "         LEFT JOIN `user` t1 ON (t1.pid = t.id)\n" +
+                "WHERE t.del = false\n" +
+                "  AND (t.id > ?)");
         //自连接
         MPJLambdaWrapper<UserDO> wrapper = new MPJLambdaWrapper<UserDO>()
                 .disableSubLogicDel()//关闭副表逻辑删除
@@ -289,26 +322,24 @@ class LambdaWrapperTest {
         List<UserDO> list = userMapper.selectJoinList(UserDO.class, wrapper);
         System.out.println(list);
 
-        ThreadLocalUtils.set("""
-                SELECT t.id,
-                       t.pid,
-                       t.`name`,
-                       t.`json`,
-                       t.sex,
-                       t.head_img,
-                       t.create_time,
-                       t.address_id,
-                       t.address_id2,
-                       t.del,
-                       t.create_by,
-                       t.update_by,
-                       t1.`name` AS createName,
-                       t2.`name` AS updateName
-                FROM `user` t
-                         LEFT JOIN `user` t1 ON (t1.id = t.create_by)
-                         LEFT JOIN `user` t2 ON (t2.id = t.update_by)
-                WHERE (t2.id = t.update_by AND t.id = t1.id)
-                """);
+        ThreadLocalUtils.set("SELECT t.id,\n" +
+                "       t.pid,\n" +
+                "       t.`name`,\n" +
+                "       t.`json`,\n" +
+                "       t.sex,\n" +
+                "       t.head_img,\n" +
+                "       t.create_time,\n" +
+                "       t.address_id,\n" +
+                "       t.address_id2,\n" +
+                "       t.del,\n" +
+                "       t.create_by,\n" +
+                "       t.update_by,\n" +
+                "       t1.`name` AS createName,\n" +
+                "       t2.`name` AS updateName\n" +
+                "FROM `user` t\n" +
+                "         LEFT JOIN `user` t1 ON (t1.id = t.create_by)\n" +
+                "         LEFT JOIN `user` t2 ON (t2.id = t.update_by)\n" +
+                "WHERE (t2.id = t.update_by AND t.id = t1.id)");
         //关联一张表多次
         MPJLambdaWrapper<UserDO> w = new MPJLambdaWrapper<UserDO>()
                 .disableLogicDel()
@@ -326,50 +357,48 @@ class LambdaWrapperTest {
         assert dos.get(0).getCreateName() != null && dos.get(0).getUpdateName() != null;
 
 
-        ThreadLocalUtils.set("""
-                SELECT t.id,
-                       t.pid,
-                       t.`name`,
-                       t.`json`,
-                       t.sex,
-                       t.head_img,
-                       t.create_time,
-                       t.address_id,
-                       t.address_id2,
-                       t.del,
-                       t.create_by,
-                       t.update_by,
-                       t1.`name`      AS alias,
-                       t1.id          AS joina_id,
-                       t1.pid         AS joina_pid,
-                       t1.`name`      AS joina_name,
-                       t1.`json`      AS joina_json,
-                       t1.sex         AS joina_sex,
-                       t1.head_img    AS joina_head_img,
-                       t1.create_time AS joina_create_time,
-                       t1.address_id  AS joina_address_id,
-                       t1.address_id2 AS joina_address_id2,
-                       t1.del         AS joina_del,
-                       t1.create_by   AS joina_create_by,
-                       t1.update_by   AS joina_update_by,
-                       t2.id          AS joinb_id,
-                       t2.pid         AS joinb_pid,
-                       t2.`name`      AS joinb_name,
-                       t2.`json`      AS joinb_json,
-                       t2.sex         AS joinb_sex,
-                       t2.head_img    AS joinb_head_img,
-                       t2.create_time AS joinb_create_time,
-                       t2.address_id  AS joinb_address_id,
-                       t2.address_id2 AS joinb_address_id2,
-                       t2.del         AS joinb_del,
-                       t2.create_by   AS joinb_create_by,
-                       t2.update_by   AS joinb_update_by
-                FROM `user` t
-                         LEFT JOIN `user` t1 ON (t1.pid = t.id)
-                         LEFT JOIN `user` t2 ON (t2.pid = t1.id)
-                WHERE t.del = false
-                  AND (t1.id <= ? AND t.id <= ?)
-                """);
+        ThreadLocalUtils.set("SELECT t.id,\n" +
+                "       t.pid,\n" +
+                "       t.`name`,\n" +
+                "       t.`json`,\n" +
+                "       t.sex,\n" +
+                "       t.head_img,\n" +
+                "       t.create_time,\n" +
+                "       t.address_id,\n" +
+                "       t.address_id2,\n" +
+                "       t.del,\n" +
+                "       t.create_by,\n" +
+                "       t.update_by,\n" +
+                "       t1.`name`      AS alias,\n" +
+                "       t1.id          AS joina_id,\n" +
+                "       t1.pid         AS joina_pid,\n" +
+                "       t1.`name`      AS joina_name,\n" +
+                "       t1.`json`      AS joina_json,\n" +
+                "       t1.sex         AS joina_sex,\n" +
+                "       t1.head_img    AS joina_head_img,\n" +
+                "       t1.create_time AS joina_create_time,\n" +
+                "       t1.address_id  AS joina_address_id,\n" +
+                "       t1.address_id2 AS joina_address_id2,\n" +
+                "       t1.del         AS joina_del,\n" +
+                "       t1.create_by   AS joina_create_by,\n" +
+                "       t1.update_by   AS joina_update_by,\n" +
+                "       t2.id          AS joinb_id,\n" +
+                "       t2.pid         AS joinb_pid,\n" +
+                "       t2.`name`      AS joinb_name,\n" +
+                "       t2.`json`      AS joinb_json,\n" +
+                "       t2.sex         AS joinb_sex,\n" +
+                "       t2.head_img    AS joinb_head_img,\n" +
+                "       t2.create_time AS joinb_create_time,\n" +
+                "       t2.address_id  AS joinb_address_id,\n" +
+                "       t2.address_id2 AS joinb_address_id2,\n" +
+                "       t2.del         AS joinb_del,\n" +
+                "       t2.create_by   AS joinb_create_by,\n" +
+                "       t2.update_by   AS joinb_update_by\n" +
+                "FROM `user` t\n" +
+                "         LEFT JOIN `user` t1 ON (t1.pid = t.id)\n" +
+                "         LEFT JOIN `user` t2 ON (t2.pid = t1.id)\n" +
+                "WHERE t.del = false\n" +
+                "  AND (t1.id <= ? AND t.id <= ?)");
         MPJLambdaWrapper<UserDO> wrapper1 = new MPJLambdaWrapper<UserDO>()
                 .disableSubLogicDel()
                 .selectAll(UserDO.class)
@@ -435,30 +464,28 @@ class LambdaWrapperTest {
 
     @Test
     void testTableAlias() {
-        ThreadLocalUtils.set("""
-                SELECT t.id,
-                       t.pid,
-                       t.`name`,
-                       t.`json`,
-                       t.sex,
-                       t.head_img,
-                       t.create_time,
-                       t.address_id,
-                       t.address_id2,
-                       t.del,
-                       t.create_by,
-                       t.update_by,
-                       aa.id,
-                       aa.user_id,
-                       aa.area_id,
-                       aa.tel,
-                       aa.address,
-                       aa.del
-                FROM `user` t
-                         LEFT JOIN address aa ON (aa.user_id = t.id)
-                WHERE t.del = false
-                  AND aa.del = false
-                """);
+        ThreadLocalUtils.set("SELECT t.id,\n" +
+                "       t.pid,\n" +
+                "       t.`name`,\n" +
+                "       t.`json`,\n" +
+                "       t.sex,\n" +
+                "       t.head_img,\n" +
+                "       t.create_time,\n" +
+                "       t.address_id,\n" +
+                "       t.address_id2,\n" +
+                "       t.del,\n" +
+                "       t.create_by,\n" +
+                "       t.update_by,\n" +
+                "       aa.id,\n" +
+                "       aa.user_id,\n" +
+                "       aa.area_id,\n" +
+                "       aa.tel,\n" +
+                "       aa.address,\n" +
+                "       aa.del\n" +
+                "FROM `user` t\n" +
+                "         LEFT JOIN address aa ON (aa.user_id = t.id)\n" +
+                "WHERE t.del = false\n" +
+                "  AND aa.del = false");
         MPJLambdaWrapper<UserDO> wrapper = new MPJLambdaWrapper<UserDO>()
 //                .disableLogicDel()//关闭主表逻辑删除
                 .selectAll(UserDO.class)
@@ -510,27 +537,25 @@ class LambdaWrapperTest {
      */
     @Test
     void test3() {
-        ThreadLocalUtils.set("""
-                SELECT t.id,
-                       t.pid,
-                       t.`name`,
-                       t.`json`,
-                       t.sex,
-                       t.head_img,
-                       t.create_time,
-                       t.address_id,
-                       t.address_id2,
-                       t.del,
-                       t.create_by,
-                       t.update_by,
-                       t1.address
-                FROM `user` t
-                         LEFT JOIN address t1 ON (t.id = t1.user_id AND t.id = t1.user_id)
-                WHERE t.del = false
-                  AND t1.del = false
-                  AND (t.id = ? AND (t.head_img = ? OR t1.user_id = ?) AND t.id = ?)
-                LIMIT ?
-                """);
+        ThreadLocalUtils.set("SELECT t.id,\n" +
+                "       t.pid,\n" +
+                "       t.`name`,\n" +
+                "       t.`json`,\n" +
+                "       t.sex,\n" +
+                "       t.head_img,\n" +
+                "       t.create_time,\n" +
+                "       t.address_id,\n" +
+                "       t.address_id2,\n" +
+                "       t.del,\n" +
+                "       t.create_by,\n" +
+                "       t.update_by,\n" +
+                "       t1.address\n" +
+                "FROM `user` t\n" +
+                "         LEFT JOIN address t1 ON (t.id = t1.user_id AND t.id = t1.user_id)\n" +
+                "WHERE t.del = false\n" +
+                "  AND t1.del = false\n" +
+                "  AND (t.id = ? AND (t.head_img = ? OR t1.user_id = ?) AND t.id = ?)\n" +
+                "LIMIT ?");
         IPage<UserDTO> page = userMapper.selectJoinPage(new Page<>(1, 10), UserDTO.class,
                 MPJWrappers.<UserDO>lambdaJoin()
                         .selectAll(UserDO.class)

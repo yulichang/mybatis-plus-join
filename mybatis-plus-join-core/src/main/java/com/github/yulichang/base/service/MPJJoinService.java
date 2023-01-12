@@ -18,7 +18,7 @@ public interface MPJJoinService<T> extends IService<T> {
     /**
      * 根据 Wrapper 条件，查询总记录数
      */
-    default Integer selectJoinCount(MPJBaseJoin<T> wrapper) {
+    default Long selectJoinCount(MPJBaseJoin<T> wrapper) {
         return ((MPJBaseMapper<T>) getBaseMapper()).selectJoinCount(wrapper);
     }
 
@@ -39,7 +39,7 @@ public interface MPJJoinService<T> extends IService<T> {
     /**
      * 连接查询返回集合并分页
      */
-    default <DTO, P extends IPage<?>> IPage<DTO> selectJoinListPage(P page, Class<DTO> clazz, MPJBaseJoin<T> wrapper) {
+    default <DTO, P extends IPage<DTO>> P selectJoinListPage(P page, Class<DTO> clazz, MPJBaseJoin<T> wrapper) {
         return ((MPJBaseMapper<T>) getBaseMapper()).selectJoinPage(page, clazz, wrapper);
     }
 
@@ -60,8 +60,7 @@ public interface MPJJoinService<T> extends IService<T> {
     /**
      * 连接查询返回Map集合并分页
      */
-    default <P extends IPage<Map<String, Object>>> IPage<Map<String, Object>> selectJoinMapsPage(
-            P page, MPJBaseJoin<T> wrapper) {
+    default <P extends IPage<Map<String, Object>>> P selectJoinMapsPage(P page, MPJBaseJoin<T> wrapper) {
         return ((MPJBaseMapper<T>) getBaseMapper()).selectJoinMapsPage(page, wrapper);
     }
 }

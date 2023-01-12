@@ -519,7 +519,7 @@ class LambdaWrapperTest {
      */
     @Test
     void test1() {
-        Page<Object> page = new Page<>(1, 10);
+        Page<UserDTO> page = new Page<>(1, 10);
         page.setSearchCount(false);
         IPage<UserDTO> iPage = userMapper.selectJoinPage(page, UserDTO.class,
                 MPJWrappers.<UserDO>lambdaJoin()
@@ -594,7 +594,7 @@ class LambdaWrapperTest {
                 .select(AddressDO.class, p -> true)
                 .leftJoin(AddressDO.class, AddressDO::getUserId, UserDO::getId)
                 .eq(UserDO::getId, 1);
-        IPage<UserDTO> page = userMapper.selectJoinPage(new Page<>(1, 10), UserDTO.class, wrapper);
+        Page<UserDTO> page = userMapper.selectJoinPage(new Page<>(1, 10), UserDTO.class, wrapper);
         assert page.getRecords().get(0).getAddress() != null;
         page.getRecords().forEach(System.out::println);
     }

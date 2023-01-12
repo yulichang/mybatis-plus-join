@@ -143,9 +143,9 @@ class test {
 
 MPJLambdaWrapper其他功能
 
-* [一对一，一对多使用](https://gitee.com/best_handsome/mybatis-plus-join/wikis/MyLambdaWrapper/selectCollection()?sort_id=6509590)
-* [简单的SQL函数使用](https://gitee.com/best_handsome/mybatis-plus-join/wikis/selectFunc()?sort_id=4082479)
-* [ON语句多条件支持](https://gitee.com/best_handsome/mybatis-plus-join/wikis/leftJoin?sort_id=3496671)
+* <a href="https://ylctmh.com/pages/core/lambda/select/selectCollection.html" target="_blank">一对一，一对多使用</a>
+* <a href="https://ylctmh.com/pages/core/lambda/select/selectFunc.html" target="_blank">简单的SQL函数使用</a>
+* <a href="https://ylctmh.com/pages/core/lambda/join/leftJoin.html" target="_blank">ON语句多条件支持</a>
 
 ### String形式用法（MPJQueryWrapper）
 

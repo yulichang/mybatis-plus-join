@@ -2,13 +2,13 @@
 
 * 对 [mybatis-plus](https://gitee.com/baomidou/mybatis-plus) 多表查询的扩展
 * [演示工程](https://gitee.com/best_handsome/mybatis-plus-join-demo)
-* <a href="https://ylctmh.com">文档</a>
+* <a href="https://ylctmh.com" target="_blank">文档</a>
 * 点个Star支持一下吧 :)
 
 QQ群:1022221898  
 [加入微信群](https://gitee.com/best_handsome/mybatis-plus-join/issues/I65N2M)
 
-### <a href="https://ylctmh.com">文档</a>
+### <a href="https://ylctmh.com" target="_blank">文档</a>
 
 ## 使用方法
 

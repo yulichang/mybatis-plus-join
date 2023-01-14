@@ -56,7 +56,7 @@ public abstract class MPJAbstractLambdaWrapper<T, Children extends MPJAbstractLa
 
     protected String columnToString(Integer index, SFunction<?, ?> column, boolean isJoin, PrefixEnum prefixEnum) {
         Class<?> entityClass = LambdaUtils.getEntityClass(column);
-        return getDefault(index, entityClass, isJoin, prefixEnum) + StringPool.DOT + getCache(column).getTagColumn();
+        return getDefault(index, entityClass, isJoin, prefixEnum) + StringPool.DOT + getCache(column).getColumn();
     }
 
     protected SelectCache getCache(SFunction<?, ?> fn) {

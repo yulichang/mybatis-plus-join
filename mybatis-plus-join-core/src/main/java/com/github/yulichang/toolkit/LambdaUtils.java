@@ -3,11 +3,15 @@ package com.github.yulichang.toolkit;
 
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.github.yulichang.toolkit.support.*;
+import kotlin.jvm.internal.CallableReference;
+import kotlin.jvm.internal.ClassReference;
+import kotlin.jvm.internal.FunctionReference;
 import org.apache.ibatis.reflection.property.PropertyNamer;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import java.sql.Ref;
 import java.util.Map;
 
 /**
@@ -49,11 +53,30 @@ public final class LambdaUtils {
             return new IdeaProxyLambdaMeta((Proxy) func);
         }
         // 2. 反射读取
+        // 3. 处理Kotlin lambda var like val fieldGetter=UserDTO::getAddresses
+        {
+            Class<?> funcClass=func.getClass();
+            Field wrappedField= ReflectionKit.getFieldOptional(func.getClass(),"arg$1")
+                    .orElse(null);
+            if(wrappedField!=null) {
+                try {
+                    Object wrapperObj = ReflectionKit.setAccessible(wrappedField).get(func);
+                    CallableReference functionReference = (CallableReference) wrapperObj;
+                    ClassReference classReference = (ClassReference) functionReference.getOwner();
+                    String funcName = functionReference.getName();
+                    Class<?> ownerClass = classReference.getJClass();
+                    return new KotlinLambdaMeta(funcName, ownerClass);
+                } catch (Throwable e) { //unreachable
+                    throw new RuntimeException(e);
+                }
+            }
+        }
+        //4. 处理Java method ref的情况
         try {
             Method method = func.getClass().getDeclaredMethod("writeReplace");
             return new ReflectLambdaMeta((java.lang.invoke.SerializedLambda) ReflectionKit.setAccessible(method).invoke(func));
         } catch (Throwable e) {
-            // 3. 反射失败使用序列化的方式读取
+            // 5. 反射失败使用序列化的方式读取
             return new ShadowLambdaMeta(SerializedLambda.extract(func));
         }
     }

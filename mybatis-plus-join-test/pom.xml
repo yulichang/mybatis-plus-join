@@ -19,6 +19,7 @@
         <module>test-join</module>
         <module>test-collection</module>
         <module>test-mapping</module>
+        <module>test-kotlin</module>
     </modules>
 
     <description>An enhanced toolkit of Mybatis-Plus to simplify development.</description>

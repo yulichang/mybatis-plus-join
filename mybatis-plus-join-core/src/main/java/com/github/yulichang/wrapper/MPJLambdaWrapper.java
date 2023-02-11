@@ -91,6 +91,19 @@ public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWr
     }
 
     /**
+     * 构造方法
+     *
+     * @param entity 主表实体
+     */
+    public MPJLambdaWrapper(T entity) {
+        super.initNeed();
+        setEntity(entity);
+        if (entity != null) {
+            tableList.setRootClass(entity.getClass());
+        }
+    }
+
+    /**
      * 自定义主表别名
      */
     public MPJLambdaWrapper(String alias) {
@@ -100,7 +113,10 @@ public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWr
     }
 
     /**
-     * 推荐使用此构造方法
+     * 构造方法
+     *
+     * @param clazz 主表class类
+     * @param alias 主表别名
      */
     public MPJLambdaWrapper(Class<T> clazz, String alias) {
         this.alias = alias;
@@ -108,6 +124,22 @@ public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWr
         super.initNeed();
         tableList.setAlias(alias);
         tableList.setRootClass(clazz);
+    }
+
+    /**
+     * 构造方法
+     *
+     * @param entity 主表实体类
+     * @param alias  主表别名
+     */
+    public MPJLambdaWrapper(T entity, String alias) {
+        this.alias = alias;
+        setEntity(entity);
+        super.initNeed();
+        tableList.setAlias(alias);
+        if (entity != null) {
+            tableList.setRootClass(entity.getClass());
+        }
     }
 
 

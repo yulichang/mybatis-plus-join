@@ -22,11 +22,13 @@ import com.github.yulichang.toolkit.reflect.GenericTypeUtils;
 
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Field;
+import java.lang.reflect.Member;
 import java.lang.reflect.Modifier;
 import java.security.AccessController;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -195,6 +197,15 @@ public final class ReflectionKit {
      */
     public static <T extends AccessibleObject> T setAccessible(T object) {
         return AccessController.doPrivileged(new SetAccessibleAction<>(object));
+    }
+
+    public static Optional<Field> getFieldOptional(Class<?> cls,String name){
+        return Arrays.stream(cls.getDeclaredFields()).filter(new Predicate<Field>() {
+            @Override
+            public boolean test(Field field) {
+                return field.getName().equals(name);
+            }
+        }).findFirst();
     }
 
 }

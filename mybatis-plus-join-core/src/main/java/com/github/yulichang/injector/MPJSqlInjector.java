@@ -10,7 +10,6 @@ import com.baomidou.mybatisplus.core.toolkit.ArrayUtils;
 import com.baomidou.mybatisplus.core.toolkit.ClassUtils;
 import com.github.yulichang.mapper.MPJTableMapperHelper;
 import com.github.yulichang.method.*;
-import com.github.yulichang.method.mp.SelectOne;
 import com.github.yulichang.toolkit.TableHelper;
 import com.github.yulichang.toolkit.reflect.GenericTypeUtils;
 import org.apache.ibatis.builder.MapperBuilderAssistant;
@@ -43,11 +42,9 @@ public class MPJSqlInjector extends DefaultSqlInjector {
     public List<AbstractMethod> getMethodList(Class<?> mapperClass) {
         List<AbstractMethod> list = Stream.of(
                 new Insert(),
-                new Delete(),
                 new DeleteByMap(),
                 new DeleteById(),
                 new DeleteBatchByIds(),
-                new Update(),
                 new UpdateById(),
                 new SelectById(),
                 new SelectBatchByIds(),
@@ -63,8 +60,16 @@ public class MPJSqlInjector extends DefaultSqlInjector {
      */
     @Override
     public List<AbstractMethod> getMethodList(Class<?> mapperClass, TableInfo tableInfo) {
-        List<String> methodList = Arrays.asList("SelectOne", "SelectCount",
-                "SelectMaps", "SelectMapsPage", "SelectObjs", "SelectList", "SelectPage");
+        List<String> methodList = Arrays.asList(
+                "Update",
+                "Delete",
+                "SelectOne",
+                "SelectCount",
+                "SelectMaps",
+                "SelectMapsPage",
+                "SelectObjs",
+                "SelectList",
+                "SelectPage");
         List<AbstractMethod> list = super.getMethodList(mapperClass, tableInfo);
         list.removeIf(i -> methodList.contains(i.getClass().getSimpleName()));
         list.addAll(getSelectMethod());
@@ -107,13 +112,15 @@ public class MPJSqlInjector extends DefaultSqlInjector {
 
     private List<AbstractMethod> getSelectMethod() {
         List<AbstractMethod> list = new ArrayList<>();
-        list.add(new SelectOne());
+        list.add(new com.github.yulichang.method.mp.Delete());
+        list.add(new com.github.yulichang.method.mp.SelectOne());
         list.add(new com.github.yulichang.method.mp.SelectCount());
         list.add(new com.github.yulichang.method.mp.SelectMaps());
         list.add(new com.github.yulichang.method.mp.SelectMapsPage());
         list.add(new com.github.yulichang.method.mp.SelectObjs());
         list.add(new com.github.yulichang.method.mp.SelectList());
         list.add(new com.github.yulichang.method.mp.SelectPage());
+        list.add(new com.github.yulichang.method.mp.Update());
         return list;
     }
 

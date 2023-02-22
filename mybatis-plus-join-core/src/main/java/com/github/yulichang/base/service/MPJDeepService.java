@@ -7,7 +7,7 @@ import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.github.yulichang.annotation.EntityMapping;
 import com.github.yulichang.annotation.FieldMapping;
-import com.github.yulichang.base.MPJBaseMapper;
+import com.github.yulichang.base.mapper.MPJDeepMapper;
 
 import java.io.Serializable;
 import java.util.Arrays;
@@ -38,7 +38,7 @@ public interface MPJDeepService<T> extends IService<T> {
      * @param id 主键ID列表
      */
     default T getByIdDeep(Serializable id) {
-        return ((MPJBaseMapper<T>) getBaseMapper()).selectByIdDeep(id);
+        return ((MPJDeepMapper<T>) getBaseMapper()).selectByIdDeep(id);
     }
 
     /**
@@ -50,7 +50,7 @@ public interface MPJDeepService<T> extends IService<T> {
      * @param property 需要关联的字段
      */
     default <R> T getByIdDeep(Serializable id, SFunction<T, R>... property) {
-        return ((MPJBaseMapper<T>) getBaseMapper()).selectByIdDeep(id, property);
+        return ((MPJDeepMapper<T>) getBaseMapper()).selectByIdDeep(id, property);
     }
 
     /**
@@ -63,7 +63,7 @@ public interface MPJDeepService<T> extends IService<T> {
      * @param property 需要关联的字段
      */
     default <R> T getByIdDeep(Serializable id, List<SFunction<T, R>> property) {
-        return ((MPJBaseMapper<T>) getBaseMapper()).selectByIdDeep(id, property);
+        return ((MPJDeepMapper<T>) getBaseMapper()).selectByIdDeep(id, property);
     }
 
     /**
@@ -72,7 +72,7 @@ public interface MPJDeepService<T> extends IService<T> {
      * @param idList 主键ID列表
      */
     default List<T> listByIdsDeep(Collection<? extends Serializable> idList) {
-        return ((MPJBaseMapper<T>) getBaseMapper()).selectBatchIdsDeep(idList);
+        return ((MPJDeepMapper<T>) getBaseMapper()).selectBatchIdsDeep(idList);
     }
 
     /**
@@ -84,7 +84,7 @@ public interface MPJDeepService<T> extends IService<T> {
      * @param property 需要关联的字段
      */
     default <R> List<T> listByIdsDeep(Collection<? extends Serializable> idList, SFunction<T, R>... property) {
-        return ((MPJBaseMapper<T>) getBaseMapper()).selectBatchIdsDeep(idList, Arrays.asList(property));
+        return ((MPJDeepMapper<T>) getBaseMapper()).selectBatchIdsDeep(idList, Arrays.asList(property));
     }
 
     /**
@@ -97,7 +97,7 @@ public interface MPJDeepService<T> extends IService<T> {
      * @param property 需要关联的字段
      */
     default <R> List<T> listByIdsDeep(Collection<? extends Serializable> idList, List<SFunction<T, R>> property) {
-        return ((MPJBaseMapper<T>) getBaseMapper()).selectBatchIdsDeep(idList, property);
+        return ((MPJDeepMapper<T>) getBaseMapper()).selectBatchIdsDeep(idList, property);
     }
 
     /**
@@ -106,7 +106,7 @@ public interface MPJDeepService<T> extends IService<T> {
      * @param columnMap 表字段 map 对象
      */
     default List<T> listByMapDeep(Map<String, Object> columnMap) {
-        return ((MPJBaseMapper<T>) getBaseMapper()).selectByMapDeep(columnMap);
+        return ((MPJDeepMapper<T>) getBaseMapper()).selectByMapDeep(columnMap);
     }
 
     /**
@@ -118,7 +118,7 @@ public interface MPJDeepService<T> extends IService<T> {
      * @param property  需要关联的字段
      */
     default <R> List<T> listByMapDeep(Map<String, Object> columnMap, SFunction<T, R>... property) {
-        return ((MPJBaseMapper<T>) getBaseMapper()).selectByMapDeep(columnMap, Arrays.asList(property));
+        return ((MPJDeepMapper<T>) getBaseMapper()).selectByMapDeep(columnMap, Arrays.asList(property));
     }
 
     /**
@@ -131,7 +131,7 @@ public interface MPJDeepService<T> extends IService<T> {
      * @param property  需要关联的字段
      */
     default <R> List<T> listByMapDeep(Map<String, Object> columnMap, List<SFunction<T, R>> property) {
-        return ((MPJBaseMapper<T>) getBaseMapper()).selectByMapDeep(columnMap, property);
+        return ((MPJDeepMapper<T>) getBaseMapper()).selectByMapDeep(columnMap, property);
     }
 
 
@@ -142,7 +142,7 @@ public interface MPJDeepService<T> extends IService<T> {
      * @param queryWrapper 实体对象封装操作类 {@link com.baomidou.mybatisplus.core.conditions.query.QueryWrapper}
      */
     default T getOneDeep(Wrapper<T> queryWrapper) {
-        return ((MPJBaseMapper<T>) getBaseMapper()).selectOneDeep(queryWrapper);
+        return ((MPJDeepMapper<T>) getBaseMapper()).selectOneDeep(queryWrapper);
     }
 
     /**
@@ -155,7 +155,7 @@ public interface MPJDeepService<T> extends IService<T> {
      * @param property     需要关联的字段
      */
     default <R> T getOneDeep(Wrapper<T> queryWrapper, SFunction<T, R>... property) {
-        return ((MPJBaseMapper<T>) getBaseMapper()).selectOneDeep(queryWrapper, Arrays.asList(property));
+        return ((MPJDeepMapper<T>) getBaseMapper()).selectOneDeep(queryWrapper, Arrays.asList(property));
     }
 
     /**
@@ -169,7 +169,7 @@ public interface MPJDeepService<T> extends IService<T> {
      * @param property     需要关联的字段
      */
     default <R> T getOneDeep(Wrapper<T> queryWrapper, List<SFunction<T, R>> property) {
-        return ((MPJBaseMapper<T>) getBaseMapper()).selectOneDeep(queryWrapper, property);
+        return ((MPJDeepMapper<T>) getBaseMapper()).selectOneDeep(queryWrapper, property);
     }
 
     /**
@@ -179,7 +179,7 @@ public interface MPJDeepService<T> extends IService<T> {
      * @param throwEx      有多个 result 是否抛出异常
      */
     default T getOneDeep(Wrapper<T> queryWrapper, boolean throwEx) {
-        return ((MPJBaseMapper<T>) getBaseMapper()).mpjQueryMapping(getOne(queryWrapper, throwEx), null);
+        return ((MPJDeepMapper<T>) getBaseMapper()).mpjQueryMapping(getOne(queryWrapper, throwEx), null);
     }
 
     /**
@@ -192,7 +192,7 @@ public interface MPJDeepService<T> extends IService<T> {
      * @param property     需要关联的字段
      */
     default <R> T getOneDeep(Wrapper<T> queryWrapper, boolean throwEx, SFunction<T, R>... property) {
-        return ((MPJBaseMapper<T>) getBaseMapper()).mpjQueryMapping(getOne(queryWrapper, throwEx), Arrays.asList(property));
+        return ((MPJDeepMapper<T>) getBaseMapper()).mpjQueryMapping(getOne(queryWrapper, throwEx), Arrays.asList(property));
     }
 
     /**
@@ -206,7 +206,7 @@ public interface MPJDeepService<T> extends IService<T> {
      * @param property     需要关联的字段
      */
     default <R> T getOneDeep(Wrapper<T> queryWrapper, boolean throwEx, List<SFunction<T, R>> property) {
-        return ((MPJBaseMapper<T>) getBaseMapper()).mpjQueryMapping(getOne(queryWrapper, throwEx), property);
+        return ((MPJDeepMapper<T>) getBaseMapper()).mpjQueryMapping(getOne(queryWrapper, throwEx), property);
     }
 
     /**
@@ -215,7 +215,7 @@ public interface MPJDeepService<T> extends IService<T> {
      * @param queryWrapper 实体对象封装操作类 {@link com.baomidou.mybatisplus.core.conditions.query.QueryWrapper}
      */
     default Map<String, Object> getMapDeep(Wrapper<T> queryWrapper) {
-        return ((MPJBaseMapper<T>) getBaseMapper()).mpjQueryMapMapping(getMap(queryWrapper), currentModelClass(),
+        return ((MPJDeepMapper<T>) getBaseMapper()).mpjQueryMapMapping(getMap(queryWrapper), currentModelClass(),
                 null);
     }
 
@@ -228,7 +228,7 @@ public interface MPJDeepService<T> extends IService<T> {
      * @param property     需要关联的字段
      */
     default <R> Map<String, Object> getMapDeep(Wrapper<T> queryWrapper, SFunction<T, R>... property) {
-        return ((MPJBaseMapper<T>) getBaseMapper()).mpjQueryMapMapping(getMap(queryWrapper), currentModelClass(),
+        return ((MPJDeepMapper<T>) getBaseMapper()).mpjQueryMapMapping(getMap(queryWrapper), currentModelClass(),
                 Arrays.asList(property));
     }
 
@@ -242,7 +242,7 @@ public interface MPJDeepService<T> extends IService<T> {
      * @param property     需要关联的字段
      */
     default <R> Map<String, Object> getMapDeep(Wrapper<T> queryWrapper, List<SFunction<T, R>> property) {
-        return ((MPJBaseMapper<T>) getBaseMapper()).mpjQueryMapMapping(getMap(queryWrapper), currentModelClass(), property);
+        return ((MPJDeepMapper<T>) getBaseMapper()).mpjQueryMapMapping(getMap(queryWrapper), currentModelClass(), property);
     }
 
     /**
@@ -251,7 +251,7 @@ public interface MPJDeepService<T> extends IService<T> {
      * @param queryWrapper 实体对象封装操作类 {@link com.baomidou.mybatisplus.core.conditions.query.QueryWrapper}
      */
     default List<T> listDeep(Wrapper<T> queryWrapper) {
-        return ((MPJBaseMapper<T>) getBaseMapper()).selectListDeep(queryWrapper);
+        return ((MPJDeepMapper<T>) getBaseMapper()).selectListDeep(queryWrapper);
     }
 
     /**
@@ -263,7 +263,7 @@ public interface MPJDeepService<T> extends IService<T> {
      * @param property     需要关联的字段
      */
     default <R> List<T> listDeep(Wrapper<T> queryWrapper, SFunction<T, R>... property) {
-        return ((MPJBaseMapper<T>) getBaseMapper()).selectListDeep(queryWrapper, Arrays.asList(property));
+        return ((MPJDeepMapper<T>) getBaseMapper()).selectListDeep(queryWrapper, Arrays.asList(property));
     }
 
     /**
@@ -276,7 +276,7 @@ public interface MPJDeepService<T> extends IService<T> {
      * @param property     需要关联的字段
      */
     default <R> List<T> listDeep(Wrapper<T> queryWrapper, List<SFunction<T, R>> property) {
-        return ((MPJBaseMapper<T>) getBaseMapper()).selectListDeep(queryWrapper, property);
+        return ((MPJDeepMapper<T>) getBaseMapper()).selectListDeep(queryWrapper, property);
     }
 
     /**
@@ -285,7 +285,7 @@ public interface MPJDeepService<T> extends IService<T> {
      * @see Wrappers#emptyWrapper()
      */
     default List<T> listDeep() {
-        return ((MPJBaseMapper<T>) getBaseMapper()).selectListDeep(Wrappers.emptyWrapper());
+        return ((MPJDeepMapper<T>) getBaseMapper()).selectListDeep(Wrappers.emptyWrapper());
     }
 
     /**
@@ -297,7 +297,7 @@ public interface MPJDeepService<T> extends IService<T> {
      * @see Wrappers#emptyWrapper()
      */
     default <R> List<T> listDeep(SFunction<T, R>... property) {
-        return ((MPJBaseMapper<T>) getBaseMapper()).selectListDeep(Wrappers.emptyWrapper(), Arrays.asList(property));
+        return ((MPJDeepMapper<T>) getBaseMapper()).selectListDeep(Wrappers.emptyWrapper(), Arrays.asList(property));
     }
 
     /**
@@ -310,7 +310,7 @@ public interface MPJDeepService<T> extends IService<T> {
      * @see Wrappers#emptyWrapper()
      */
     default <R> List<T> listDeep(List<SFunction<T, R>> property) {
-        return ((MPJBaseMapper<T>) getBaseMapper()).selectListDeep(Wrappers.emptyWrapper(), property);
+        return ((MPJDeepMapper<T>) getBaseMapper()).selectListDeep(Wrappers.emptyWrapper(), property);
     }
 
     /**
@@ -321,7 +321,7 @@ public interface MPJDeepService<T> extends IService<T> {
      */
     default <E extends IPage<T>> E pageDeep(E page, Wrapper<T> queryWrapper) {
         E e = page(page, queryWrapper);
-        ((MPJBaseMapper<T>) getBaseMapper()).mpjQueryMapping(e.getRecords(), null);
+        ((MPJDeepMapper<T>) getBaseMapper()).mpjQueryMapping(e.getRecords(), null);
         return e;
     }
 
@@ -336,7 +336,7 @@ public interface MPJDeepService<T> extends IService<T> {
      */
     default <R, E extends IPage<T>> E pageDeep(E page, Wrapper<T> queryWrapper, SFunction<T, R>... property) {
         E e = page(page, queryWrapper);
-        ((MPJBaseMapper<T>) getBaseMapper()).mpjQueryMapping(e.getRecords(), Arrays.asList(property));
+        ((MPJDeepMapper<T>) getBaseMapper()).mpjQueryMapping(e.getRecords(), Arrays.asList(property));
         return e;
     }
 
@@ -352,7 +352,7 @@ public interface MPJDeepService<T> extends IService<T> {
      */
     default <R, E extends IPage<T>> E pageDeep(E page, Wrapper<T> queryWrapper, List<SFunction<T, R>> property) {
         E e = page(page, queryWrapper);
-        ((MPJBaseMapper<T>) getBaseMapper()).mpjQueryMapping(e.getRecords(), property);
+        ((MPJDeepMapper<T>) getBaseMapper()).mpjQueryMapping(e.getRecords(), property);
         return e;
     }
 
@@ -364,7 +364,7 @@ public interface MPJDeepService<T> extends IService<T> {
      */
     default <E extends IPage<T>> E pageDeep(E page) {
         E e = page(page);
-        ((MPJBaseMapper<T>) getBaseMapper()).mpjQueryMapping(e.getRecords(), null);
+        ((MPJDeepMapper<T>) getBaseMapper()).mpjQueryMapping(e.getRecords(), null);
         return e;
     }
 
@@ -379,7 +379,7 @@ public interface MPJDeepService<T> extends IService<T> {
      */
     default <R, E extends IPage<T>> E pageDeep(E page, SFunction<T, R>... property) {
         E e = page(page);
-        ((MPJBaseMapper<T>) getBaseMapper()).mpjQueryMapping(e.getRecords(), Arrays.asList(property));
+        ((MPJDeepMapper<T>) getBaseMapper()).mpjQueryMapping(e.getRecords(), Arrays.asList(property));
         return e;
     }
 
@@ -395,7 +395,7 @@ public interface MPJDeepService<T> extends IService<T> {
      */
     default <R, E extends IPage<T>> E pageDeep(E page, List<SFunction<T, R>> property) {
         E e = page(page);
-        ((MPJBaseMapper<T>) getBaseMapper()).mpjQueryMapping(e.getRecords(), property);
+        ((MPJDeepMapper<T>) getBaseMapper()).mpjQueryMapping(e.getRecords(), property);
         return e;
     }
 
@@ -405,7 +405,7 @@ public interface MPJDeepService<T> extends IService<T> {
      * @param queryWrapper 实体对象封装操作类 {@link com.baomidou.mybatisplus.core.conditions.query.QueryWrapper}
      */
     default List<Map<String, Object>> listMapsDeep(Wrapper<T> queryWrapper) {
-        return ((MPJBaseMapper<T>) getBaseMapper()).mpjQueryMapMapping(listMaps(queryWrapper), currentModelClass(), null);
+        return ((MPJDeepMapper<T>) getBaseMapper()).mpjQueryMapMapping(listMaps(queryWrapper), currentModelClass(), null);
     }
 
     /**
@@ -417,7 +417,7 @@ public interface MPJDeepService<T> extends IService<T> {
      * @param property     需要关联的字段
      */
     default <R> List<Map<String, Object>> listMapsDeep(Wrapper<T> queryWrapper, SFunction<T, R>... property) {
-        return ((MPJBaseMapper<T>) getBaseMapper()).mpjQueryMapMapping(listMaps(queryWrapper), currentModelClass(),
+        return ((MPJDeepMapper<T>) getBaseMapper()).mpjQueryMapMapping(listMaps(queryWrapper), currentModelClass(),
                 Arrays.asList(property));
     }
 
@@ -431,7 +431,7 @@ public interface MPJDeepService<T> extends IService<T> {
      * @param property     需要关联的字段
      */
     default <R> List<Map<String, Object>> listMapsDeep(Wrapper<T> queryWrapper, List<SFunction<T, R>> property) {
-        return ((MPJBaseMapper<T>) getBaseMapper()).mpjQueryMapMapping(listMaps(queryWrapper), currentModelClass(), property);
+        return ((MPJDeepMapper<T>) getBaseMapper()).mpjQueryMapMapping(listMaps(queryWrapper), currentModelClass(), property);
     }
 
     /**
@@ -440,7 +440,7 @@ public interface MPJDeepService<T> extends IService<T> {
      * @see Wrappers#emptyWrapper()
      */
     default List<Map<String, Object>> listMapsDeep() {
-        return ((MPJBaseMapper<T>) getBaseMapper()).mpjQueryMapMapping(listMaps(), currentModelClass(), null);
+        return ((MPJDeepMapper<T>) getBaseMapper()).mpjQueryMapMapping(listMaps(), currentModelClass(), null);
     }
 
     /**
@@ -452,7 +452,7 @@ public interface MPJDeepService<T> extends IService<T> {
      * @see Wrappers#emptyWrapper()
      */
     default <R> List<Map<String, Object>> listMapsDeep(SFunction<T, R>... property) {
-        return ((MPJBaseMapper<T>) getBaseMapper()).mpjQueryMapMapping(listMaps(), currentModelClass(), Arrays.asList(property));
+        return ((MPJDeepMapper<T>) getBaseMapper()).mpjQueryMapMapping(listMaps(), currentModelClass(), Arrays.asList(property));
     }
 
     /**
@@ -465,7 +465,7 @@ public interface MPJDeepService<T> extends IService<T> {
      * @see Wrappers#emptyWrapper()
      */
     default <R> List<Map<String, Object>> listMapsDeep(List<SFunction<T, R>> property) {
-        return ((MPJBaseMapper<T>) getBaseMapper()).mpjQueryMapMapping(listMaps(), currentModelClass(), property);
+        return ((MPJDeepMapper<T>) getBaseMapper()).mpjQueryMapMapping(listMaps(), currentModelClass(), property);
     }
 
     /**
@@ -476,7 +476,7 @@ public interface MPJDeepService<T> extends IService<T> {
      */
     default <E extends IPage<Map<String, Object>>> E pageMapsDeep(E page, Wrapper<T> queryWrapper) {
         E e = pageMaps(page, queryWrapper);
-        ((MPJBaseMapper<T>) getBaseMapper()).mpjQueryMapMapping(e.getRecords(), currentModelClass(), null);
+        ((MPJDeepMapper<T>) getBaseMapper()).mpjQueryMapMapping(e.getRecords(), currentModelClass(), null);
         return e;
     }
 
@@ -491,7 +491,7 @@ public interface MPJDeepService<T> extends IService<T> {
      */
     default <R, E extends IPage<Map<String, Object>>> E pageMapsDeep(E page, Wrapper<T> queryWrapper, SFunction<T, R>... property) {
         E e = pageMaps(page, queryWrapper);
-        ((MPJBaseMapper<T>) getBaseMapper()).mpjQueryMapMapping(e.getRecords(), currentModelClass(), Arrays.asList(property));
+        ((MPJDeepMapper<T>) getBaseMapper()).mpjQueryMapMapping(e.getRecords(), currentModelClass(), Arrays.asList(property));
         return e;
     }
 
@@ -507,7 +507,7 @@ public interface MPJDeepService<T> extends IService<T> {
      */
     default <R, E extends IPage<Map<String, Object>>> E pageMapsDeep(E page, Wrapper<T> queryWrapper, List<SFunction<T, R>> property) {
         E e = pageMaps(page, queryWrapper);
-        ((MPJBaseMapper<T>) getBaseMapper()).mpjQueryMapMapping(e.getRecords(), currentModelClass(), property);
+        ((MPJDeepMapper<T>) getBaseMapper()).mpjQueryMapMapping(e.getRecords(), currentModelClass(), property);
         return e;
     }
 
@@ -519,7 +519,7 @@ public interface MPJDeepService<T> extends IService<T> {
      */
     default <E extends IPage<Map<String, Object>>> E pageMapsDeep(E page) {
         E e = pageMaps(page);
-        ((MPJBaseMapper<T>) getBaseMapper()).mpjQueryMapMapping(e.getRecords(), currentModelClass(), null);
+        ((MPJDeepMapper<T>) getBaseMapper()).mpjQueryMapMapping(e.getRecords(), currentModelClass(), null);
         return e;
     }
 
@@ -534,7 +534,7 @@ public interface MPJDeepService<T> extends IService<T> {
      */
     default <R, E extends IPage<Map<String, Object>>> E pageMapsDeep(E page, SFunction<T, R>... property) {
         E e = pageMaps(page);
-        ((MPJBaseMapper<T>) getBaseMapper()).mpjQueryMapMapping(e.getRecords(), currentModelClass(), Arrays.asList(property));
+        ((MPJDeepMapper<T>) getBaseMapper()).mpjQueryMapMapping(e.getRecords(), currentModelClass(), Arrays.asList(property));
         return e;
     }
 
@@ -550,7 +550,7 @@ public interface MPJDeepService<T> extends IService<T> {
      */
     default <R, E extends IPage<Map<String, Object>>> E pageMapsDeep(E page, List<SFunction<T, R>> property) {
         E e = pageMaps(page);
-        ((MPJBaseMapper<T>) getBaseMapper()).mpjQueryMapMapping(e.getRecords(), currentModelClass(), property);
+        ((MPJDeepMapper<T>) getBaseMapper()).mpjQueryMapMapping(e.getRecords(), currentModelClass(), property);
         return e;
     }
 }

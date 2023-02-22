@@ -1,5 +1,6 @@
 package com.github.yulichang.toolkit;
 
+import com.baomidou.mybatisplus.core.metadata.TableFieldInfo;
 import com.baomidou.mybatisplus.core.metadata.TableInfo;
 import com.baomidou.mybatisplus.core.toolkit.Assert;
 import com.baomidou.mybatisplus.core.toolkit.Constants;
@@ -34,12 +35,13 @@ public class LogicInfoUtils implements Constants {
         String logicStr;
         TableInfo tableInfo = TableHelper.get(clazz);
         Assert.notNull(tableInfo, "table not find by class <%s>", clazz.getSimpleName());
-        if (tableInfo.isWithLogicDelete() && Objects.nonNull(tableInfo.getLogicDeleteFieldInfo())) {
-            final String value = tableInfo.getLogicDeleteFieldInfo().getLogicNotDeleteValue();
+        TableFieldInfo logicField = JR.mpjGetLogicField(tableInfo);
+        if (JR.mpjHasLogic(tableInfo) && Objects.nonNull(logicField)) {
+            final String value = logicField.getLogicNotDeleteValue();
             if (NULL.equalsIgnoreCase(value)) {
-                logicStr = " AND " + prefix + DOT + tableInfo.getLogicDeleteFieldInfo().getColumn() + " IS NULL";
+                logicStr = " AND " + prefix + DOT + logicField.getColumn() + " IS NULL";
             } else {
-                logicStr = " AND " + prefix + DOT + tableInfo.getLogicDeleteFieldInfo().getColumn() + EQUALS + String.format(tableInfo.getLogicDeleteFieldInfo().isCharSequence() ? "'%s'" : "%s", value);
+                logicStr = " AND " + prefix + DOT + logicField.getColumn() + EQUALS + String.format(logicField.isCharSequence() ? "'%s'" : "%s", value);
             }
         } else {
             logicStr = StringPool.EMPTY;

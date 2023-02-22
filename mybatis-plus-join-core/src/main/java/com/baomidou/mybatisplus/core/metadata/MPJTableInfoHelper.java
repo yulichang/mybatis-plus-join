@@ -5,7 +5,9 @@ import com.baomidou.mybatisplus.core.toolkit.ReflectionKit;
 import com.github.yulichang.annotation.EntityMapping;
 import com.github.yulichang.annotation.FieldMapping;
 import com.github.yulichang.exception.MPJException;
+import com.github.yulichang.mapper.MPJTableFieldInfo;
 import com.github.yulichang.mapper.MPJTableInfo;
+import com.github.yulichang.toolkit.MPJReflectionKit;
 import com.github.yulichang.toolkit.TableHelper;
 import org.apache.ibatis.session.Configuration;
 
@@ -28,7 +30,6 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author yulichang
  * @see TableInfoHelper
  */
-@SuppressWarnings("deprecation")
 public class MPJTableInfoHelper {
 
     /**
@@ -45,7 +46,7 @@ public class MPJTableInfoHelper {
      * @return 数据库表反射信息
      */
     public static MPJTableInfo getTableInfo(Class<?> clazz) {
-        if (clazz == null || ReflectionKit.isPrimitiveOrWrapper(clazz) || clazz == String.class || clazz.isInterface()) {
+        if (clazz == null || MPJReflectionKit.isPrimitiveOrWrapper(clazz) || clazz == String.class || clazz.isInterface()) {
             return null;
         }
         return TABLE_INFO_CACHE.get(clazz);
@@ -76,10 +77,14 @@ public class MPJTableInfoHelper {
         }
         MPJTableInfo mpjTableInfo = new MPJTableInfo();
         mpjTableInfo.setMapperClass(mapperClass);
+        mpjTableInfo.setEntityClass(clazz);
         TableInfo tableInfo = TableHelper.get(clazz);
         if (tableInfo == null) {
-            return;
+            if (mapperClass != null) {
+                return;
+            }
         }
+        mpjTableInfo.setDto(tableInfo == null);
         mpjTableInfo.setTableInfo(tableInfo);
         initMapping(mpjTableInfo);
         TABLE_INFO_CACHE.put(clazz, mpjTableInfo);
@@ -98,26 +103,26 @@ public class MPJTableInfoHelper {
      */
     public static void initMapping(MPJTableInfo mpjTableInfo) {
         // 是否存在 @EntityMapping 注解
-        boolean existMapping = isExistMapping(mpjTableInfo.getTableInfo().getEntityType());
+        boolean existMapping = isExistMapping(mpjTableInfo.getEntityClass());
         mpjTableInfo.setHasMapping(existMapping);
         // 是否存在 @FieldMapping 注解
-        boolean existMappingField = isExistMappingField(mpjTableInfo.getTableInfo().getEntityType());
+        boolean existMappingField = isExistMappingField(mpjTableInfo.getEntityClass());
         mpjTableInfo.setHasMappingField(existMappingField);
         mpjTableInfo.setHasMappingOrField(existMapping || existMappingField);
         /* 关系映射初始化 */
-        List<com.github.yulichang.mapper.MPJTableFieldInfo> mpjFieldList = new ArrayList<>();
-        List<Field> fields = ReflectionKit.getFieldList(ClassUtils.getUserClass(mpjTableInfo.getTableInfo().getEntityType()));
+        List<MPJTableFieldInfo> mpjFieldList = new ArrayList<>();
+        List<Field> fields = ReflectionKit.getFieldList(ClassUtils.getUserClass(mpjTableInfo.getEntityClass()));
         for (Field field : fields) {
             if (existMapping) {
                 EntityMapping mapping = field.getAnnotation(EntityMapping.class);
                 if (mapping != null) {
-                    mpjFieldList.add(new com.github.yulichang.mapper.MPJTableFieldInfo(mpjTableInfo.getTableInfo().getEntityType(), mapping, field));
+                    mpjFieldList.add(new MPJTableFieldInfo(mpjTableInfo.getEntityClass(), mapping, field));
                 }
             }
             if (existMappingField) {
                 FieldMapping mapping = field.getAnnotation(FieldMapping.class);
                 if (mapping != null) {
-                    mpjFieldList.add(new com.github.yulichang.mapper.MPJTableFieldInfo(mpjTableInfo.getTableInfo().getEntityType(), mapping, field));
+                    mpjFieldList.add(new MPJTableFieldInfo(mpjTableInfo.getEntityClass(), mapping, field));
                 }
             }
         }

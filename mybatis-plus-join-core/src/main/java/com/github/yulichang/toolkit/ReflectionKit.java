@@ -125,7 +125,7 @@ public final class ReflectionKit {
         if (Objects.isNull(clazz)) {
             return Collections.emptyList();
         }
-        return CollectionUtils.computeIfAbsent(CLASS_FIELD_CACHE, clazz, k -> {
+        return computeIfAbsent(CLASS_FIELD_CACHE, clazz, k -> {
             Field[] fields = k.getDeclaredFields();
             List<Field> superFields = new ArrayList<>();
             Class<?> currentClass = k.getSuperclass();
@@ -197,4 +197,11 @@ public final class ReflectionKit {
         return AccessController.doPrivileged(new SetAccessibleAction<>(object));
     }
 
+    public static <K, V> V computeIfAbsent(Map<K, V> concurrentHashMap, K key, Function<? super K, ? extends V> mappingFunction) {
+        V v = concurrentHashMap.get(key);
+        if (v != null) {
+            return v;
+        }
+        return concurrentHashMap.computeIfAbsent(key, mappingFunction);
+    }
 }

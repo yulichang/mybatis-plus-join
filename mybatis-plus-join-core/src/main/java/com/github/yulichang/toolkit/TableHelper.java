@@ -2,6 +2,7 @@ package com.github.yulichang.toolkit;
 
 import com.baomidou.mybatisplus.core.metadata.TableInfo;
 import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
+import com.baomidou.mybatisplus.core.toolkit.ClassUtils;
 
 import java.util.Map;
 import java.util.Objects;
@@ -29,13 +30,24 @@ public class TableHelper {
         }
     }
 
+    @SuppressWarnings("ConstantConditions")
     public static TableInfo get(Class<?> clazz) {
         if (Objects.nonNull(clazz)) {
             TableInfo tableInfo = TableInfoHelper.getTableInfo(clazz);
             if (Objects.nonNull(tableInfo)) {
                 return tableInfo;
             }
-            return TABLE_INFO_CACHE.get(clazz);
+            TableInfo info = TABLE_INFO_CACHE.get(clazz);
+            //尝试获取父类缓存
+            Class<?> currentClass = clazz;
+            while (Object.class != currentClass) {
+                currentClass = currentClass.getSuperclass();
+                info = TABLE_INFO_CACHE.get(ClassUtils.getUserClass(currentClass));
+            }
+            if (Objects.nonNull(info)) {
+                TABLE_INFO_CACHE.put(currentClass, info);
+            }
+            return info;
         } else {
             return null;
         }

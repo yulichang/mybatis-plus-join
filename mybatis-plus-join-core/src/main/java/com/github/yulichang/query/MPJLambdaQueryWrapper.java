@@ -18,17 +18,12 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 /**
- * 不推荐使用这wrapper
- * 这种既有string又有lambda对开发人员并不友好
- * <p>
- * 推荐使用以下两个类 :
- * String -> {@link MPJQueryWrapper<T>}
- * lambda -> {@link com.github.yulichang.wrapper.MPJLambdaWrapper<T>}
- * <p>
+ * MPJLambdaQueryWrapper
+ * 参考 -> {@link com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper}
  *
  * @author yulichang
+ * @see com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper
  */
-@Deprecated
 @SuppressWarnings("unused")
 public class MPJLambdaQueryWrapper<T> extends AbstractLambdaWrapper<T, MPJLambdaQueryWrapper<T>>
         implements Query<MPJLambdaQueryWrapper<T>, T, SFunction<T, ?>>, StringJoin<MPJLambdaQueryWrapper<T>, T> {

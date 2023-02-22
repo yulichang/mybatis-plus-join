@@ -73,4 +73,12 @@ public abstract class MPJAbstractMethod extends AbstractMethod implements MPJBas
         return SqlScriptUtils.convertIf("DISTINCT", "ew.selectDistinct", false);
     }
 
+    @Override
+    protected String sqlFirst() {
+        try {
+            return super.sqlFirst();
+        } catch (Throwable e) {
+            return "";
+        }
+    }
 }

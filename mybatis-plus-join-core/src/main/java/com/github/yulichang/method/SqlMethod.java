@@ -11,6 +11,20 @@ import java.util.stream.Collectors;
  */
 public enum SqlMethod {
 
+//    /**
+//     * 修改
+//     */
+
+    /**
+     * 删除
+     */
+    DELETE("delete", "根据 entity 条件删除记录", "<script>\nDELETE FROM %s %s %s\n</script>"),
+
+    /**
+     * 逻辑删除
+     */
+    LOGIC_DELETE("delete", "根据 entity 条件逻辑删除记录", "<script>\nUPDATE %s %s %s %s\n</script>"),
+
     /**
      * 连表查询
      */

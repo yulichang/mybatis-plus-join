@@ -38,6 +38,21 @@ public class MPJTableInfo {
     private boolean hasMappingField;
 
     /**
+     * 实例类 class
+     */
+    private Class<?> entityClass;
+
+    /**
+     * 非数据库实体类
+     */
+    private boolean isDto;
+
+    /**
+     * 是否循环
+     */
+    private boolean isLoop;
+
+    /**
      * mapperClass
      */
     private Class<?> mapperClass;

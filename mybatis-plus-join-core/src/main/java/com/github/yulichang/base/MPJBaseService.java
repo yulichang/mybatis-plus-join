@@ -9,7 +9,6 @@ import com.github.yulichang.base.service.MPJJoinService;
  *
  * @author yulichang
  * @see MPJJoinService
- * @see MPJDeepService
  */
 public interface MPJBaseService<T> extends MPJJoinService<T>, MPJDeepService<T> {
 }

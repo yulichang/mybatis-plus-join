@@ -1,12 +1,12 @@
 # mybatis-plus-join
 
-* 对 [mybatis-plus](https://gitee.com/baomidou/mybatis-plus) 多表查询的扩展
-* [演示工程](https://gitee.com/best_handsome/mybatis-plus-join-demo)
+* 对 <a href="https://gitee.com/baomidou/mybatis-plus" target="_blank">mybatis-plus</a> 多表查询的扩展
+* <a href="https://gitee.com/best_handsome/mybatis-plus-join-demo" target="_blank">演示工程</a>
 * <a href="https://ylctmh.com" target="_blank">文档</a>
 * 点个Star支持一下吧 :)
 
 QQ群:1022221898  
-[加入微信群](https://gitee.com/best_handsome/mybatis-plus-join/issues/I65N2M)
+<a href="https://gitee.com/best_handsome/mybatis-plus-join/issues/I65N2M" target="_blank">加入微信群</a>
 
 ### <a href="https://ylctmh.com" target="_blank">文档</a>
 
@@ -28,7 +28,7 @@ QQ群:1022221898
   ```
   或者clone代码到本地执行 mvn install, 再引入以上依赖  
   <br>
-  注意: mybatis plus version >= 3.4.0
+  注意: mybatis plus version >= 3.3.0
   <br>
 
 ### 使用
@@ -252,7 +252,7 @@ ORDER BY
     addr.id DESC
 ```
 
-# [wiki](https://ylctmh.com)
+# <a href="https://ylctmh.com" target="_blank">wiki</a>
 
 
 

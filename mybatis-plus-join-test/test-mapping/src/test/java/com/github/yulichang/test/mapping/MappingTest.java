@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import javax.annotation.Resource;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -23,7 +24,7 @@ class MappingTest {
 
     @Test
     public void test() {
-        List<UserDO> dos = userMapper.selectRelation(e -> e.selectList(new QueryWrapper<>()), true);
+        List<UserDO> dos = userMapper.selectRelation(e -> e.selectList(new QueryWrapper<>()), Collections.singletonList(UserDO::getAddressId));
         System.out.println(1);
     }
 
@@ -32,7 +33,7 @@ class MappingTest {
         MPJLambdaWrapper<UserDO> wrapper = new MPJLambdaWrapper<UserDO>()
                 .selectAll(UserDO.class)
                 .leftJoin(AddressDO.class, AddressDO::getId, UserDO::getAddressId);
-        List<UserDO> dos = userMapper.selectRelation(e -> e.selectList(wrapper), true);
+        List<UserDO> dos = userMapper.selectRelation(e -> e.selectList(wrapper));
         System.out.println(1);
     }
 }

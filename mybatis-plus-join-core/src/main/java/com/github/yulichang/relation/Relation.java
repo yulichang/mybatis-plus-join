@@ -16,9 +16,8 @@ import java.util.stream.Collectors;
 @SuppressWarnings("all")
 public class Relation {
 
-//    private static final List EMPTY_LIST = new ArrayList<>();
 
-    public static <T> List<T> list(List<T> data, List<SFunction<T, ?>> property, boolean deep) {
+    public static <T> List<T> list(List<T> data, List<SFunction<T, ?>> property) {
         if (CollectionUtils.isEmpty(data)) {
             return data;
         }
@@ -38,12 +37,8 @@ public class Relation {
                         data.forEach(i -> mpjBindData(i, fieldInfo, joinList));
                         fieldInfo.removeJoinField(joinList);
                         if (CollectionUtils.isEmpty(joinList)) {
-//                            continue;
+                            continue;
                         }
-//                        //深度查询
-//                        if (deep) {
-//
-//                        }
                     } else {
                         data.forEach(i -> fieldInfo.fieldSet(i, new ArrayList<>()));
                     }
@@ -62,7 +57,7 @@ public class Relation {
      *
      * @param t 第一次查询结果
      */
-    public static <T> T one(T t, List<SFunction<T, ?>> property, boolean deep) {
+    public static <T> T one(T t, List<SFunction<T, ?>> property) {
         if (t == null) {
             return null;
         }

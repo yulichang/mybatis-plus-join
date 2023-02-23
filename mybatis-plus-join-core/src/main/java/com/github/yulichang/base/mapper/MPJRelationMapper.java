@@ -7,25 +7,34 @@ import com.baomidou.mybatisplus.core.toolkit.ExceptionUtils;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.github.yulichang.relation.Relation;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.Function;
 
+/**
+ * 注解映射Mapper 用于替代 MPJDeepMapper
+ *
+ * @author yulichang
+ * @since 1.4.3
+ */
 public interface MPJRelationMapper<T> extends BaseMapper<T> {
+
+    default <R, M extends BaseMapper<T>> R selectRelation(Function<M, R> function) {
+        return selectRelation(function, new ArrayList<>());
+    }
 
     /**
      * 通过注解实现单表多次查询
      *
      * @param function BaseMapper调用方法
-     * @param deep     是否深度查询
-     * @param prop     属性过滤, 可以只查询需要映射的属性
+     * @param list     属性过滤, 可以只查询需要映射的属性
      * @see com.github.yulichang.annotation.EntityMapping
      * @see com.github.yulichang.annotation.FieldMapping
      */
     @SuppressWarnings("unchecked")
-    default <R, M extends BaseMapper<T>> R selectRelation(Function<M, R> function, boolean deep, SFunction<T, ?>... prop) {
+    default <R, M extends BaseMapper<T>> R selectRelation(Function<M, R> function, List<SFunction<T, ?>> list) {
         R r = function.apply((M) this);
         if (Objects.isNull(r)) {
             return null;
@@ -42,7 +51,7 @@ public interface MPJRelationMapper<T> extends BaseMapper<T> {
                 if (Object.class == t.getClass()) {
                     return r;
                 }
-                return (R) Relation.list(data, Arrays.asList(prop), deep);
+                return (R) Relation.list(data, list);
             }
         }
         if (r instanceof IPage) {
@@ -55,7 +64,7 @@ public interface MPJRelationMapper<T> extends BaseMapper<T> {
                 if (Object.class == t.getClass()) {
                     return r;
                 }
-                Relation.list(data.getRecords(), Arrays.asList(prop), deep);
+                Relation.list(data.getRecords(), list);
             }
             return r;
         }
@@ -72,6 +81,6 @@ public interface MPJRelationMapper<T> extends BaseMapper<T> {
             return r;
         }
         T data = (T) r;
-        return (R) Relation.one(data, Arrays.asList(prop), deep);
+        return (R) Relation.one(data, list);
     }
 }

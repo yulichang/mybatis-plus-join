@@ -5,6 +5,10 @@ import com.baomidou.mybatisplus.core.metadata.TableInfo;
 import com.github.yulichang.adapter.base.IAdapter;
 import org.apache.ibatis.session.Configuration;
 
+/**
+ * @author yulichang
+ * @since 1.4.3
+ */
 public class Adapter implements IAdapter {
 
     @Override

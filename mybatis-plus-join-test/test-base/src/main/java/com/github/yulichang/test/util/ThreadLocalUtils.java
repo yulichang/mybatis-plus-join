@@ -1,4 +1,4 @@
-package com.github.yulichang.test.join.util;
+package com.github.yulichang.test.util;
 
 public class ThreadLocalUtils {
 

@@ -4,6 +4,10 @@ import com.baomidou.mybatisplus.core.metadata.TableFieldInfo;
 import com.baomidou.mybatisplus.core.metadata.TableInfo;
 import org.apache.ibatis.session.Configuration;
 
+/**
+ * @author yulichang
+ * @since 1.4.3
+ */
 public interface IAdapter {
 
     boolean mpjHasLogic(TableInfo tableInfo);

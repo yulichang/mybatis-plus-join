@@ -12,7 +12,7 @@ import com.github.yulichang.test.join.entity.UserDO;
 import com.github.yulichang.test.join.entity.UserDto;
 import com.github.yulichang.test.join.mapper.UserDTOMapper;
 import com.github.yulichang.test.join.mapper.UserMapper;
-import com.github.yulichang.test.join.util.ThreadLocalUtils;
+import com.github.yulichang.test.util.ThreadLocalUtils;
 import com.github.yulichang.toolkit.MPJWrappers;
 import com.github.yulichang.wrapper.MPJLambdaWrapper;
 import org.junit.jupiter.api.Test;

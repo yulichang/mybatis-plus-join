@@ -16,6 +16,7 @@
     <name>mybatis-plus-join-test</name>
 
     <modules>
+        <module>test-base</module>
         <module>test-join</module>
         <module>test-collection</module>
         <module>test-mapping</module>
@@ -97,7 +98,6 @@
         <dependency>
             <groupId>com.baomidou</groupId>
             <artifactId>mybatis-plus-boot-starter</artifactId>
-<!--            <version>3.3.0</version>-->
             <version>3.5.2</version>
         </dependency>
         <dependency>

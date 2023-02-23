@@ -8,6 +8,10 @@ import org.apache.ibatis.session.Configuration;
 
 import java.util.Objects;
 
+/**
+ * @author yulichang
+ * @since 1.4.3
+ */
 public class AdapterV33x implements IAdapter {
 
     @Override

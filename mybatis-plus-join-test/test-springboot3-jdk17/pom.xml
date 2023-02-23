@@ -49,6 +49,12 @@
             <artifactId>mybatis-plus-boot-starter</artifactId>
             <version>3.5.3.1</version>
         </dependency>
+
+        <dependency>
+            <groupId>com.github.yulichang</groupId>
+            <artifactId>test-base</artifactId>
+            <version>1.4.2.2</version>
+        </dependency>
     </dependencies>
 
 </project>

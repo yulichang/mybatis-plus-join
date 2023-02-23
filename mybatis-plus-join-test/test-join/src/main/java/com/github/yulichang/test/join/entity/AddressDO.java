@@ -8,12 +8,14 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import lombok.experimental.Accessors;
 
+import java.io.Serializable;
+
 @Data
 @ToString
 @Accessors(chain = true)
 @EqualsAndHashCode
 @TableName("address")
-public class AddressDO {
+public class AddressDO implements Serializable {
 
     @TableId
     private Integer id;

@@ -1,6 +1,7 @@
 package com.github.yulichang.wrapper.interfaces;
 
 import com.baomidou.mybatisplus.core.toolkit.Assert;
+import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.github.yulichang.toolkit.LambdaUtils;
 import com.github.yulichang.toolkit.MPJReflectionKit;
@@ -10,7 +11,6 @@ import com.github.yulichang.wrapper.resultmap.MybatisLabel;
 import java.lang.reflect.Field;
 import java.util.Collection;
 import java.util.Map;
-import java.util.Objects;
 
 @SuppressWarnings({"unchecked", "unused"})
 public interface QueryLabel<Children> {
@@ -123,14 +123,14 @@ public interface QueryLabel<Children> {
         return selectAssociation(null, child, dtoField);
     }
 
-    default <S, C, F> Children selectAssociation(Integer index, Class<C> child, SFunction<S, F> dtoField) {
+    default <S, C, F> Children selectAssociation(String prefix, Class<C> child, SFunction<S, F> dtoField) {
         String dtoFieldName = LambdaUtils.getName(dtoField);
         Class<S> dtoClass = LambdaUtils.getEntityClass(dtoField);
         Map<String, Field> fieldMap = MPJReflectionKit.getFieldMap(dtoClass);
         Field field = fieldMap.get(dtoFieldName);
         Assert.isFalse(Collection.class.isAssignableFrom(field.getType()), "association 不支持集合类");
         MybatisLabel.Builder<C, F> builder;
-        builder = new MybatisLabel.Builder<>(Objects.isNull(index) ? null : index.toString(),
+        builder = new MybatisLabel.Builder<>(StringUtils.isBlank(prefix) ? null : prefix,
                 dtoFieldName, child, field.getType(), (Class<F>) field.getType(), true);
         addLabel(builder.build());
         return getChildren();
@@ -146,13 +146,13 @@ public interface QueryLabel<Children> {
         return selectAssociation(null, child, dtoField, collection);
     }
 
-    default <S, C, F> Children selectAssociation(Integer index, Class<C> child, SFunction<S, F> dtoField,
+    default <S, C, F> Children selectAssociation(String prefix, Class<C> child, SFunction<S, F> dtoField,
                                                  MFunc<MybatisLabel.Builder<C, F>> collection) {
         String dtoFieldName = LambdaUtils.getName(dtoField);
         Class<S> dtoClass = LambdaUtils.getEntityClass(dtoField);
         Field field = MPJReflectionKit.getFieldMap(dtoClass).get(dtoFieldName);
         Assert.isFalse(Collection.class.isAssignableFrom(field.getType()), "association 不支持集合类");
-        MybatisLabel.Builder<C, F> builder = new MybatisLabel.Builder<>(Objects.isNull(index) ? null : index.toString(),
+        MybatisLabel.Builder<C, F> builder = new MybatisLabel.Builder<>(StringUtils.isBlank(prefix) ? null : prefix,
                 dtoFieldName, child, field.getType(), (Class<F>) field.getType(), false);
         MybatisLabel.Builder<C, F> cfBuilder = collection.apply(builder);
         addLabel(cfBuilder.build());

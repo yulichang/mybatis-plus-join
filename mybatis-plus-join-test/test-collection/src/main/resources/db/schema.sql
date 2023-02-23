@@ -46,3 +46,13 @@ create table table_e
     `did`  int not null,
     `name` varchar(255) null
 );
+
+DROP TABLE IF EXISTS table_t;
+create table table_t
+(
+    id     int auto_increment
+        primary key,
+    `aid1`  int not null,
+    `aid2`  int not null,
+    `name` varchar(255) null
+);

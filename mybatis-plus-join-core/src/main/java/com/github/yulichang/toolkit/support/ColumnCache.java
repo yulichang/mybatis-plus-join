@@ -2,7 +2,7 @@ package com.github.yulichang.toolkit.support;
 
 import com.baomidou.mybatisplus.core.metadata.TableInfo;
 import com.baomidou.mybatisplus.core.toolkit.Assert;
-import com.github.yulichang.toolkit.JR;
+import com.github.yulichang.config.ConfigProperties;
 import com.github.yulichang.toolkit.TableHelper;
 import com.github.yulichang.wrapper.segments.SelectCache;
 
@@ -30,7 +30,7 @@ public class ColumnCache {
             TableInfo tableInfo = TableHelper.get(clazz);
             Assert.notNull(tableInfo, "table not find by class <%s>", c.getSimpleName());
             List<SelectCache> list = new ArrayList<>();
-            if (JR.mpjHasPK(tableInfo)) {
+            if (ConfigProperties.adapter.mpjHasPK(tableInfo)) {
                 list.add(new SelectCache(clazz, true, tableInfo.getKeyColumn(), tableInfo.getKeyType(), tableInfo.getKeyProperty(), null));
             }
             list.addAll(tableInfo.getFieldList().stream().map(f -> new SelectCache(clazz, false, f.getColumn(), f.getPropertyType(), f.getProperty(), f)).collect(Collectors.toList()));

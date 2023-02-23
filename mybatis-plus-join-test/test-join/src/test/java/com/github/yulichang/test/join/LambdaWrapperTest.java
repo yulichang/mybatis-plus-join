@@ -74,7 +74,6 @@ class LambdaWrapperTest {
                 "  AND t2.del = false\n" +
                 "  AND (t.id <= ?)\n" +
                 "ORDER BY t.id DESC");
-
         MPJLambdaWrapper<UserDO> wrapper = new MPJLambdaWrapper<UserDO>()
                 .selectAll(UserDO.class)
                 .selectCollection(AddressDO.class, UserDTO::getAddressList, addr -> addr
@@ -86,6 +85,42 @@ class LambdaWrapperTest {
         List<UserDTO> list = userMapper.selectJoinList(UserDTO.class, wrapper);
 
         assert list.get(0).getAddressList() != null && list.get(0).getAddressList().get(0).getId() != null;
+        list.forEach(System.out::println);
+    }
+
+    @Test
+    void testJoinField() {
+        ThreadLocalUtils.set("SELECT t.id,\n" +
+                "       t.pid,\n" +
+                "       t.`name`,\n" +
+                "       t.`json`,\n" +
+                "       t.sex,\n" +
+                "       t.head_img,\n" +
+                "       t.create_time,\n" +
+                "       t.address_id,\n" +
+                "       t.address_id2,\n" +
+                "       t.del,\n" +
+                "       t.create_by,\n" +
+                "       t.update_by,\n" +
+                "       t1.id AS joina_id\n" +
+                "FROM `user` t\n" +
+                "         LEFT JOIN address t1 ON (t1.user_id = t.id)\n" +
+                "WHERE t.del = false\n" +
+                "  AND t1.del = false\n" +
+                "  AND (t.id <= ?)\n" +
+                "ORDER BY t.id DESC");
+        MPJLambdaWrapper<UserDO> wrapper = new MPJLambdaWrapper<UserDO>()
+                .selectAll(UserDO.class)
+
+                .selectCollection(AddressDO.class, UserDTO::getAddressIds, e -> e
+                        .id(AddressDO::getId))
+
+                .leftJoin(AddressDO.class, AddressDO::getUserId, UserDO::getId)
+                .le(UserDO::getId, 10000)
+                .orderByDesc(UserDO::getId);
+        List<UserDTO> list = userMapper.selectJoinList(UserDTO.class, wrapper);
+
+        assert list.get(0).getAddressIds() != null;
         list.forEach(System.out::println);
     }
 
@@ -197,12 +232,14 @@ class LambdaWrapperTest {
                 "WHERE t.id = ?\n" +
                 "  AND t.del = false\n" +
                 "  AND (t.id <= ?)\n" +
-                "ORDER BY t.id ASC, t.name ASC");
-        MPJLambdaWrapper<UserDO> wrapper = new MPJLambdaWrapper<UserDO>()
+                "ORDER BY t.id ASC, t.`name` ASC");
+        MPJLambdaWrapper<UserDO> wrapper = new MPJLambdaWrapper<UserDO>(new UserDO() {{
+            setId(1);
+        }})
                 .selectAll(UserDO.class)
-                .setEntity(new UserDO() {{
-                    setId(1);
-                }})
+//                .setEntity(new UserDO() {{
+//                    setId(1);
+//                }})
                 .le(UserDO::getId, 100)
                 .orderByAsc(UserDO::getId, UserDO::getName);
 
@@ -265,7 +302,7 @@ class LambdaWrapperTest {
                 "  AND ua.del = false\n" +
                 "  AND ub.del = false\n" +
                 "  AND uc.del = false\n" +
-                "  AND (ua.head_img = tt.name AND tt.id = ua.id)");
+                "  AND (ua.head_img = tt.`name` AND tt.id = ua.id)");
         MPJLambdaWrapper<UserDO> w = new MPJLambdaWrapper<UserDO>("tt")
                 .selectAll(UserDO.class)
                 .leftJoin(UserDO.class, "ua", UserDO::getId, UserDO::getPid, ext -> ext
@@ -597,6 +634,18 @@ class LambdaWrapperTest {
         Page<UserDTO> page = userMapper.selectJoinPage(new Page<>(1, 10), UserDTO.class, wrapper);
         assert page.getRecords().get(0).getAddress() != null;
         page.getRecords().forEach(System.out::println);
+    }
+
+    /**
+     * 忽略个别查询字段
+     */
+    @Test
+    void test8() {
+        ThreadLocalUtils.set("SELECT t.`name` FROM `user` t WHERE t.del=false AND (t.`name` = ?)");
+        MPJLambdaWrapper<UserDO> wrapper = new MPJLambdaWrapper<UserDO>()
+                .select(UserDO::getName)
+                .eq(UserDO::getName, "ref");
+        userMapper.selectList(wrapper);
     }
 
 

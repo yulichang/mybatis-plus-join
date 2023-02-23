@@ -4,7 +4,7 @@ import com.baomidou.mybatisplus.core.metadata.TableFieldInfo;
 import com.baomidou.mybatisplus.core.metadata.TableInfo;
 import com.baomidou.mybatisplus.core.toolkit.Assert;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
-import com.github.yulichang.toolkit.JR;
+import com.github.yulichang.config.ConfigProperties;
 import com.github.yulichang.toolkit.TableHelper;
 import lombok.Getter;
 import org.apache.ibatis.session.Configuration;
@@ -57,7 +57,7 @@ public class SelectCache {
             if (this.hasTypeHandle) {
                 TableInfo info = TableHelper.get(clazz);
                 Assert.notNull(info, "table not find by class <%s>", clazz.getSimpleName());
-                this.typeHandler = getTypeHandler(JR.mpjGetConfiguration(info), tableFieldInfo);
+                this.typeHandler = getTypeHandler(ConfigProperties.adapter.mpjGetConfiguration(info), tableFieldInfo);
             } else {
                 this.typeHandler = null;
             }

@@ -11,6 +11,7 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import lombok.experimental.Accessors;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
@@ -20,7 +21,7 @@ import java.util.Map;
 @Accessors(chain = true)
 @EqualsAndHashCode
 @TableName(value = "`user`", autoResultMap = true)
-public class UserDO {
+public class UserDO implements Serializable {
 
     @TableId
     private Integer id;

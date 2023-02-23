@@ -19,6 +19,7 @@
         <module>test-join</module>
         <module>test-collection</module>
         <module>test-mapping</module>
+        <module>test-springboot3-jdk17</module>
     </modules>
 
     <description>An enhanced toolkit of Mybatis-Plus to simplify development.</description>
@@ -75,7 +76,7 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>1.18.24</version>
+            <version>1.18.26</version>
         </dependency>
         <dependency>
             <groupId>com.github.yulichang</groupId>
@@ -91,12 +92,13 @@
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
-            <version>2.14.0</version>
+            <version>2.14.2</version>
         </dependency>
         <dependency>
             <groupId>com.baomidou</groupId>
             <artifactId>mybatis-plus-boot-starter</artifactId>
-            <version>3.5.3</version>
+<!--            <version>3.3.0</version>-->
+            <version>3.5.2</version>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>

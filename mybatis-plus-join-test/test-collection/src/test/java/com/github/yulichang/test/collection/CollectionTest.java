@@ -1,11 +1,9 @@
 package com.github.yulichang.test.collection;
 
-import com.github.yulichang.test.collection.dto.TableADTO;
-import com.github.yulichang.test.collection.dto.TableBDTO;
-import com.github.yulichang.test.collection.dto.TableCDTO;
-import com.github.yulichang.test.collection.dto.TableDDTO;
+import com.github.yulichang.test.collection.dto.*;
 import com.github.yulichang.test.collection.entity.*;
 import com.github.yulichang.test.collection.mapper.TableAMapper;
+import com.github.yulichang.test.collection.mapper.TableTMapper;
 import com.github.yulichang.wrapper.MPJLambdaWrapper;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.junit.jupiter.api.Test;
@@ -27,6 +25,8 @@ import java.util.List;
 class CollectionTest {
     @Resource
     private TableAMapper tableAMapper;
+    @Resource
+    private TableTMapper tableMapper;
     @Resource
     private SqlSessionFactory sqlSessionFactory;
 
@@ -80,6 +80,21 @@ class CollectionTest {
                 .leftJoin(TableE.class, TableE::getDid, TableD::getId)
                 .last("LIMIT 1");
         List<TableADTO> dtos1 = tableAMapper.selectJoinList(TableADTO.class, wrapper1);
+        System.out.println(1);
+    }
+
+    /**
+     * 映射同一张表多次
+     */
+    @Test
+    void testRepeat() {
+        MPJLambdaWrapper<TableT> wrapper = new MPJLambdaWrapper<TableT>()
+                .selectAll(TableT.class)
+                .selectAssociation("t1", TableA.class, TableDTO::getTable1)
+                .selectAssociation("t2", TableA.class, TableDTO::getTable2)
+                .leftJoin(TableA.class, TableA::getId, TableT::getAid1)
+                .leftJoin(TableA.class, TableA::getId, TableT::getAid2);
+        List<TableDTO> dtos = tableMapper.selectJoinList(TableDTO.class, wrapper);
         System.out.println(1);
     }
 }

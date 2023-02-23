@@ -27,3 +27,7 @@ insert into table_e (id, did, `name`) values (1, 1, 'tableE1');
 insert into table_e (id, did, `name`) values (2, 1, 'tableE2');
 insert into table_e (id, did, `name`) values (3, 2, 'tableE3');
 
+DELETE FROM table_t;
+insert into table_t (id, aid1, aid2, `name`) values (1, 1, 2, 'tableT1');
+insert into table_t (id, aid1, aid2, `name`) values (2, 1, 2, 'tableT2');
+insert into table_t (id, aid1, aid2, `name`) values (3, 2, 3, 'tableT3');

@@ -7,7 +7,6 @@ import com.baomidou.mybatisplus.core.toolkit.Constants;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.core.toolkit.sql.SqlScriptUtils;
 import com.github.yulichang.config.ConfigProperties;
-import com.github.yulichang.toolkit.JR;
 
 import java.util.Objects;
 
@@ -22,19 +21,23 @@ import static java.util.stream.Collectors.joining;
 public interface MPJBaseMethod extends Constants {
 
     default String mpjSqlWhereEntityWrapper(boolean newLine, TableInfo table) {
-        if (JR.mpjHasLogic(table)) {
+        if (ConfigProperties.adapter.mpjHasLogic(table)) {
             String sqlScript = getAllSqlWhere(table, true, true, WRAPPER_ENTITY_DOT);
             sqlScript = SqlScriptUtils.convertIf(sqlScript, String.format("%s != null", WRAPPER_ENTITY), true);
             sqlScript += NEWLINE;
-            sqlScript += SqlScriptUtils.convertIf(getLogicDeleteSql(table, true, true), String.format("%s.logicSql", WRAPPER), true);
+            sqlScript += SqlScriptUtils.convertIf(getLogicDeleteSql(table, true, true),
+                    String.format("%s.logicSql", WRAPPER), true);
             if (ConfigProperties.subTableLogic) {
                 sqlScript += (NEWLINE + String.format("${%s.subLogicSql}", WRAPPER));
             }
-            sqlScript += SqlScriptUtils.convertIf(String.format("AND ${%s}", WRAPPER_SQLSEGMENT), String.format("%s != null and %s != '' and %s", WRAPPER_SQLSEGMENT, WRAPPER_SQLSEGMENT, WRAPPER_NONEMPTYOFNORMAL), true);
+            sqlScript += SqlScriptUtils.convertIf(String.format("AND ${%s}", WRAPPER_SQLSEGMENT),
+                    String.format("%s != null and %s != '' and %s", WRAPPER_SQLSEGMENT, WRAPPER_SQLSEGMENT, WRAPPER_NONEMPTYOFNORMAL), true);
             sqlScript += NEWLINE;
             sqlScript = SqlScriptUtils.convertWhere(sqlScript);
-            sqlScript += SqlScriptUtils.convertIf(String.format(" ${%s}", WRAPPER_SQLSEGMENT), String.format("%s != null and %s != '' and %s", WRAPPER_SQLSEGMENT, WRAPPER_SQLSEGMENT, WRAPPER_EMPTYOFNORMAL), true);
-            sqlScript = SqlScriptUtils.convertChoose(String.format("%s != null", WRAPPER), sqlScript, table.getLogicDeleteSql(false, true));
+            sqlScript += SqlScriptUtils.convertIf(String.format(" ${%s}", WRAPPER_SQLSEGMENT),
+                    String.format("%s != null and %s != '' and %s", WRAPPER_SQLSEGMENT, WRAPPER_SQLSEGMENT, WRAPPER_EMPTYOFNORMAL), true);
+            sqlScript = SqlScriptUtils.convertChoose(String.format("%s != null", WRAPPER), sqlScript,
+                    table.getLogicDeleteSql(false, true));
             return newLine ? NEWLINE + sqlScript : sqlScript;
         } else {
             String sqlScript = getAllSqlWhere(table, false, true, WRAPPER_ENTITY_DOT);
@@ -44,9 +47,11 @@ public interface MPJBaseMethod extends Constants {
                 sqlScript += (String.format("${%s.subLogicSql}", WRAPPER) + NEWLINE);
             }
             String s = SqlScriptUtils.convertIf("AND", WRAPPER_NONEMPTYOFNORMAL, true);
-            sqlScript += SqlScriptUtils.convertIf(s + String.format(" ${%s}", WRAPPER_SQLSEGMENT), String.format("%s != null and %s != '' and %s", WRAPPER_SQLSEGMENT, WRAPPER_SQLSEGMENT, WRAPPER_NONEMPTYOFWHERE), true);
+            sqlScript += SqlScriptUtils.convertIf(s + String.format(" ${%s}", WRAPPER_SQLSEGMENT),
+                    String.format("%s != null and %s != '' and %s", WRAPPER_SQLSEGMENT, WRAPPER_SQLSEGMENT, WRAPPER_NONEMPTYOFWHERE), true);
             sqlScript = SqlScriptUtils.convertWhere(sqlScript) + NEWLINE;
-            sqlScript += SqlScriptUtils.convertIf(String.format(" ${%s}", WRAPPER_SQLSEGMENT), String.format("%s != null and %s != '' and %s", WRAPPER_SQLSEGMENT, WRAPPER_SQLSEGMENT, WRAPPER_EMPTYOFWHERE), true);
+            sqlScript += SqlScriptUtils.convertIf(String.format(" ${%s}", WRAPPER_SQLSEGMENT),
+                    String.format("%s != null and %s != '' and %s", WRAPPER_SQLSEGMENT, WRAPPER_SQLSEGMENT, WRAPPER_EMPTYOFWHERE), true);
             sqlScript = SqlScriptUtils.convertIf(sqlScript, String.format("%s != null", WRAPPER), true);
             return newLine ? NEWLINE + sqlScript : sqlScript;
         }
@@ -61,7 +66,7 @@ public interface MPJBaseMethod extends Constants {
         String filedSqlScript = tableInfo.getFieldList().stream()
                 .filter(i -> {
                     if (ignoreLogicDelFiled) {
-                        return !(JR.mpjHasLogic(tableInfo) && i.isLogicDelete());
+                        return !(ConfigProperties.adapter.mpjHasLogic(tableInfo) && i.isLogicDelete());
                     }
                     return true;
                 })
@@ -70,7 +75,8 @@ public interface MPJBaseMethod extends Constants {
             return filedSqlScript;
         }
         String newKeyProperty = newPrefix + tableInfo.getKeyProperty();
-        String keySqlScript = ConfigProperties.tableAlias + DOT + tableInfo.getKeyColumn() + EQUALS + SqlScriptUtils.safeParam(newKeyProperty);
+        String keySqlScript = ConfigProperties.tableAlias + DOT + tableInfo.getKeyColumn() + EQUALS +
+                SqlScriptUtils.safeParam(newKeyProperty);
         return SqlScriptUtils.convertIf(keySqlScript, String.format("%s != null", newKeyProperty), false)
                 + NEWLINE + filedSqlScript;
     }
@@ -78,16 +84,18 @@ public interface MPJBaseMethod extends Constants {
     default String getSqlWhere(TableFieldInfo tableFieldInfo, final String prefix) {
         final String newPrefix = prefix == null ? EMPTY : prefix;
         // 默认:  AND column=#{prefix + el}
-        String sqlScript = " AND " + String.format(tableFieldInfo.getCondition(), ConfigProperties.tableAlias + DOT + tableFieldInfo.getColumn(), newPrefix + tableFieldInfo.getEl());
+        String sqlScript = " AND " + String.format(tableFieldInfo.getCondition(), ConfigProperties.tableAlias + DOT +
+                tableFieldInfo.getColumn(), newPrefix + tableFieldInfo.getEl());
         // 查询的时候只判非空
-        return convertIf(tableFieldInfo, sqlScript, convertIfProperty(newPrefix, tableFieldInfo.getProperty()), tableFieldInfo.getWhereStrategy());
+        return convertIf(tableFieldInfo, sqlScript, convertIfProperty(newPrefix, tableFieldInfo.getProperty()),
+                tableFieldInfo.getWhereStrategy());
     }
 
     default String convertIf(TableFieldInfo tableFieldInfo, final String sqlScript, final String property, final FieldStrategy fieldStrategy) {
         if (fieldStrategy == FieldStrategy.NEVER) {
             return null;
         }
-        if (JR.mpjIsPrimitive(tableFieldInfo) || fieldStrategy == FieldStrategy.IGNORED) {
+        if (ConfigProperties.adapter.mpjIsPrimitive(tableFieldInfo) || fieldStrategy == FieldStrategy.IGNORED) {
             return sqlScript;
         }
         if (fieldStrategy == FieldStrategy.NOT_EMPTY && tableFieldInfo.isCharSequence()) {
@@ -103,7 +111,7 @@ public interface MPJBaseMethod extends Constants {
 
 
     default String getLogicDeleteSql(TableInfo tableInfo, boolean startWithAnd, boolean isWhere) {
-        if (JR.mpjHasLogic(tableInfo)) {
+        if (ConfigProperties.adapter.mpjHasLogic(tableInfo)) {
             String logicDeleteSql = formatLogicDeleteSql(tableInfo, isWhere);
             if (startWithAnd) {
                 logicDeleteSql = " AND " + logicDeleteSql;
@@ -115,12 +123,16 @@ public interface MPJBaseMethod extends Constants {
 
 
     default String formatLogicDeleteSql(TableInfo tableInfo, boolean isWhere) {
-        final String value = isWhere ? JR.mpjGetLogicField(tableInfo).getLogicNotDeleteValue() : JR.mpjGetLogicField(tableInfo).getLogicDeleteValue();
+        final String value = isWhere ? ConfigProperties.adapter.mpjGetLogicField(tableInfo).getLogicNotDeleteValue() :
+                ConfigProperties.adapter.mpjGetLogicField(tableInfo).getLogicDeleteValue();
         if (isWhere) {
             if (NULL.equalsIgnoreCase(value)) {
-                return "${ew.alias}." + JR.mpjGetLogicField(tableInfo).getColumn() + " IS NULL";
+                return "${ew.alias}." + ConfigProperties.adapter.mpjGetLogicField(tableInfo).getColumn() +
+                        " IS NULL";
             } else {
-                return "${ew.alias}." + JR.mpjGetLogicField(tableInfo).getColumn() + EQUALS + String.format(JR.mpjGetLogicField(tableInfo).isCharSequence() ? "'%s'" : "%s", value);
+                return "${ew.alias}." + ConfigProperties.adapter.mpjGetLogicField(tableInfo).getColumn() +
+                        EQUALS + String.format(ConfigProperties.adapter.mpjGetLogicField(tableInfo).isCharSequence() ?
+                        "'%s'" : "%s", value);
             }
         }
         final String targetStr = "${ew.alias}." + tableInfo.getLogicDeleteFieldInfo().getColumn() + EQUALS;

@@ -1,12 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>com.github.yulichang</groupId>
-    <artifactId>mybatis-plus-join-root</artifactId>
-    <packaging>pom</packaging>
+    <parent>
+        <groupId>com.github.yulichang</groupId>
+        <artifactId>mybatis-plus-join-adapter</artifactId>
+        <version>1.4.2.2</version>
+    </parent>
+    <artifactId>mybatis-plus-join-adapter-base</artifactId>
     <version>1.4.2.2</version>
-    <name>mybatis-plus-join-root</name>
+    <name>mybatis-plus-join-adapter-base</name>
 
     <description>An enhanced toolkit of Mybatis-Plus to simplify development.</description>
     <url>https://github.com/yulichang/mybatis-plus-join</url>
@@ -29,14 +32,6 @@
         <url>https://github.com/yulichang/mybatis-plus-join</url>
     </scm>
 
-    <modules>
-        <module>mybatis-plus-join-boot-starter</module>
-        <module>mybatis-plus-join-adapter</module>
-        <module>mybatis-plus-join-core</module>
-        <module>mybatis-plus-join-annotation</module>
-        <module>mybatis-plus-join-test</module>
-    </modules>
-
     <properties>
         <jdkVersion>1.8</jdkVersion>
         <jdkVersion.test>1.8</jdkVersion.test>
@@ -46,4 +41,12 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
+    <dependencies>
+        <dependency>
+            <groupId>com.baomidou</groupId>
+            <artifactId>mybatis-plus-extension</artifactId>
+            <version>3.5.2</version>
+            <scope>provided</scope>
+        </dependency>
+    </dependencies>
 </project>

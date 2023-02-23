@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.metadata.TableInfo;
 import com.baomidou.mybatisplus.core.toolkit.Assert;
 import com.baomidou.mybatisplus.core.toolkit.Constants;
 import com.baomidou.mybatisplus.core.toolkit.StringPool;
+import com.github.yulichang.config.ConfigProperties;
 
 import java.util.Map;
 import java.util.Objects;
@@ -35,8 +36,8 @@ public class LogicInfoUtils implements Constants {
         String logicStr;
         TableInfo tableInfo = TableHelper.get(clazz);
         Assert.notNull(tableInfo, "table not find by class <%s>", clazz.getSimpleName());
-        TableFieldInfo logicField = JR.mpjGetLogicField(tableInfo);
-        if (JR.mpjHasLogic(tableInfo) && Objects.nonNull(logicField)) {
+        TableFieldInfo logicField = ConfigProperties.adapter.mpjGetLogicField(tableInfo);
+        if (ConfigProperties.adapter.mpjHasLogic(tableInfo) && Objects.nonNull(logicField)) {
             final String value = logicField.getLogicNotDeleteValue();
             if (NULL.equalsIgnoreCase(value)) {
                 logicStr = " AND " + prefix + DOT + logicField.getColumn() + " IS NULL";

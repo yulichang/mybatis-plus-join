@@ -51,10 +51,18 @@
 //                if (sql != null && s != null) {
 //                    String s1 = formatSql(sql);
 //                    String s2 = formatSql(s);
-//                    if (StringUtils.isNotBlank(s) && !Objects.equals(s1.toLowerCase(), s2.toLowerCase())) {
-//                        System.err.println("执行sql: " + removeExtraWhitespaces(sql));
-//                        System.err.println("预期sql: " + removeExtraWhitespaces(s));
-//                        throw new RuntimeException("sql error");
+//                    if (StringUtils.isNotBlank(s)) {
+//                        if (!Objects.equals(s1.toLowerCase(), s2.toLowerCase())) {
+//                            System.err.println("执行sql: " + removeExtraWhitespaces(sql));
+//                            System.err.println("预期sql: " + removeExtraWhitespaces(s));
+//                            throw new RuntimeException("sql error");
+//                        }else {
+//                            System.out.println("===============================================");
+//                            System.out.println();
+//                            System.out.println("pass");
+//                            System.out.println();
+//                            System.out.println("===============================================");
+//                        }
 //                    }
 //                }
 //            }

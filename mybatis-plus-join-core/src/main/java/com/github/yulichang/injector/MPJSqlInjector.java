@@ -11,8 +11,11 @@ import com.baomidou.mybatisplus.core.toolkit.ClassUtils;
 import com.github.yulichang.mapper.MPJTableMapperHelper;
 import com.github.yulichang.method.*;
 import com.github.yulichang.toolkit.TableHelper;
+import com.github.yulichang.toolkit.VersionUtils;
 import com.github.yulichang.toolkit.reflect.GenericTypeUtils;
 import org.apache.ibatis.builder.MapperBuilderAssistant;
+import org.mybatis.logging.Logger;
+import org.mybatis.logging.LoggerFactory;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -33,6 +36,7 @@ import static java.util.stream.Collectors.toList;
  */
 public class MPJSqlInjector extends DefaultSqlInjector {
 
+    private static final Logger logger = LoggerFactory.getLogger(MPJSqlInjector.class);
 
     /**
      * 升级到 mybatis plus 3.4.3.2 后对之前的版本兼容
@@ -40,6 +44,10 @@ public class MPJSqlInjector extends DefaultSqlInjector {
     @Deprecated
     @SuppressWarnings("unused")
     public List<AbstractMethod> getMethodList(Class<?> mapperClass) {
+        if (VersionUtils.compare(MybatisPlusVersion.getVersion(), "3.4.3.2") >= 0) {
+            logger.error(() -> "DefaultSqlInjector 的 getMethodList(Class<?> mapperClass) 方法已在 3.4.3.2+ 改为" +
+                    "getMethodList(Class<?> mapperClass, TableInfo tableInfo)");
+        }
         List<AbstractMethod> list = Stream.of(
                 new Insert(),
                 new DeleteByMap(),

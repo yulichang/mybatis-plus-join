@@ -47,10 +47,18 @@ public class MybatisPlusConfig {
         public void beforeQuery(Executor executor, MappedStatement ms, Object parameter, RowBounds rowBounds, ResultHandler resultHandler, BoundSql boundSql) {
             String sql = boundSql.getSql();
             String s = ThreadLocalUtils.get();
-            if (StringUtils.isNotBlank(s) && !Objects.equals(formatSql(sql), formatSql(s))) {
-                System.err.println("执行sql: " + SqlSourceBuilder.removeExtraWhitespaces(sql));
-                System.err.println("预期sql: " + SqlSourceBuilder.removeExtraWhitespaces(s));
-                throw new RuntimeException("sql error");
+            if (StringUtils.isNotBlank(s)) {
+                if (!Objects.equals(formatSql(sql), formatSql(s))) {
+                    System.err.println("执行sql: " + SqlSourceBuilder.removeExtraWhitespaces(sql));
+                    System.err.println("预期sql: " + SqlSourceBuilder.removeExtraWhitespaces(s));
+                    throw new RuntimeException("sql error");
+                } else {
+                    System.out.println("===============================================");
+                    System.out.println();
+                    System.out.println("pass");
+                    System.out.println();
+                    System.out.println("===============================================");
+                }
             }
         }
 
@@ -63,10 +71,18 @@ public class MybatisPlusConfig {
                     return;
                 }
                 String s = ThreadLocalUtils.get();
-                if (StringUtils.isNotBlank(s) && !Objects.equals(formatSql(sql), formatSql(s))) {
-                    System.err.println("执行sql: " + SqlSourceBuilder.removeExtraWhitespaces(sql));
-                    System.err.println("预期sql: " + SqlSourceBuilder.removeExtraWhitespaces(s));
-                    throw new RuntimeException("sql error");
+                if (StringUtils.isNotBlank(s)) {
+                    if (!Objects.equals(formatSql(sql), formatSql(s))) {
+                        System.err.println("执行sql: " + SqlSourceBuilder.removeExtraWhitespaces(sql));
+                        System.err.println("预期sql: " + SqlSourceBuilder.removeExtraWhitespaces(s));
+                        throw new RuntimeException("sql error");
+                    }else {
+                        System.out.println("===============================================");
+                        System.out.println();
+                        System.out.println("pass");
+                        System.out.println();
+                        System.out.println("===============================================");
+                    }
                 }
             }
         }

@@ -2,13 +2,13 @@
 
 * 对 <a href="https://gitee.com/baomidou/mybatis-plus" target="_blank">mybatis-plus</a> 多表查询的扩展
 * <a href="https://gitee.com/best_handsome/mybatis-plus-join-demo" target="_blank">演示工程</a>
-* <a href="https://ylctmh.com" target="_blank">文档</a>
+* <a href="https://www.baidu.com/link?url=cknmzNRg3E2p9d0BbUuQ2MBYCSSs6u1LCtNm5RzIzui&wd=&eqid=a5bbe908000085540000000563f830c5" target="_blank">文档</a>
 * 点个Star支持一下吧 :)
 
 QQ群:1022221898  
 <a href="https://gitee.com/best_handsome/mybatis-plus-join/issues/I65N2M" target="_blank">加入微信群</a>
 
-### <a href="https://ylctmh.com" target="_blank">文档</a>
+### <a href="https://www.baidu.com/link?url=cknmzNRg3E2p9d0BbUuQ2MBYCSSs6u1LCtNm5RzIzui&wd=&eqid=a5bbe908000085540000000563f830c5" target="_blank">文档</a>
 
 ## 使用方法
 
@@ -252,7 +252,7 @@ ORDER BY
     addr.id DESC
 ```
 
-# <a href="https://ylctmh.com" target="_blank">wiki</a>
+# <a href="https://www.baidu.com/link?url=cknmzNRg3E2p9d0BbUuQ2MBYCSSs6u1LCtNm5RzIzui&wd=&eqid=a5bbe908000085540000000563f830c5" target="_blank">wiki</a>
 
 
 

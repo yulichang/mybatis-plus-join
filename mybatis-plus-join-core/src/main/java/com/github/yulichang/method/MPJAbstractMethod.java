@@ -4,7 +4,7 @@ import com.baomidou.mybatisplus.core.injector.AbstractMethod;
 import com.baomidou.mybatisplus.core.metadata.TableInfo;
 import com.baomidou.mybatisplus.core.toolkit.StringPool;
 import com.baomidou.mybatisplus.core.toolkit.sql.SqlScriptUtils;
-import com.github.yulichang.adapter.before352.AbstractMethod352;
+import com.github.yulichang.adapter.v352.AbstractMethod352;
 import com.github.yulichang.config.ConfigProperties;
 
 import java.util.ArrayList;

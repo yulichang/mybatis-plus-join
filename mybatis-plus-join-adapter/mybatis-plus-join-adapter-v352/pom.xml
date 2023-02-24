@@ -10,7 +10,7 @@
     </parent>
     <artifactId>mybatis-plus-join-adapter-v352</artifactId>
     <version>1.4.2.2</version>
-    <name>mybatis-plus-join-adapter-before352</name>
+    <name>mybatis-plus-join-adapter-v352</name>
 
     <description>An enhanced toolkit of Mybatis-Plus to simplify development.</description>
     <url>https://github.com/yulichang/mybatis-plus-join</url>

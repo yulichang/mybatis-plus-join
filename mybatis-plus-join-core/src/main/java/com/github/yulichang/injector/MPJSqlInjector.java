@@ -46,7 +46,7 @@ public class MPJSqlInjector extends DefaultSqlInjector {
     public List<AbstractMethod> getMethodList(Class<?> mapperClass) {
         if (VersionUtils.compare(MybatisPlusVersion.getVersion(), "3.4.3.2") >= 0) {
             logger.error(() -> "DefaultSqlInjector 的 getMethodList(Class<?> mapperClass) 方法已在 3.4.3.2+ 改为" +
-                    "getMethodList(Class<?> mapperClass, TableInfo tableInfo)");
+                    "getMethodList(Class<?> mapperClass, TableInfo tableInfo)\n");
         }
         List<AbstractMethod> list = Stream.of(
                 new Insert(),

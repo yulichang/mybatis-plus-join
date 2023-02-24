@@ -1,4 +1,4 @@
-package com.github.yulichang.adapter.before352;
+package com.github.yulichang.adapter.v352;
 
 import com.baomidou.mybatisplus.core.injector.AbstractMethod;
 

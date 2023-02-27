@@ -163,7 +163,7 @@ public class MPJInterceptor implements Interceptor {
             return result;
         }
         MPJLambdaWrapper wrapper = (MPJLambdaWrapper) obj;
-        Map<String, Field> fieldMap = ReflectionKit.getFieldMap(resultType);
+        Map<String, Field> fieldMap = MPJReflectionKit.getFieldMap(resultType);
         List<Select> columnList = wrapper.getSelectColumns();
         //移除对多查询列，为了可重复使用wrapper
         columnList.removeIf(Select::isLabel);
@@ -175,7 +175,7 @@ public class MPJInterceptor implements Interceptor {
                 columnSet.add(i.getAlias());
                 if (Objects.nonNull(field)) {
                     ResultMapping.Builder builder = new ResultMapping.Builder(ms.getConfiguration(), i.getAlias(),
-                            i.getAlias(), field.getType());
+                            i.getAlias(), MPJReflectionKit.getFieldType(resultType, i.getAlias()));
                     resultMappings.add(selectToResult(wrapper.getEntityClass(), i, field.getType(), builder));
                 }
             } else {
@@ -183,7 +183,7 @@ public class MPJInterceptor implements Interceptor {
                 columnSet.add(i.getTagColumn());
                 if (Objects.nonNull(field)) {
                     ResultMapping.Builder builder = new ResultMapping.Builder(ms.getConfiguration(), i.getColumProperty(),
-                            i.getTagColumn(), field.getType());
+                            i.getTagColumn(), MPJReflectionKit.getFieldType(resultType, i.getColumProperty()));
                     resultMappings.add(selectToResult(wrapper.getEntityClass(), i, field.getType(), builder));
                 }
             }

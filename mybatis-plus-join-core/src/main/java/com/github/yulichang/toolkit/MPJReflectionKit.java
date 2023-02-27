@@ -1,6 +1,7 @@
 package com.github.yulichang.toolkit;
 
 import com.baomidou.mybatisplus.core.toolkit.Assert;
+import org.apache.ibatis.reflection.Reflector;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
@@ -21,6 +22,9 @@ import java.util.concurrent.ConcurrentHashMap;
 public final class MPJReflectionKit {
 
     private static final Map<Class<?>, Map<String, Field>> CLASS_FIELD_CACHE = new ConcurrentHashMap<>();
+
+    //mybatis 缓存
+    private static final Map<Class<?>, Reflector> CLASS_REFLECTOR_CACHE = new ConcurrentHashMap<>();
 
     private static final Map<String, Field> EMPTY_MAP = new HashMap<>();
 
@@ -84,6 +88,18 @@ public final class MPJReflectionKit {
         Map<String, Field> map = ReflectionKit.getFieldMap(clazz);
         CLASS_FIELD_CACHE.put(clazz, map);
         return map;
+    }
+
+    public static Class<?> getFieldType(Class<?> clazz, String name) {
+        if (clazz == null) {
+            return null;
+        }
+        Reflector reflector = CLASS_REFLECTOR_CACHE.computeIfAbsent(clazz, Reflector::new);
+        Class<?> getterType = reflector.getGetterType(name);
+        if (getterType != null) {
+            return getterType;
+        }
+        return getFieldMap(clazz).get(name).getType();
     }
 
     public static boolean isPrimitiveOrWrapper(Class<?> clazz) {

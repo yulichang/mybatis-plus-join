@@ -6,10 +6,7 @@ import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.github.yulichang.test.join.dto.AddressDTO;
 import com.github.yulichang.test.join.dto.UserDTO;
-import com.github.yulichang.test.join.entity.AddressDO;
-import com.github.yulichang.test.join.entity.AreaDO;
-import com.github.yulichang.test.join.entity.UserDO;
-import com.github.yulichang.test.join.entity.UserDto;
+import com.github.yulichang.test.join.entity.*;
 import com.github.yulichang.test.join.mapper.UserDTOMapper;
 import com.github.yulichang.test.join.mapper.UserMapper;
 import com.github.yulichang.test.util.ThreadLocalUtils;
@@ -683,5 +680,17 @@ class LambdaWrapperTest {
 
         List<UserDO> dos = userMapper.selectJoinList(UserDO.class, wrapper);
         System.out.println(1);
+    }
+
+    /**
+     * 泛型测试
+     */
+    @Test
+    void testGeneric() {
+        MPJLambdaWrapper<UserDO> wrapper = new MPJLambdaWrapper<UserDO>()
+                .selectAll(UserDO.class)
+                .le(UserDO::getId, 10000)
+                .orderByDesc(UserDO::getId);
+        List<UserTTT> list = userMapper.selectJoinList(UserTTT.class, wrapper);
     }
 }

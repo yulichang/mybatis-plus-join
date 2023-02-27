@@ -1,7 +1,6 @@
 package com.github.yulichang.test.join.entity;
 
 import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
@@ -19,12 +18,9 @@ import java.util.Map;
 @Data
 @ToString
 @Accessors(chain = true)
-@EqualsAndHashCode
+@EqualsAndHashCode(callSuper = true)
 @TableName(value = "`user`", autoResultMap = true)
-public class UserDO implements Serializable {
-
-    @TableId
-    private Integer id;
+public class UserDO extends ID<Integer> implements Serializable {
 
     private Integer pid;
 

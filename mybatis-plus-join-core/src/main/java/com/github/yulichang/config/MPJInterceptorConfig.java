@@ -29,7 +29,7 @@ public class MPJInterceptorConfig {
             //打印banner
             System.out.println(" _ _   |_  _ _|_. ___ _ |    _  .  _  .  _  \n" +
                     "| | |\\/|_)(_| | |_\\  |_)||_|_\\  | (_) | | | \n" +
-                    "     /               |          /            1.4.2.2");
+                    "     /               |          /            1.4.3");
         }
     }
 

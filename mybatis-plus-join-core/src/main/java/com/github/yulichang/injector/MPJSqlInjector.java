@@ -87,18 +87,7 @@ public class MPJSqlInjector extends DefaultSqlInjector {
 
     private List<AbstractMethod> getJoinMethod() {
         List<AbstractMethod> list = new ArrayList<>();
-
-        int v1, v2;
-        try {
-            String version = MybatisPlusVersion.getVersion();
-            String[] split = version.split("\\.");
-            v1 = Integer.parseInt(split[0]);
-            v2 = Integer.parseInt(split[1]);
-        } catch (Exception e) {
-            v1 = 3;
-            v2 = 4;
-        }
-        if ((v1 == 3 && v2 >= 5) || v1 > 3) {
+        if (VersionUtils.compare(MybatisPlusVersion.getVersion(), "3.5.0") >= 0) {
             list.add(new SelectJoinCount(SqlMethod.SELECT_JOIN_COUNT.getMethod()));
             list.add(new SelectJoinOne(SqlMethod.SELECT_JOIN_ONE.getMethod()));
             list.add(new SelectJoinList(SqlMethod.SELECT_JOIN_LIST.getMethod()));

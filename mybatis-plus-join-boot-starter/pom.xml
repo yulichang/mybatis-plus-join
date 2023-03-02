@@ -7,9 +7,9 @@
     <parent>
         <groupId>com.github.yulichang</groupId>
         <artifactId>mybatis-plus-join-root</artifactId>
-        <version>1.4.3</version>
+        <version>1.4.3.1</version>
     </parent>
-    <version>1.4.3</version>
+    <version>1.4.3.1</version>
     <artifactId>mybatis-plus-join-boot-starter</artifactId>
     <name>mybatis-plus-join-boot-starter</name>
 
@@ -47,7 +47,7 @@
         <dependency>
             <groupId>com.github.yulichang</groupId>
             <artifactId>mybatis-plus-join-core</artifactId>
-            <version>1.4.3</version>
+            <version>1.4.3.1</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>

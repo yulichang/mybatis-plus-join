@@ -1,6 +1,5 @@
 package com.github.yulichang.toolkit;
 
-import com.baomidou.mybatisplus.core.toolkit.StringPool;
 import lombok.Data;
 
 import java.util.ArrayList;
@@ -152,7 +151,7 @@ public class TableList {
         if (Objects.isNull(node)) {
             return alias;
         } else {
-            return node.hasAlias ? node.getAlias() : (node.getAlias() + StringPool.DOT + node.getIndex());
+            return node.hasAlias ? node.getAlias() : (node.getAlias() + node.getIndex());
         }
     }
 

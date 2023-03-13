@@ -85,6 +85,12 @@ public abstract class MPJAbstractWrapper<T, Children extends MPJAbstractWrapper<
      */
     @Getter
     protected Class<?> joinClass;
+
+    /**
+     * 连表表名
+     */
+    @Getter
+    protected String tableName;
     /**
      * 主表wrapper
      */

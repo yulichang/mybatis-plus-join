@@ -1,5 +1,10 @@
 package com.github.yulichang.test.util;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import java.util.Arrays;
+
 public class ThreadLocalUtils {
 
     private final static ThreadLocal<String> userThreadLocal = new ThreadLocal<>();
@@ -7,8 +12,13 @@ public class ThreadLocalUtils {
     /**
      * 设置数据到当前线程
      */
-    public static void set(String sql) {
-        userThreadLocal.set(sql);
+    public static void set(String... sql) {
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            userThreadLocal.set(mapper.writeValueAsString(Arrays.asList(sql)));
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     /**
@@ -16,7 +26,7 @@ public class ThreadLocalUtils {
      */
     public static String get() {
         String s = userThreadLocal.get();
-        set(null);
+        set("");
         return s;
     }
 }

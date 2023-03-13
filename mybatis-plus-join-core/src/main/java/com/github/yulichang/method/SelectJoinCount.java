@@ -26,7 +26,7 @@ public class SelectJoinCount extends MPJAbstractMethod {
     public MappedStatement injectMappedStatement(Class<?> mapperClass, Class<?> modelClass, TableInfo tableInfo) {
         SqlMethod sqlMethod = SqlMethod.SELECT_JOIN_COUNT;
         String sql = String.format(sqlMethod.getSql(), sqlFirst(), sqlCount(),
-                tableInfo.getTableName(), sqlAlias(), sqlFrom(), sqlWhereEntityWrapper(true, tableInfo), sqlComment());
+                mpjTableName(tableInfo), sqlAlias(), sqlFrom(), sqlWhereEntityWrapper(true, tableInfo), sqlComment());
         SqlSource sqlSource = languageDriver.createSqlSource(configuration, sql, modelClass);
         return this.addSelectMappedStatementForOther(mapperClass, sqlMethod.getMethod(), sqlSource, Long.class);
     }

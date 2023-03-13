@@ -15,10 +15,11 @@ import com.github.yulichang.method.MPJBaseMethod;
 public interface TableAlias extends Constants, MPJBaseMethod {
 
     default String getTableName(TableInfo tableInfo) {
-        String from = SqlScriptUtils.convertIf("${ew.from}",
+        String from = SqlScriptUtils.convertIf(" ${ew.from}",
                 String.format("%s != null and %s != ''", "ew.from", "ew.from"), true);
-        String alias = SqlScriptUtils.convertIf("${ew.alias}" + NEWLINE + from,
-                String.format("%s != null and %s instanceof %s", Constants.WRAPPER, Constants.WRAPPER, MPJBaseJoin.class.getName()), true);
-        return tableInfo.getTableName() + SPACE + alias;
+        String alias = SqlScriptUtils.convertChoose(
+                String.format("%s != null and %s instanceof %s", Constants.WRAPPER, Constants.WRAPPER, MPJBaseJoin.class.getName()),
+                mpjTableName(tableInfo) + " ${ew.alias} " + NEWLINE + from, tableInfo.getTableName());
+        return SPACE + alias;
     }
 }

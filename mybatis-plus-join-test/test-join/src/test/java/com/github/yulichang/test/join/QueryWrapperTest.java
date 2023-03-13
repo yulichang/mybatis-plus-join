@@ -6,8 +6,10 @@ import com.github.yulichang.query.MPJQueryWrapper;
 import com.github.yulichang.test.join.dto.UserDTO;
 import com.github.yulichang.test.join.entity.UserDO;
 import com.github.yulichang.test.join.mapper.UserMapper;
+import com.github.yulichang.test.util.ThreadLocalUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.jdbc.BadSqlGrammarException;
 
 import javax.annotation.Resource;
 import java.util.List;
@@ -23,23 +25,28 @@ class QueryWrapperTest {
      */
     @Test
     void test1() {
-        MPJQueryWrapper<UserDO> last = new MPJQueryWrapper<UserDO>()
-                .disableLogicDel()
-                .selectAll(UserDO.class)
-                .eq("t.id", 1)
-                .last("LIMIT 1");
-        System.out.println(last.getSqlSegment());
-        System.out.println(last.isEmptyOfNormal());
-        System.out.println(last.nonEmptyOfNormal());
-        UserDO userDO = userMapper.selectJoinOne(UserDO.class, last);
-
-        System.out.println(userDO);
-
         UserDTO dto = userMapper.selectJoinOne(UserDTO.class, new MPJQueryWrapper<UserDO>()
                 .selectAll(UserDO.class)
                 .select("name AS nameName")
                 .last("LIMIT 1"));
         System.out.println(dto);
+    }
+
+    /**
+     * 链表查询
+     */
+    @Test
+    void table() {
+        ThreadLocalUtils.set("SELECT t.id,t.pid,t.`name`,t.`json`,t.sex,t.head_img,t.create_time,t.address_id,t.address_id2,t.del,t.create_by,t.update_by,name AS nameName FROM `user`fwear t WHERE t.del=false LIMIT 1");
+        MPJQueryWrapper<UserDO> wrapper = new MPJQueryWrapper<UserDO>()
+                .selectAll(UserDO.class)
+                .setTableName(name -> name + "fwear")
+                .select("name AS nameName")
+                .last("LIMIT 1");
+        try {
+            userMapper.selectJoinOne(UserDTO.class, wrapper);
+        } catch (BadSqlGrammarException ignored) {
+        }
     }
 
     @Test

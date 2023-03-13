@@ -15,6 +15,7 @@ import com.github.yulichang.wrapper.MPJLambdaWrapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.jdbc.BadSqlGrammarException;
 
 import java.sql.Timestamp;
 import java.util.List;
@@ -36,6 +37,7 @@ class LambdaWrapperTest {
 
     @Autowired
     private UserDTOMapper userDTOMapper;
+
 
     @Test
     void testJoin() {
@@ -628,7 +630,7 @@ class LambdaWrapperTest {
                 .select(AddressDO.class, p -> true)
                 .leftJoin(AddressDO.class, AddressDO::getUserId, UserDO::getId)
                 .eq(UserDO::getId, 1);
-        Page<UserDTO> page = userMapper.selectJoinPage(new Page<>(1, 10), UserDTO.class, wrapper);
+        IPage<UserDTO> page = userMapper.selectJoinPage(new Page<>(1, 10), UserDTO.class, wrapper);
         assert page.getRecords().get(0).getAddress() != null;
         page.getRecords().forEach(System.out::println);
     }
@@ -675,11 +677,15 @@ class LambdaWrapperTest {
      */
     @Test
     void testFunc() {
+        ThreadLocalUtils.set("SELECT if(t1.user_id < 5,t1.user_id,t1.user_id + 100) AS id FROM `user` t LEFT JOIN address t1 ON (t1.user_id = t.id) WHERE t.del=false AND t1.del=false");
         MPJLambdaWrapper<UserDO> wrapper = new MPJLambdaWrapper<UserDO>()
-                .selectAll(UserDO.class);
+                .selectFunc("if(%s < 5,%s,%s + 100)", arg -> arg.accept(AddressDO::getUserId, AddressDO::getUserId, AddressDO::getUserId), UserDO::getId)
+                .leftJoin(AddressDO.class, AddressDO::getUserId, UserDO::getId);
 
-        List<UserDO> dos = userMapper.selectJoinList(UserDO.class, wrapper);
-        System.out.println(1);
+        try {
+            List<UserDO> dos = userMapper.selectJoinList(UserDO.class, wrapper);
+        } catch (BadSqlGrammarException ignored) {
+        }
     }
 
     /**
@@ -692,5 +698,47 @@ class LambdaWrapperTest {
                 .le(UserDO::getId, 10000)
                 .orderByDesc(UserDO::getId);
         List<UserTTT> list = userMapper.selectJoinList(UserTTT.class, wrapper);
+    }
+
+    /**
+     * count
+     */
+    @Test
+    void testCount() {
+        ThreadLocalUtils.set(
+                "SELECT COUNT( * ) AS total FROM `user` t LEFT JOIN address t1 ON (t1.user_id = t.id) LEFT JOIN area t2 ON (t2.id = t1.area_id) WHERE t.del=false AND t1.del=false AND t2.del=false",
+                "SELECT COUNT( * ) FROM `user` t LEFT JOIN address t1 ON (t1.user_id = t.id) LEFT JOIN area t2 ON (t2.id = t1.area_id) WHERE t.del=false AND t1.del=false AND t2.del=false");
+        MPJLambdaWrapper<UserDO> wrapper = new MPJLambdaWrapper<UserDO>()
+                .leftJoin(AddressDO.class, AddressDO::getUserId, UserDO::getId)
+                .leftJoin(AreaDO.class, AreaDO::getId, AddressDO::getAreaId);
+        Integer integer = userMapper.selectCount(wrapper);
+
+        ThreadLocalUtils.set("SELECT COUNT( * ) FROM `user` t LEFT JOIN address t1 ON (t1.user_id = t.id) LEFT JOIN area t2 ON (t2.id = t1.area_id) WHERE t.del=false AND t1.del=false AND t2.del=false");
+        MPJLambdaWrapper<UserDO> wrapper1 = new MPJLambdaWrapper<UserDO>()
+                .leftJoin(AddressDO.class, AddressDO::getUserId, UserDO::getId)
+                .leftJoin(AreaDO.class, AreaDO::getId, AddressDO::getAreaId);
+        Long aLong1 = userMapper.selectJoinCount(wrapper1);
+    }
+
+
+    /**
+     * 动态别名
+     */
+    @Test
+    void testTable() {
+        ThreadLocalUtils.set("SELECT t.id FROM `user`bbbbbbb t LEFT JOIN addressaaaaaaaaaa t1 ON (t1.user_id = t.id) LEFT JOIN area t2 ON (t2.id = t1.area_id) WHERE t.del=false AND t1.del=false AND t2.del=false AND (t.id <= ?) ORDER BY t.id DESC");
+        MPJLambdaWrapper<UserDO> wrapper = new MPJLambdaWrapper<UserDO>()
+                .select(UserDO::getId)
+                .leftJoin(AddressDO.class, on -> on
+                        .eq(AddressDO::getUserId, UserDO::getId)
+                        .setTableName(name -> name + "aaaaaaaaaa"))
+                .leftJoin(AreaDO.class, AreaDO::getId, AddressDO::getAreaId)
+                .le(UserDO::getId, 10000)
+                .orderByDesc(UserDO::getId)
+                .setTableName(name -> name + "bbbbbbb");
+        try {
+            List<UserDTO> list = userMapper.selectJoinList(UserDTO.class, wrapper);
+        } catch (BadSqlGrammarException ignored) {
+        }
     }
 }

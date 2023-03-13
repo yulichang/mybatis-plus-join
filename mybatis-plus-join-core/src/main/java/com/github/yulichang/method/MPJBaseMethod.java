@@ -6,8 +6,11 @@ import com.baomidou.mybatisplus.core.metadata.TableInfo;
 import com.baomidou.mybatisplus.core.toolkit.Constants;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.core.toolkit.sql.SqlScriptUtils;
+import com.github.yulichang.annotation.DynamicTableName;
 import com.github.yulichang.config.ConfigProperties;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.Objects;
 
 import static java.util.stream.Collectors.joining;
@@ -145,5 +148,23 @@ public interface MPJBaseMethod extends Constants {
 
     default String mpjSqlSelectColumns() {
         return SqlScriptUtils.convertIf("DISTINCT", "ew.selectDistinct", false);
+    }
+
+    /**
+     * 获取表名
+     */
+    default String mpjTableName(TableInfo tableInfo) {
+        DynamicTableName dynamicTableName = tableInfo.getEntityType().getAnnotation(DynamicTableName.class);
+        if (Objects.isNull(dynamicTableName)) {
+            return tableInfo.getTableName();
+        }
+        String tableName = tableInfo.getTableName(), encode;
+        try {
+            encode = URLEncoder.encode(tableName, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            encode = tableName;
+        }
+        boolean en = tableName.equals(encode);
+        return String.format("${ew.getTableName%s(\"%s\")}", en ? "" : "Enc", en ? tableName : encode);
     }
 }

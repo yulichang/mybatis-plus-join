@@ -5,7 +5,10 @@ import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.InnerInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.PaginationInnerInterceptor;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.yulichang.test.util.ThreadLocalUtils;
+import lombok.SneakyThrows;
 import org.apache.ibatis.builder.SqlSourceBuilder;
 import org.apache.ibatis.executor.Executor;
 import org.apache.ibatis.executor.statement.StatementHandler;
@@ -17,6 +20,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import java.sql.Connection;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -44,25 +48,30 @@ public class MybatisPlusConfig {
     public static class SqlInterceptor implements InnerInterceptor {
 
         @Override
+        @SneakyThrows
         public void beforeQuery(Executor executor, MappedStatement ms, Object parameter, RowBounds rowBounds, ResultHandler resultHandler, BoundSql boundSql) {
             String sql = boundSql.getSql();
             String s = ThreadLocalUtils.get();
             if (StringUtils.isNotBlank(s)) {
-                if (!Objects.equals(formatSql(sql), formatSql(s))) {
-                    System.err.println("执行sql: " + SqlSourceBuilder.removeExtraWhitespaces(sql));
-                    System.err.println("预期sql: " + SqlSourceBuilder.removeExtraWhitespaces(s));
-                    throw new RuntimeException("sql error");
-                } else {
+                ObjectMapper mapper = new ObjectMapper();
+                List<String> sqlList = mapper.readValue(s, new TypeReference<List<String>>() {
+                });
+                if (sqlList.stream().anyMatch(e -> Objects.equals(formatSql(sql), formatSql(e)))) {
                     System.out.println("===============================================");
                     System.out.println();
                     System.out.println("pass");
                     System.out.println();
                     System.out.println("===============================================");
+                } else {
+                    System.err.println("执行sql: " + SqlSourceBuilder.removeExtraWhitespaces(sql));
+                    sqlList.forEach(i -> System.err.println("预期sql: " + i));
+                    throw new RuntimeException("sql error");
                 }
             }
         }
 
         @Override
+        @SneakyThrows
         public void beforePrepare(StatementHandler sh, Connection connection, Integer transactionTimeout) {
             BoundSql boundSql = sh.getBoundSql();
             if (boundSql != null && StringUtils.isNotBlank(boundSql.getSql())) {
@@ -72,16 +81,19 @@ public class MybatisPlusConfig {
                 }
                 String s = ThreadLocalUtils.get();
                 if (StringUtils.isNotBlank(s)) {
-                    if (!Objects.equals(formatSql(sql), formatSql(s))) {
-                        System.err.println("执行sql: " + SqlSourceBuilder.removeExtraWhitespaces(sql));
-                        System.err.println("预期sql: " + SqlSourceBuilder.removeExtraWhitespaces(s));
-                        throw new RuntimeException("sql error");
-                    }else {
+                    ObjectMapper mapper = new ObjectMapper();
+                    List<String> sqlList = mapper.readValue(s, new TypeReference<List<String>>() {
+                    });
+                    if (sqlList.stream().anyMatch(e -> Objects.equals(formatSql(sql), formatSql(e)))) {
                         System.out.println("===============================================");
                         System.out.println();
                         System.out.println("pass");
                         System.out.println();
                         System.out.println("===============================================");
+                    } else {
+                        System.err.println("执行sql: " + SqlSourceBuilder.removeExtraWhitespaces(sql));
+                        sqlList.forEach(i -> System.err.println("预期sql: " + i));
+                        throw new RuntimeException("sql error");
                     }
                 }
             }

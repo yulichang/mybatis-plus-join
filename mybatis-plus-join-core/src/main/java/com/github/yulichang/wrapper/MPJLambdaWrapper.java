@@ -149,7 +149,7 @@ public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWr
     MPJLambdaWrapper(T entity, Class<T> entityClass, SharedString sqlSelect, AtomicInteger paramNameSeq,
                      Map<String, Object> paramNameValuePairs, MergeSegments mergeSegments,
                      SharedString lastSql, SharedString sqlComment, SharedString sqlFirst,
-                     TableList tableList, Integer index, String keyWord, Class<?> joinClass) {
+                     TableList tableList, Integer index, String keyWord, Class<?> joinClass, String tableName) {
         super.setEntity(entity);
         super.setEntityClass(entityClass);
         this.paramNameSeq = paramNameSeq;
@@ -163,6 +163,7 @@ public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWr
         this.index = index;
         this.keyWord = keyWord;
         this.joinClass = joinClass;
+        this.tableName = tableName;
     }
 
 
@@ -267,13 +268,10 @@ public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWr
             StringBuilder value = new StringBuilder();
             for (MPJLambdaWrapper<?> wrapper : onWrappers) {
                 if (StringUtils.isBlank(wrapper.from.getStringValue())) {
-                    TableInfo info = TableHelper.get(wrapper.getJoinClass());
-                    Assert.notNull(info, "table not find by class <%s>", wrapper.getJoinClass().getSimpleName());
-                    String tableName = info.getTableName();
                     value.append(StringPool.SPACE)
                             .append(wrapper.getKeyWord())
                             .append(StringPool.SPACE)
-                            .append(tableName)
+                            .append(wrapper.getTableName())
                             .append(StringPool.SPACE)
                             .append(wrapper.hasAlias ? wrapper.alias : (wrapper.alias + wrapper.getIndex()))
                             .append(Constant.ON)
@@ -306,13 +304,13 @@ public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWr
      */
     @Override
     protected MPJLambdaWrapper<T> instance() {
-        return instance(index, null, null);
+        return instance(index, null, null, null);
     }
 
-    protected MPJLambdaWrapper<T> instance(Integer index, String keyWord, Class<?> joinClass) {
+    protected MPJLambdaWrapper<T> instance(Integer index, String keyWord, Class<?> joinClass, String tableName) {
         return new MPJLambdaWrapper<>(getEntity(), getEntityClass(), null, paramNameSeq, paramNameValuePairs,
                 new MergeSegments(), SharedString.emptyString(), SharedString.emptyString(), SharedString.emptyString(),
-                this.tableList, index, keyWord, joinClass);
+                this.tableList, index, keyWord, joinClass, tableName);
     }
 
     @Override
@@ -382,8 +380,11 @@ public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWr
     public <R> MPJLambdaWrapper<T> join(String keyWord, Class<R> clazz, String tableAlias, BiConsumer<MPJAbstractLambdaWrapper<T, ?>, MPJLambdaWrapper<T>> consumer) {
         Integer oldIndex = this.getIndex();
         int newIndex = tableIndex;
-        MPJLambdaWrapper<T> instance = instance(newIndex, keyWord, clazz);
+        TableInfo info = TableHelper.get(clazz);
+        Assert.notNull(info, "table not find by class <%s>", clazz.getSimpleName());
+        MPJLambdaWrapper<T> instance = instance(newIndex, keyWord, clazz, info.getTableName());
         instance.isNo = true;
+        instance.isMain = false;
         onWrappers.add(instance);
         if (StringUtils.isBlank(tableAlias)) {
             tableList.put(oldIndex, clazz, false, ConfigProperties.tableAlias, newIndex);

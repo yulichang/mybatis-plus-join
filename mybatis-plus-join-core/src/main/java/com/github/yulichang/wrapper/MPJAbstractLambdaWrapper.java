@@ -2,20 +2,25 @@ package com.github.yulichang.wrapper;
 
 import com.baomidou.mybatisplus.core.conditions.SharedString;
 import com.baomidou.mybatisplus.core.conditions.segments.MergeSegments;
+import com.baomidou.mybatisplus.core.metadata.TableInfo;
 import com.baomidou.mybatisplus.core.toolkit.StringPool;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.github.yulichang.config.ConfigProperties;
 import com.github.yulichang.toolkit.LambdaUtils;
+import com.github.yulichang.toolkit.TableHelper;
 import com.github.yulichang.toolkit.TableList;
 import com.github.yulichang.toolkit.support.ColumnCache;
 import com.github.yulichang.wrapper.enums.PrefixEnum;
 import com.github.yulichang.wrapper.segments.SelectCache;
 import lombok.Getter;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Function;
 
 import static java.util.stream.Collectors.joining;
 
@@ -42,6 +47,67 @@ public abstract class MPJAbstractLambdaWrapper<T, Children extends MPJAbstractLa
      */
     protected int tableIndex = 1;
 
+    /**
+     * 主表 表名处理方法
+     */
+    protected boolean dynamicTableName = false;
+
+    /**
+     * 主表 表名处理方法
+     */
+    protected Function<String, String> tableFunc;
+
+    /**
+     * 设置表别名
+     * 设置表别名注意sql注入问题
+     *
+     * @return 自定义表别名
+     */
+    public Children setTableName(Function<String, String> tableFunc) {
+        if (isMain) {
+            if (tableFunc != null) {
+                this.dynamicTableName = true;
+                this.tableFunc = tableFunc;
+            }
+        } else {
+            this.tableName = tableFunc.apply(this.tableName);
+        }
+        return typedThis;
+    }
+
+    public String getTableName(String tableName) {
+        if (isMain) {
+            if (dynamicTableName) {
+                return tableFunc.apply(tableName);
+            }
+            return tableName;
+        }
+        return super.getTableName();
+    }
+
+    @SuppressWarnings("unused")
+    public String getTableNameEnc(String tableName) {
+        Class<T> entityClass = getEntityClass();
+        if (entityClass != null) {
+            TableInfo tableInfo = TableHelper.get(entityClass);
+            if (tableInfo != null) {
+                if (dynamicTableName) {
+                    return tableFunc.apply(tableInfo.getTableName());
+                }
+                return tableInfo.getTableName();
+            }
+        }
+        String decode;
+        try {
+            decode = URLDecoder.decode(tableName, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            decode = tableName;
+        }
+        if (dynamicTableName) {
+            return tableFunc.apply(decode);
+        }
+        return decode;
+    }
 
     @Override
     protected <X> String columnToString(Integer index, X column, boolean isJoin, PrefixEnum prefixEnum) {

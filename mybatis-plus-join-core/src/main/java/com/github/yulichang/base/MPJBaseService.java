@@ -1,6 +1,5 @@
 package com.github.yulichang.base;
 
-import com.github.yulichang.base.service.MPJDeepService;
 import com.github.yulichang.base.service.MPJJoinService;
 
 /**
@@ -10,5 +9,5 @@ import com.github.yulichang.base.service.MPJJoinService;
  * @author yulichang
  * @see MPJJoinService
  */
-public interface MPJBaseService<T> extends MPJJoinService<T>, MPJDeepService<T> {
+public interface MPJBaseService<T> extends MPJJoinService<T> {
 }

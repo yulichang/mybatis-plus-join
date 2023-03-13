@@ -1,12 +1,11 @@
 package com.github.yulichang.test.config;
 
 import com.baomidou.mybatisplus.annotation.DbType;
+import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.InnerInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.PaginationInnerInterceptor;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.yulichang.test.util.ThreadLocalUtils;
 import lombok.SneakyThrows;
 import org.apache.ibatis.builder.SqlSourceBuilder;
@@ -51,11 +50,8 @@ public class MybatisPlusConfig {
         @SneakyThrows
         public void beforeQuery(Executor executor, MappedStatement ms, Object parameter, RowBounds rowBounds, ResultHandler resultHandler, BoundSql boundSql) {
             String sql = boundSql.getSql();
-            String s = ThreadLocalUtils.get();
-            if (StringUtils.isNotBlank(s)) {
-                ObjectMapper mapper = new ObjectMapper();
-                List<String> sqlList = mapper.readValue(s, new TypeReference<List<String>>() {
-                });
+            List<String> sqlList = ThreadLocalUtils.get();
+            if (CollectionUtils.isNotEmpty(sqlList)) {
                 if (sqlList.stream().anyMatch(e -> Objects.equals(formatSql(sql), formatSql(e)))) {
                     System.out.println("===============================================");
                     System.out.println();
@@ -79,11 +75,8 @@ public class MybatisPlusConfig {
                 if (sql.toUpperCase().startsWith("SELECT")) {
                     return;
                 }
-                String s = ThreadLocalUtils.get();
-                if (StringUtils.isNotBlank(s)) {
-                    ObjectMapper mapper = new ObjectMapper();
-                    List<String> sqlList = mapper.readValue(s, new TypeReference<List<String>>() {
-                    });
+                List<String> sqlList = ThreadLocalUtils.get();
+                if (CollectionUtils.isNotEmpty(sqlList)) {
                     if (sqlList.stream().anyMatch(e -> Objects.equals(formatSql(sql), formatSql(e)))) {
                         System.out.println("===============================================");
                         System.out.println();

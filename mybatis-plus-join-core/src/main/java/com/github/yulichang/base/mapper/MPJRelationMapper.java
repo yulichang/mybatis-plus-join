@@ -21,6 +21,13 @@ import java.util.function.Function;
  */
 public interface MPJRelationMapper<T> extends BaseMapper<T> {
 
+    /**
+     * 通过注解实现单表多次查询
+     *
+     * @param function BaseMapper调用方法
+     * @see com.github.yulichang.annotation.EntityMapping
+     * @see com.github.yulichang.annotation.FieldMapping
+     */
     default <R, M extends BaseMapper<T>> R selectRelation(Function<M, R> function) {
         return selectRelation(function, new ArrayList<>());
     }
@@ -38,8 +45,7 @@ public interface MPJRelationMapper<T> extends BaseMapper<T> {
         R r = function.apply((M) this);
         if (Objects.isNull(r)) {
             return null;
-        }
-        if (r instanceof List) {
+        } else if (r instanceof List) {
             List<T> data = (List<T>) r;
             if (CollectionUtils.isEmpty(data)) {
                 return r;
@@ -53,8 +59,7 @@ public interface MPJRelationMapper<T> extends BaseMapper<T> {
                 }
                 return (R) Relation.list(data, list);
             }
-        }
-        if (r instanceof IPage) {
+        } else if (r instanceof IPage) {
             IPage<T> data = (IPage<T>) r;
             if (!CollectionUtils.isEmpty(data.getRecords())) {
                 T t = data.getRecords().get(0);
@@ -67,20 +72,16 @@ public interface MPJRelationMapper<T> extends BaseMapper<T> {
                 Relation.list(data.getRecords(), list);
             }
             return r;
-        }
-        if (r instanceof Integer) {
+        } else if (r instanceof Integer) {
             return r;
-        }
-        if (r instanceof Long) {
+        } else if (r instanceof Long) {
             return r;
-        }
-        if (r instanceof Boolean) {
+        } else if (r instanceof Boolean) {
             return r;
-        }
-        if (Object.class == r.getClass()) {
+        } else if (Object.class == r.getClass()) {
             return r;
+        } else {
+            return (R) Relation.one((T) r, list);
         }
-        T data = (T) r;
-        return (R) Relation.one(data, list);
     }
 }

@@ -1,9 +1,13 @@
 package com.github.yulichang.test.util;
 
+import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.SneakyThrows;
 
 import java.util.Arrays;
+import java.util.List;
 
 public class ThreadLocalUtils {
 
@@ -24,9 +28,17 @@ public class ThreadLocalUtils {
     /**
      * 获取线程中的数据
      */
-    public static String get() {
+    @SneakyThrows
+    public static List<String> get() {
         String s = userThreadLocal.get();
+        if (StringUtils.isBlank(s)) {
+            return null;
+        }
+        ObjectMapper mapper = new ObjectMapper();
+        List<String> sqlList = mapper.readValue(s, new TypeReference<List<String>>() {
+        });
+        sqlList.removeIf(StringUtils::isBlank);
         set("");
-        return s;
+        return sqlList;
     }
 }

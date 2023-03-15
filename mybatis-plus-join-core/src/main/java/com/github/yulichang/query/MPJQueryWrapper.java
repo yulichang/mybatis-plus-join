@@ -10,6 +10,7 @@ import com.baomidou.mybatisplus.core.toolkit.*;
 import com.github.yulichang.config.ConfigProperties;
 import com.github.yulichang.query.interfaces.StringJoin;
 import com.github.yulichang.toolkit.TableHelper;
+import com.github.yulichang.wrapper.interfaces.Chain;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
@@ -30,8 +31,8 @@ import java.util.stream.Collectors;
  * @see com.github.yulichang.toolkit.JoinWrappers
  */
 @SuppressWarnings("unused")
-public class MPJQueryWrapper<T> extends AbstractWrapper<T, String, MPJQueryWrapper<T>>
-        implements Query<MPJQueryWrapper<T>, T, String>, StringJoin<MPJQueryWrapper<T>, T> {
+public class MPJQueryWrapper<T> extends AbstractWrapper<T, String, MPJQueryWrapper<T>> implements
+        Query<MPJQueryWrapper<T>, T, String>, StringJoin<MPJQueryWrapper<T>, T>, Chain<T> {
 
     /**
      * 查询字段
@@ -260,7 +261,8 @@ public class MPJQueryWrapper<T> extends AbstractWrapper<T, String, MPJQueryWrapp
      * 如果主表需要动态表名,主表实体必须添加 @DynamicTableName 注解
      * 关联表则不需要 加不加注解都会生效
      * <p>
-     * @see  com.github.yulichang.annotation.DynamicTableName
+     *
+     * @see com.github.yulichang.annotation.DynamicTableName
      */
     public MPJQueryWrapper<T> setTableName(Function<String, String> func) {
         this.tableNameFunc = func;

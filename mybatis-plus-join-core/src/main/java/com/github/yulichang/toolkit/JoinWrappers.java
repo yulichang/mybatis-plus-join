@@ -11,31 +11,31 @@ import com.github.yulichang.wrapper.MPJLambdaWrapper;
 public class JoinWrappers {
 
     /**
-     * JoinWrappers.<UserDO>queryJoin()
+     * JoinWrappers.<UserDO>query()
      */
-    public static <T> MPJQueryWrapper<T> queryJoin() {
+    public static <T> MPJQueryWrapper<T> query() {
         return new MPJQueryWrapper<>();
     }
 
 
     /**
-     * JoinWrappers.<UserDO>queryJoin()
+     * JoinWrappers.<UserDO>query(User.class)
      */
-    public static <T> MPJQueryWrapper<T> queryJoin(Class<T> clazz) {
+    public static <T> MPJQueryWrapper<T> query(Class<T> clazz) {
         return new MPJQueryWrapper<>(clazz);
     }
 
     /**
-     * JoinWrappers.<UserDO>lambdaJoin()
+     * JoinWrappers.<UserDO>lambda()
      */
-    public static <T> MPJLambdaWrapper<T> lambdaJoin() {
+    public static <T> MPJLambdaWrapper<T> lambda() {
         return new MPJLambdaWrapper<>();
     }
 
     /**
-     * JoinWrappers.<UserDO>lambdaJoin()
+     * JoinWrappers.<UserDO>lambda(User.class)
      */
-    public static <T> MPJLambdaWrapper<T> lambdaJoin(Class<T> clazz) {
+    public static <T> MPJLambdaWrapper<T> lambda(Class<T> clazz) {
         return new MPJLambdaWrapper<>(clazz);
     }
 }

@@ -10,6 +10,7 @@ import com.github.yulichang.config.enums.LogicDelTypeEnum;
 import com.github.yulichang.toolkit.LambdaUtils;
 import com.github.yulichang.toolkit.*;
 import com.github.yulichang.toolkit.support.ColumnCache;
+import com.github.yulichang.wrapper.interfaces.Chain;
 import com.github.yulichang.wrapper.interfaces.Query;
 import com.github.yulichang.wrapper.interfaces.QueryJoin;
 import com.github.yulichang.wrapper.interfaces.QueryLabel;
@@ -33,8 +34,8 @@ import static com.baomidou.mybatisplus.core.enums.WrapperKeyword.APPLY;
  * @author yulichang
  */
 @SuppressWarnings({"unused"})
-public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWrapper<T>>
-        implements Query<MPJLambdaWrapper<T>>, QueryJoin<MPJLambdaWrapper<T>, T>, QueryLabel<MPJLambdaWrapper<T>> {
+public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWrapper<T>> implements
+        Query<MPJLambdaWrapper<T>>, QueryJoin<MPJLambdaWrapper<T>, T>, QueryLabel<MPJLambdaWrapper<T>>, Chain<T> {
 
     /**
      * 查询表

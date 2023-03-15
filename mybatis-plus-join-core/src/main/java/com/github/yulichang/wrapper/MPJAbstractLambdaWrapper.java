@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.core.metadata.TableInfo;
 import com.baomidou.mybatisplus.core.toolkit.StringPool;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.github.yulichang.config.ConfigProperties;
+import com.github.yulichang.config.enums.LogicDelTypeEnum;
 import com.github.yulichang.toolkit.LambdaUtils;
 import com.github.yulichang.toolkit.TableHelper;
 import com.github.yulichang.toolkit.TableList;
@@ -29,7 +30,7 @@ import static java.util.stream.Collectors.joining;
  *
  * @author yulichang
  */
-@SuppressWarnings("DuplicatedCode")
+@SuppressWarnings({"DuplicatedCode", "unused"})
 public abstract class MPJAbstractLambdaWrapper<T, Children extends MPJAbstractLambdaWrapper<T, Children>>
         extends MPJAbstractWrapper<T, Children> {
 
@@ -56,6 +57,11 @@ public abstract class MPJAbstractLambdaWrapper<T, Children extends MPJAbstractLa
      * 主表 表名处理方法
      */
     protected Function<String, String> tableFunc;
+
+    /**
+     * 逻辑删除位置
+     */
+    protected LogicDelTypeEnum logicDelType = ConfigProperties.logicDelType;
 
     /**
      * 设置表别名
@@ -85,7 +91,7 @@ public abstract class MPJAbstractLambdaWrapper<T, Children extends MPJAbstractLa
         return super.getTableName();
     }
 
-    @SuppressWarnings("unused")
+
     public String getTableNameEnc(String tableName) {
         Class<T> entityClass = getEntityClass();
         if (entityClass != null) {

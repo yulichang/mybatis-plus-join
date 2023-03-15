@@ -36,6 +36,12 @@
       "defaultValue": "join",
       "type": "java.lang.String",
       "description": "重复字段前缀."
+    },
+    {
+      "name": "mybatis-plus-join.logic-del-type",
+      "defaultValue": "where",
+      "type": "java.lang.String",
+      "description": "逻辑删除的位置支持where和on两个."
     }
   ]
 }

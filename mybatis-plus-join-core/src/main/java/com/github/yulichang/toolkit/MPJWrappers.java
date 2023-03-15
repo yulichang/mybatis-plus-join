@@ -5,22 +5,34 @@ import com.github.yulichang.wrapper.MPJLambdaWrapper;
 
 /**
  * Wrapper 条件构造
+ * 改名 JoinWrappers
  *
  * @author yulichang
+ * @see JoinWrappers
+ * @deprecated
  */
-@SuppressWarnings("unused")
+@Deprecated
+@SuppressWarnings("DeprecatedIsStillUsed")
 public class MPJWrappers {
 
     /**
      * MPJWrappers.<UserDO>queryJoin()
+     * 请使用 JoinWrappers
+     *
+     * @see JoinWrappers
      */
+    @Deprecated
     public static <T> MPJQueryWrapper<T> queryJoin() {
         return new MPJQueryWrapper<>();
     }
 
     /**
      * MPJWrappers.<UserDO>lambdaJoin()
+     * 请使用 JoinWrappers
+     *
+     * @see JoinWrappers
      */
+    @Deprecated
     public static <T> MPJLambdaWrapper<T> lambdaJoin() {
         return new MPJLambdaWrapper<>();
     }

@@ -39,4 +39,9 @@ public class MybatisPlusJoinProperties {
      * 连表查询重复字段名前缀
      */
     private String joinPrefix = "join";
+
+    /**
+     * 逻辑删除类型 支持 where on
+     */
+    private String logicDelType = "where";
 }

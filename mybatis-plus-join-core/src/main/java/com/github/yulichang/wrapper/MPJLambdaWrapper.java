@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.core.metadata.TableInfo;
 import com.baomidou.mybatisplus.core.toolkit.*;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.github.yulichang.config.ConfigProperties;
+import com.github.yulichang.config.enums.LogicDelTypeEnum;
 import com.github.yulichang.toolkit.LambdaUtils;
 import com.github.yulichang.toolkit.*;
 import com.github.yulichang.toolkit.support.ColumnCache;
@@ -22,6 +23,8 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
+
+import static com.baomidou.mybatisplus.core.enums.WrapperKeyword.APPLY;
 
 /**
  * 参考 {@link com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper}
@@ -267,6 +270,14 @@ public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWr
         if (StringUtils.isBlank(from.getStringValue())) {
             StringBuilder value = new StringBuilder();
             for (MPJLambdaWrapper<?> wrapper : onWrappers) {
+                if (wrapper.subLogicSql && this.logicDelType == LogicDelTypeEnum.ON) {
+                    TableInfo tableInfo = TableHelper.get(wrapper.getJoinClass());
+                    if (ConfigProperties.adapter.mpjHasLogic(tableInfo)) {
+                        wrapper.appendSqlSegments(APPLY, () -> LogicInfoUtils.getLogicInfoNoAnd(
+                                wrapper.getIndex(), wrapper.getJoinClass(), wrapper.isHasAlias(), wrapper.getAlias()
+                        ));
+                    }
+                }
                 if (StringUtils.isBlank(wrapper.from.getStringValue())) {
                     value.append(StringPool.SPACE)
                             .append(wrapper.getKeyWord())
@@ -356,7 +367,7 @@ public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWr
      * 副表部分逻辑删除支持
      */
     public String getSubLogicSql() {
-        if (subLogicSql) {
+        if (subLogicSql && logicDelType == LogicDelTypeEnum.WHERE) {
             if (tableList.getAll().isEmpty()) {
                 return StringPool.EMPTY;
             }
@@ -371,6 +382,22 @@ public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWr
      */
     public boolean getLogicSql() {
         return this.logicSql;
+    }
+
+    /**
+     * 调整逻辑删除位置为ON语句
+     */
+    public MPJLambdaWrapper<T> logicDelToOn() {
+        this.logicDelType = LogicDelTypeEnum.ON;
+        return typedThis;
+    }
+
+    /**
+     * 调整逻辑删除位置为WHERE语句
+     */
+    public MPJLambdaWrapper<T> logicDelToWhere() {
+        this.logicDelType = LogicDelTypeEnum.WHERE;
+        return typedThis;
     }
 
     /**

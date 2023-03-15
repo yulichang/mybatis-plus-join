@@ -10,7 +10,7 @@ import com.github.yulichang.test.join.entity.*;
 import com.github.yulichang.test.join.mapper.UserDTOMapper;
 import com.github.yulichang.test.join.mapper.UserMapper;
 import com.github.yulichang.test.util.ThreadLocalUtils;
-import com.github.yulichang.toolkit.MPJWrappers;
+import com.github.yulichang.toolkit.JoinWrappers;
 import com.github.yulichang.wrapper.MPJLambdaWrapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -558,7 +558,7 @@ class LambdaWrapperTest {
         Page<UserDTO> page = new Page<>(1, 10);
         page.setSearchCount(false);
         IPage<UserDTO> iPage = userMapper.selectJoinPage(page, UserDTO.class,
-                MPJWrappers.<UserDO>lambdaJoin()
+                JoinWrappers.lambdaJoin(UserDO.class)
                         .selectAll(UserDO.class)
                         .select(AddressDO::getAddress)
                         .select(AreaDO::getProvince)
@@ -593,7 +593,7 @@ class LambdaWrapperTest {
                 "  AND (t.id = ? AND (t.head_img = ? OR t1.user_id = ?) AND t.id = ?)\n" +
                 "LIMIT ?");
         IPage<UserDTO> page = userMapper.selectJoinPage(new Page<>(1, 10), UserDTO.class,
-                MPJWrappers.<UserDO>lambdaJoin()
+                JoinWrappers.<UserDO>lambdaJoin()
                         .selectAll(UserDO.class)
                         .select(AddressDO::getAddress)
                         .leftJoin(AddressDO.class, on -> on
@@ -612,7 +612,7 @@ class LambdaWrapperTest {
      */
     @Test
     void test4() {
-        UserDTO one = userMapper.selectJoinOne(UserDTO.class, MPJWrappers.<UserDO>lambdaJoin()
+        UserDTO one = userMapper.selectJoinOne(UserDTO.class, JoinWrappers.<UserDO>lambdaJoin()
                 .selectSum(UserDO::getId)
                 .selectMax(UserDO::getId, UserDTO::getHeadImg)
                 .leftJoin(AddressDO.class, AddressDO::getUserId, UserDO::getId));
@@ -653,7 +653,7 @@ class LambdaWrapperTest {
      */
     @Test
     void test7() {
-        List<Map<String, Object>> list = userMapper.selectJoinMaps(MPJWrappers.<UserDO>lambdaJoin()
+        List<Map<String, Object>> list = userMapper.selectJoinMaps(JoinWrappers.<UserDO>lambdaJoin()
                 .selectAll(UserDO.class)
                 .select(AddressDO::getAddress)
                 .leftJoin(AddressDO.class, AddressDO::getUserId, UserDO::getId));
@@ -706,8 +706,9 @@ class LambdaWrapperTest {
     @Test
     void testCount() {
         ThreadLocalUtils.set(
-                "SELECT COUNT( * ) AS total FROM `user` t LEFT JOIN address t1 ON (t1.user_id = t.id) LEFT JOIN area t2 ON (t2.id = t1.area_id) WHERE t.del=false AND t1.del=false AND t2.del=false",
-                "SELECT COUNT( * ) FROM `user` t LEFT JOIN address t1 ON (t1.user_id = t.id) LEFT JOIN area t2 ON (t2.id = t1.area_id) WHERE t.del=false AND t1.del=false AND t2.del=false");
+                "SELECT COUNT( 1 ) FROM `user` t LEFT JOIN address t1 ON (t1.user_id = t.id) LEFT JOIN area t2 ON (t2.id = t1.area_id) WHERE t.del=false AND t1.del=false AND t2.del=false",
+                "SELECT COUNT( * ) FROM `user` t LEFT JOIN address t1 ON (t1.user_id = t.id) LEFT JOIN area t2 ON (t2.id = t1.area_id) WHERE t.del=false AND t1.del=false AND t2.del=false",
+                "SELECT COUNT( * ) AS total FROM `user` t LEFT JOIN address t1 ON (t1.user_id = t.id) LEFT JOIN area t2 ON (t2.id = t1.area_id) WHERE t.del=false AND t1.del=false AND t2.del=false");
         MPJLambdaWrapper<UserDO> wrapper = new MPJLambdaWrapper<UserDO>()
                 .leftJoin(AddressDO.class, AddressDO::getUserId, UserDO::getId)
                 .leftJoin(AreaDO.class, AreaDO::getId, AddressDO::getAreaId);
@@ -740,5 +741,57 @@ class LambdaWrapperTest {
             List<UserDTO> list = userMapper.selectJoinList(UserDTO.class, wrapper);
         } catch (BadSqlGrammarException ignored) {
         }
+    }
+
+
+    /**
+     * 逻辑删除类型
+     */
+    @Test
+    void logicDelType() {
+        ThreadLocalUtils.set("SELECT t.id,\n" +
+                "       t.pid,\n" +
+                "       t.`name`,\n" +
+                "       t.`json`,\n" +
+                "       t.sex,\n" +
+                "       t.head_img,\n" +
+                "       t.create_time,\n" +
+                "       t.address_id,\n" +
+                "       t.address_id2,\n" +
+                "       t.del,\n" +
+                "       t.create_by,\n" +
+                "       t.update_by,\n" +
+                "       t1.id  AS joina_id,\n" +
+                "       t1.user_id,\n" +
+                "       t1.area_id,\n" +
+                "       t1.tel,\n" +
+                "       t1.address,\n" +
+                "       t1.del AS joina_del,\n" +
+                "       t2.id  AS joinb_id,\n" +
+                "       t2.province,\n" +
+                "       t2.city,\n" +
+                "       t2.area,\n" +
+                "       t2.postcode,\n" +
+                "       t2.del AS joinb_del\n" +
+                "FROM `user` t\n" +
+                "         LEFT JOIN address t1 ON (t1.user_id = t.id AND t1.del = false)\n" +
+                "         LEFT JOIN area t2 ON (t2.id = t1.area_id AND t2.del = false)\n" +
+                "WHERE t.del = false\n" +
+                "  AND (t.id <= ?)\n" +
+                "ORDER BY t.id DESC\n");
+        MPJLambdaWrapper<UserDO> wrapper = new MPJLambdaWrapper<UserDO>()
+                .logicDelToOn()
+                .selectAll(UserDO.class)
+                .selectCollection(AddressDO.class, UserDTO::getAddressList, addr -> addr
+                        .association(AreaDO.class, AddressDTO::getArea))
+                .leftJoin(AddressDO.class, AddressDO::getUserId, UserDO::getId)
+                .leftJoin(AreaDO.class, AreaDO::getId, AddressDO::getAreaId)
+                .le(UserDO::getId, 10000)
+                .orderByDesc(UserDO::getId);
+        System.out.println(wrapper.getFrom());
+        List<UserDTO> list = userMapper.selectJoinList(UserDTO.class, wrapper);
+
+        assert list.get(0).getAddressList() != null && list.get(0).getAddressList().get(0).getId() != null;
+        list.forEach(System.out::println);
     }
 }

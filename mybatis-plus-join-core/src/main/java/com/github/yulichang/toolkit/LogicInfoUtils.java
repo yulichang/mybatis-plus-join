@@ -21,6 +21,7 @@ public class LogicInfoUtils implements Constants {
 
     private static final Map<Class<?>, Map<String, String>> LOGIC_CACHE = new ConcurrentHashMap<>();
 
+    private static final Map<Class<?>, Map<String, String>> LOGIC_CACHE_NO_AND = new ConcurrentHashMap<>();
 
     public static String getLogicInfo(Integer tableIndex, Class<?> clazz, boolean hasAlias, String alias) {
         Map<String, String> absent = LOGIC_CACHE.get(clazz);
@@ -28,10 +29,19 @@ public class LogicInfoUtils implements Constants {
             absent = new ConcurrentHashMap<>();
             LOGIC_CACHE.put(clazz, absent);
         }
-        return absent.computeIfAbsent(hasAlias ? alias : (alias + tableIndex), key -> getLogicStr(key, clazz));
+        return absent.computeIfAbsent(hasAlias ? alias : (alias + tableIndex), key -> getLogicStr(key, clazz, true));
     }
 
-    private static String getLogicStr(String prefix, Class<?> clazz) {
+    public static String getLogicInfoNoAnd(Integer tableIndex, Class<?> clazz, boolean hasAlias, String alias) {
+        Map<String, String> absent = LOGIC_CACHE_NO_AND.get(clazz);
+        if (absent == null) {
+            absent = new ConcurrentHashMap<>();
+            LOGIC_CACHE_NO_AND.put(clazz, absent);
+        }
+        return absent.computeIfAbsent(hasAlias ? alias : (alias + tableIndex), key -> getLogicStr(key, clazz, false));
+    }
+
+    private static String getLogicStr(String prefix, Class<?> clazz, boolean and) {
 
         String logicStr;
         TableInfo tableInfo = TableHelper.get(clazz);
@@ -40,9 +50,9 @@ public class LogicInfoUtils implements Constants {
         if (ConfigProperties.adapter.mpjHasLogic(tableInfo) && Objects.nonNull(logicField)) {
             final String value = logicField.getLogicNotDeleteValue();
             if (NULL.equalsIgnoreCase(value)) {
-                logicStr = " AND " + prefix + DOT + logicField.getColumn() + " IS NULL";
+                logicStr = (and ? " AND " : EMPTY) + prefix + DOT + logicField.getColumn() + " IS NULL";
             } else {
-                logicStr = " AND " + prefix + DOT + logicField.getColumn() + EQUALS + String.format(logicField.isCharSequence() ? "'%s'" : "%s", value);
+                logicStr = (and ? " AND " : EMPTY) + prefix + DOT + logicField.getColumn() + EQUALS + String.format(logicField.isCharSequence() ? "'%s'" : "%s", value);
             }
         } else {
             logicStr = StringPool.EMPTY;

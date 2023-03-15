@@ -2,6 +2,7 @@ package com.github.yulichang.config;
 
 import com.github.yulichang.adapter.AdapterHelper;
 import com.github.yulichang.adapter.base.IAdapter;
+import com.github.yulichang.config.enums.LogicDelTypeEnum;
 
 /**
  * @author yulichang
@@ -25,6 +26,10 @@ public class ConfigProperties {
      * 字段名重复时前缀
      */
     public static String joinPrefix = "join";
+    /**
+     * 逻辑删除类型 支持 where on
+     */
+    public static LogicDelTypeEnum logicDelType = LogicDelTypeEnum.WHERE;
     /**
      * 适配器
      */

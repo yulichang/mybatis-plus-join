@@ -9,7 +9,6 @@ import com.baomidou.mybatisplus.core.metadata.TableInfo;
 import com.baomidou.mybatisplus.core.toolkit.*;
 import com.github.yulichang.config.ConfigProperties;
 import com.github.yulichang.query.interfaces.StringJoin;
-import com.github.yulichang.toolkit.MPJWrappers;
 import com.github.yulichang.toolkit.TableHelper;
 
 import java.io.UnsupportedEncodingException;
@@ -25,10 +24,10 @@ import java.util.stream.Collectors;
 
 /**
  * copy {@link com.baomidou.mybatisplus.core.conditions.query.QueryWrapper}
- * 推荐使用 MPJWrappers.<UserDO>queryJoin();构造
+ * 推荐使用 JoinWrappers.<UserDO>queryJoin();构造
  *
  * @author yulichang
- * @see MPJWrappers
+ * @see com.github.yulichang.toolkit.JoinWrappers
  */
 @SuppressWarnings("unused")
 public class MPJQueryWrapper<T> extends AbstractWrapper<T, String, MPJQueryWrapper<T>>
@@ -75,6 +74,16 @@ public class MPJQueryWrapper<T> extends AbstractWrapper<T, String, MPJQueryWrapp
 
 
     public MPJQueryWrapper() {
+        super.initNeed();
+    }
+
+    public MPJQueryWrapper(Class<T> clazz) {
+        super.setEntityClass(clazz);
+        super.initNeed();
+    }
+
+    public MPJQueryWrapper(T entity) {
+        super.setEntity(entity);
         super.initNeed();
     }
 

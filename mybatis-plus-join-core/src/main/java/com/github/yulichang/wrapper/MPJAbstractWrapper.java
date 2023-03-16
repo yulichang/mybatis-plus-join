@@ -667,12 +667,6 @@ public abstract class MPJAbstractWrapper<T, Children extends MPJAbstractWrapper<
      * 获取 columnName
      */
     protected final <X> ISqlSegment columnToSqlSegment(Integer index, SFunction<X, ?> column, boolean isJoin) {
-        PrefixEnum prefixEnum;
-        if (isMain) {
-            prefixEnum = isNo ? PrefixEnum.ON_FIRST /* 理论上不可能有这种情况 */ : PrefixEnum.CD_FIRST;
-        } else {
-            prefixEnum = isNo ? PrefixEnum.ON_FIRST : PrefixEnum.CD_ON_FIRST;
-        }
         return () -> columnToString(index, column, isJoin, isNo ? PrefixEnum.ON_FIRST : PrefixEnum.CD_FIRST);
     }
 

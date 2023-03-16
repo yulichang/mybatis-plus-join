@@ -246,6 +246,7 @@ public class MybatisLabel<E, T> implements Label<T> {
                     mybatisLabel.resultList.addAll(listField.stream().map(i -> {
                         Result result = new Result();
                         result.setId(i.isPk());
+                        result.setIndex(mybatisLabel.index);
                         result.setProperty(i.getColumProperty());
                         result.setJavaType(i.getColumnType());
                         result.setJdbcType(Objects.isNull(i.getTableFieldInfo()) ? null : i.getTableFieldInfo().getJdbcType());
@@ -258,6 +259,7 @@ public class MybatisLabel<E, T> implements Label<T> {
                         if (Objects.nonNull(field)) {
                             Result result = new Result();
                             result.setId(s.isPk());
+                            result.setIndex(mybatisLabel.index);
                             result.setProperty(s.getColumProperty());
                             result.setJavaType(field.getType());
                             result.setSelectNormal(s);

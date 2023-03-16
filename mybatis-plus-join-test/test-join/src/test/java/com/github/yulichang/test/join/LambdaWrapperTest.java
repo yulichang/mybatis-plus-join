@@ -713,7 +713,7 @@ class LambdaWrapperTest {
         MPJLambdaWrapper<UserDO> wrapper = new MPJLambdaWrapper<UserDO>()
                 .leftJoin(AddressDO.class, AddressDO::getUserId, UserDO::getId)
                 .leftJoin(AreaDO.class, AreaDO::getId, AddressDO::getAreaId);
-        Integer integer = userMapper.selectCount(wrapper);
+        Object integer = userMapper.selectCount(wrapper);
 
         ThreadLocalUtils.set("SELECT COUNT( * ) FROM `user` t LEFT JOIN address t1 ON (t1.user_id = t.id) LEFT JOIN area t2 ON (t2.id = t1.area_id) WHERE t.del=false AND t1.del=false AND t2.del=false");
         MPJLambdaWrapper<UserDO> wrapper1 = new MPJLambdaWrapper<UserDO>()

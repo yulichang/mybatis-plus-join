@@ -17,12 +17,18 @@ public class JoinWrappers {
         return new MPJQueryWrapper<>();
     }
 
-
     /**
      * JoinWrappers.<UserDO>query(User.class)
      */
     public static <T> MPJQueryWrapper<T> query(Class<T> clazz) {
         return new MPJQueryWrapper<>(clazz);
+    }
+
+    /**
+     * JoinWrappers.<UserDO>query(user)
+     */
+    public static <T> MPJQueryWrapper<T> query(T entity) {
+        return new MPJQueryWrapper<>(entity);
     }
 
     /**
@@ -37,5 +43,12 @@ public class JoinWrappers {
      */
     public static <T> MPJLambdaWrapper<T> lambda(Class<T> clazz) {
         return new MPJLambdaWrapper<>(clazz);
+    }
+
+    /**
+     * JoinWrappers.<UserDO>lambda(user)
+     */
+    public static <T> MPJLambdaWrapper<T> lambda(T entity) {
+        return new MPJLambdaWrapper<>(entity);
     }
 }

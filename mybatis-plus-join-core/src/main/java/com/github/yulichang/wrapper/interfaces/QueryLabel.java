@@ -12,6 +12,12 @@ import java.lang.reflect.Field;
 import java.util.Collection;
 import java.util.Map;
 
+/**
+ * 对一或对多查询
+ *
+ * @author yulichang
+ * @since 1.3.0
+ */
 @SuppressWarnings({"unchecked", "unused"})
 public interface QueryLabel<Children> {
 

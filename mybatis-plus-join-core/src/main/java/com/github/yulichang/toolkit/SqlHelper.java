@@ -30,7 +30,7 @@ public class SqlHelper {
         Assert.notNull(mapperClass, "mapper not find by class <%s>", entityClass.getSimpleName());
         Object mapper = SpringContentUtils.getBean(mapperClass);
         Assert.notNull(mapper, "mapper not init <%s>", entityClass.getSimpleName());
-        Assert.isTrue(mapper instanceof MPJBaseMapper, "mapper not extends MPJBaseMapper <%s>", entityClass.getSimpleName());
+        Assert.isTrue(mapper instanceof MPJBaseMapper, "mapper <%s> not extends MPJBaseMapper ", entityClass.getSimpleName());
         return function.apply((MPJBaseMapper<T>) mapper);
     }
 }

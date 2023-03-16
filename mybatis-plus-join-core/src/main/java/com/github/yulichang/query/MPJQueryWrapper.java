@@ -179,7 +179,7 @@ public class MPJQueryWrapper<T> extends AbstractWrapper<T, String, MPJQueryWrapp
     public final MPJQueryWrapper<T> selectAll(Class<?> clazz, String as) {
         TableInfo info = TableHelper.get(clazz);
         Assert.notNull(info, "table not find by class <%s>", clazz);
-        if (info.havePK()) {
+        if (ConfigProperties.adapter.mpjHasPK(info)) {
             selectColumns.add(as + StringPool.DOT + info.getKeySqlSelect());
         }
         selectColumns.addAll(info.getFieldList().stream().map(i ->

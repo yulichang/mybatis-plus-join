@@ -12,6 +12,7 @@ import com.baomidou.mybatisplus.core.toolkit.sql.SqlUtils;
 import com.baomidou.mybatisplus.core.toolkit.sql.StringEscape;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.github.yulichang.toolkit.LambdaUtils;
+import com.github.yulichang.toolkit.MPJStringUtils;
 import com.github.yulichang.toolkit.TableList;
 import com.github.yulichang.toolkit.sql.SqlScriptUtils;
 import com.github.yulichang.wrapper.enums.PrefixEnum;
@@ -959,7 +960,7 @@ public abstract class MPJAbstractWrapper<T, Children extends MPJAbstractWrapper<
     }
 
     protected String columnSqlInjectFilter(String column) {
-        return StringUtils.sqlInjectionReplaceBlank(column);
+        return MPJStringUtils.sqlInjectionReplaceBlank(column);
     }
 
     @Override

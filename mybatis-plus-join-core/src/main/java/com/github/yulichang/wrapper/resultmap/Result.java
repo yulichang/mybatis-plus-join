@@ -40,21 +40,22 @@ public class Result {
 
 
     @SuppressWarnings({"UnusedReturnValue", "unused"})
-    public static class Builder<E, T> {
+    public static class Builder<T> {
 
         private final Result result;
 
-        public Builder(boolean isId) {
+        public Builder(boolean isId, String index) {
             this.result = new Result();
             result.isId = isId;
+            result.index = index;
         }
 
-        public Builder<E, T> property(SFunction<T, ?> property) {
+        public Builder<T> property(SFunction<T, ?> property) {
             result.property = LambdaUtils.getName(property);
             return this;
         }
 
-        public Builder<E, T> column(SFunction<E, ?> column) {
+        public <E> Builder<T> column(SFunction<E, ?> column) {
             Class<E> entityClass = LambdaUtils.getEntityClass(column);
             Map<String, SelectCache> normalMap = ColumnCache.getMapField(entityClass);
             String name = LambdaUtils.getName(column);
@@ -72,12 +73,12 @@ public class Result {
             return this;
         }
 
-        public Builder<E, T> javaType(Class<?> javaType) {
+        public Builder<T> javaType(Class<?> javaType) {
             result.javaType = javaType;
             return this;
         }
 
-        public Builder<E, T> jdbcType(JdbcType jdbcType) {
+        public Builder<T> jdbcType(JdbcType jdbcType) {
             result.jdbcType = jdbcType;
             return this;
         }

@@ -5,8 +5,10 @@ import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.github.yulichang.toolkit.LambdaUtils;
 import com.github.yulichang.toolkit.MPJReflectionKit;
+import com.github.yulichang.wrapper.resultmap.Label;
 import com.github.yulichang.wrapper.resultmap.MFunc;
 import com.github.yulichang.wrapper.resultmap.MybatisLabel;
+import com.github.yulichang.wrapper.resultmap.MybatisLabelFree;
 
 import java.lang.reflect.Field;
 import java.util.Collection;
@@ -21,7 +23,7 @@ import java.util.Map;
 @SuppressWarnings({"unchecked", "unused"})
 public interface QueryLabel<Children> {
 
-    void addLabel(MybatisLabel<?, ?> label);
+    void addLabel(Label<?> label);
 
     Children getChildren();
 
@@ -104,6 +106,21 @@ public interface QueryLabel<Children> {
         return selectCollection(null, child, dtoField, collection);
     }
 
+    default <S, Z, F extends java.util.Collection<Z>> Children selectCollection(SFunction<S, F> dtoField,
+                                                                                MFunc<MybatisLabelFree.Builder<Z>> collection) {
+        //自由映射必须存在泛型Z
+        String dtoFieldName = LambdaUtils.getName(dtoField);
+        Class<S> dtoClass = LambdaUtils.getEntityClass(dtoField);
+        Field field = MPJReflectionKit.getFieldMap(dtoClass).get(dtoFieldName);
+        //获取集合泛型
+        Class<?> genericType = MPJReflectionKit.getGenericType(field);
+        Class<Z> ofType = (Class<Z>) genericType;
+        MybatisLabelFree.Builder<Z> builder = new MybatisLabelFree.Builder<>(dtoFieldName, field.getType(), ofType);
+        MybatisLabelFree.Builder<Z> czBuilder = collection.apply(builder);
+        addLabel(czBuilder.build());
+        return getChildren();
+    }
+
     default <S, C, Z, F extends java.util.Collection<Z>> Children selectCollection(String prefix,
                                                                                    Class<C> child,
                                                                                    SFunction<S, F> dtoField,
@@ -150,6 +167,18 @@ public interface QueryLabel<Children> {
     default <S, C, F> Children selectAssociation(Class<C> child, SFunction<S, F> dtoField,
                                                  MFunc<MybatisLabel.Builder<C, F>> collection) {
         return selectAssociation(null, child, dtoField, collection);
+    }
+
+    default <S, C, F> Children selectAssociation(SFunction<S, F> dtoField,
+                                                 MFunc<MybatisLabelFree.Builder<F>> collection) {
+        String dtoFieldName = LambdaUtils.getName(dtoField);
+        Class<S> dtoClass = LambdaUtils.getEntityClass(dtoField);
+        Field field = MPJReflectionKit.getFieldMap(dtoClass).get(dtoFieldName);
+        Assert.isFalse(Collection.class.isAssignableFrom(field.getType()), "association 不支持集合类");
+        MybatisLabelFree.Builder<F> builder = new MybatisLabelFree.Builder<>(dtoFieldName, field.getType(), (Class<F>) field.getType());
+        MybatisLabelFree.Builder<F> cfBuilder = collection.apply(builder);
+        addLabel(cfBuilder.build());
+        return getChildren();
     }
 
     default <S, C, F> Children selectAssociation(String prefix, Class<C> child, SFunction<S, F> dtoField,

@@ -14,7 +14,7 @@ import com.github.yulichang.wrapper.interfaces.Chain;
 import com.github.yulichang.wrapper.interfaces.Query;
 import com.github.yulichang.wrapper.interfaces.QueryJoin;
 import com.github.yulichang.wrapper.interfaces.QueryLabel;
-import com.github.yulichang.wrapper.resultmap.MybatisLabel;
+import com.github.yulichang.wrapper.resultmap.Label;
 import com.github.yulichang.wrapper.segments.Select;
 import com.github.yulichang.wrapper.segments.SelectCache;
 import com.github.yulichang.wrapper.segments.SelectNormal;
@@ -50,7 +50,7 @@ public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWr
      * 映射关系
      */
     @Getter
-    private final List<MybatisLabel<?, ?>> resultMapMybatisLabel = new ArrayList<>();
+    private final List<Label<?>> resultMapMybatisLabel = new ArrayList<>();
     /**
      * 是否有表别名
      */
@@ -187,7 +187,7 @@ public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWr
     }
 
     @Override
-    public void addLabel(MybatisLabel<?, ?> label) {
+    public void addLabel(Label<?> label) {
         this.resultMap = true;
         this.resultMapMybatisLabel.add(label);
     }

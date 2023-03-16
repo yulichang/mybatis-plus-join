@@ -10,7 +10,7 @@ import com.github.yulichang.toolkit.Constant;
 import com.github.yulichang.toolkit.MPJReflectionKit;
 import com.github.yulichang.toolkit.TableHelper;
 import com.github.yulichang.wrapper.MPJLambdaWrapper;
-import com.github.yulichang.wrapper.resultmap.MybatisLabel;
+import com.github.yulichang.wrapper.resultmap.Label;
 import com.github.yulichang.wrapper.resultmap.Result;
 import com.github.yulichang.wrapper.segments.Select;
 import com.github.yulichang.wrapper.segments.SelectLabel;
@@ -190,7 +190,7 @@ public class MPJInterceptor implements Interceptor {
         }
         if (wrapper.isResultMap()) {
             for (Object o : wrapper.getResultMapMybatisLabel()) {
-                MybatisLabel<?, ?> label = (MybatisLabel<?, ?>) o;
+                Label<?> label = (Label<?>) o;
                 resultMappings.add(buildResult(ms, label, columnSet, columnList));
             }
         }
@@ -214,15 +214,13 @@ public class MPJInterceptor implements Interceptor {
     /**
      * @return 返回节点id
      */
-    private ResultMapping buildResult(MappedStatement ms, MybatisLabel<?, ?> mybatisLabel, Set<String> columnSet,
+    private ResultMapping buildResult(MappedStatement ms, Label<?> mybatisLabel, Set<String> columnSet,
                                       List<Select> columnList) {
         List<Result> resultList = mybatisLabel.getResultList();
         if (CollectionUtils.isEmpty(resultList)) {
             return null;
         }
         StringBuilder childId = new StringBuilder("MPJ_")
-                .append(mybatisLabel.getEntityClass().getName())
-                .append(StringPool.UNDERSCORE)
                 .append(mybatisLabel.getOfType().getName())
                 .append(StringPool.UNDERSCORE)
                 .append(mybatisLabel.getProperty())
@@ -235,7 +233,7 @@ public class MPJInterceptor implements Interceptor {
             String columnName = StringUtils.getTargetColumn(r.getSelectNormal().getColumn());
             SelectLabel label;
             Field field = ofTypeField.get(r.getProperty());
-            String index = mybatisLabel.getIndex();
+            String index = r.getIndex();
             if (columnSet.contains(columnName)) {
                 columnName = getColumn(columnSet, columnName, 0);
                 label = new SelectLabel(r.getSelectNormal(), null, mybatisLabel.getOfType(), field, columnName, StringUtils.isNotBlank(index), index);
@@ -269,7 +267,8 @@ public class MPJInterceptor implements Interceptor {
         if (CollectionUtils.isNotEmpty(mybatisLabel.getMybatisLabels())) {
             //递归调用
             childId.append("[");
-            for (MybatisLabel<?, ?> o : mybatisLabel.getMybatisLabels()) {
+            for (Object it : mybatisLabel.getMybatisLabels()) {
+                Label<?> o = (Label<?>) it;
                 if (Objects.isNull(o)) {
                     continue;
                 }

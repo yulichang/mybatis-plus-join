@@ -847,4 +847,29 @@ class LambdaWrapperTest {
         assert list.get(0).getAddressList() != null && list.get(0).getAddressList().get(0).getId() != null;
         list.forEach(System.out::println);
     }
+
+    @Test
+    void joinRandomMap() {
+        MPJLambdaWrapper<UserDO> wrapper = JoinWrappers.lambda(UserDO.class)
+                .logicDelToOn()
+                .selectAll(UserDO.class)
+//                .selectCollection(AddressDO.class, UserDTO::getAddressList, addr -> addr
+//                        .id(AddressDO::getId))
+                .selectCollection(UserDTO::getAddressList, addr -> addr
+                        .id(AddressDO::getId, AddressDTO::getId)
+                        .result(UserDO::getName, AddressDTO::getAddress)
+                        .collection(AddressDTO::getAreaList, map -> map
+                                .id(AreaDO::getId)
+                                .result(AreaDO::getArea, AreaDO::getArea)))
+                .leftJoin(AddressDO.class, AddressDO::getUserId, UserDO::getId)
+                .leftJoin(AreaDO.class, AreaDO::getId, AddressDO::getAreaId)
+                .le(UserDO::getId, 10000)
+                .orderByDesc(UserDO::getId);
+
+        List<UserDTO> list = wrapper.list(UserDTO.class);
+
+        System.out.println(list);
+        assert list.get(0).getAddressList() != null && list.get(0).getAddressList().get(0).getId() != null;
+        list.forEach(System.out::println);
+    }
 }

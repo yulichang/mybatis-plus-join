@@ -87,7 +87,12 @@ public class MPJInterceptor implements Interceptor {
         String id = ms.getId() + StringPool.DASH + (resultType.getName().replaceAll("\\.", StringPool.DASH));
         if (ew instanceof MPJLambdaWrapper) {
             MPJLambdaWrapper wrapper = (MPJLambdaWrapper) ew;
-            wrapper.setEntityClass(MPJTableMapperHelper.getEntity(getEntity(ms.getId())));
+            if (wrapper.getEntityClass() == null) {
+                wrapper.setEntityClass(MPJTableMapperHelper.getEntity(getEntity(ms.getId())));
+            }
+            if (wrapper.getSelectColumns().isEmpty() && wrapper.getEntityClass() != null) {
+                wrapper.selectAll(wrapper.getEntityClass());
+            }
             //TODO 重构缓存 -> 根据sql缓存
             //不走缓存
         }

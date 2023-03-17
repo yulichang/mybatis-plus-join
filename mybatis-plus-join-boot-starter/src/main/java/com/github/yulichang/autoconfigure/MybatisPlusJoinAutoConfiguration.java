@@ -94,7 +94,7 @@ public class MybatisPlusJoinAutoConfiguration {
     }
 
     /**
-     * springboot content 工具类
+     * springboot context 工具类
      */
     @Bean
     @Order(Ordered.HIGHEST_PRECEDENCE)

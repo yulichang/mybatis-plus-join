@@ -3,7 +3,8 @@
     {
       "sourceType": "com.github.yulichang.autoconfigure.MybatisPlusJoinProperties",
       "name": "mybatis-plus-join",
-      "type": "com.github.yulichang.autoconfigure.MybatisPlusJoinProperties"
+      "type": "com.github.yulichang.autoconfigure.MybatisPlusJoinProperties",
+      "description": "mybatis-plus-join configure."
     }
   ],
   "properties": [
@@ -42,6 +43,21 @@
       "defaultValue": "where",
       "type": "java.lang.String",
       "description": "逻辑删除的位置支持where和on两个."
+    }
+  ],
+  "hints": [
+    {
+      "name": "mybatis-plus-join.logic-del-type",
+      "values": [
+        {
+          "value": "where",
+          "description": "logic delete condition to where."
+        },
+        {
+          "value": "on",
+          "description": "logic delete condition to on."
+        }
+      ]
     }
   ]
 }

@@ -20,8 +20,9 @@ mybatis-plus:
   configuration:
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
 
-# 打印 mybatis plus join banner
 mybatis-plus-join:
+  # 打印 mybatis plus join banner
   banner: true
   sub-table-logic: true
   ms-cache: true
+  logic-del-type: where

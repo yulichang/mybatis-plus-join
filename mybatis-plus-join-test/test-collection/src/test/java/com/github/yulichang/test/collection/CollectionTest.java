@@ -11,6 +11,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import javax.annotation.Resource;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * 连表测试类
@@ -80,7 +81,7 @@ class CollectionTest {
                 .leftJoin(TableE.class, TableE::getDid, TableD::getId)
                 .last("LIMIT 1");
         List<TableADTO> dtos1 = tableAMapper.selectJoinList(TableADTO.class, wrapper1);
-        System.out.println(1);
+        assert dtos1.get(0).getB().getC().getD().getE().getId() != null;
     }
 
     /**
@@ -96,5 +97,43 @@ class CollectionTest {
                 .leftJoin(TableA.class, TableA::getId, TableT::getAid2);
         List<TableDTO> dtos = tableMapper.selectJoinList(TableDTO.class, wrapper);
         System.out.println(1);
+    }
+
+    @Test
+    void testFree(){
+        MPJLambdaWrapper<TableA> wrapper1 = new MPJLambdaWrapper<TableA>()
+                .selectAll(TableA.class)
+                .selectAssociation(TableADTO::getB, b -> b
+                        .all(TableB.class)
+                        .association(TableC.class, TableBDTO::getC, c -> c
+                                .association(TableD.class, TableCDTO::getD, d -> d
+                                        .association(TableE.class, TableDDTO::getE, e -> e
+                                                .id(TableE::getId)))))
+                .leftJoin(TableB.class, TableB::getAid, TableA::getId)
+                .leftJoin(TableC.class, TableC::getBid, TableB::getId)
+                .leftJoin(TableD.class, TableD::getCid, TableC::getId)
+                .leftJoin(TableE.class, TableE::getDid, TableD::getId)
+                .last("LIMIT 1");
+        List<TableADTO> dtos1 = tableAMapper.selectJoinList(TableADTO.class, wrapper1);
+        assert dtos1.get(0).getB().getC().getD().getE().getId() != null;
+
+
+        MPJLambdaWrapper<TableA> wrapper2 = new MPJLambdaWrapper<TableA>()
+                .selectAll(TableA.class)
+                .selectAssociation(TableADTO::getB, b -> b
+                        .id(TableB::getId)
+                        .result(TableD::getName,TableBDTO::getName)
+                        .association(TableC.class, TableBDTO::getC, c -> c
+                                .association(TableD.class, TableCDTO::getD, d -> d
+                                        .association(TableE.class, TableDDTO::getE, e -> e
+                                                .id(TableE::getId)))))
+                .leftJoin(TableB.class, TableB::getAid, TableA::getId)
+                .leftJoin(TableC.class, TableC::getBid, TableB::getId)
+                .leftJoin(TableD.class, TableD::getCid, TableC::getId)
+                .leftJoin(TableE.class, TableE::getDid, TableD::getId)
+                .last("LIMIT 1");
+        List<TableADTO> dtos2 = tableAMapper.selectJoinList(TableADTO.class, wrapper2);
+        assert dtos2.get(0).getB().getC().getD().getE().getId() != null;
+        assert Objects.equals(dtos2.get(0).getB().getName(), "tableD1");
     }
 }

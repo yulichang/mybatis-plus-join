@@ -1,9 +1,12 @@
 package com.github.yulichang.wrapper.resultmap;
 
+import com.baomidou.mybatisplus.core.metadata.TableInfo;
 import com.baomidou.mybatisplus.core.toolkit.Assert;
+import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.github.yulichang.toolkit.LambdaUtils;
 import com.github.yulichang.toolkit.MPJReflectionKit;
+import com.github.yulichang.toolkit.TableHelper;
 import com.github.yulichang.toolkit.support.ColumnCache;
 import com.github.yulichang.wrapper.segments.SelectCache;
 import lombok.Getter;
@@ -222,6 +225,13 @@ public class MybatisLabelFree<T> implements Label<T> {
         }
 
         public MybatisLabelFree<T> build() {
+            if (CollectionUtils.isEmpty(mybatisLabel.resultList)) {
+                TableInfo tableInfo = TableHelper.get(mybatisLabel.ofType);
+                Assert.notNull(tableInfo,
+                        "无法自动映射, 找不到 <%s> 对应的表, 请使用 .all(xxx.class), id()或者result() 手动映射",
+                        mybatisLabel.ofType.getSimpleName());
+                all(mybatisLabel.ofType);
+            }
             return mybatisLabel;
         }
 

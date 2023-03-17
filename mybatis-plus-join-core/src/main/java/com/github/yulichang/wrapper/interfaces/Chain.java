@@ -10,7 +10,7 @@ import java.util.List;
 
 /**
  * 链式调用
- * 构造方法不须传 class 或 entity 否则会报错
+ * 构造方法必须传 class 或 entity 否则会报错
  * new MPJLambdaWrapper(User.class)
  * new MPJQueryWrapper(User.class)
  * MPJWrappers.\<User\>lambdaJoin(User.class)
@@ -27,7 +27,7 @@ public interface Chain<T> {
     /**
      * 链式调用 等效于 selectOne
      * <p>
-     * 构造方法不须传 class 或 entity 否则会报错
+     * 构造方法必须传 class 或 entity 否则会报错
      * new MPJLambdaWrapper(User.class)
      * new MPJQueryWrapper(User.class)
      * MPJWrappers.\<User\>lambdaJoin(User.class)
@@ -40,7 +40,7 @@ public interface Chain<T> {
     /**
      * 链式调用 等效于 selectJoinOne
      * <p>
-     * 构造方法不须传 class 或 entity 否则会报错
+     * 构造方法必须传 class 或 entity 否则会报错
      * new MPJLambdaWrapper(User.class)
      * new MPJQueryWrapper(User.class)
      * MPJWrappers.\<User\>lambdaJoin(User.class)
@@ -53,7 +53,7 @@ public interface Chain<T> {
     /**
      * 链式调用 查询列表第一个 匹配多个不会抛异常
      * <p>
-     * 构造方法不须传 class 或 entity 否则会报错
+     * 构造方法必须传 class 或 entity 否则会报错
      * new MPJLambdaWrapper(User.class)
      * new MPJQueryWrapper(User.class)
      * MPJWrappers.\<User\>lambdaJoin(User.class)
@@ -67,7 +67,7 @@ public interface Chain<T> {
     /**
      * 链式调用 查询列表第一个 匹配多个不会抛异常
      * <p>
-     * 构造方法不须传 class 或 entity 否则会报错
+     * 构造方法必须传 class 或 entity 否则会报错
      * new MPJLambdaWrapper(User.class)
      * new MPJQueryWrapper(User.class)
      * MPJWrappers.\<User\>lambdaJoin(User.class)
@@ -80,7 +80,7 @@ public interface Chain<T> {
 
     /**
      * 链式调用
-     * 构造方法不须传 class 或 entity 否则会报错
+     * 构造方法必须传 class 或 entity 否则会报错
      * new MPJLambdaWrapper(User.class)
      * new MPJQueryWrapper(User.class)
      * MPJWrappers.\<User\>lambdaJoin(User.class)
@@ -92,7 +92,7 @@ public interface Chain<T> {
 
     /**
      * 链式调用
-     * 构造方法不须传 class 或 entity 否则会报错
+     * 构造方法必须传 class 或 entity 否则会报错
      * new MPJLambdaWrapper(User.class)
      * new MPJQueryWrapper(User.class)
      * MPJWrappers.\<User\>lambdaJoin(User.class)
@@ -104,7 +104,7 @@ public interface Chain<T> {
 
     /**
      * 链式调用
-     * 构造方法不须传 class 或 entity 否则会报错
+     * 构造方法必须传 class 或 entity 否则会报错
      * new MPJLambdaWrapper(User.class)
      * new MPJQueryWrapper(User.class)
      * MPJWrappers.\<User\>lambdaJoin(User.class)
@@ -116,7 +116,7 @@ public interface Chain<T> {
 
     /**
      * 链式调用
-     * 构造方法不须传 class 或 entity 否则会报错
+     * 构造方法必须传 class 或 entity 否则会报错
      * new MPJLambdaWrapper(User.class)
      * new MPJQueryWrapper(User.class)
      * MPJWrappers.\<User\>lambdaJoin(User.class)

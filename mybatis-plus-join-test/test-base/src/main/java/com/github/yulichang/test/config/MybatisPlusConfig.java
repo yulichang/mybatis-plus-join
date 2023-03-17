@@ -60,7 +60,7 @@ public class MybatisPlusConfig {
                     System.out.println("===============================================");
                 } else {
                     System.err.println("执行sql: " + SqlSourceBuilder.removeExtraWhitespaces(sql));
-                    sqlList.forEach(i -> System.err.println("预期sql: " + i));
+                    sqlList.forEach(i -> System.err.println("预期sql: " + SqlSourceBuilder.removeExtraWhitespaces(i)));
                     throw new RuntimeException("sql error");
                 }
             }
@@ -85,7 +85,7 @@ public class MybatisPlusConfig {
                         System.out.println("===============================================");
                     } else {
                         System.err.println("执行sql: " + SqlSourceBuilder.removeExtraWhitespaces(sql));
-                        sqlList.forEach(i -> System.err.println("预期sql: " + i));
+                        sqlList.forEach(i -> System.err.println("预期sql: " + SqlSourceBuilder.removeExtraWhitespaces(i)));
                         throw new RuntimeException("sql error");
                     }
                 }

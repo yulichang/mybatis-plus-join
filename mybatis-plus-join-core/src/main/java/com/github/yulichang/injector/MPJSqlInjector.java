@@ -2,17 +2,20 @@ package com.github.yulichang.injector;
 
 import com.baomidou.mybatisplus.core.MybatisPlusVersion;
 import com.baomidou.mybatisplus.core.injector.AbstractMethod;
+import com.baomidou.mybatisplus.core.injector.AbstractSqlInjector;
 import com.baomidou.mybatisplus.core.injector.DefaultSqlInjector;
 import com.baomidou.mybatisplus.core.injector.methods.*;
 import com.baomidou.mybatisplus.core.mapper.Mapper;
 import com.baomidou.mybatisplus.core.metadata.TableInfo;
 import com.baomidou.mybatisplus.core.toolkit.ArrayUtils;
 import com.baomidou.mybatisplus.core.toolkit.ClassUtils;
+import com.github.yulichang.adapter.v3431.AbstractMethodV3431;
 import com.github.yulichang.mapper.MPJTableMapperHelper;
 import com.github.yulichang.method.*;
 import com.github.yulichang.toolkit.TableHelper;
 import com.github.yulichang.toolkit.VersionUtils;
 import com.github.yulichang.toolkit.reflect.GenericTypeUtils;
+import lombok.Getter;
 import org.apache.ibatis.builder.MapperBuilderAssistant;
 import org.mybatis.logging.Logger;
 import org.mybatis.logging.LoggerFactory;
@@ -24,6 +27,7 @@ import java.lang.reflect.WildcardType;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toList;
@@ -38,6 +42,16 @@ public class MPJSqlInjector extends DefaultSqlInjector {
 
     private static final Logger logger = LoggerFactory.getLogger(MPJSqlInjector.class);
 
+    @Getter
+    private AbstractSqlInjector sqlInjector;
+
+    public MPJSqlInjector() {
+    }
+
+    public MPJSqlInjector(AbstractSqlInjector sqlInjector) {
+        this.sqlInjector = sqlInjector;
+    }
+
     /**
      * 升级到 mybatis plus 3.4.3.2 后对之前的版本兼容
      */
@@ -48,19 +62,24 @@ public class MPJSqlInjector extends DefaultSqlInjector {
             logger.error(() -> "DefaultSqlInjector 的 getMethodList(Class<?> mapperClass) 方法已在 3.4.3.2+ 改为" +
                     "getMethodList(Class<?> mapperClass, TableInfo tableInfo)\n");
         }
-        List<AbstractMethod> list = Stream.of(
-                new Insert(),
-                new DeleteByMap(),
-                new DeleteById(),
-                new DeleteBatchByIds(),
-                new UpdateById(),
-                new SelectById(),
-                new SelectBatchByIds(),
-                new SelectByMap()
-        ).collect(toList());
-        list.addAll(getJoinMethod());
-        list.addAll(getSelectMethod());
-        return list;
+        if (Objects.nonNull(sqlInjector)) {
+            List<AbstractMethod> methodList = AbstractMethodV3431.getMethod(sqlInjector, mapperClass);
+            return methodFilter(methodList);
+        } else {
+            List<AbstractMethod> list = Stream.of(
+                    new Insert(),
+                    new DeleteByMap(),
+                    new DeleteById(),
+                    new DeleteBatchByIds(),
+                    new UpdateById(),
+                    new SelectById(),
+                    new SelectBatchByIds(),
+                    new SelectByMap()
+            ).collect(toList());
+            list.addAll(getWrapperMethod());
+            list.addAll(getJoinMethod());
+            return list;
+        }
     }
 
     /**
@@ -68,6 +87,13 @@ public class MPJSqlInjector extends DefaultSqlInjector {
      */
     @Override
     public List<AbstractMethod> getMethodList(Class<?> mapperClass, TableInfo tableInfo) {
+        if (Objects.nonNull(sqlInjector)) {
+            return methodFilter(sqlInjector.getMethodList(mapperClass, tableInfo));
+        }
+        return methodFilter(super.getMethodList(mapperClass, tableInfo));
+    }
+
+    private List<AbstractMethod> methodFilter(List<AbstractMethod> list) {
         List<String> methodList = Arrays.asList(
                 "Update",
                 "Delete",
@@ -78,9 +104,8 @@ public class MPJSqlInjector extends DefaultSqlInjector {
                 "SelectObjs",
                 "SelectList",
                 "SelectPage");
-        List<AbstractMethod> list = super.getMethodList(mapperClass, tableInfo);
         list.removeIf(i -> methodList.contains(i.getClass().getSimpleName()));
-        list.addAll(getSelectMethod());
+        list.addAll(getWrapperMethod());
         list.addAll(getJoinMethod());
         return list;
     }
@@ -107,7 +132,7 @@ public class MPJSqlInjector extends DefaultSqlInjector {
         return list;
     }
 
-    private List<AbstractMethod> getSelectMethod() {
+    private List<AbstractMethod> getWrapperMethod() {
         List<AbstractMethod> list = new ArrayList<>();
         list.add(new com.github.yulichang.method.mp.Delete());
         list.add(new com.github.yulichang.method.mp.SelectOne());
@@ -134,6 +159,7 @@ public class MPJSqlInjector extends DefaultSqlInjector {
         return null == typeArguments ? null : typeArguments[index];
     }
 
+    @SuppressWarnings("IfStatementWithIdenticalBranches")
     protected Class<?> extractModelClassOld(Class<?> mapperClass) {
         Type[] types = mapperClass.getGenericInterfaces();
         ParameterizedType target = null;

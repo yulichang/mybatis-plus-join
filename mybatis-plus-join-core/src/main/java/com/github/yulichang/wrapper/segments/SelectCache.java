@@ -57,7 +57,7 @@ public class SelectCache {
             if (this.hasTypeHandle) {
                 TableInfo info = TableHelper.get(clazz);
                 Assert.notNull(info, "table not find by class <%s>", clazz.getSimpleName());
-                this.typeHandler = getTypeHandler(ConfigProperties.adapter.mpjGetConfiguration(info), tableFieldInfo);
+                this.typeHandler = getTypeHandler(ConfigProperties.tableInfoAdapter.mpjGetConfiguration(info), tableFieldInfo);
             } else {
                 this.typeHandler = null;
             }

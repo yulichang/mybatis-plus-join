@@ -23,6 +23,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.BadSqlGrammarException;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -654,6 +655,10 @@ class LambdaWrapperTest {
                 .select(UserDO::getName)
                 .eq(UserDO::getName, "ref");
         userMapper.selectList(wrapper);
+        try {
+            userMapper.insertBatchSomeColumn(new ArrayList<>());
+        } catch (BadSqlGrammarException ignored) {
+        }
     }
 
 

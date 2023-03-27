@@ -273,7 +273,7 @@ public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWr
             for (MPJLambdaWrapper<?> wrapper : onWrappers) {
                 if (wrapper.subLogicSql && this.logicDelType == LogicDelTypeEnum.ON) {
                     TableInfo tableInfo = TableHelper.get(wrapper.getJoinClass());
-                    if (ConfigProperties.adapter.mpjHasLogic(tableInfo)) {
+                    if (ConfigProperties.tableInfoAdapter.mpjHasLogic(tableInfo)) {
                         wrapper.appendSqlSegments(APPLY, () -> LogicInfoUtils.getLogicInfoNoAnd(
                                 wrapper.getIndex(), wrapper.getJoinClass(), wrapper.isHasAlias(), wrapper.getAlias()
                         ));

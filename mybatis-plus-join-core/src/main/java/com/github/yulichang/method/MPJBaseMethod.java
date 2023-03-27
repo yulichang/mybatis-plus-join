@@ -24,7 +24,7 @@ import static java.util.stream.Collectors.joining;
 public interface MPJBaseMethod extends Constants {
 
     default String mpjSqlWhereEntityWrapper(boolean newLine, TableInfo table) {
-        if (ConfigProperties.adapter.mpjHasLogic(table)) {
+        if (ConfigProperties.tableInfoAdapter.mpjHasLogic(table)) {
             String sqlScript = getAllSqlWhere(table, true, true, WRAPPER_ENTITY_DOT);
             sqlScript = SqlScriptUtils.convertIf(sqlScript, String.format("%s != null", WRAPPER_ENTITY), true);
             sqlScript += NEWLINE;
@@ -69,7 +69,7 @@ public interface MPJBaseMethod extends Constants {
         String filedSqlScript = tableInfo.getFieldList().stream()
                 .filter(i -> {
                     if (ignoreLogicDelFiled) {
-                        return !(ConfigProperties.adapter.mpjHasLogic(tableInfo) && i.isLogicDelete());
+                        return !(ConfigProperties.tableInfoAdapter.mpjHasLogic(tableInfo) && i.isLogicDelete());
                     }
                     return true;
                 })
@@ -98,7 +98,7 @@ public interface MPJBaseMethod extends Constants {
         if (fieldStrategy == FieldStrategy.NEVER) {
             return null;
         }
-        if (ConfigProperties.adapter.mpjIsPrimitive(tableFieldInfo) || fieldStrategy == FieldStrategy.IGNORED) {
+        if (ConfigProperties.tableInfoAdapter.mpjIsPrimitive(tableFieldInfo) || fieldStrategy == FieldStrategy.IGNORED) {
             return sqlScript;
         }
         if (fieldStrategy == FieldStrategy.NOT_EMPTY && tableFieldInfo.isCharSequence()) {
@@ -114,7 +114,7 @@ public interface MPJBaseMethod extends Constants {
 
 
     default String getLogicDeleteSql(TableInfo tableInfo, boolean startWithAnd, boolean isWhere) {
-        if (ConfigProperties.adapter.mpjHasLogic(tableInfo)) {
+        if (ConfigProperties.tableInfoAdapter.mpjHasLogic(tableInfo)) {
             String logicDeleteSql = formatLogicDeleteSql(tableInfo, isWhere);
             if (startWithAnd) {
                 logicDeleteSql = " AND " + logicDeleteSql;
@@ -126,15 +126,15 @@ public interface MPJBaseMethod extends Constants {
 
 
     default String formatLogicDeleteSql(TableInfo tableInfo, boolean isWhere) {
-        final String value = isWhere ? ConfigProperties.adapter.mpjGetLogicField(tableInfo).getLogicNotDeleteValue() :
-                ConfigProperties.adapter.mpjGetLogicField(tableInfo).getLogicDeleteValue();
+        final String value = isWhere ? ConfigProperties.tableInfoAdapter.mpjGetLogicField(tableInfo).getLogicNotDeleteValue() :
+                ConfigProperties.tableInfoAdapter.mpjGetLogicField(tableInfo).getLogicDeleteValue();
         if (isWhere) {
             if (NULL.equalsIgnoreCase(value)) {
-                return "${ew.alias}." + ConfigProperties.adapter.mpjGetLogicField(tableInfo).getColumn() +
+                return "${ew.alias}." + ConfigProperties.tableInfoAdapter.mpjGetLogicField(tableInfo).getColumn() +
                         " IS NULL";
             } else {
-                return "${ew.alias}." + ConfigProperties.adapter.mpjGetLogicField(tableInfo).getColumn() +
-                        EQUALS + String.format(ConfigProperties.adapter.mpjGetLogicField(tableInfo).isCharSequence() ?
+                return "${ew.alias}." + ConfigProperties.tableInfoAdapter.mpjGetLogicField(tableInfo).getColumn() +
+                        EQUALS + String.format(ConfigProperties.tableInfoAdapter.mpjGetLogicField(tableInfo).isCharSequence() ?
                         "'%s'" : "%s", value);
             }
         }

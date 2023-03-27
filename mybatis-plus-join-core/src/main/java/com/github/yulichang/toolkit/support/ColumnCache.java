@@ -30,7 +30,7 @@ public class ColumnCache {
             TableInfo tableInfo = TableHelper.get(clazz);
             Assert.notNull(tableInfo, "table not find by class <%s>", c.getSimpleName());
             List<SelectCache> list = new ArrayList<>();
-            if (ConfigProperties.adapter.mpjHasPK(tableInfo)) {
+            if (ConfigProperties.tableInfoAdapter.mpjHasPK(tableInfo)) {
                 list.add(new SelectCache(clazz, true, tableInfo.getKeyColumn(), tableInfo.getKeyType(), tableInfo.getKeyProperty(), null));
             }
             list.addAll(tableInfo.getFieldList().stream().map(f -> new SelectCache(clazz, false, f.getColumn(), f.getPropertyType(), f.getProperty(), f)).collect(Collectors.toList()));

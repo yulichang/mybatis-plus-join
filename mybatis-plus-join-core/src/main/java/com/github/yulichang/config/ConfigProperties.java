@@ -1,7 +1,7 @@
 package com.github.yulichang.config;
 
 import com.github.yulichang.adapter.AdapterHelper;
-import com.github.yulichang.adapter.base.IAdapter;
+import com.github.yulichang.adapter.base.ITableInfoAdapter;
 import com.github.yulichang.config.enums.LogicDelTypeEnum;
 
 /**
@@ -31,7 +31,7 @@ public class ConfigProperties {
      */
     public static LogicDelTypeEnum logicDelType = LogicDelTypeEnum.WHERE;
     /**
-     * 适配器
+     * TableInfo适配器
      */
-    public static IAdapter adapter = AdapterHelper.getAdapter();
+    public static ITableInfoAdapter tableInfoAdapter = AdapterHelper.getTableInfoAdapter();
 }

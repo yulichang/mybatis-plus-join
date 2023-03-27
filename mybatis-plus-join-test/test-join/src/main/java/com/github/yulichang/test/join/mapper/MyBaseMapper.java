@@ -1,14 +1,14 @@
 package com.github.yulichang.test.join.mapper;
 
 import com.github.yulichang.base.MPJBaseMapper;
+import com.github.yulichang.base.mapper.MPJDeepMapper;
 import org.apache.ibatis.annotations.Mapper;
 
-import java.io.Serializable;
 import java.util.List;
 
 @Mapper
-@SuppressWarnings("unused")
-public interface MyBaseMapper<T extends Serializable> extends MPJBaseMapper<T> {
+public interface MyBaseMapper<T> extends MPJBaseMapper<T>, MPJDeepMapper<T> {
 
+    @SuppressWarnings("UnusedReturnValue")
     int insertBatchSomeColumn(List<T> entityList);
 }

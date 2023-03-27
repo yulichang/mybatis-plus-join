@@ -1,17 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--suppress VulnerableLibrariesLocal -->
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.github.yulichang</groupId>
-        <artifactId>mybatis-plus-join-root</artifactId>
+        <artifactId>mybatis-plus-join-adapter</artifactId>
         <version>1.4.4</version>
     </parent>
+    <artifactId>mybatis-plus-join-adapter-v3431</artifactId>
     <version>1.4.4</version>
-    <artifactId>mybatis-plus-join-core</artifactId>
-    <name>mybatis-plus-join-core</name>
+    <name>mybatis-plus-join-adapter-v3431</name>
 
     <description>An enhanced toolkit of Mybatis-Plus to simplify development.</description>
     <url>https://github.com/yulichang/mybatis-plus-join</url>
@@ -46,41 +45,15 @@
     <dependencies>
         <dependency>
             <groupId>com.github.yulichang</groupId>
-            <artifactId>mybatis-plus-join-annotation</artifactId>
-            <version>1.4.4</version>
-        </dependency>
-        <dependency>
-            <groupId>com.github.yulichang</groupId>
-            <artifactId>mybatis-plus-join-adapter-v33x</artifactId>
-            <version>1.4.4</version>
-        </dependency>
-        <dependency>
-            <groupId>com.github.yulichang</groupId>
-            <artifactId>mybatis-plus-join-adapter-v3431</artifactId>
-            <version>1.4.4</version>
-        </dependency>
-        <dependency>
-            <groupId>com.github.yulichang</groupId>
-            <artifactId>mybatis-plus-join-adapter-v352</artifactId>
+            <artifactId>mybatis-plus-join-adapter-base</artifactId>
             <version>1.4.4</version>
         </dependency>
         <dependency>
             <groupId>com.baomidou</groupId>
-            <artifactId>mybatis-plus-extension</artifactId>
-            <version>3.5.3.1</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <version>1.18.24</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-aop</artifactId>
-            <version>5.3.23</version>
+            <artifactId>mybatis-plus-boot-starter</artifactId>
+            <version>3.4.3.1</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>
+
 </project>

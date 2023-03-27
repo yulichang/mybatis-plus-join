@@ -19,7 +19,7 @@ import java.util.function.Function;
  * @author yulichang
  * @since 1.4.3
  */
-public interface MPJRelationMapper<T> extends BaseMapper<T> {
+public interface MPJRelationMapper<T> {
 
     /**
      * 通过注解实现单表多次查询

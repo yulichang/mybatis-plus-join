@@ -8,7 +8,7 @@ import org.apache.ibatis.session.Configuration;
  * @author yulichang
  * @since 1.4.3
  */
-public interface IAdapter {
+public interface ITableInfoAdapter {
 
     boolean mpjHasLogic(TableInfo tableInfo);
 

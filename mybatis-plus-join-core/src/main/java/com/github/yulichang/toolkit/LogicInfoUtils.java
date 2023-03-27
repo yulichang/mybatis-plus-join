@@ -46,8 +46,8 @@ public class LogicInfoUtils implements Constants {
         String logicStr;
         TableInfo tableInfo = TableHelper.get(clazz);
         Assert.notNull(tableInfo, "table not find by class <%s>", clazz.getSimpleName());
-        TableFieldInfo logicField = ConfigProperties.adapter.mpjGetLogicField(tableInfo);
-        if (ConfigProperties.adapter.mpjHasLogic(tableInfo) && Objects.nonNull(logicField)) {
+        TableFieldInfo logicField = ConfigProperties.tableInfoAdapter.mpjGetLogicField(tableInfo);
+        if (ConfigProperties.tableInfoAdapter.mpjHasLogic(tableInfo) && Objects.nonNull(logicField)) {
             final String value = logicField.getLogicNotDeleteValue();
             if (NULL.equalsIgnoreCase(value)) {
                 logicStr = (and ? " AND " : EMPTY) + prefix + DOT + logicField.getColumn() + " IS NULL";

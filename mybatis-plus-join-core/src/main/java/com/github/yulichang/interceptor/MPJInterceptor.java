@@ -9,6 +9,7 @@ import com.github.yulichang.query.MPJQueryWrapper;
 import com.github.yulichang.toolkit.Constant;
 import com.github.yulichang.toolkit.MPJReflectionKit;
 import com.github.yulichang.toolkit.TableHelper;
+import com.github.yulichang.toolkit.support.FieldCache;
 import com.github.yulichang.wrapper.MPJLambdaWrapper;
 import com.github.yulichang.wrapper.resultmap.Label;
 import com.github.yulichang.wrapper.resultmap.Result;
@@ -168,7 +169,7 @@ public class MPJInterceptor implements Interceptor {
             return result;
         }
         MPJLambdaWrapper wrapper = (MPJLambdaWrapper) obj;
-        Map<String, Field> fieldMap = MPJReflectionKit.getFieldMap(resultType);
+        Map<String, FieldCache> fieldMap = MPJReflectionKit.getFieldMap(resultType);
         List<Select> columnList = wrapper.getSelectColumns();
         //移除对多查询列，为了可重复使用wrapper
         columnList.removeIf(Select::isLabel);
@@ -176,19 +177,19 @@ public class MPJInterceptor implements Interceptor {
         Set<String> columnSet = new HashSet<>();
         for (Select i : columnList) {
             if (i.isHasAlias()) {
-                Field field = fieldMap.get(i.getAlias());
+                FieldCache field = fieldMap.get(i.getAlias());
                 columnSet.add(i.getAlias());
                 if (Objects.nonNull(field)) {
                     ResultMapping.Builder builder = new ResultMapping.Builder(ms.getConfiguration(), i.getAlias(),
-                            i.getAlias(), MPJReflectionKit.getFieldType(resultType, i.getAlias()));
+                            i.getAlias(), field.getType());
                     resultMappings.add(selectToResult(wrapper.getEntityClass(), i, field.getType(), builder));
                 }
             } else {
-                Field field = fieldMap.get(i.getColumProperty());
+                FieldCache field = fieldMap.get(i.getColumProperty());
                 columnSet.add(i.getTagColumn());
                 if (Objects.nonNull(field)) {
                     ResultMapping.Builder builder = new ResultMapping.Builder(ms.getConfiguration(), i.getColumProperty(),
-                            i.getTagColumn(), MPJReflectionKit.getFieldType(resultType, i.getColumProperty()));
+                            i.getTagColumn(), field.getType());
                     resultMappings.add(selectToResult(wrapper.getEntityClass(), i, field.getType(), builder));
                 }
             }
@@ -233,18 +234,18 @@ public class MPJInterceptor implements Interceptor {
         List<ResultMapping> childMapping = new ArrayList<>(resultList.size());
         for (Result r : resultList) {
             childId.append("(");
-            Map<String, Field> ofTypeField = MPJReflectionKit.getFieldMap(mybatisLabel.getOfType());
+            Map<String, FieldCache> ofTypeField = MPJReflectionKit.getFieldMap(mybatisLabel.getOfType());
             //列名去重
             String columnName = StringUtils.getTargetColumn(r.getSelectNormal().getColumn());
             SelectLabel label;
-            Field field = ofTypeField.get(r.getProperty());
+            FieldCache field = ofTypeField.get(r.getProperty());
             String index = r.getIndex();
             if (columnSet.contains(columnName)) {
                 columnName = getColumn(columnSet, columnName, 0);
-                label = new SelectLabel(r.getSelectNormal(), null, mybatisLabel.getOfType(), field, columnName, StringUtils.isNotBlank(index), index);
+                label = new SelectLabel(r.getSelectNormal(), null, mybatisLabel.getOfType(), columnName, StringUtils.isNotBlank(index), index);
             } else {
                 columnSet.add(columnName);
-                label = new SelectLabel(r.getSelectNormal(), null, mybatisLabel.getOfType(), field, StringUtils.isNotBlank(index), index);
+                label = new SelectLabel(r.getSelectNormal(), null, mybatisLabel.getOfType(), StringUtils.isNotBlank(index), index);
             }
             columnList.add(label);
             ResultMapping.Builder builder = new ResultMapping.Builder(ms.getConfiguration(), r.getProperty(), columnName, r.getJavaType());

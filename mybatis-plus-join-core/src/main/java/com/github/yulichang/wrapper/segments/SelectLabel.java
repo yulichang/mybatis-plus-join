@@ -7,8 +7,6 @@ import com.github.yulichang.wrapper.enums.BaseFuncEnum;
 import lombok.Getter;
 import org.apache.ibatis.type.TypeHandler;
 
-import java.lang.reflect.Field;
-
 /**
  * 对多或对一查询列
  *
@@ -24,8 +22,6 @@ public class SelectLabel implements Select {
 
     private final Class<?> tagClass;
 
-    private final Field tagField;
-
     private final boolean hasAlias;
 
     private final String alias;
@@ -34,22 +30,20 @@ public class SelectLabel implements Select {
 
     private final String tableAlias;
 
-    public SelectLabel(SelectCache cache, Integer index, Class<?> tagClass, Field tagField, boolean hasTableAlias, String tableAlias) {
+    public SelectLabel(SelectCache cache, Integer index, Class<?> tagClass, boolean hasTableAlias, String tableAlias) {
         this.cache = cache;
         this.index = index;
         this.tagClass = tagClass;
-        this.tagField = tagField;
         this.hasAlias = false;
         this.alias = null;
         this.hasTableAlias = hasTableAlias;
         this.tableAlias = tableAlias;
     }
 
-    public SelectLabel(SelectCache cache, Integer index, Class<?> tagClass, Field tagField, String column, boolean hasTableAlias, String tableAlias) {
+    public SelectLabel(SelectCache cache, Integer index, Class<?> tagClass, String column, boolean hasTableAlias, String tableAlias) {
         this.cache = cache;
         this.index = index;
         this.tagClass = tagClass;
-        this.tagField = tagField;
         this.hasAlias = true;
         this.alias = column;
         this.hasTableAlias = hasTableAlias;

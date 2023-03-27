@@ -8,10 +8,10 @@ import com.github.yulichang.toolkit.LambdaUtils;
 import com.github.yulichang.toolkit.MPJReflectionKit;
 import com.github.yulichang.toolkit.TableHelper;
 import com.github.yulichang.toolkit.support.ColumnCache;
+import com.github.yulichang.toolkit.support.FieldCache;
 import com.github.yulichang.wrapper.segments.SelectCache;
 import lombok.Getter;
 
-import java.lang.reflect.Field;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -44,7 +44,7 @@ public class MybatisLabel<E, T> implements Label<T> {
     private MybatisLabel() {
     }
 
-    @SuppressWarnings({"unused", "unchecked"})
+    @SuppressWarnings({"unused", "unchecked", "DuplicatedCode"})
     public static class Builder<E, T> {
 
         private final MybatisLabel<E, T> mybatisLabel;
@@ -124,9 +124,9 @@ public class MybatisLabel<E, T> implements Label<T> {
         public <A, R, B extends Collection<R>> Builder<E, T> collection(String prefix, Class<A> entityClass, SFunction<T, B> func) {
             String dtoFieldName = LambdaUtils.getName(func);
             Class<T> dtoClass = LambdaUtils.getEntityClass(func);
-            Map<String, Field> fieldMap = MPJReflectionKit.getFieldMap(dtoClass);
-            Field field = fieldMap.get(dtoFieldName);
-            Class<?> genericType = MPJReflectionKit.getGenericType(field);
+            Map<String, FieldCache> fieldMap = MPJReflectionKit.getFieldMap(dtoClass);
+            FieldCache field = fieldMap.get(dtoFieldName);
+            Class<?> genericType = MPJReflectionKit.getGenericType(field.getField());
             MybatisLabel.Builder<A, R> builder;
             if (genericType == null || genericType.isAssignableFrom(entityClass)) {
                 //找不到集合泛型 List List<?> List<Object> ， 直接查询数据库实体
@@ -150,9 +150,9 @@ public class MybatisLabel<E, T> implements Label<T> {
                                                                         MFunc<MybatisLabelFree.Builder<R>> mFunc) {
             String dtoFieldName = LambdaUtils.getName(func);
             Class<T> dtoClass = LambdaUtils.getEntityClass(func);
-            Field field = MPJReflectionKit.getFieldMap(dtoClass).get(dtoFieldName);
+            FieldCache field = MPJReflectionKit.getFieldMap(dtoClass).get(dtoFieldName);
             //获取集合泛型
-            Class<?> genericType = MPJReflectionKit.getGenericType(field);
+            Class<?> genericType = MPJReflectionKit.getGenericType(field.getField());
             Class<R> ofType = (Class<R>) genericType;
             MybatisLabelFree.Builder<R> builder = new MybatisLabelFree.Builder<>(dtoFieldName, field.getType(), ofType);
             mybatisLabel.mybatisLabels.add(mFunc.apply(builder).build());
@@ -168,9 +168,9 @@ public class MybatisLabel<E, T> implements Label<T> {
                                                                         MFunc<Builder<A, R>> mFunc) {
             String dtoFieldName = LambdaUtils.getName(func);
             Class<T> dtoClass = LambdaUtils.getEntityClass(func);
-            Field field = MPJReflectionKit.getFieldMap(dtoClass).get(dtoFieldName);
+            FieldCache field = MPJReflectionKit.getFieldMap(dtoClass).get(dtoFieldName);
             //获取集合泛型
-            Class<?> genericType = MPJReflectionKit.getGenericType(field);
+            Class<?> genericType = MPJReflectionKit.getGenericType(field.getField());
             Class<R> ofType = (Class<R>) genericType;
             MybatisLabel.Builder<A, R> builder = new MybatisLabel.Builder<>(prefix, dtoFieldName, entityClass, field.getType(), ofType, false);
             mybatisLabel.mybatisLabels.add(mFunc.apply(builder).build());
@@ -186,9 +186,9 @@ public class MybatisLabel<E, T> implements Label<T> {
          */
         public <A, B> Builder<E, T> association(String index, Class<A> child, SFunction<T, B> dtoField) {
             Class<T> dtoClass = LambdaUtils.getEntityClass(dtoField);
-            Map<String, Field> fieldMap = MPJReflectionKit.getFieldMap(dtoClass);
+            Map<String, FieldCache> fieldMap = MPJReflectionKit.getFieldMap(dtoClass);
             String dtoFieldName = LambdaUtils.getName(dtoField);
-            Field field = fieldMap.get(dtoFieldName);
+            FieldCache field = fieldMap.get(dtoFieldName);
             Assert.isFalse(Collection.class.isAssignableFrom(field.getType()), "association 不支持集合类");
             MybatisLabel.Builder<A, B> builder;
             builder = new MybatisLabel.Builder<>(index, dtoFieldName, child, field.getType(), (Class<B>) field.getType(), true);
@@ -208,7 +208,7 @@ public class MybatisLabel<E, T> implements Label<T> {
                                                 MFunc<MybatisLabelFree.Builder<B>> collection) {
             String dtoFieldName = LambdaUtils.getName(dtoField);
             Class<T> dtoClass = LambdaUtils.getEntityClass(dtoField);
-            Field field = MPJReflectionKit.getFieldMap(dtoClass).get(dtoFieldName);
+            FieldCache field = MPJReflectionKit.getFieldMap(dtoClass).get(dtoFieldName);
             Assert.isFalse(Collection.class.isAssignableFrom(field.getType()), "association 不支持集合类");
             MybatisLabelFree.Builder<B> builder = new MybatisLabelFree.Builder<>(dtoFieldName, field.getType(), (Class<B>) field.getType());
             mybatisLabel.mybatisLabels.add(collection.apply(builder).build());
@@ -222,7 +222,7 @@ public class MybatisLabel<E, T> implements Label<T> {
                                                 MFunc<MybatisLabel.Builder<A, B>> collection) {
             String dtoFieldName = LambdaUtils.getName(dtoField);
             Class<T> dtoClass = LambdaUtils.getEntityClass(dtoField);
-            Field field = MPJReflectionKit.getFieldMap(dtoClass).get(dtoFieldName);
+            FieldCache field = MPJReflectionKit.getFieldMap(dtoClass).get(dtoFieldName);
             Assert.isFalse(Collection.class.isAssignableFrom(field.getType()), "association 不支持集合类");
             MybatisLabel.Builder<A, B> builder = new MybatisLabel.Builder<>(index, dtoFieldName, child, field.getType(), (Class<B>) field.getType(), false);
             mybatisLabel.mybatisLabels.add(collection.apply(builder).build());
@@ -239,7 +239,7 @@ public class MybatisLabel<E, T> implements Label<T> {
         private void autoBuild(boolean auto, Class<E> entityClass, Class<T> tagClass) {
             TableInfo tableInfo = TableHelper.get(entityClass);
             Assert.notNull(tableInfo, "table not find by class <%s>", entityClass.getSimpleName());
-            Map<String, Field> tagMap = MPJReflectionKit.getFieldMap(tagClass);
+            Map<String, FieldCache> tagMap = MPJReflectionKit.getFieldMap(tagClass);
             if (auto && !tagMap.isEmpty()) {
                 List<SelectCache> listField = ColumnCache.getListField(entityClass);
                 if (entityClass.isAssignableFrom(tagClass)) {
@@ -255,7 +255,7 @@ public class MybatisLabel<E, T> implements Label<T> {
                     }).collect(Collectors.toList()));
                 } else {
                     for (SelectCache s : listField) {
-                        Field field = tagMap.get(s.getColumProperty());
+                        FieldCache field = tagMap.get(s.getColumProperty());
                         if (Objects.nonNull(field)) {
                             Result result = new Result();
                             result.setId(s.isPk());

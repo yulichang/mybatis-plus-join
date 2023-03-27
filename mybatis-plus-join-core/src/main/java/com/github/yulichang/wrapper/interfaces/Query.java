@@ -9,12 +9,12 @@ import com.github.yulichang.toolkit.LambdaUtils;
 import com.github.yulichang.toolkit.MPJReflectionKit;
 import com.github.yulichang.toolkit.TableHelper;
 import com.github.yulichang.toolkit.support.ColumnCache;
+import com.github.yulichang.toolkit.support.FieldCache;
 import com.github.yulichang.wrapper.enums.BaseFuncEnum;
 import com.github.yulichang.wrapper.enums.DefaultFuncEnum;
 import com.github.yulichang.wrapper.segments.*;
 
 import java.io.Serializable;
-import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -112,7 +112,7 @@ public interface Query<Children> extends Serializable {
      */
     default <E> Children selectAsClass(Class<E> source, Class<?> tag) {
         List<SelectCache> normalList = ColumnCache.getListField(source);
-        Map<String, Field> fieldMap = MPJReflectionKit.getFieldMap(tag);
+        Map<String, FieldCache> fieldMap = MPJReflectionKit.getFieldMap(tag);
         for (SelectCache cache : normalList) {
             if (fieldMap.containsKey(cache.getColumProperty())) {
                 getSelectColum().add(new SelectNormal(cache, getIndex(), isHasAlias(), getAlias()));

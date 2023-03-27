@@ -5,7 +5,6 @@ import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.github.yulichang.toolkit.support.*;
 import org.apache.ibatis.reflection.property.PropertyNamer;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.Map;
@@ -20,7 +19,7 @@ public final class LambdaUtils {
         LambdaMeta extract = extract(fn);
         String name = PropertyNamer.methodToProperty(extract.getImplMethodName());
         if (Character.isUpperCase(name.charAt(0))) {
-            Map<String, Field> map = MPJReflectionKit.getFieldMap(extract.getInstantiatedClass());
+            Map<String, FieldCache> map = MPJReflectionKit.getFieldMap(extract.getInstantiatedClass());
             if (map.containsKey(name)) {
                 return name;
             } else {

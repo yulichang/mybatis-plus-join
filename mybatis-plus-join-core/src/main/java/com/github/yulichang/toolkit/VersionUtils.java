@@ -1,5 +1,11 @@
 package com.github.yulichang.toolkit;
 
+/**
+ * 版本工具类
+ *
+ * @author yulichang
+ * @since 1.4.4
+ */
 public class VersionUtils {
 
     public static int compare(String v1, String v2) {

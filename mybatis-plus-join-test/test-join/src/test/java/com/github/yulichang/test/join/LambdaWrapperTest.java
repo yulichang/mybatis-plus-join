@@ -6,7 +6,11 @@ import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.github.yulichang.test.join.dto.AddressDTO;
 import com.github.yulichang.test.join.dto.UserDTO;
-import com.github.yulichang.test.join.entity.*;
+import com.github.yulichang.test.join.entity.AddressDO;
+import com.github.yulichang.test.join.entity.AreaDO;
+import com.github.yulichang.test.join.entity.UserDO;
+import com.github.yulichang.test.join.entity.UserDto;
+import com.github.yulichang.test.join.mapper.AddressMapper;
 import com.github.yulichang.test.join.mapper.UserDTOMapper;
 import com.github.yulichang.test.join.mapper.UserMapper;
 import com.github.yulichang.test.util.ThreadLocalUtils;
@@ -21,6 +25,7 @@ import org.springframework.jdbc.BadSqlGrammarException;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * 连表测试类
@@ -38,6 +43,9 @@ class LambdaWrapperTest {
 
     @Autowired
     private UserDTOMapper userDTOMapper;
+
+    @Autowired
+    private AddressMapper addressMapper;
 
 
     @Test
@@ -694,11 +702,13 @@ class LambdaWrapperTest {
      */
     @Test
     void testGeneric() {
-        MPJLambdaWrapper<UserDO> wrapper = new MPJLambdaWrapper<UserDO>()
-                .selectAll(UserDO.class)
-                .le(UserDO::getId, 10000)
-                .orderByDesc(UserDO::getId);
-        List<UserTTT> list = userMapper.selectJoinList(UserTTT.class, wrapper);
+        MPJLambdaWrapper<AddressDO> wrapper = new MPJLambdaWrapper<AddressDO>()
+                .selectAll(AddressDO.class)
+                .le(AddressDO::getId, 10000)
+                .orderByDesc(AddressDO::getId);
+        List<AddressDTO> list = addressMapper.selectJoinList(AddressDTO.class, wrapper);
+        assert Objects.equals("[AddressDTO(id=22, userId=22, areaId=10022, tel=10000000022, address=朝阳22, del=false, areaList=null, area=null), AddressDTO(id=21, userId=21, areaId=10021, tel=10000000021, address=朝阳21, del=false, areaList=null, area=null), AddressDTO(id=20, userId=20, areaId=10020, tel=10000000020, address=朝阳20, del=false, areaList=null, area=null), AddressDTO(id=19, userId=19, areaId=10019, tel=10000000019, address=朝阳19, del=false, areaList=null, area=null), AddressDTO(id=18, userId=18, areaId=10018, tel=10000000018, address=朝阳18, del=false, areaList=null, area=null), AddressDTO(id=17, userId=17, areaId=10017, tel=10000000017, address=朝阳17, del=false, areaList=null, area=null), AddressDTO(id=16, userId=16, areaId=10016, tel=10000000016, address=朝阳16, del=false, areaList=null, area=null), AddressDTO(id=15, userId=15, areaId=10015, tel=10000000015, address=朝阳15, del=false, areaList=null, area=null), AddressDTO(id=14, userId=14, areaId=10014, tel=10000000014, address=朝阳14, del=false, areaList=null, area=null), AddressDTO(id=13, userId=13, areaId=10013, tel=10000000013, address=朝阳13, del=false, areaList=null, area=null), AddressDTO(id=12, userId=12, areaId=10012, tel=10000000012, address=朝阳12, del=false, areaList=null, area=null), AddressDTO(id=11, userId=11, areaId=10011, tel=10000000011, address=朝阳11, del=false, areaList=null, area=null), AddressDTO(id=10, userId=10, areaId=10010, tel=10000000010, address=朝阳10, del=false, areaList=null, area=null), AddressDTO(id=5, userId=1, areaId=10005, tel=10000000005, address=朝阳05, del=false, areaList=null, area=null), AddressDTO(id=4, userId=1, areaId=10004, tel=10000000004, address=朝阳04, del=false, areaList=null, area=null), AddressDTO(id=3, userId=1, areaId=10003, tel=10000000003, address=朝阳03, del=false, areaList=null, area=null), AddressDTO(id=2, userId=1, areaId=10002, tel=10000000002, address=朝阳02, del=false, areaList=null, area=null), AddressDTO(id=1, userId=1, areaId=10001, tel=10000000001, address=朝阳01, del=false, areaList=null, area=null)]"
+                , list.toString());
     }
 
     /**

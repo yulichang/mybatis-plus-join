@@ -1,6 +1,7 @@
 package com.github.yulichang.toolkit;
 
 import com.baomidou.mybatisplus.core.toolkit.Assert;
+import com.github.yulichang.toolkit.support.FieldCache;
 import org.apache.ibatis.reflection.Reflector;
 
 import java.lang.reflect.Field;
@@ -10,6 +11,7 @@ import java.lang.reflect.WildcardType;
 import java.util.HashMap;
 import java.util.IdentityHashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -21,12 +23,9 @@ import java.util.concurrent.ConcurrentHashMap;
 @SuppressWarnings("unused")
 public final class MPJReflectionKit {
 
-    private static final Map<Class<?>, Map<String, Field>> CLASS_FIELD_CACHE = new ConcurrentHashMap<>();
+    private static final Map<Class<?>, Map<String, FieldCache>> CLASS_FIELD_CACHE = new ConcurrentHashMap<>();
 
-    //mybatis 缓存
-    private static final Map<Class<?>, Reflector> CLASS_REFLECTOR_CACHE = new ConcurrentHashMap<>();
-
-    private static final Map<String, Field> EMPTY_MAP = new HashMap<>();
+    private static final Map<String, FieldCache> EMPTY_MAP = new HashMap<>();
 
 
     @Deprecated
@@ -77,29 +76,30 @@ public final class MPJReflectionKit {
      *
      * @param clazz 反射类
      */
-    public static Map<String, Field> getFieldMap(Class<?> clazz) {
+    public static Map<String, FieldCache> getFieldMap(Class<?> clazz) {
         if (clazz == null) {
             return EMPTY_MAP;
         }
-        Map<String, Field> fieldMap = CLASS_FIELD_CACHE.get(clazz);
+        Map<String, FieldCache> fieldMap = CLASS_FIELD_CACHE.get(clazz);
         if (fieldMap != null) {
             return fieldMap;
         }
         Map<String, Field> map = ReflectionKit.getFieldMap(clazz);
-        CLASS_FIELD_CACHE.put(clazz, map);
-        return map;
-    }
-
-    public static Class<?> getFieldType(Class<?> clazz, String name) {
-        if (clazz == null) {
-            return null;
-        }
-        Reflector reflector = CLASS_REFLECTOR_CACHE.computeIfAbsent(clazz, Reflector::new);
-        Class<?> getterType = reflector.getGetterType(name);
-        if (getterType != null) {
-            return getterType;
-        }
-        return getFieldMap(clazz).get(name).getType();
+        Map<String, FieldCache> cache = new HashMap<>();
+        map.forEach((key, value) -> {
+            FieldCache fieldCache = new FieldCache();
+            fieldCache.setField(value);
+            try {
+                Reflector reflector = new Reflector(clazz);
+                Class<?> getterType = reflector.getGetterType(key);
+                fieldCache.setType(Objects.isNull(getterType) ? value.getType() : getterType);
+            } catch (Throwable throwable) {
+                fieldCache.setType(value.getType());
+            }
+            cache.put(key, fieldCache);
+        });
+        CLASS_FIELD_CACHE.put(clazz, cache);
+        return cache;
     }
 
     public static boolean isPrimitiveOrWrapper(Class<?> clazz) {

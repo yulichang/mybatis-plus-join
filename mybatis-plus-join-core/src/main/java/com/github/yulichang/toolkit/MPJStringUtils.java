@@ -17,7 +17,6 @@ package com.github.yulichang.toolkit;
 
 import com.baomidou.mybatisplus.core.toolkit.ArrayUtils;
 import com.baomidou.mybatisplus.core.toolkit.StringPool;
-import com.baomidou.mybatisplus.core.toolkit.sql.SqlInjectionUtils;
 import com.baomidou.mybatisplus.core.toolkit.sql.StringEscape;
 import com.baomidou.mybatisplus.core.toolkit.support.BiIntFunction;
 
@@ -595,7 +594,7 @@ public final class MPJStringUtils {
      * @param str 字符串
      */
     public static String sqlInjectionReplaceBlank(String str) {
-        if (SqlInjectionUtils.check(str)) {
+        if (MPJSqlInjectionUtils.check(str)) {
             /**
              * 过滤sql黑名单字符，存在 SQL 注入，去除空白内容
              */

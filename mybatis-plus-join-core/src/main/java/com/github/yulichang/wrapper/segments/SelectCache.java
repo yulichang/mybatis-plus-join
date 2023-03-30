@@ -2,12 +2,10 @@ package com.github.yulichang.wrapper.segments;
 
 import com.baomidou.mybatisplus.core.metadata.TableFieldInfo;
 import com.baomidou.mybatisplus.core.metadata.TableInfo;
-import com.baomidou.mybatisplus.core.toolkit.Assert;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.github.yulichang.config.ConfigProperties;
 import com.github.yulichang.toolkit.Asserts;
 import com.github.yulichang.toolkit.TableHelper;
-import jdk.nashorn.internal.AssertsEnabled;
 import lombok.Getter;
 import org.apache.ibatis.session.Configuration;
 import org.apache.ibatis.type.TypeHandler;

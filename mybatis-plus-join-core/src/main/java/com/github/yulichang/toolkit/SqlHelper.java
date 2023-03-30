@@ -3,7 +3,6 @@ package com.github.yulichang.toolkit;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.toolkit.Assert;
 import com.github.yulichang.base.MPJBaseMapper;
-import com.github.yulichang.mapper.MPJTableMapperHelper;
 
 import java.util.function.Function;
 

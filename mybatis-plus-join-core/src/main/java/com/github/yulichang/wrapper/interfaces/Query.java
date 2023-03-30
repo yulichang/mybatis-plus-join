@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.metadata.TableInfo;
 import com.baomidou.mybatisplus.core.toolkit.Assert;
 import com.baomidou.mybatisplus.core.toolkit.Constants;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
+import com.github.yulichang.toolkit.Asserts;
 import com.github.yulichang.toolkit.LambdaUtils;
 import com.github.yulichang.toolkit.MPJReflectionKit;
 import com.github.yulichang.toolkit.TableHelper;
@@ -55,7 +56,7 @@ public interface Query<Children> extends Serializable {
      */
     default <E> Children select(Class<E> entityClass, Predicate<TableFieldInfo> predicate) {
         TableInfo info = TableHelper.get(entityClass);
-        Assert.notNull(info, "table not find by class <%s>", entityClass.getSimpleName());
+        Asserts.hasTable(info, entityClass);
         Map<String, SelectCache> cacheMap = ColumnCache.getMapField(entityClass);
         info.getFieldList().stream().filter(predicate).collect(Collectors.toList()).forEach(
                 i -> getSelectColum().add(new SelectNormal(cacheMap.get(i.getProperty()), getIndex(), isHasAlias(), getAlias())));

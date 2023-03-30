@@ -94,6 +94,7 @@ public class MPJSqlInjector extends DefaultSqlInjector {
     }
 
     private List<AbstractMethod> methodFilter(List<AbstractMethod> list) {
+        String packageStr = SelectList.class.getPackage().getName();
         List<String> methodList = Arrays.asList(
                 "Update",
                 "Delete",
@@ -104,9 +105,10 @@ public class MPJSqlInjector extends DefaultSqlInjector {
                 "SelectObjs",
                 "SelectList",
                 "SelectPage");
-        list.removeIf(i -> methodList.contains(i.getClass().getSimpleName()));
-        list.addAll(getWrapperMethod());
-        list.addAll(getJoinMethod());
+        list.removeIf(i -> methodList.contains(i.getClass().getSimpleName()) &&
+                Objects.equals(packageStr, i.getClass().getPackage().getName()));
+        addAll(list,getWrapperMethod());
+        addAll(list,getJoinMethod());
         return list;
     }
 
@@ -144,6 +146,14 @@ public class MPJSqlInjector extends DefaultSqlInjector {
         list.add(new com.github.yulichang.method.mp.SelectPage());
         list.add(new com.github.yulichang.method.mp.Update());
         return list;
+    }
+
+    private void addAll(List<AbstractMethod> source, List<AbstractMethod> addList) {
+        for (AbstractMethod method : addList) {
+            if (source.stream().noneMatch(m -> m.getClass().getSimpleName().equals(method.getClass().getSimpleName()))) {
+                source.add(method);
+            }
+        }
     }
 
     @Override

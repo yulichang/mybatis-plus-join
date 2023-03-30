@@ -409,7 +409,7 @@ public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWr
         Integer oldIndex = this.getIndex();
         int newIndex = tableIndex;
         TableInfo info = TableHelper.get(clazz);
-        Assert.notNull(info, "table not find by class <%s>", clazz.getSimpleName());
+        Asserts.hasTable(info, clazz);
         MPJLambdaWrapper<T> instance = instance(newIndex, keyWord, clazz, info.getTableName());
         instance.isNo = true;
         instance.isMain = false;

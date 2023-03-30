@@ -136,4 +136,18 @@ class CollectionTest {
         assert dtos2.get(0).getB().getC().getD().getE().getId() != null;
         assert Objects.equals(dtos2.get(0).getB().getName(), "tableD1");
     }
+
+    void test(){
+        MPJLambdaWrapper<TableA> wrapper1 = new MPJLambdaWrapper<TableA>()
+                .selectAll(TableA.class)
+                .selectAssociation(TableB.class, TableADTO::getB, b -> b
+                        .collection(TableC.class, TableBDTO::getCList))
+                .leftJoin(TableB.class, TableB::getAid, TableA::getId)
+                .leftJoin(TableC.class, TableC::getBid, TableB::getId)
+                .leftJoin(TableD.class, TableD::getCid, TableC::getId)
+                .leftJoin(TableE.class, TableE::getDid, TableD::getId);
+        List<TableADTO> dtos1 = tableAMapper.selectJoinList(TableADTO.class, wrapper1);
+
+
+    }
 }

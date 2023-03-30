@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.metadata.TableInfo;
 import com.baomidou.mybatisplus.core.toolkit.Assert;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
+import com.github.yulichang.toolkit.Asserts;
 import com.github.yulichang.toolkit.LambdaUtils;
 import com.github.yulichang.toolkit.MPJReflectionKit;
 import com.github.yulichang.toolkit.TableHelper;
@@ -238,7 +239,7 @@ public class MybatisLabel<E, T> implements Label<T> {
 
         private void autoBuild(boolean auto, Class<E> entityClass, Class<T> tagClass) {
             TableInfo tableInfo = TableHelper.get(entityClass);
-            Assert.notNull(tableInfo, "table not find by class <%s>", entityClass.getSimpleName());
+            Asserts.hasTable(tableInfo, entityClass);
             Map<String, FieldCache> tagMap = MPJReflectionKit.getFieldMap(tagClass);
             if (auto && !tagMap.isEmpty()) {
                 List<SelectCache> listField = ColumnCache.getListField(entityClass);

@@ -42,6 +42,8 @@ public class UserDTO {
 
     private List<AddressDTO> addressList;
 
+    private AddressDTO addressDTO;
+
     private List<Integer> addressIds;
 
     private List<UserDO> children;

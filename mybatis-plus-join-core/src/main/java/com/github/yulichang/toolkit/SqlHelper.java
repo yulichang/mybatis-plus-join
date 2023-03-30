@@ -17,18 +17,14 @@ public class SqlHelper {
 
     public static <R, T> R exec(Class<T> entityClass, Function<BaseMapper<T>, R> function) {
         Assert.notNull(entityClass,"请使用 new MPJLambdaWrapper(主表.class) 或 JoinWrappers.lambda(主表.class) 构造方法");
-        Class<?> mapperClass = MPJTableMapperHelper.getMapper(entityClass);
-        Assert.notNull(mapperClass, "mapper not find by class <%s>", entityClass.getSimpleName());
-        Object mapper = SpringContentUtils.getBean(mapperClass);
+        Object mapper = SpringContentUtils.getMapper(entityClass);
         Assert.notNull(mapper, "mapper not init <%s>", entityClass.getSimpleName());
         return function.apply((BaseMapper<T>) mapper);
     }
 
     public static <R, T> R execJoin(Class<T> entityClass, Function<MPJBaseMapper<T>, R> function) {
         Assert.notNull(entityClass,"请使用 new MPJLambdaWrapper(主表.class) 或 JoinWrappers.lambda(主表.class) 构造方法");
-        Class<?> mapperClass = MPJTableMapperHelper.getMapper(entityClass);
-        Assert.notNull(mapperClass, "mapper not find by class <%s>", entityClass.getSimpleName());
-        Object mapper = SpringContentUtils.getBean(mapperClass);
+        Object mapper = SpringContentUtils.getMapper(entityClass);
         Assert.notNull(mapper, "mapper not init <%s>", entityClass.getSimpleName());
         Assert.isTrue(mapper instanceof MPJBaseMapper, "mapper <%s> not extends MPJBaseMapper ", entityClass.getSimpleName());
         return function.apply((MPJBaseMapper<T>) mapper);

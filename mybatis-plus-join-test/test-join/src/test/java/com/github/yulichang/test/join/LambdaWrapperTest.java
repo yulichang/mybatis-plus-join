@@ -684,6 +684,12 @@ class LambdaWrapperTest {
                 .gt(UserDO::getId, 3)
                 .lt(UserDO::getId, 8));
         assert dos.size() == 4;
+
+        ThreadLocalUtils.set("SELECT id,pid,`name`,`json`,sex,head_img,create_time,address_id,address_id2,del,create_by,update_by FROM `user` t WHERE t.del=false AND (t.id > ? AND t.id < ?)");
+        List<UserDO> dos1 = userMapper.selectList(new MPJLambdaWrapper<UserDO>()
+                .gt(UserDO::getId, 3)
+                .lt(UserDO::getId, 8));
+        assert dos1.size() == 4;
     }
 
     /**

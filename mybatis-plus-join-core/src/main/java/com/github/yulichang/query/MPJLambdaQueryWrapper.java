@@ -10,6 +10,7 @@ import com.baomidou.mybatisplus.core.toolkit.*;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.github.yulichang.config.ConfigProperties;
 import com.github.yulichang.query.interfaces.StringJoin;
+import com.github.yulichang.toolkit.Asserts;
 import com.github.yulichang.toolkit.TableHelper;
 
 import java.util.*;
@@ -155,7 +156,7 @@ public class MPJLambdaQueryWrapper<T> extends AbstractLambdaWrapper<T, MPJLambda
     @Override
     public MPJLambdaQueryWrapper<T> select(Class<T> entityClass, Predicate<TableFieldInfo> predicate) {
         TableInfo info = TableHelper.get(entityClass);
-        Assert.notNull(info, "table not find by class <%s>", entityClass.getSimpleName());
+        Asserts.hasTable(info, entityClass);
         selectColumns.addAll(info.getFieldList().stream().filter(predicate).map(c ->
                 alias + StringPool.DOT + c.getColumn()).collect(Collectors.toList()));
         return typedThis;
@@ -180,7 +181,7 @@ public class MPJLambdaQueryWrapper<T> extends AbstractLambdaWrapper<T, MPJLambda
     @SuppressWarnings("DuplicatedCode")
     public final MPJLambdaQueryWrapper<T> selectAll(Class<?> clazz, String as) {
         TableInfo info = TableHelper.get(clazz);
-        Assert.notNull(info, "table not find by class <%s>", clazz.getSimpleName());
+        Asserts.hasTable(info, clazz);
         if (info.havePK()) {
             selectColumns.add(as + StringPool.DOT + info.getKeyColumn());
         }

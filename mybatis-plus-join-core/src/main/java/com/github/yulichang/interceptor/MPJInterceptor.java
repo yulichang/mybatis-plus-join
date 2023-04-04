@@ -377,11 +377,18 @@ public class MPJInterceptor implements Interceptor {
 
     @Override
     public Object plugin(Object target) {
-        return Plugin.wrap(target, this);
+        try {
+            return Interceptor.super.plugin(target);
+        } catch (Exception e) {
+            return Plugin.wrap(target, this);
+        }
     }
 
     @Override
     public void setProperties(Properties properties) {
-        // NOP
+        try {
+            Interceptor.super.setProperties(properties);
+        } catch (Exception ignored) {
+        }
     }
 }

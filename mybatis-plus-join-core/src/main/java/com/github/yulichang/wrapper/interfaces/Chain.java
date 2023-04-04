@@ -13,8 +13,8 @@ import java.util.List;
  * 构造方法必须传 class 或 entity 否则会报错
  * new MPJLambdaWrapper(User.class)
  * new MPJQueryWrapper(User.class)
- * MPJWrappers.\<User\>lambdaJoin(User.class)
- * MPJWrappers.\<User\>queryJoin(User.class)
+ * JoinWrappers.\<User\>lambdaJoin(User.class)
+ * JoinWrappers.\<User\>queryJoin(User.class)
  *
  * @author yulichang
  * @since 1.4.4
@@ -30,8 +30,8 @@ public interface Chain<T> {
      * 构造方法必须传 class 或 entity 否则会报错
      * new MPJLambdaWrapper(User.class)
      * new MPJQueryWrapper(User.class)
-     * MPJWrappers.\<User\>lambdaJoin(User.class)
-     * MPJWrappers.\<User\>queryJoin(User.class)
+     * JoinWrappers.\<User\>lambdaJoin(User.class)
+     * JoinWrappers.\<User\>queryJoin(User.class)
      */
     default T one() {
         return SqlHelper.exec(getEntityClass(), mapper -> mapper.selectOne((Wrapper<T>) this));
@@ -43,8 +43,8 @@ public interface Chain<T> {
      * 构造方法必须传 class 或 entity 否则会报错
      * new MPJLambdaWrapper(User.class)
      * new MPJQueryWrapper(User.class)
-     * MPJWrappers.\<User\>lambdaJoin(User.class)
-     * MPJWrappers.\<User\>queryJoin(User.class)
+     * JoinWrappers.\<User\>lambdaJoin(User.class)
+     * JoinWrappers.\<User\>queryJoin(User.class)
      */
     default <R> R one(Class<R> resultType) {
         return SqlHelper.execJoin(getEntityClass(), mapper -> mapper.selectJoinOne(resultType, (MPJBaseJoin<T>) this));
@@ -56,8 +56,8 @@ public interface Chain<T> {
      * 构造方法必须传 class 或 entity 否则会报错
      * new MPJLambdaWrapper(User.class)
      * new MPJQueryWrapper(User.class)
-     * MPJWrappers.\<User\>lambdaJoin(User.class)
-     * MPJWrappers.\<User\>queryJoin(User.class)
+     * JoinWrappers.\<User\>lambdaJoin(User.class)
+     * JoinWrappers.\<User\>queryJoin(User.class)
      */
     default T first() {
         List<T> list = list();
@@ -70,8 +70,8 @@ public interface Chain<T> {
      * 构造方法必须传 class 或 entity 否则会报错
      * new MPJLambdaWrapper(User.class)
      * new MPJQueryWrapper(User.class)
-     * MPJWrappers.\<User\>lambdaJoin(User.class)
-     * MPJWrappers.\<User\>queryJoin(User.class)
+     * JoinWrappers.\<User\>lambdaJoin(User.class)
+     * JoinWrappers.\<User\>queryJoin(User.class)
      */
     default <R> R first(Class<R> resultType) {
         List<R> list = list(resultType);
@@ -83,8 +83,8 @@ public interface Chain<T> {
      * 构造方法必须传 class 或 entity 否则会报错
      * new MPJLambdaWrapper(User.class)
      * new MPJQueryWrapper(User.class)
-     * MPJWrappers.\<User\>lambdaJoin(User.class)
-     * MPJWrappers.\<User\>queryJoin(User.class)
+     * JoinWrappers.\<User\>lambdaJoin(User.class)
+     * JoinWrappers.\<User\>queryJoin(User.class)
      */
     default List<T> list() {
         return SqlHelper.exec(getEntityClass(), mapper -> mapper.selectList((Wrapper<T>) this));
@@ -95,8 +95,8 @@ public interface Chain<T> {
      * 构造方法必须传 class 或 entity 否则会报错
      * new MPJLambdaWrapper(User.class)
      * new MPJQueryWrapper(User.class)
-     * MPJWrappers.\<User\>lambdaJoin(User.class)
-     * MPJWrappers.\<User\>queryJoin(User.class)
+     * JoinWrappers.\<User\>lambdaJoin(User.class)
+     * JoinWrappers.\<User\>queryJoin(User.class)
      */
     default <R> List<R> list(Class<R> resultType) {
         return SqlHelper.execJoin(getEntityClass(), mapper -> mapper.selectJoinList(resultType, (MPJBaseJoin<T>) this));
@@ -107,8 +107,8 @@ public interface Chain<T> {
      * 构造方法必须传 class 或 entity 否则会报错
      * new MPJLambdaWrapper(User.class)
      * new MPJQueryWrapper(User.class)
-     * MPJWrappers.\<User\>lambdaJoin(User.class)
-     * MPJWrappers.\<User\>queryJoin(User.class)
+     * JoinWrappers.\<User\>lambdaJoin(User.class)
+     * JoinWrappers.\<User\>queryJoin(User.class)
      */
     default <P extends IPage<T>> P page(P page) {
         return SqlHelper.exec(getEntityClass(), mapper -> mapper.selectPage(page, (Wrapper<T>) this));
@@ -119,8 +119,8 @@ public interface Chain<T> {
      * 构造方法必须传 class 或 entity 否则会报错
      * new MPJLambdaWrapper(User.class)
      * new MPJQueryWrapper(User.class)
-     * MPJWrappers.\<User\>lambdaJoin(User.class)
-     * MPJWrappers.\<User\>queryJoin(User.class)
+     * JoinWrappers.\<User\>lambdaJoin(User.class)
+     * JoinWrappers.\<User\>queryJoin(User.class)
      */
     default <R, P extends IPage<R>> P page(P page, Class<R> resultType) {
         return SqlHelper.execJoin(getEntityClass(), mapper -> mapper.selectJoinPage(page, resultType, (MPJBaseJoin<T>) this));

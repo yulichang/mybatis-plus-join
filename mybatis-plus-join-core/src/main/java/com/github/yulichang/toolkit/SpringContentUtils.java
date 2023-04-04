@@ -1,6 +1,7 @@
 package com.github.yulichang.toolkit;
 
 
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.toolkit.Assert;
 import com.baomidou.mybatisplus.extension.toolkit.SqlHelper;
 import com.github.yulichang.mapper.MPJTableMapperHelper;
@@ -31,11 +32,15 @@ public class SpringContentUtils {
         if (Objects.isNull(springContext)) {
             SqlSession session = SqlHelper.sqlSession(clazz);
             Assert.notNull(session, "mapper not find by class <%s>", clazz.getSimpleName());
-            return  (T) SqlHelper.getMapper(clazz, session);
+            BaseMapper<?> mapper = SqlHelper.getMapper(clazz, session);
+            Assert.notNull(mapper, "mapper not find by class <%s>", clazz.getSimpleName());
+            return (T) mapper;
         }
         Class<?> mapper = MPJTableMapperHelper.getMapper(clazz);
         Assert.notNull(mapper, "mapper not find by class <%s>", clazz.getSimpleName());
-        return (T)getBean(mapper);
+        Object bean = getBean(mapper);
+        Assert.notNull(bean, "mapper not find by class <%s>", clazz.getSimpleName());
+        return (T) bean;
     }
 
     public interface SpringContext {

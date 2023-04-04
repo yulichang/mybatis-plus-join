@@ -44,6 +44,24 @@ public interface Query<Children> extends Serializable {
 
     /**
      * 过滤查询的字段信息(主键除外!)
+     * 推荐使用 selectFilter(Class, Predicate) 含主键
+     *
+     * @param predicate 过滤方式
+     * @return children
+     * @see Query#selectFilter(Class, Predicate)
+     */
+    @Deprecated
+    default <E> Children select(Class<E> entityClass, Predicate<TableFieldInfo> predicate) {
+        TableInfo info = TableHelper.get(entityClass);
+        Asserts.hasTable(info, entityClass);
+        Map<String, SelectCache> cacheMap = ColumnCache.getMapField(entityClass);
+        info.getFieldList().stream().filter(predicate).collect(Collectors.toList()).forEach(
+                i -> getSelectColum().add(new SelectNormal(cacheMap.get(i.getProperty()), getIndex(), isHasAlias(), getAlias())));
+        return getChildren();
+    }
+
+    /**
+     * 过滤查询的字段信息
      * <p>例1: 只要 java 字段名以 "test" 开头的             -> select(i -> i.getProperty().startsWith("test"))</p>
      * <p>例2: 只要 java 字段属性是 CharSequence 类型的     -> select(TableFieldInfo::isCharSequence)</p>
      * <p>例3: 只要 java 字段没有填充策略的                 -> select(i -> i.getFieldFill() == FieldFill.DEFAULT)</p>
@@ -53,12 +71,12 @@ public interface Query<Children> extends Serializable {
      * @param predicate 过滤方式
      * @return children
      */
-    default <E> Children select(Class<E> entityClass, Predicate<TableFieldInfo> predicate) {
+    default <E> Children selectFilter(Class<E> entityClass, Predicate<SelectCache> predicate) {
         TableInfo info = TableHelper.get(entityClass);
         Asserts.hasTable(info, entityClass);
-        Map<String, SelectCache> cacheMap = ColumnCache.getMapField(entityClass);
-        info.getFieldList().stream().filter(predicate).collect(Collectors.toList()).forEach(
-                i -> getSelectColum().add(new SelectNormal(cacheMap.get(i.getProperty()), getIndex(), isHasAlias(), getAlias())));
+        List<SelectCache> cacheList = ColumnCache.getListField(entityClass);
+        cacheList.stream().filter(predicate).collect(Collectors.toList()).forEach(
+                i -> getSelectColum().add(new SelectNormal(i, getIndex(), isHasAlias(), getAlias())));
         return getChildren();
     }
 
@@ -81,7 +99,7 @@ public interface Query<Children> extends Serializable {
      *
      * @param column 列
      */
-    default <E> Children select(String column, SFunction<E, ?> alias) {
+    default <E> Children selectAs(String column, SFunction<E, ?> alias) {
         getSelectColum().add(new SelectString(column + Constants.AS + LambdaUtils.getName(alias), isHasAlias(), getAlias()));
         return getChildren();
     }
@@ -91,7 +109,7 @@ public interface Query<Children> extends Serializable {
      *
      * @param column 列
      */
-    default <E> Children select(String index, SFunction<E, ?> column, SFunction<E, ?> alias) {
+    default <E, X> Children selectAs(String index, SFunction<E, ?> column, SFunction<X, ?> alias) {
         Map<String, SelectCache> cacheMap = ColumnCache.getMapField(LambdaUtils.getEntityClass(column));
         SelectCache cache = cacheMap.get(LambdaUtils.getName(column));
         getSelectColum().add(new SelectString(

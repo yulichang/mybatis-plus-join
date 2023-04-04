@@ -23,22 +23,51 @@ import java.util.Objects;
 @Getter
 public class SelectCache {
 
+    /**
+     * 实体类
+     */
     private final Class<?> clazz;
 
+    /**
+     * 是否是主键
+     */
     private final boolean isPk;
 
+    /**
+     * 查询字段
+     */
     private final String column;
 
+    /**
+     * 字段类型
+     */
     private final Class<?> columnType;
 
+    /**
+     * 查询字段 去除特殊符号 比如反引号,单引号,双引号等
+     *
+     * @see StringUtils#getTargetColumn(String)
+     */
     private final String tagColumn;
 
+    /**
+     * 字段属性名
+     */
     private final String columProperty;
 
+    /**
+     * mp 字段信息
+     */
     private final TableFieldInfo tableFieldInfo;
 
+    /**
+     * 使用使用 hasTypeHandle
+     */
     private final boolean hasTypeHandle;
 
+    /**
+     * hasTypeHandle 类型
+     */
     private final TypeHandler<?> typeHandler;
 
     public SelectCache(Class<?> clazz, boolean isPk, String column, Class<?> columnType, String columProperty, TableFieldInfo tableFieldInfo) {

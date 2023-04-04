@@ -637,7 +637,7 @@ class LambdaWrapperTest {
     void test6() {
         MPJLambdaWrapper<UserDO> wrapper = new MPJLambdaWrapper<UserDO>()
                 .selectAll(UserDO.class)
-                .select(AddressDO.class, p -> true)
+                .selectFilter(AddressDO.class, p -> true)
                 .leftJoin(AddressDO.class, AddressDO::getUserId, UserDO::getId)
                 .eq(UserDO::getId, 1);
         IPage<UserDTO> page = userMapper.selectJoinPage(new Page<>(1, 10), UserDTO.class, wrapper);

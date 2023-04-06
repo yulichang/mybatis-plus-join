@@ -3,11 +3,13 @@ package com.github.yulichang.wrapper;
 import com.baomidou.mybatisplus.core.conditions.SharedString;
 import com.baomidou.mybatisplus.core.conditions.segments.MergeSegments;
 import com.baomidou.mybatisplus.core.metadata.TableInfo;
-import com.baomidou.mybatisplus.core.toolkit.*;
+import com.baomidou.mybatisplus.core.toolkit.ArrayUtils;
+import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
+import com.baomidou.mybatisplus.core.toolkit.StringPool;
+import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.github.yulichang.config.ConfigProperties;
 import com.github.yulichang.config.enums.LogicDelTypeEnum;
-import com.github.yulichang.toolkit.LambdaUtils;
 import com.github.yulichang.toolkit.*;
 import com.github.yulichang.toolkit.support.ColumnCache;
 import com.github.yulichang.wrapper.interfaces.Chain;
@@ -271,15 +273,15 @@ public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWr
         if (StringUtils.isBlank(from.getStringValue())) {
             StringBuilder value = new StringBuilder();
             for (MPJLambdaWrapper<?> wrapper : onWrappers) {
-                if (wrapper.subLogicSql && this.logicDelType == LogicDelTypeEnum.ON) {
-                    TableInfo tableInfo = TableHelper.get(wrapper.getJoinClass());
-                    if (ConfigProperties.tableInfoAdapter.mpjHasLogic(tableInfo)) {
-                        wrapper.appendSqlSegments(APPLY, () -> LogicInfoUtils.getLogicInfoNoAnd(
-                                wrapper.getIndex(), wrapper.getJoinClass(), wrapper.isHasAlias(), wrapper.getAlias()
-                        ));
-                    }
-                }
                 if (StringUtils.isBlank(wrapper.from.getStringValue())) {
+                    if (wrapper.subLogicSql && this.logicDelType == LogicDelTypeEnum.ON) {
+                        TableInfo tableInfo = TableHelper.get(wrapper.getJoinClass());
+                        if (ConfigProperties.tableInfoAdapter.mpjHasLogic(tableInfo)) {
+                            wrapper.appendSqlSegments(APPLY, () -> LogicInfoUtils.getLogicInfoNoAnd(
+                                    wrapper.getIndex(), wrapper.getJoinClass(), wrapper.isHasAlias(), wrapper.getAlias()
+                            ));
+                        }
+                    }
                     value.append(StringPool.SPACE)
                             .append(wrapper.getKeyWord())
                             .append(StringPool.SPACE)

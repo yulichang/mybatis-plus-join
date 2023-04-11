@@ -14,6 +14,7 @@ import com.github.yulichang.wrapper.segments.SelectCache;
 import lombok.Getter;
 
 import java.util.*;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 /**
@@ -85,6 +86,25 @@ public class MybatisLabel<E, T> implements Label<T> {
             mybatisLabel.resultList = new ArrayList<>();
             mybatisLabel.mybatisLabels = new ArrayList<>();
             autoBuild(auto, entityClass, ofType);
+        }
+
+        /**
+         * 映射实体全部字段
+         */
+        public Builder<E, T> all() {
+            autoBuild(true, mybatisLabel.entityClass, mybatisLabel.ofType);
+            return this;
+        }
+
+        /**
+         * 映射实体字段过滤(含主键)
+         */
+        public Builder<E, T> filter(Predicate<SelectCache> predicate) {
+            Map<String, FieldCache> fieldMap = MPJReflectionKit.getFieldMap(mybatisLabel.ofType);
+            ColumnCache.getListField(mybatisLabel.entityClass).stream().filter(predicate)
+                    .filter(p -> fieldMap.containsKey(p.getColumProperty())).forEach(c ->
+                            mybatisLabel.resultList.add(new Result.Builder<T>(c.isPk(), mybatisLabel.index, c).build()));
+            return this;
         }
 
         public Builder<E, T> id(SFunction<E, ?> entity, SFunction<T, ?> tag) {

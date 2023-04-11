@@ -1,5 +1,6 @@
 package com.github.yulichang.wrapper.resultmap;
 
+import com.baomidou.mybatisplus.core.metadata.TableFieldInfo;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.github.yulichang.toolkit.LambdaUtils;
@@ -12,6 +13,7 @@ import org.apache.ibatis.type.JdbcType;
 
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 
 /**
  * result 标签
@@ -48,6 +50,16 @@ public class Result {
             this.result = new Result();
             result.isId = isId;
             result.index = index;
+        }
+
+        public Builder(boolean isId, String index, SelectCache selectCache) {
+            this.result = new Result();
+            result.isId = isId;
+            result.index = index;
+            result.selectNormal = selectCache;
+            result.property = selectCache.getColumProperty();
+            result.javaType = selectCache.getColumnType();
+            result.jdbcType = Optional.ofNullable(selectCache.getTableFieldInfo()).map(TableFieldInfo::getJdbcType).orElse(null);
         }
 
         public Builder<T> property(SFunction<T, ?> property) {

@@ -13,6 +13,7 @@ import com.github.yulichang.wrapper.segments.SelectCache;
 import lombok.Getter;
 
 import java.util.*;
+import java.util.function.Predicate;
 
 /**
  * 无泛型约束 实现自由映射
@@ -60,13 +61,35 @@ public class MybatisLabelFree<T> implements Label<T> {
             mybatisLabel.mybatisLabels = new ArrayList<>();
         }
 
-        public <E> Builder<T> all(Class<?> entityClass) {
+        public <E> Builder<T> all(Class<E> entityClass) {
             allBuild(null, entityClass);
             return this;
         }
 
-        public <E> Builder<T> all(String prefix, Class<?> entityClass) {
+        public <E> Builder<T> all(String prefix, Class<E> entityClass) {
             allBuild(prefix, entityClass);
+            return this;
+        }
+
+        /**
+         * 映射实体字段过滤(含主键)
+         */
+        public <E> Builder<T> filter(Class<E> entityClass, Predicate<SelectCache> predicate) {
+            Map<String, FieldCache> fieldMap = MPJReflectionKit.getFieldMap(mybatisLabel.ofType);
+            ColumnCache.getListField(entityClass).stream().filter(predicate)
+                    .filter(p -> fieldMap.containsKey(p.getColumProperty())).forEach(c ->
+                            mybatisLabel.resultList.add(new Result.Builder<T>(false, null, c).build()));
+            return this;
+        }
+
+        /**
+         * 映射实体字段过滤(含主键)
+         */
+        public <E> Builder<T> filter(String prefix, Class<E> entityClass, Predicate<SelectCache> predicate) {
+            Map<String, FieldCache> fieldMap = MPJReflectionKit.getFieldMap(mybatisLabel.ofType);
+            ColumnCache.getListField(entityClass).stream().filter(predicate)
+                    .filter(p -> fieldMap.containsKey(p.getColumProperty())).forEach(c ->
+                            mybatisLabel.resultList.add(new Result.Builder<T>(false, prefix, c).build()));
             return this;
         }
 

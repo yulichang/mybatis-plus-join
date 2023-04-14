@@ -685,7 +685,8 @@ class LambdaWrapperTest {
                 .lt(UserDO::getId, 8));
         assert dos.size() == 4;
 
-        ThreadLocalUtils.set("SELECT id,pid,`name`,`json`,sex,head_img,create_time,address_id,address_id2,del,create_by,update_by FROM `user` t WHERE t.del=false AND (t.id > ? AND t.id < ?)");
+        ThreadLocalUtils.set("SELECT id,pid,`name`,`json`,sex,head_img,create_time,address_id,address_id2,del,create_by,update_by FROM `user` t WHERE t.del=false AND (t.id > ? AND t.id < ?)",
+                "SELECT * FROM `user` t WHERE t.del=false AND (t.id > ? AND t.id < ?) ");
         List<UserDO> dos1 = userMapper.selectList(new MPJLambdaWrapper<UserDO>()
                 .gt(UserDO::getId, 3)
                 .lt(UserDO::getId, 8));
@@ -892,5 +893,20 @@ class LambdaWrapperTest {
         System.out.println(list);
         assert list.get(0).getAddressList() != null && list.get(0).getAddressList().get(0).getId() != null;
         list.forEach(System.out::println);
+    }
+
+    @Test
+    void joinRandomMap111() {
+        ThreadLocalUtils.set("SELECT t.id,t.user_id,t.area_id,t.tel,t.address,t.del FROM address t LEFT JOIN `user` t1 ON (t1.address_id = t.id) LEFT JOIN `user` t2 ON (t2.pid = t1.id) WHERE t.del=false AND t1.del=false AND t2.del=false");
+        MPJLambdaWrapper<AddressDO> wrapper = JoinWrappers.lambda(AddressDO.class)
+                .selectAll(AddressDO.class)
+//                .selectAssociation(AddressDO::getUsera, map -> map
+//                        .all("t1", UserDO.class)
+//                        .result("t2", UserDO::getName, UserDO::getPname))
+                .leftJoin(UserDO.class, UserDO::getAddressId, AddressDO::getId)
+                .leftJoin(UserDO.class, UserDO::getPid, UserDO::getId);
+
+        List<AddressDO> addressDOS = wrapper.list();
+        System.out.println(1);
     }
 }

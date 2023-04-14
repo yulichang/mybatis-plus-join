@@ -2,7 +2,9 @@ package com.github.yulichang.wrapper.interfaces;
 
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.core.toolkit.Assert;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
+import com.github.yulichang.base.MPJBaseMapper;
 import com.github.yulichang.interfaces.MPJBaseJoin;
 import com.github.yulichang.toolkit.SqlHelper;
 
@@ -23,6 +25,22 @@ import java.util.List;
 public interface Chain<T> {
 
     Class<T> getEntityClass();
+
+    /**
+     * 链式调用 等效于MP mapper的 selectCount()
+     * <p>
+     * 构造方法必须传 class 或 entity 否则会报错
+     * new MPJLambdaWrapper(User.class)
+     * new MPJQueryWrapper(User.class)
+     * JoinWrappers.\<User\>lambdaJoin(User.class)
+     * JoinWrappers.\<User\>queryJoin(User.class)
+     */
+    default Long count() {
+        return SqlHelper.exec(getEntityClass(), mapper -> {
+            Assert.isTrue(mapper instanceof MPJBaseMapper, "mapper <%s> is not extends MPJBaseMapper", mapper.getClass().getSimpleName());
+            return ((MPJBaseMapper<T>) mapper).selectJoinCount((MPJBaseJoin<T>) this);
+        });
+    }
 
     /**
      * 链式调用 等效于 selectOne

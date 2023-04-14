@@ -123,7 +123,7 @@ public class TableList {
                 }
             } else if (list.size() > 1) {
                 for (Node n : list) {
-                    if (n.getClazz() != node.getClazz()) {
+                    if (n.getIndex() != node.getIndex()) {
                         return n.isHasAlias() ? n.getAlias() : (n.getAlias() + n.getIndex());
                     }
                 }

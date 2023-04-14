@@ -1,5 +1,9 @@
 package com.github.yulichang.test.join.service;
 
-public interface UserService {
+import com.github.yulichang.base.MPJBaseService;
+import com.github.yulichang.test.join.entity.UserDO;
+
+public interface UserService extends MPJBaseService<UserDO> {
+
 
 }

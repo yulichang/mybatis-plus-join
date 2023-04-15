@@ -19,12 +19,12 @@ QQ群:1022221898
   <dependency>
       <groupId>com.github.yulichang</groupId>
       <artifactId>mybatis-plus-join-boot-starter</artifactId>
-      <version>1.4.4</version>
+      <version>1.4.4.1</version>
   </dependency>
   ```
 - Gradle
   ```
-   implementation 'com.github.yulichang:mybatis-plus-join-boot-starter:1.4.4'
+   implementation 'com.github.yulichang:mybatis-plus-join-boot-starter:1.4.4.1'
   ```
   或者clone代码到本地执行 mvn install, 再引入以上依赖  
   <br>
@@ -51,7 +51,7 @@ class test {
         MPJLambdaWrapper<UserDO> wrapper = new MPJLambdaWrapper<UserDO>()
                 .selectAll(UserDO.class)//查询user表全部字段
                 .select(UserAddressDO::getTel)//查询user_address tel 字段
-                .selectAs(UserAddressDO::getAddress, UserDTO::getUserAddress)//别名 t.address AS userAddress
+                .selectAs(UserAddressDO::getAddress, UserDTO::getUserAddress)//别名
                 .select(AreaDO::getProvince, AreaDO::getCity)
                 .leftJoin(UserAddressDO.class, UserAddressDO::getUserId, UserDO::getId)
                 .leftJoin(AreaDO.class, AreaDO::getId, UserAddressDO::getAreaId)

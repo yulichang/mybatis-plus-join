@@ -5,10 +5,10 @@
     <parent>
         <groupId>com.github.yulichang</groupId>
         <artifactId>mybatis-plus-join-test</artifactId>
-        <version>1.4.4</version>
+        <version>1.4.4.1</version>
     </parent>
     <artifactId>test-base</artifactId>
-    <version>1.4.4</version>
+    <version>1.4.4.1</version>
     <name>test-base</name>
 
     <description>test-base</description>

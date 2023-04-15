@@ -6,7 +6,7 @@
     <parent>
         <groupId>com.github.yulichang</groupId>
         <artifactId>mybatis-plus-join-test</artifactId>
-        <version>1.4.4</version>
+        <version>1.4.4.1</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -22,7 +22,7 @@
         <dependency>
             <groupId>com.github.yulichang</groupId>
             <artifactId>test-base</artifactId>
-            <version>1.4.4</version>
+            <version>1.4.4.1</version>
         </dependency>
     </dependencies>
 

@@ -55,6 +55,11 @@ public class MPJLambdaQueryWrapper<T> extends AbstractLambdaWrapper<T, MPJLambda
     private List<String> ignoreColumns = new ArrayList<>();
 
     /**
+     * 是否 select distinct
+     */
+    private boolean selectDistinct = false;
+
+    /**
      * 不建议直接 new 该实例，使用 Wrappers.lambdaQuery(entity)
      */
     public MPJLambdaQueryWrapper() {
@@ -209,6 +214,15 @@ public class MPJLambdaQueryWrapper<T> extends AbstractLambdaWrapper<T, MPJLambda
         return sqlSelect.getStringValue();
     }
 
+    /**
+     * sql去重
+     * select distinct
+     */
+    public MPJLambdaQueryWrapper<T> distinct() {
+        this.selectDistinct = true;
+        return typedThis;
+    }
+
     public String getFrom() {
         return from.getStringValue();
     }
@@ -216,6 +230,10 @@ public class MPJLambdaQueryWrapper<T> extends AbstractLambdaWrapper<T, MPJLambda
 
     public String getAlias() {
         return alias;
+    }
+
+    public boolean getSelectDistinct() {
+        return selectDistinct;
     }
 
     /**

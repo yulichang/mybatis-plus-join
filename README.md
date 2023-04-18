@@ -2,13 +2,14 @@
 
 * 对 <a href="https://gitee.com/baomidou/mybatis-plus" target="_blank">mybatis-plus</a> 多表查询的扩展
 * <a href="https://gitee.com/best_handsome/mybatis-plus-join-demo" target="_blank">演示工程</a>
-* <a href="https://www.baidu.com/link?url=cknmzNRg3E2p9d0BbUuQ2MBYCSSs6u1LCtNm5RzIzui&wd=&eqid=a5bbe908000085540000000563f830c5" target="_blank">文档</a>
+* <a href="https://www.baidu.com/link?url=cknmzNRg3E2p9d0BbUuQ2MBYCSSs6u1LCtNm5RzIzui&wd=&eqid=a5bbe908000085540000000563f830c5" target="_blank">插件文档 https://ylctmh.com</a>
 * 点个Star支持一下吧 :)
 
 QQ群:1022221898  
-<a href="https://gitee.com/best_handsome/mybatis-plus-join/issues/I65N2M" target="_blank">加入微信群</a>
+<a href="https://gitee.com/best_handsome/mybatis-plus-join/issues/I65N2M" target="_blank">添加作者微信，备注MPJ，加入微信群</a>  
+<img width="200px" src="https://ylctmh.com/qr.png"  alt="添加作者微信，备注MPJ，加入微信群"/>
 
-### <a href="https://www.baidu.com/link?url=cknmzNRg3E2p9d0BbUuQ2MBYCSSs6u1LCtNm5RzIzui&wd=&eqid=a5bbe908000085540000000563f830c5" target="_blank">文档</a>
+### <a href="https://www.baidu.com/link?url=cknmzNRg3E2p9d0BbUuQ2MBYCSSs6u1LCtNm5RzIzui&wd=&eqid=a5bbe908000085540000000563f830c5" target="_blank">插件文档 https://ylctmh.com</a>
 
 ## 使用方法
 
@@ -48,7 +49,7 @@ class test {
 
     void testJoin() {
         //和Mybatis plus一致，MPJLambdaWrapper的泛型必须是主表的泛型，并且要用主表的Mapper来调用
-        MPJLambdaWrapper<UserDO> wrapper = new MPJLambdaWrapper<UserDO>()
+        MPJLambdaWrapper<UserDO> wrapper = JoinWrappers.lambda(User.class)
                 .selectAll(UserDO.class)//查询user表全部字段
                 .select(UserAddressDO::getTel)//查询user_address tel 字段
                 .selectAs(UserAddressDO::getAddress, UserDTO::getUserAddress)//别名
@@ -147,113 +148,5 @@ MPJLambdaWrapper其他功能
 * <a href="https://ylctmh.com/pages/core/lambda/select/selectFunc.html" target="_blank">简单的SQL函数使用</a>
 * <a href="https://ylctmh.com/pages/core/lambda/join/leftJoin.html" target="_blank">ON语句多条件支持</a>
 
-### String形式用法（MPJQueryWrapper）
 
-#### 简单的连表查询
-
-```java
-class test {
-    @Resource
-    private UserMapper userMapper;
-
-    void testJoin() {
-        MPJQueryWrapper wrapper = new MPJQueryWrapper<UserDO>()
-                .selectAll(UserDO.class)
-                .select("addr.tel", "addr.address", "a.province")
-                .leftJoin("user_address addr on t.id = addr.user_id")
-                .rightJoin("area a on addr.area_id = a.id")
-                .like("addr.tel", "1")
-                .le("a.province", "1");
-
-        //列表查询
-        List<UserDTO> list = userMapper.selectJoinList(UserDTO.class, wrapper);
-
-        //分页查询 （需要启用 mybatis plus 分页插件）
-        Page<UserDTO> listPage = userMapper.selectJoinPage(new Page<>(1, 10), UserDTO.class, wrapper);
-    }
-}
-```
-
-对应sql
-
-```
-SELECT 
-    t.id,
-    t.name,
-    t.sex,
-    t.head_img,
-    addr.tel,
-    addr.address,
-    a.province
-FROM 
-    user t
-    LEFT JOIN user_address addr on t.id = addr.user_id
-    RIGHT JOIN area a on addr.area_id = a.id
-WHERE (
-    addr.tel LIKE ?
-    AND a.province <= ?)
-```
-
-说明:
-
-* UserDTO.class 查询结果类(resultType)
-* selectAll(UserDO.class) 查询主表全部字段(主表实体类)默认主表别名 "t"
-* select() mp的select策略是覆盖,以最后一次为准,这里的策略是追加,可以一直select  
-  主表字段可以用lambda,会自动添加表别名,主表别名默认是 t ,非主表字段必须带别名查询
-* leftJoin() rightJoin() innerJoin() 传sql片段 格式 (表 + 别名 + 关联条件)
-* 条件查询,可以查询主表以及参与连接的所有表的字段,全部调用mp原生的方法,正常使用没有sql注入风险
-
-#### 还可以这么操作,但不建议
-
-```java
-class test {
-    @Resource
-    private UserMapper userMapper;
-
-    void testJoin() {
-        List<UserDTO> list = userMapper.selectJoinList(UserDTO.class,
-                new MPJQueryWrapper<UserDO>()
-                        .selectAll(UserDO.class)
-                        .select("addr.tel", "addr.address")
-                        //行列转换
-                        .select("CASE t.sex WHEN '男' THEN '1' ELSE '0' END AS sex")
-                        //求和函数
-                        .select("sum(a.province) AS province")
-                        //自定义数据集
-                        .leftJoin("(select * from user_address) addr on t.id = addr.user_id")
-                        .rightJoin("area a on addr.area_id = a.id")
-                        .like("addr.tel", "1")
-                        .le("a.province", "1")
-                        .orderByDesc("addr.id"));
-    }
-}
-```
-
-对应sql
-
-```
-SELECT 
-    t.id,
-    t.name,
-    t.sex,
-    t.head_img,
-    addr.tel,
-    addr.address,
-    CASE t.sex WHEN '男' THEN '1' ELSE '0' END AS sex,
-    sum(a.province) AS province
-FROM 
-    user t
-    LEFT JOIN (select * from user_address) addr on t.id = addr.user_id
-    RIGHT JOIN area a on addr.area_id = a.id
-WHERE (
-    addr.tel LIKE ?
-    AND a.province <= ?)
-ORDER BY
-    addr.id DESC
-```
-
-# <a href="https://www.baidu.com/link?url=cknmzNRg3E2p9d0BbUuQ2MBYCSSs6u1LCtNm5RzIzui&wd=&eqid=a5bbe908000085540000000563f830c5" target="_blank">wiki</a>
-
-
-
-
+# <a href="https://www.baidu.com/link?url=cknmzNRg3E2p9d0BbUuQ2MBYCSSs6u1LCtNm5RzIzui&wd=&eqid=a5bbe908000085540000000563f830c5" target="_blank">插件文档 wiki https://ylctmh.com</a>

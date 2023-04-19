@@ -20,19 +20,19 @@ public enum SqlMethod {
             "<script>\n%s SELECT %s %s FROM %s %s %s %s %s\n</script>"),
 
     SELECT_JOIN_LIST("selectJoinList", "返回List集合",
-            "<script>\n%s SELECT %s %s FROM %s %s %s %s %s\n</script>"),
+            "<script>\n%s SELECT %s %s FROM %s %s %s %s %s %s\n</script>"),
 
     SELECT_JOIN_MAP("selectJoinMap", "返回一个Map",
             "<script>\n%s SELECT %s %s FROM %s %s %s %s %s\n</script>"),
 
     SELECT_JOIN_MAPS("selectJoinMaps", "返回Map集合",
-            "<script>\n%s SELECT %s %s FROM %s %s %s %s %s\n</script>"),
+            "<script>\n%s SELECT %s %s FROM %s %s %s %s %s %s\n</script>"),
 
     SELECT_JOIN_PAGE("selectJoinPage", "连表查询并分页",
-            "<script>\n%s SELECT %s %s FROM %s %s %s %s %s\n</script>"),
+            "<script>\n%s SELECT %s %s FROM %s %s %s %s %s %s\n</script>"),
 
     SELECT_JOIN_MAPS_PAGE("selectJoinMapsPage", "返回Map集合并分页",
-            "<script>\n%s SELECT %s %s FROM %s %s %s %s %s\n</script>");
+            "<script>\n%s SELECT %s %s FROM %s %s %s %s %s %s\n</script>");
 
     private final String method;
     private final String sql;

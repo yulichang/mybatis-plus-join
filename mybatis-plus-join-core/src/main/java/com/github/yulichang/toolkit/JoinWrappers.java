@@ -39,6 +39,13 @@ public class JoinWrappers {
     }
 
     /**
+     * JoinWrappers.<UserDO>lambda("t")
+     */
+    public static <T> MPJLambdaWrapper<T> lambda(String alias) {
+        return new MPJLambdaWrapper<>(alias);
+    }
+
+    /**
      * JoinWrappers.lambda(User.class)
      */
     public static <T> MPJLambdaWrapper<T> lambda(Class<T> clazz) {
@@ -46,9 +53,23 @@ public class JoinWrappers {
     }
 
     /**
+     * JoinWrappers.lambda("t", User.class)
+     */
+    public static <T> MPJLambdaWrapper<T> lambda(String alias, Class<T> clazz) {
+        return new MPJLambdaWrapper<T>(alias).setEntityClass(clazz);
+    }
+
+    /**
      * JoinWrappers.lambda(user)
      */
     public static <T> MPJLambdaWrapper<T> lambda(T entity) {
         return new MPJLambdaWrapper<>(entity);
+    }
+
+    /**
+     * JoinWrappers.lambda("t", user)
+     */
+    public static <T> MPJLambdaWrapper<T> lambda(String alias, T entity) {
+        return new MPJLambdaWrapper<T>(alias).setEntity(entity);
     }
 }

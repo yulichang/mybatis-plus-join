@@ -1,5 +1,6 @@
 package com.github.yulichang.toolkit;
 
+import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import lombok.Data;
 
 import java.util.ArrayList;
@@ -92,18 +93,14 @@ public class TableList {
     public String getPrefixOther(Integer index, Class<?> clazz) {
         if (Objects.isNull(index)) {
             List<Node> list = getByClass(clazz);
-            if (list.size() == 1 && list.get(0).getClazz() == clazz) {
-                return alias;
-            } else if (list.size() > 1) {
+            if (CollectionUtils.isNotEmpty(list)) {
                 for (Node n : list) {
                     if (n.getClazz() == clazz) {
                         return n.isHasAlias() ? n.getAlias() : (n.getAlias() + n.getIndex());
                     }
                 }
-                return alias;
-            } else {
-                return alias;
             }
+            return alias;
         }
         Node node = getByIndex(index);
         Node dg = dg(node, node.getClazz());

@@ -35,6 +35,12 @@ public class SelectMapsPage extends com.baomidou.mybatisplus.core.injector.metho
     }
 
     @Override
+    protected String sqlOrderBy(TableInfo table) {
+        return SqlScriptUtils.convertChoose(String.format("%s == null or !(%s instanceof %s)", Constants.WRAPPER, Constants.WRAPPER, MPJBaseJoin.class.getName()),
+                super.sqlOrderBy(table), mpjSqlOrderBy(table));
+    }
+
+    @Override
     protected String sqlSelectColumns(TableInfo table, boolean queryWrapper) {
         String selectColumns = super.sqlSelectColumns(table, queryWrapper);
         return SqlScriptUtils.convertChoose(String.format("%s == null or !(%s instanceof %s)", Constants.WRAPPER, Constants.WRAPPER, MPJBaseJoin.class.getName()),

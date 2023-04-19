@@ -98,7 +98,7 @@ public class MPJQueryWrapper<T> extends AbstractWrapper<T, String, MPJQueryWrapp
                            Map<String, Object> paramNameValuePairs, MergeSegments mergeSegments,
                            SharedString sqlSelect, SharedString from, SharedString lastSql,
                            SharedString sqlComment, SharedString sqlFirst,
-                           List<String> selectColumns, List<String> ignoreColumns) {
+                           List<String> selectColumns, List<String> ignoreColumns, boolean selectDistinct) {
         super.setEntity(entity);
         super.setEntityClass(entityClass);
         this.paramNameSeq = paramNameSeq;
@@ -111,6 +111,7 @@ public class MPJQueryWrapper<T> extends AbstractWrapper<T, String, MPJQueryWrapp
         this.sqlFirst = sqlFirst;
         this.selectColumns = selectColumns;
         this.ignoreColumns = ignoreColumns;
+        this.selectDistinct = selectDistinct;
     }
 
     /**
@@ -295,7 +296,7 @@ public class MPJQueryWrapper<T> extends AbstractWrapper<T, String, MPJQueryWrapp
      */
     public MPJLambdaQueryWrapper<T> lambda() {
         return new MPJLambdaQueryWrapper<>(getEntity(), getEntityClass(), from, sqlSelect, paramNameSeq, paramNameValuePairs,
-                expression, lastSql, sqlComment, sqlFirst, selectColumns, ignoreColumns);
+                expression, lastSql, sqlComment, sqlFirst, selectColumns, ignoreColumns, selectDistinct);
     }
 
     /**
@@ -305,7 +306,7 @@ public class MPJQueryWrapper<T> extends AbstractWrapper<T, String, MPJQueryWrapp
     @Override
     protected MPJQueryWrapper<T> instance() {
         return new MPJQueryWrapper<>(getEntity(), getEntityClass(), paramNameSeq, paramNameValuePairs, new MergeSegments(),
-                null, null, SharedString.emptyString(), SharedString.emptyString(), SharedString.emptyString(), null, null);
+                null, null, SharedString.emptyString(), SharedString.emptyString(), SharedString.emptyString(), null, null, selectDistinct);
     }
 
 

@@ -6,7 +6,10 @@ import com.baomidou.mybatisplus.core.conditions.query.Query;
 import com.baomidou.mybatisplus.core.conditions.segments.MergeSegments;
 import com.baomidou.mybatisplus.core.metadata.TableFieldInfo;
 import com.baomidou.mybatisplus.core.metadata.TableInfo;
-import com.baomidou.mybatisplus.core.toolkit.*;
+import com.baomidou.mybatisplus.core.toolkit.ArrayUtils;
+import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
+import com.baomidou.mybatisplus.core.toolkit.StringPool;
+import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.github.yulichang.config.ConfigProperties;
 import com.github.yulichang.query.interfaces.StringJoin;
@@ -72,7 +75,7 @@ public class MPJLambdaQueryWrapper<T> extends AbstractLambdaWrapper<T, MPJLambda
     MPJLambdaQueryWrapper(T entity, Class<T> entityClass, SharedString from, SharedString sqlSelect, AtomicInteger paramNameSeq,
                           Map<String, Object> paramNameValuePairs, MergeSegments mergeSegments,
                           SharedString lastSql, SharedString sqlComment, SharedString sqlFirst,
-                          List<String> selectColumns, List<String> ignoreColumns) {
+                          List<String> selectColumns, List<String> ignoreColumns, boolean selectDistinct) {
         super.setEntity(entity);
         super.setEntityClass(entityClass);
         this.paramNameSeq = paramNameSeq;
@@ -85,6 +88,7 @@ public class MPJLambdaQueryWrapper<T> extends AbstractLambdaWrapper<T, MPJLambda
         this.sqlFirst = sqlFirst;
         this.selectColumns = selectColumns;
         this.ignoreColumns = ignoreColumns;
+        this.selectDistinct = selectDistinct;
     }
 
     /**
@@ -200,7 +204,7 @@ public class MPJLambdaQueryWrapper<T> extends AbstractLambdaWrapper<T, MPJLambda
      */
     public MPJQueryWrapper<T> stringQuery() {
         return new MPJQueryWrapper<>(getEntity(), getEntityClass(), paramNameSeq, paramNameValuePairs,
-                expression, sqlSelect, from, lastSql, sqlComment, sqlFirst, selectColumns, ignoreColumns);
+                expression, sqlSelect, from, lastSql, sqlComment, sqlFirst, selectColumns, ignoreColumns, selectDistinct);
     }
 
     @Override
@@ -243,7 +247,7 @@ public class MPJLambdaQueryWrapper<T> extends AbstractLambdaWrapper<T, MPJLambda
     @Override
     protected MPJLambdaQueryWrapper<T> instance() {
         return new MPJLambdaQueryWrapper<>(getEntity(), getEntityClass(), null, null, paramNameSeq, paramNameValuePairs,
-                new MergeSegments(), SharedString.emptyString(), SharedString.emptyString(), SharedString.emptyString(), null, null);
+                new MergeSegments(), SharedString.emptyString(), SharedString.emptyString(), SharedString.emptyString(), null, null, selectDistinct);
     }
 
     @Override

@@ -1,9 +1,12 @@
 package com.github.yulichang.wrapper;
 
+import com.baomidou.mybatisplus.annotation.OrderBy;
 import com.baomidou.mybatisplus.core.conditions.SharedString;
 import com.baomidou.mybatisplus.core.conditions.segments.MergeSegments;
 import com.baomidou.mybatisplus.core.metadata.TableInfo;
+import com.baomidou.mybatisplus.core.toolkit.Constants;
 import com.baomidou.mybatisplus.core.toolkit.StringPool;
+import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.github.yulichang.config.ConfigProperties;
 import com.github.yulichang.config.enums.LogicDelTypeEnum;
@@ -158,6 +161,21 @@ public abstract class MPJAbstractLambdaWrapper<T, Children extends MPJAbstractLa
         } else {
             return tableList.getAlias();
         }
+    }
+
+    /**
+     * 是否使用默认注解 {@link OrderBy} 排序
+     *
+     * @return true 使用 false 不使用
+     */
+    public boolean isUseAnnotationOrderBy() {
+        final String _sqlSegment = this.getSqlSegment();
+        if (StringUtils.isBlank(_sqlSegment)) {
+            return true;
+        }
+        final String _sqlSegmentToUpperCase = _sqlSegment.toUpperCase();
+        return !(_sqlSegmentToUpperCase.contains(Constants.ORDER_BY)
+                || _sqlSegmentToUpperCase.contains(Constants.LIMIT));
     }
 
     /**

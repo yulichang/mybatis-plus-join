@@ -1,15 +1,42 @@
-# mybatis-plus-join
+<p align="center">
+  <a href="https://github.com/yulichang/mybatis-plus-join" target="_blank">
+   <img alt="Mybatis-Plus-Join-Logo" src="https://mybatisplusjoin.com/lg.png">
+  </a>
+</p>
+<p align="center">
+  为简化开发工作、提高生产率而生
+</p>
 
-* 对 <a href="https://gitee.com/baomidou/mybatis-plus" target="_blank">mybatis-plus</a> 多表查询的扩展
-* <a href="https://gitee.com/best_handsome/mybatis-plus-join-demo" target="_blank">演示工程</a>
-* <a href="https://www.baidu.com/link?url=cknmzNRg3E2p9d0BbUuQ2MBYCSSs6u1LCtNm5RzIzui&wd=&eqid=a5bbe908000085540000000563f830c5" target="_blank">插件文档 https://ylctmh.com</a>
-* 点个Star支持一下吧 :)
+<p align="center">
+  <a>
+    <img src="https://img.shields.io/github/stars/yulichang/mybatis-plus-join.svg?style=social&label=Stars" />
+  </a>
+  <img src="https://gitee.com/best_handsome/mybatis-plus-join/badge/star.svg?theme=dark" alt=""/>
+  <br/>
+  <a href="https://central.sonatype.com/artifact/com.github.yulichang/mybatis-plus-join-boot-starter">
+    <img alt="maven" src="https://img.shields.io/maven-central/v/com.github.yulichang/mybatis-plus-join-boot-starter.svg?style=flat-square">
+  </a>
 
-QQ群:1022221898  
+  <a href="https://www.apache.org/licenses/LICENSE-2.0">
+    <img alt="code style" src="https://img.shields.io/badge/license-Apache%202-4EB1BA.svg?style=flat-square">
+  </a>
+</p>
+<h1 align="center">mybatis-plus-join</h1>
+<p align="center">
+对 <a href="https://gitee.com/baomidou/mybatis-plus" target="_blank">mybatis-plus</a> 多表查询的扩展 |
+<a href="https://gitee.com/best_handsome/mybatis-plus-join-demo" target="_blank">演示工程</a> |
+<a href="https://www.baidu.com/link?url=cknmzNRg3E2p9d0BbUuQ2MBYCSSs6u1LCtNm5RzIzui&wd=&eqid=a5bbe908000085540000000563f830c5" target="_blank">使用文档</a> |
+点个Star支持一下吧 (☆▽☆)
+</p>
+
+<p align="center">
+QQ群:1022221898  或者 
 <a href="https://gitee.com/best_handsome/mybatis-plus-join/issues/I65N2M" target="_blank">添加作者微信，备注MPJ，加入微信群</a>  
-<img width="200px" src="https://ylctmh.com/qr.png"  alt="添加作者微信，备注MPJ，加入微信群"/>
+<br/>
+<img width="200px" src="https://mybatisplusjoin.com/qr.png"  alt="添加作者微信，备注MPJ，加入微信群"/>
+</p>
 
-### <a href="https://www.baidu.com/link?url=cknmzNRg3E2p9d0BbUuQ2MBYCSSs6u1LCtNm5RzIzui&wd=&eqid=a5bbe908000085540000000563f830c5" target="_blank">插件文档 https://ylctmh.com</a>
+### <a href="https://www.baidu.com/link?url=6NtKqbGKUIIdwoBUaqNkQnLiG3d5y03L6Pfg6ODId0VKfPifpB1xqdQzsBprm-0h&wd=&eqid=d26e7f1600004777000000056440ade6" target="_blank">使用文档WIKI</a>
 
 ## 使用方法
 
@@ -108,7 +135,7 @@ class test {
 
     @Test
     void testResultMap() {
-        MPJLambdaWrapper<UserDO> wrapper = new MPJLambdaWrapper<UserDO>()
+        MPJLambdaWrapper<UserDO> wrapper = new MPJLambdaWrapper<>(User.class)
                 .selectAll(UserDO.class)
                 //对多查询
                 .selectCollection(AddressDO.class, UesrDTO::getAddressList)
@@ -124,29 +151,12 @@ class test {
 }
 ```
 
-等效于ResultMap
-
-```xml
-
-<resultMap id="xxxxxxxx" type="com.github.yulichang.join.dto.UserDTO">
-    <result property="id" column="id"/>
-    <result property="name" column="name"/>
-    <!--其他属性省略-->
-    <collection property="addressList" javaType="java.util.List"
-                ofType="com.github.yulichang.join.entity.UserAddressDO">
-        <id property="id" column="mpj_id"/>
-        <result property="address" column="address"/>
-        <result property="userId" column="user_id"/>
-        <!--其他属性省略-->
-    </collection>
-</resultMap>
-```
-
 MPJLambdaWrapper其他功能
 
-* <a href="https://ylctmh.com/pages/core/lambda/select/selectCollection.html" target="_blank">一对一，一对多使用</a>
-* <a href="https://ylctmh.com/pages/core/lambda/select/selectFunc.html" target="_blank">简单的SQL函数使用</a>
-* <a href="https://ylctmh.com/pages/core/lambda/join/leftJoin.html" target="_blank">ON语句多条件支持</a>
+* <a href="https://mybatisplusjoin.com/pages/core/lambda/select/selectCollection.html" target="_blank">
+  一对一，一对多使用</a>
+* <a href="https://mybatisplusjoin.com/pages/core/lambda/select/selectFunc.html" target="_blank">简单的SQL函数使用</a>
+* <a href="https://mybatisplusjoin.com/pages/core/lambda/join/leftJoin.html" target="_blank">ON语句多条件支持</a>
+* <a href="https://www.baidu.com/link?url=cknmzNRg3E2p9d0BbUuQ2MBYCSSs6u1LCtNm5RzIzui&wd=&eqid=a5bbe908000085540000000563f830c5" target="_blank">其他全部功能请参考使用文档</a>
 
-
-# <a href="https://www.baidu.com/link?url=cknmzNRg3E2p9d0BbUuQ2MBYCSSs6u1LCtNm5RzIzui&wd=&eqid=a5bbe908000085540000000563f830c5" target="_blank">插件文档 wiki https://ylctmh.com</a>
+# <a href="https://www.baidu.com/link?url=cknmzNRg3E2p9d0BbUuQ2MBYCSSs6u1LCtNm5RzIzui&wd=&eqid=a5bbe908000085540000000563f830c5" target="_blank">使用文档 wiki https://mybatisplusjoin.com</a>

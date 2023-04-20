@@ -8,10 +8,12 @@
 </p>
 
 <p align="center">
-  <a>
-    <img src="https://img.shields.io/github/stars/yulichang/mybatis-plus-join.svg?style=social&label=Stars" />
+  <a href="https://github.com/yulichang/mybatis-plus-join" target="_blank">
+    <img src="https://img.shields.io/github/stars/yulichang/mybatis-plus-join.svg?style=social&label=Stars" alt=""/>
   </a>
-  <img src="https://gitee.com/best_handsome/mybatis-plus-join/badge/star.svg?theme=dark" alt=""/>
+  <a href="https://gitee.com/best_handsome/mybatis-plus-join" target="_blank">
+    <img src="https://gitee.com/best_handsome/mybatis-plus-join/badge/star.svg?theme=dark" alt=""/>
+  </a>
   <br/>
   <a href="https://central.sonatype.com/artifact/com.github.yulichang/mybatis-plus-join-boot-starter">
     <img alt="maven" src="https://img.shields.io/maven-central/v/com.github.yulichang/mybatis-plus-join-boot-starter.svg?style=flat-square">
@@ -25,7 +27,7 @@
 <p align="center">
 对 <a href="https://gitee.com/baomidou/mybatis-plus" target="_blank">mybatis-plus</a> 多表查询的扩展 |
 <a href="https://gitee.com/best_handsome/mybatis-plus-join-demo" target="_blank">演示工程</a> |
-<a href="https://www.baidu.com/link?url=cknmzNRg3E2p9d0BbUuQ2MBYCSSs6u1LCtNm5RzIzui&wd=&eqid=a5bbe908000085540000000563f830c5" target="_blank">使用文档</a> |
+<a href="https://www.baidu.com/link?url=wdmhssysW-Mj19Gkcc2CBOzNVoimHat57mlnH78SEU_6y0awYgDKTBy7es9BXnAH&wd=&eqid=908484020001866e000000056440b5e3" target="_blank">使用文档</a> |
 点个Star支持一下吧 (☆▽☆)
 </p>
 
@@ -157,6 +159,6 @@ MPJLambdaWrapper其他功能
   一对一，一对多使用</a>
 * <a href="https://mybatisplusjoin.com/pages/core/lambda/select/selectFunc.html" target="_blank">简单的SQL函数使用</a>
 * <a href="https://mybatisplusjoin.com/pages/core/lambda/join/leftJoin.html" target="_blank">ON语句多条件支持</a>
-* <a href="https://www.baidu.com/link?url=cknmzNRg3E2p9d0BbUuQ2MBYCSSs6u1LCtNm5RzIzui&wd=&eqid=a5bbe908000085540000000563f830c5" target="_blank">其他全部功能请参考使用文档</a>
+* <a href="https://www.baidu.com/link?url=wdmhssysW-Mj19Gkcc2CBOzNVoimHat57mlnH78SEU_6y0awYgDKTBy7es9BXnAH&wd=&eqid=908484020001866e000000056440b5e3" target="_blank">其他全部功能请参考使用文档</a>
 
-# <a href="https://www.baidu.com/link?url=cknmzNRg3E2p9d0BbUuQ2MBYCSSs6u1LCtNm5RzIzui&wd=&eqid=a5bbe908000085540000000563f830c5" target="_blank">使用文档 wiki https://mybatisplusjoin.com</a>
+# <a href="https://www.baidu.com/link?url=wdmhssysW-Mj19Gkcc2CBOzNVoimHat57mlnH78SEU_6y0awYgDKTBy7es9BXnAH&wd=&eqid=908484020001866e000000056440b5e3" target="_blank">使用文档 wiki</a>

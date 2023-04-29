@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.MybatisPlusVersion;
 import com.baomidou.mybatisplus.core.injector.AbstractMethod;
 import com.baomidou.mybatisplus.core.injector.AbstractSqlInjector;
 import com.baomidou.mybatisplus.core.injector.DefaultSqlInjector;
+import com.baomidou.mybatisplus.core.injector.ISqlInjector;
 import com.baomidou.mybatisplus.core.injector.methods.*;
 import com.baomidou.mybatisplus.core.mapper.Mapper;
 import com.baomidou.mybatisplus.core.metadata.TableInfo;
@@ -48,8 +49,10 @@ public class MPJSqlInjector extends DefaultSqlInjector {
     public MPJSqlInjector() {
     }
 
-    public MPJSqlInjector(AbstractSqlInjector sqlInjector) {
-        this.sqlInjector = sqlInjector;
+    public MPJSqlInjector(ISqlInjector sqlInjector) {
+        if (Objects.nonNull(sqlInjector) && sqlInjector instanceof AbstractSqlInjector) {
+            this.sqlInjector = (AbstractSqlInjector) sqlInjector;
+        }
     }
 
     /**
@@ -107,14 +110,15 @@ public class MPJSqlInjector extends DefaultSqlInjector {
                 "SelectPage");
         list.removeIf(i -> methodList.contains(i.getClass().getSimpleName()) &&
                 Objects.equals(packageStr, i.getClass().getPackage().getName()));
-        addAll(list,getWrapperMethod());
-        addAll(list,getJoinMethod());
+        addAll(list, getWrapperMethod());
+        addAll(list, getJoinMethod());
         return list;
     }
 
     private List<AbstractMethod> getJoinMethod() {
         List<AbstractMethod> list = new ArrayList<>();
         if (VersionUtils.compare(MybatisPlusVersion.getVersion(), "3.5.0") >= 0) {
+            list.add(new DeleteJoin(SqlMethod.DELETE_JOIN.getMethod()));
             list.add(new SelectJoinCount(SqlMethod.SELECT_JOIN_COUNT.getMethod()));
             list.add(new SelectJoinOne(SqlMethod.SELECT_JOIN_ONE.getMethod()));
             list.add(new SelectJoinList(SqlMethod.SELECT_JOIN_LIST.getMethod()));
@@ -123,6 +127,7 @@ public class MPJSqlInjector extends DefaultSqlInjector {
             list.add(new SelectJoinMaps(SqlMethod.SELECT_JOIN_MAPS.getMethod()));
             list.add(new SelectJoinMapsPage(SqlMethod.SELECT_JOIN_MAPS_PAGE.getMethod()));
         } else {
+            list.add(new DeleteJoin());
             list.add(new SelectJoinCount());
             list.add(new SelectJoinOne());
             list.add(new SelectJoinList());

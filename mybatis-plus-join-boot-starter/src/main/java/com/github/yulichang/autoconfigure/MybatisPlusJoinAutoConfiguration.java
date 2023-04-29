@@ -1,7 +1,6 @@
 package com.github.yulichang.autoconfigure;
 
 import com.baomidou.mybatisplus.autoconfigure.MybatisPlusLanguageDriverAutoConfiguration;
-import com.baomidou.mybatisplus.core.injector.AbstractSqlInjector;
 import com.baomidou.mybatisplus.core.injector.ISqlInjector;
 import com.github.yulichang.autoconfigure.conditional.MPJSqlInjectorCondition;
 import com.github.yulichang.config.ConfigProperties;
@@ -15,6 +14,7 @@ import org.mybatis.spring.SqlSessionFactoryBean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
@@ -70,6 +70,7 @@ public class MybatisPlusJoinAutoConfiguration {
      * mybatis plus join 拦截器
      */
     @Bean
+    @ConditionalOnClass({SqlSessionFactory.class, SqlSessionFactoryBean.class})
     public MPJInterceptor mpjInterceptor() {
         return new MPJInterceptor();
     }
@@ -78,8 +79,8 @@ public class MybatisPlusJoinAutoConfiguration {
      * mybatis plus 拦截器配置
      */
     @Bean
-    @ConditionalOnBean(SqlSessionFactory.class)
-    public MPJInterceptorConfig mpjInterceptorConfig(List<SqlSessionFactory> sqlSessionFactoryList) {
+    @ConditionalOnClass({SqlSessionFactory.class, SqlSessionFactoryBean.class})
+    public MPJInterceptorConfig mpjInterceptorConfig(@Autowired(required = false) List<SqlSessionFactory> sqlSessionFactoryList) {
         return new MPJInterceptorConfig(sqlSessionFactoryList, properties.getBanner());
     }
 
@@ -91,7 +92,8 @@ public class MybatisPlusJoinAutoConfiguration {
     @MPJSqlInjectorCondition
     @Order(Ordered.HIGHEST_PRECEDENCE)
     @ConditionalOnBean(ISqlInjector.class)
-    public MPJSqlInjector mpjSqlInjector(AbstractSqlInjector sqlInjector) {
+    @ConditionalOnClass({SqlSessionFactory.class, SqlSessionFactoryBean.class})
+    public MPJSqlInjector mpjSqlInjector(ISqlInjector sqlInjector) {
         logger.info("MPJSqlInjector init");
         return new MPJSqlInjector(sqlInjector);
     }
@@ -102,6 +104,7 @@ public class MybatisPlusJoinAutoConfiguration {
     @Bean
     @Order(Ordered.HIGHEST_PRECEDENCE)
     @ConditionalOnMissingBean(ISqlInjector.class)
+    @ConditionalOnClass({SqlSessionFactory.class, SqlSessionFactoryBean.class})
     public MPJSqlInjector mpjSqlInjectorOnMiss() {
         logger.info("MPJSqlInjector init");
         return new MPJSqlInjector();
@@ -112,13 +115,14 @@ public class MybatisPlusJoinAutoConfiguration {
      */
     @Bean
     @Order(Ordered.HIGHEST_PRECEDENCE)
-    public SpringContentUtils mpjSpringContent(MPJSpringContext springContext) {
+    @ConditionalOnClass({SqlSessionFactory.class, SqlSessionFactoryBean.class})
+    public SpringContentUtils mpjSpringContent(@Autowired(required = false) MPJSpringContext springContext) {
         return new SpringContentUtils(springContext);
     }
 
     @Configuration
     @Order(Ordered.HIGHEST_PRECEDENCE)
-    @ConditionalOnBean(SqlSessionFactory.class)
+    @ConditionalOnClass({SqlSessionFactory.class, SqlSessionFactoryBean.class})
     public static class MPJMappingConfig implements ApplicationListener<ApplicationReadyEvent> {
         @Override
         @SuppressWarnings("NullableProblems")
@@ -128,7 +132,7 @@ public class MybatisPlusJoinAutoConfiguration {
     }
 
     @Configuration
-    @ConditionalOnBean(SqlSessionFactory.class)
+    @ConditionalOnClass({SqlSessionFactory.class, SqlSessionFactoryBean.class})
     public static class MPJSpringContext implements SpringContentUtils.SpringContext, ApplicationContextAware {
 
         private ApplicationContext applicationContext;

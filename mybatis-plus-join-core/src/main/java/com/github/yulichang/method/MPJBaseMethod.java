@@ -9,6 +9,7 @@ import com.baomidou.mybatisplus.core.toolkit.Constants;
 import com.baomidou.mybatisplus.core.toolkit.StringPool;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.core.toolkit.sql.SqlScriptUtils;
+import com.github.yulichang.adapter.AdapterHelper;
 import com.github.yulichang.annotation.DynamicTableName;
 import com.github.yulichang.config.ConfigProperties;
 import com.github.yulichang.toolkit.VersionUtils;
@@ -199,5 +200,85 @@ public interface MPJBaseMethod extends Constants {
         }
         boolean en = tableName.equals(encode);
         return String.format("${ew.getTableName%s(\"%s\")}", en ? "" : "Enc", en ? tableName : encode);
+    }
+
+    default String mpjSqlSet(boolean logic, boolean ew, TableInfo table, boolean judgeAliasNull, String alias, String prefix) {
+        String sqlScript = mpjGetAllSqlSet(table, logic, prefix);
+        if (judgeAliasNull) {
+            sqlScript = SqlScriptUtils.convertIf(sqlScript, String.format("%s != null", alias), true);
+        }
+        if (ew) {
+            sqlScript += NEWLINE;
+            sqlScript += mpjConvertIfEwParam(U_WRAPPER_SQL_SET, false);
+        }
+        sqlScript = SqlScriptUtils.convertSet(sqlScript);
+        return sqlScript;
+    }
+
+    default String mpjConvertIfEwParam(final String param, final boolean newLine) {
+        return StringPool.EMPTY;
+    }
+
+    /**
+     * 获取所有的 sql set 片段
+     *
+     * @param ignoreLogicDelFiled 是否过滤掉逻辑删除字段
+     * @param prefix              前缀
+     * @return sql 脚本片段
+     */
+    default String mpjGetAllSqlSet(TableInfo tableInfo, boolean ignoreLogicDelFiled, final String prefix) {
+        final String newPrefix = prefix == null ? EMPTY : prefix;
+        return tableInfo.getFieldList().stream()
+                .filter(i -> {
+                    if (ignoreLogicDelFiled) {
+                        return !(AdapterHelper.getTableInfoAdapter().mpjHasLogic(tableInfo) && i.isLogicDelete());
+                    }
+                    return true;
+                }).map(i -> mpjGetSqlSet(i, newPrefix)).filter(Objects::nonNull).collect(joining(NEWLINE));
+    }
+
+    /**
+     * 获取 set sql 片段
+     *
+     * @param prefix 前缀
+     * @return sql 脚本片段
+     */
+    default String mpjGetSqlSet(TableFieldInfo tableFieldInfo, final String prefix) {
+        return mpjGetSqlSet(tableFieldInfo, false, prefix);
+    }
+
+    /**
+     * 获取 set sql 片段
+     *
+     * @param ignoreIf 忽略 IF 包裹
+     * @param prefix   前缀
+     * @return sql 脚本片段
+     */
+    default String mpjGetSqlSet(TableFieldInfo tableFieldInfo, final boolean ignoreIf, final String prefix) {
+        final String newPrefix = prefix == null ? EMPTY : prefix;
+        // 默认: column=
+        String sqlSet = "${ew.alias}." + tableFieldInfo.getColumn() + EQUALS;
+        if (StringUtils.isNotBlank(tableFieldInfo.getUpdate())) {
+            sqlSet += String.format(tableFieldInfo.getUpdate(), tableFieldInfo.getColumn());
+        } else {
+            sqlSet += SqlScriptUtils.safeParam(newPrefix + tableFieldInfo.getEl());
+        }
+        sqlSet += COMMA;
+        if (ignoreIf) {
+            return sqlSet;
+        }
+        if (tableFieldInfo.isWithUpdateFill()) {
+            // 不进行 if 包裹
+            return sqlSet;
+        }
+        return mpjConvertIf(tableFieldInfo, sqlSet, mpjConvertIfProperty(newPrefix, tableFieldInfo.getProperty()), tableFieldInfo.getUpdateStrategy());
+    }
+
+    default String mpjConvertIfProperty(String prefix, String property) {
+        return StringUtils.isNotBlank(prefix) ? prefix.substring(0, prefix.length() - 1) + "['" + property + "']" : property;
+    }
+
+    default String mpjConvertIf(TableFieldInfo tableFieldInfo, final String sqlScript, final String property, final FieldStrategy fieldStrategy) {
+        return StringPool.EMPTY;
     }
 }

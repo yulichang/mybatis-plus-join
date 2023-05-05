@@ -9,7 +9,9 @@ import com.baomidou.mybatisplus.core.injector.methods.*;
 import com.baomidou.mybatisplus.core.mapper.Mapper;
 import com.baomidou.mybatisplus.core.metadata.TableInfo;
 import com.baomidou.mybatisplus.core.toolkit.ArrayUtils;
+import com.baomidou.mybatisplus.core.toolkit.Assert;
 import com.baomidou.mybatisplus.core.toolkit.ClassUtils;
+import com.baomidou.mybatisplus.core.toolkit.ExceptionUtils;
 import com.github.yulichang.adapter.v3431.AbstractMethodV3431;
 import com.github.yulichang.mapper.MPJTableMapperHelper;
 import com.github.yulichang.method.*;
@@ -59,10 +61,10 @@ public class MPJSqlInjector extends DefaultSqlInjector {
      * 升级到 mybatis plus 3.4.3.2 后对之前的版本兼容
      */
     @Deprecated
-    @SuppressWarnings("unused")
+    @SuppressWarnings({"unused", "DeprecatedIsStillUsed"})
     public List<AbstractMethod> getMethodList(Class<?> mapperClass) {
         if (VersionUtils.compare(MybatisPlusVersion.getVersion(), "3.4.3.2") >= 0) {
-            logger.error(() -> "DefaultSqlInjector 的 getMethodList(Class<?> mapperClass) 方法已在 3.4.3.2+ 改为" +
+            throw ExceptionUtils.mpe("DefaultSqlInjector 的 getMethodList(Class<?> mapperClass) 方法已在 3.4.3.2+ 改为" +
                     "getMethodList(Class<?> mapperClass, TableInfo tableInfo)\n");
         }
         if (Objects.nonNull(sqlInjector)) {
@@ -119,6 +121,8 @@ public class MPJSqlInjector extends DefaultSqlInjector {
         List<AbstractMethod> list = new ArrayList<>();
         if (VersionUtils.compare(MybatisPlusVersion.getVersion(), "3.5.0") >= 0) {
             list.add(new DeleteJoin(SqlMethod.DELETE_JOIN.getMethod()));
+            list.add(new UpdateJoin(SqlMethod.UPDATE_JOIN.getMethod()));
+            list.add(new UpdateJoinAndNull(SqlMethod.UPDATE_JOIN_AND_NULL.getMethod()));
             list.add(new SelectJoinCount(SqlMethod.SELECT_JOIN_COUNT.getMethod()));
             list.add(new SelectJoinOne(SqlMethod.SELECT_JOIN_ONE.getMethod()));
             list.add(new SelectJoinList(SqlMethod.SELECT_JOIN_LIST.getMethod()));
@@ -128,6 +132,8 @@ public class MPJSqlInjector extends DefaultSqlInjector {
             list.add(new SelectJoinMapsPage(SqlMethod.SELECT_JOIN_MAPS_PAGE.getMethod()));
         } else {
             list.add(new DeleteJoin());
+            list.add(new UpdateJoin());
+            list.add(new UpdateJoinAndNull());
             list.add(new SelectJoinCount());
             list.add(new SelectJoinOne());
             list.add(new SelectJoinList());

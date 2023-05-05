@@ -72,22 +72,6 @@ public class MybatisPlusConfig {
         };
     }
 
-//    @Bean
-//    @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
-//    public SqlSessionFactory sqlSessionFactory(DataSource dataSource,
-//                                               MybatisPlusInterceptor interceptor) throws Exception {
-//        MybatisSqlSessionFactoryBean factory = new MybatisSqlSessionFactoryBean();
-//        factory.setDataSource(dataSource);
-//        GlobalConfig.DbConfig config = new GlobalConfig.DbConfig();
-//        config.setLogicDeleteField("del");
-//        config.setLogicDeleteValue("true");
-//        config.setLogicNotDeleteValue("false");
-//        factory.setGlobalConfig(new GlobalConfig().setSqlInjector(new MPJSqlInjector())
-//                .setDbConfig(config));
-//        factory.setPlugins(interceptor);
-//        return factory.getObject();
-//    }
-
     /**
      * 校验sql
      */

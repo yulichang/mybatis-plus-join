@@ -5,7 +5,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.github.yulichang.test.util.ThreadLocalUtils;
-import com.github.yulichang.toolkit.MPJWrappers;
+import com.github.yulichang.toolkit.JoinWrappers;
 import com.github.yulichang.wrapper.MPJLambdaWrapper;
 import com.yulichang.test.springboot3jdk17.dto.AddressDTO;
 import com.yulichang.test.springboot3jdk17.dto.UserDTO;
@@ -571,7 +571,7 @@ class LambdaWrapperTest {
         Page<UserDTO> page = new Page<>(1, 10);
         page.setSearchCount(false);
         IPage<UserDTO> iPage = userMapper.selectJoinPage(page, UserDTO.class,
-                MPJWrappers.<UserDO>lambdaJoin()
+                JoinWrappers.lambda(UserDO.class)
                         .selectAll(UserDO.class)
                         .select(AddressDO::getAddress)
                         .select(AreaDO::getProvince)
@@ -607,7 +607,7 @@ class LambdaWrapperTest {
                   AND (t.id = ? AND (t.head_img = ? OR t1.user_id = ?) AND t.id = ?)
                 LIMIT ?""");
         IPage<UserDTO> page = userMapper.selectJoinPage(new Page<>(1, 10), UserDTO.class,
-                MPJWrappers.<UserDO>lambdaJoin()
+                JoinWrappers.lambda(UserDO.class)
                         .selectAll(UserDO.class)
                         .select(AddressDO::getAddress)
                         .leftJoin(AddressDO.class, on -> on
@@ -626,7 +626,7 @@ class LambdaWrapperTest {
      */
     @Test
     void test4() {
-        UserDTO one = userMapper.selectJoinOne(UserDTO.class, MPJWrappers.<UserDO>lambdaJoin()
+        UserDTO one = userMapper.selectJoinOne(UserDTO.class, JoinWrappers.lambda(UserDO.class)
                 .selectSum(UserDO::getId)
                 .selectMax(UserDO::getId, UserDTO::getHeadImg)
                 .leftJoin(AddressDO.class, AddressDO::getUserId, UserDO::getId));
@@ -667,7 +667,7 @@ class LambdaWrapperTest {
      */
     @Test
     void test7() {
-        List<Map<String, Object>> list = userMapper.selectJoinMaps(MPJWrappers.<UserDO>lambdaJoin()
+        List<Map<String, Object>> list = userMapper.selectJoinMaps(JoinWrappers.lambda(UserDO.class)
                 .selectAll(UserDO.class)
                 .select(AddressDO::getAddress)
                 .leftJoin(AddressDO.class, AddressDO::getUserId, UserDO::getId));

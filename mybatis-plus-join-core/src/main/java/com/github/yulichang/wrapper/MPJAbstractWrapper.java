@@ -70,9 +70,8 @@ public abstract class MPJAbstractWrapper<T, Children extends MPJAbstractWrapper<
     /**
      * ON sql wrapper集合
      */
-    protected final List<MPJLambdaWrapper<T>> onWrappers = new ArrayList<>();
+    protected final List<Children> onWrappers = new ArrayList<>();
     /**
-     * ß
      * 数据库表映射实体类
      */
     private T entity;
@@ -517,6 +516,10 @@ public abstract class MPJAbstractWrapper<T, Children extends MPJAbstractWrapper<
      */
     protected abstract Children instance();
 
+    protected abstract Children instanceEmpty();
+
+    protected abstract Children instance(Integer index, String keyWord, Class<?> joinClass, String tableName);
+
     /**
      * 格式化 sql
      * <p>
@@ -604,6 +607,12 @@ public abstract class MPJAbstractWrapper<T, Children extends MPJAbstractWrapper<
         lastSql.toEmpty();
         sqlComment.toEmpty();
         sqlFirst.toEmpty();
+        tableList.clear();
+        entityClass = null;
+        onWrappers.clear();
+        index = null;
+        isMain = true;
+        isNo = false;
     }
 
     /**
@@ -978,6 +987,4 @@ public abstract class MPJAbstractWrapper<T, Children extends MPJAbstractWrapper<
         return maybeDo(condition, () -> columns.forEach(c -> appendSqlSegments(ORDER_BY,
                 columnToSqlSegment(columnSqlInjectFilter(c)), isAsc ? ASC : DESC)));
     }
-
-
 }

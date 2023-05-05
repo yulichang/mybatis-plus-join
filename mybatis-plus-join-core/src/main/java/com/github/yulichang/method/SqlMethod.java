@@ -32,8 +32,29 @@ public enum SqlMethod {
             "<script>\n%s SELECT %s %s FROM %s %s %s %s %s %s\n</script>"),
 
     SELECT_JOIN_MAPS_PAGE("selectJoinMapsPage", "返回Map集合并分页",
-            "<script>\n%s SELECT %s %s FROM %s %s %s %s %s %s\n</script>");
+            "<script>\n%s SELECT %s %s FROM %s %s %s %s %s %s\n</script>"),
 
+    /**
+     * 连表删除
+     */
+    DELETE_JOIN("deleteJoin", "连表删除",
+                                  "<script>\n%s DELETE %s FROM %s %s %s %s %s\n</script>"),
+
+    /**
+     * 连表逻辑删除
+     */
+    LOGIC_DELETE_JOIN("deleteJoin", "连表逻辑删除", "<script>\n%s UPDATE %s %s %s %s %s %s\n</script>"),
+
+    /**
+     * 连表更新
+     */
+    UPDATE_JOIN("updateJoin", "连表更新", "<script>\n%s UPDATE %s %s %s %s %s %s\n</script>"),
+
+    /**
+     * 连表逻辑更新 (会更新null字段)
+     */
+    UPDATE_JOIN_AND_NULL("updateJoinAndNull", "连表更新", "<script>\n%s UPDATE %s %s %s %s %s %s\n</script>"),
+    ;
     private final String method;
     private final String sql;
 

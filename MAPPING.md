@@ -62,7 +62,6 @@ public class UserDO {
 ```java
 /**
  * 一对一，一对多关系映射查询
- * 映射只对以Deep结尾有效，比如 getByIdDeep listByIdsDeep 等
  * 如果不需要关系映射就使用mybatis plus原生方法即可，比如 getById listByIds 等
  *
  * 注意：关系映射不会去关联查询，而是执行多次单表查询（对结果汇总后使用in语句查询,再对结果进行匹配）
@@ -80,14 +79,15 @@ class MappingTest {
 
     @Test
     void test2() {
-        List<UserDO> list = userMapper.selectListDeep(Wrappers.emptyWrapper());
+        List<UserDO> list = userMapper.selectRelation(mapper -> mapper.selectList(Wrappers.emptyWrapper()));
         list.forEach(System.out::println);
     }
 
     @Test
     void test3() {
-        Page<UserDO> page = userMapper.selectPageDeep(new Page<>(2, 2), Wrappers.emptyWrapper());
-        page.getRecords().forEach(System.out::println);
+        Page<UserDO> page = new Page<>(2, 2);
+        Page<UserDO> result = userMapper.selectRelation(mapper -> mapper.selectPage(page, Wrappers.emptyWrapper()));
+        result.getRecords().forEach(System.out::println);
     }
 
     /**

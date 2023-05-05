@@ -5,7 +5,6 @@ import com.github.yulichang.interfaces.MPJBaseJoin;
 import com.github.yulichang.query.interfaces.StringJoin;
 import com.github.yulichang.toolkit.Constant;
 import com.github.yulichang.wrapper.MPJAbstractLambdaWrapper;
-import com.github.yulichang.wrapper.MPJLambdaWrapper;
 
 import java.util.function.BiConsumer;
 
@@ -45,7 +44,7 @@ public interface QueryJoin<Children, Entity> extends MPJBaseJoin<Entity>, String
      * @param left  条件
      * @param right 条件
      */
-    default <T, X> Children leftJoin(Class<T> clazz, SFunction<T, ?> left, SFunction<X, ?> right, WrapperFunction<MPJLambdaWrapper<Entity>> ext) {
+    default <T, X> Children leftJoin(Class<T> clazz, SFunction<T, ?> left, SFunction<X, ?> right, WrapperFunction<Children> ext) {
         return join(Constant.LEFT_JOIN, clazz, left, right, ext);
     }
 
@@ -57,7 +56,7 @@ public interface QueryJoin<Children, Entity> extends MPJBaseJoin<Entity>, String
      * @param clazz    关联实体类
      * @param consumer 条件
      */
-    default <T> Children leftJoin(Class<T> clazz, BiConsumer<MPJAbstractLambdaWrapper<Entity, ?>, MPJLambdaWrapper<Entity>> consumer) {
+    default <T> Children leftJoin(Class<T> clazz, BiConsumer<MPJAbstractLambdaWrapper<Entity, ?>, Children> consumer) {
         return join(Constant.LEFT_JOIN, clazz, consumer);
     }
 
@@ -91,7 +90,7 @@ public interface QueryJoin<Children, Entity> extends MPJBaseJoin<Entity>, String
      * @param left  条件
      * @param right 条件
      */
-    default <T, X> Children leftJoin(Class<T> clazz, String alias, SFunction<T, ?> left, SFunction<X, ?> right, WrapperFunction<MPJLambdaWrapper<Entity>> ext) {
+    default <T, X> Children leftJoin(Class<T> clazz, String alias, SFunction<T, ?> left, SFunction<X, ?> right, WrapperFunction<Children> ext) {
         return join(Constant.LEFT_JOIN, clazz, alias, left, right, ext);
     }
 
@@ -103,7 +102,7 @@ public interface QueryJoin<Children, Entity> extends MPJBaseJoin<Entity>, String
      * @param clazz    关联实体类
      * @param consumer 条件
      */
-    default <T> Children leftJoin(Class<T> clazz, String alias, BiConsumer<MPJAbstractLambdaWrapper<Entity, ?>, MPJLambdaWrapper<Entity>> consumer) {
+    default <T> Children leftJoin(Class<T> clazz, String alias, BiConsumer<MPJAbstractLambdaWrapper<Entity, ?>, Children> consumer) {
         return join(Constant.LEFT_JOIN, clazz, alias, consumer);
     }
 
@@ -124,14 +123,14 @@ public interface QueryJoin<Children, Entity> extends MPJBaseJoin<Entity>, String
     /**
      * ignore 参考 left join
      */
-    default <T, X> Children rightJoin(Class<T> clazz, SFunction<T, ?> left, SFunction<X, ?> right, WrapperFunction<MPJLambdaWrapper<Entity>> ext) {
+    default <T, X> Children rightJoin(Class<T> clazz, SFunction<T, ?> left, SFunction<X, ?> right, WrapperFunction<Children> ext) {
         return join(Constant.RIGHT_JOIN, clazz, left, right, ext);
     }
 
     /**
      * ignore 参考 left join
      */
-    default <T, X> Children rightJoin(Class<T> clazz, BiConsumer<MPJAbstractLambdaWrapper<Entity, ?>, MPJLambdaWrapper<Entity>> consumer) {
+    default <T, X> Children rightJoin(Class<T> clazz, BiConsumer<MPJAbstractLambdaWrapper<Entity, ?>, Children> consumer) {
         return join(Constant.RIGHT_JOIN, clazz, consumer);
     }
 
@@ -152,14 +151,14 @@ public interface QueryJoin<Children, Entity> extends MPJBaseJoin<Entity>, String
     /**
      * ignore 参考 left join
      */
-    default <T, X> Children rightJoin(Class<T> clazz, String alias, SFunction<T, ?> left, SFunction<X, ?> right, WrapperFunction<MPJLambdaWrapper<Entity>> ext) {
+    default <T, X> Children rightJoin(Class<T> clazz, String alias, SFunction<T, ?> left, SFunction<X, ?> right, WrapperFunction<Children> ext) {
         return join(Constant.RIGHT_JOIN, clazz, alias, left, right, ext);
     }
 
     /**
      * ignore 参考 left join
      */
-    default <T, X> Children rightJoin(Class<T> clazz, String alias, BiConsumer<MPJAbstractLambdaWrapper<Entity, ?>, MPJLambdaWrapper<Entity>> consumer) {
+    default <T, X> Children rightJoin(Class<T> clazz, String alias, BiConsumer<MPJAbstractLambdaWrapper<Entity, ?>, Children> consumer) {
         return join(Constant.RIGHT_JOIN, clazz, alias, consumer);
     }
 
@@ -181,14 +180,14 @@ public interface QueryJoin<Children, Entity> extends MPJBaseJoin<Entity>, String
     /**
      * ignore 参考 left join
      */
-    default <T, X> Children innerJoin(Class<T> clazz, SFunction<T, ?> left, SFunction<X, ?> right, WrapperFunction<MPJLambdaWrapper<Entity>> ext) {
+    default <T, X> Children innerJoin(Class<T> clazz, SFunction<T, ?> left, SFunction<X, ?> right, WrapperFunction<Children> ext) {
         return join(Constant.INNER_JOIN, clazz, left, right, ext);
     }
 
     /**
      * ignore 参考 left join
      */
-    default <T> Children innerJoin(Class<T> clazz, BiConsumer<MPJAbstractLambdaWrapper<Entity, ?>, MPJLambdaWrapper<Entity>> consumer) {
+    default <T> Children innerJoin(Class<T> clazz, BiConsumer<MPJAbstractLambdaWrapper<Entity, ?>, Children> consumer) {
         return join(Constant.INNER_JOIN, clazz, consumer);
     }
 
@@ -210,14 +209,14 @@ public interface QueryJoin<Children, Entity> extends MPJBaseJoin<Entity>, String
     /**
      * ignore 参考 left join
      */
-    default <T, X> Children innerJoin(Class<T> clazz, String alias, SFunction<T, ?> left, SFunction<X, ?> right, WrapperFunction<MPJLambdaWrapper<Entity>> ext) {
+    default <T, X> Children innerJoin(Class<T> clazz, String alias, SFunction<T, ?> left, SFunction<X, ?> right, WrapperFunction<Children> ext) {
         return join(Constant.INNER_JOIN, clazz, alias, left, right, ext);
     }
 
     /**
      * ignore 参考 left join
      */
-    default <T> Children innerJoin(Class<T> clazz, String alias, BiConsumer<MPJAbstractLambdaWrapper<Entity, ?>, MPJLambdaWrapper<Entity>> consumer) {
+    default <T> Children innerJoin(Class<T> clazz, String alias, BiConsumer<MPJAbstractLambdaWrapper<Entity, ?>, Children> consumer) {
         return join(Constant.INNER_JOIN, clazz, alias, consumer);
     }
 
@@ -238,14 +237,14 @@ public interface QueryJoin<Children, Entity> extends MPJBaseJoin<Entity>, String
     /**
      * ignore 参考 left join
      */
-    default <T, X> Children fullJoin(Class<T> clazz, SFunction<T, ?> left, SFunction<X, ?> right, WrapperFunction<MPJLambdaWrapper<Entity>> ext) {
+    default <T, X> Children fullJoin(Class<T> clazz, SFunction<T, ?> left, SFunction<X, ?> right, WrapperFunction<Children> ext) {
         return join(Constant.FULL_JOIN, clazz, left, right, ext);
     }
 
     /**
      * ignore 参考 left join
      */
-    default <T> Children fullJoin(Class<T> clazz, BiConsumer<MPJAbstractLambdaWrapper<Entity, ?>, MPJLambdaWrapper<Entity>> consumer) {
+    default <T> Children fullJoin(Class<T> clazz, BiConsumer<MPJAbstractLambdaWrapper<Entity, ?>, Children> consumer) {
         return join(Constant.FULL_JOIN, clazz, consumer);
     }
 
@@ -266,14 +265,14 @@ public interface QueryJoin<Children, Entity> extends MPJBaseJoin<Entity>, String
     /**
      * ignore 参考 left join
      */
-    default <T, X> Children fullJoin(Class<T> clazz, String alias, SFunction<T, ?> left, SFunction<X, ?> right, WrapperFunction<MPJLambdaWrapper<Entity>> ext) {
+    default <T, X> Children fullJoin(Class<T> clazz, String alias, SFunction<T, ?> left, SFunction<X, ?> right, WrapperFunction<Children> ext) {
         return join(Constant.FULL_JOIN, clazz, alias, left, right, ext);
     }
 
     /**
      * ignore 参考 left join
      */
-    default <T> Children fullJoin(Class<T> clazz, String alias, BiConsumer<MPJAbstractLambdaWrapper<Entity, ?>, MPJLambdaWrapper<Entity>> consumer) {
+    default <T> Children fullJoin(Class<T> clazz, String alias, BiConsumer<MPJAbstractLambdaWrapper<Entity, ?>, Children> consumer) {
         return join(Constant.FULL_JOIN, clazz, alias, consumer);
     }
 
@@ -311,7 +310,7 @@ public interface QueryJoin<Children, Entity> extends MPJBaseJoin<Entity>, String
      * @param left  条件
      * @param right 条件
      */
-    default <T, X> Children join(String keyWord, Class<T> clazz, SFunction<T, ?> left, SFunction<X, ?> right, WrapperFunction<MPJLambdaWrapper<Entity>> ext) {
+    default <T, X> Children join(String keyWord, Class<T> clazz, SFunction<T, ?> left, SFunction<X, ?> right, WrapperFunction<Children> ext) {
         return join(keyWord, clazz, (on, e) -> {
             on.eq(left, right);
             ext.apply(e);
@@ -352,7 +351,7 @@ public interface QueryJoin<Children, Entity> extends MPJBaseJoin<Entity>, String
      * @param left  条件
      * @param right 条件
      */
-    default <T, X> Children join(String keyWord, Class<T> clazz, String alias, SFunction<T, ?> left, SFunction<X, ?> right, WrapperFunction<MPJLambdaWrapper<Entity>> ext) {
+    default <T, X> Children join(String keyWord, Class<T> clazz, String alias, SFunction<T, ?> left, SFunction<X, ?> right, WrapperFunction<Children> ext) {
         return join(keyWord, clazz, alias, (on, e) -> {
             on.eq(left, right);
             ext.apply(e);
@@ -362,12 +361,12 @@ public interface QueryJoin<Children, Entity> extends MPJBaseJoin<Entity>, String
     /**
      * 内部使用, 不建议直接调用
      */
-    default <T> Children join(String keyWord, Class<T> clazz, BiConsumer<MPJAbstractLambdaWrapper<Entity, ?>, MPJLambdaWrapper<Entity>> consumer) {
+    default <T> Children join(String keyWord, Class<T> clazz, BiConsumer<MPJAbstractLambdaWrapper<Entity, ?>, Children> consumer) {
         return join(keyWord, clazz, null, consumer);
     }
 
     /**
      * 内部使用, 不建议直接调用
      */
-    <T> Children join(String keyWord, Class<T> clazz, String alias, BiConsumer<MPJAbstractLambdaWrapper<Entity, ?>, MPJLambdaWrapper<Entity>> consumer);
+    <T> Children join(String keyWord, Class<T> clazz, String alias, BiConsumer<MPJAbstractLambdaWrapper<Entity, ?>, Children> consumer);
 }

@@ -1,7 +1,9 @@
 package com.github.yulichang.toolkit;
 
 import com.github.yulichang.query.MPJQueryWrapper;
+import com.github.yulichang.wrapper.DeleteJoinWrapper;
 import com.github.yulichang.wrapper.MPJLambdaWrapper;
+import com.github.yulichang.wrapper.UpdateJoinWrapper;
 
 /**
  * @author yulichang
@@ -56,7 +58,7 @@ public class JoinWrappers {
      * JoinWrappers.lambda("t", User.class)
      */
     public static <T> MPJLambdaWrapper<T> lambda(String alias, Class<T> clazz) {
-        return new MPJLambdaWrapper<T>(alias).setEntityClass(clazz);
+        return new MPJLambdaWrapper<T>(clazz, alias);
     }
 
     /**
@@ -70,6 +72,27 @@ public class JoinWrappers {
      * JoinWrappers.lambda("t", user)
      */
     public static <T> MPJLambdaWrapper<T> lambda(String alias, T entity) {
-        return new MPJLambdaWrapper<T>(alias).setEntity(entity);
+        return new MPJLambdaWrapper<T>(entity, alias);
+    }
+
+    /**
+     * JoinWrappers.delete(User.class)
+     */
+    public static <T> DeleteJoinWrapper<T> delete(Class<T> clazz) {
+        return new DeleteJoinWrapper<>(clazz);
+    }
+
+    /**
+     * JoinWrappers.update(User.class)
+     */
+    public static <T> UpdateJoinWrapper<T> update(Class<T> clazz) {
+        return new UpdateJoinWrapper<>(clazz);
+    }
+
+    /**
+     * JoinWrappers.update("t", User.class)
+     */
+    public static <T> UpdateJoinWrapper<T> update(String alias, Class<T> clazz) {
+        return new UpdateJoinWrapper<>(clazz, alias);
     }
 }

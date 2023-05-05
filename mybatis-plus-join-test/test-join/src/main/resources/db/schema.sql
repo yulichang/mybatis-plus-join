@@ -56,3 +56,12 @@ create table user_dto
     update_by int not null,
     del       bit null
 );
+
+create table order_t
+(
+    id        int auto_increment
+        primary key,
+    user_id   int not null,
+    age   int not null,
+    name varchar(255) not null
+);

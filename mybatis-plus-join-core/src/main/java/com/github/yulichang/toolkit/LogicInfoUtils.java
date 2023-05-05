@@ -22,13 +22,15 @@ public class LogicInfoUtils implements Constants {
 
     private static final Map<Class<?>, Map<String, String>> LOGIC_CACHE_NO_AND = new ConcurrentHashMap<>();
 
+    private static final Map<Class<?>, Map<String, String>> LOGIC_CACHE_INVERT = new ConcurrentHashMap<>();
+
     public static String getLogicInfo(Integer tableIndex, Class<?> clazz, boolean hasAlias, String alias) {
         Map<String, String> absent = LOGIC_CACHE.get(clazz);
         if (absent == null) {
             absent = new ConcurrentHashMap<>();
             LOGIC_CACHE.put(clazz, absent);
         }
-        return absent.computeIfAbsent(hasAlias ? alias : (alias + tableIndex), key -> getLogicStr(key, clazz, true));
+        return absent.computeIfAbsent(hasAlias ? alias : (alias + tableIndex), key -> getLogicStr(key, clazz, true, false));
     }
 
     public static String getLogicInfoNoAnd(Integer tableIndex, Class<?> clazz, boolean hasAlias, String alias) {
@@ -37,21 +39,31 @@ public class LogicInfoUtils implements Constants {
             absent = new ConcurrentHashMap<>();
             LOGIC_CACHE_NO_AND.put(clazz, absent);
         }
-        return absent.computeIfAbsent(hasAlias ? alias : (alias + tableIndex), key -> getLogicStr(key, clazz, false));
+        return absent.computeIfAbsent(hasAlias ? alias : (alias + tableIndex), key -> getLogicStr(key, clazz, false, false));
     }
 
-    private static String getLogicStr(String prefix, Class<?> clazz, boolean and) {
+    public static String getLogicInfoInvert(Integer tableIndex, Class<?> clazz, boolean hasAlias, String alias) {
+        Map<String, String> absent = LOGIC_CACHE_INVERT.get(clazz);
+        if (absent == null) {
+            absent = new ConcurrentHashMap<>();
+            LOGIC_CACHE_INVERT.put(clazz, absent);
+        }
+        return absent.computeIfAbsent(hasAlias ? alias : (alias + tableIndex), key -> getLogicStr(key, clazz, false, true));
+    }
 
+    private static String getLogicStr(String prefix, Class<?> clazz, boolean and, boolean invert) {
         String logicStr;
         TableInfo tableInfo = TableHelper.get(clazz);
         Asserts.hasTable(tableInfo, clazz);
         TableFieldInfo logicField = ConfigProperties.tableInfoAdapter.mpjGetLogicField(tableInfo);
         if (ConfigProperties.tableInfoAdapter.mpjHasLogic(tableInfo) && Objects.nonNull(logicField)) {
-            final String value = logicField.getLogicNotDeleteValue();
-            if (NULL.equalsIgnoreCase(value)) {
-                logicStr = (and ? " AND " : EMPTY) + prefix + DOT + logicField.getColumn() + " IS NULL";
+            final String notDeleteValue = logicField.getLogicNotDeleteValue();
+            final String deleteValue = logicField.getLogicDeleteValue();
+            if (NULL.equalsIgnoreCase(notDeleteValue)) {
+                logicStr = (and ? " AND " : EMPTY) + prefix + DOT + logicField.getColumn() + (invert ? " IS NOT NULL" : " IS NULL");
             } else {
-                logicStr = (and ? " AND " : EMPTY) + prefix + DOT + logicField.getColumn() + EQUALS + String.format(logicField.isCharSequence() ? "'%s'" : "%s", value);
+                logicStr = (and ? " AND " : EMPTY) + prefix + DOT + logicField.getColumn() + EQUALS +
+                        String.format(logicField.isCharSequence() ? "'%s'" : "%s", invert ? deleteValue : notDeleteValue);
             }
         } else {
             logicStr = StringPool.EMPTY;

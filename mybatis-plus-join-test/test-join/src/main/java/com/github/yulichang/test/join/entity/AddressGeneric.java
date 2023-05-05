@@ -4,8 +4,10 @@ package com.github.yulichang.test.join.entity;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableLogic;
 import lombok.Data;
+import lombok.experimental.Accessors;
 
 @Data
+@Accessors(chain = true)
 public class AddressGeneric<ID, USER_ID, AREA_ID, TEL, ADDRESS, DEL> {
 
     @TableId

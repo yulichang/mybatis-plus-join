@@ -1,5 +1,6 @@
 package com.github.yulichang.toolkit;
 
+import com.baomidou.mybatisplus.core.toolkit.Assert;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import lombok.Data;
 
@@ -155,16 +156,36 @@ public class TableList {
         }
     }
 
+    public String getPrefixByClassAssert(Class<?> clazz) {
+        if (Objects.equals(clazz, rootClass)) {
+            return alias;
+        }
+        Node node = getByClassFirst(clazz);
+        Assert.notNull(node, "sql 中无法找到 <%s> 类对应的表", clazz.getSimpleName());
+        return node.hasAlias ? node.getAlias() : (node.getAlias() + node.getIndex());
+    }
+
     private Node getByIndex(int index) {
         return all.stream().filter(i -> i.getIndex() == index).findFirst().orElse(null);
     }
 
-    private Node getByClassFirst(Class<?> clazz) {
+    public Node getByClassFirst(Class<?> clazz) {
         return all.stream().filter(i -> i.getClazz() == clazz).findFirst().orElse(null);
     }
 
     private List<Node> getByClass(Class<?> clazz) {
         return all.stream().filter(i -> i.getClazz() == clazz).collect(Collectors.toList());
+    }
+
+
+    public boolean contain(Class<?> clazz) {
+        if (Objects.isNull(clazz)) {
+            return false;
+        }
+        if (rootClass != null && rootClass == clazz) {
+            return true;
+        }
+        return all.stream().anyMatch(i -> i.getClazz() == clazz);
     }
 
     public void clear() {

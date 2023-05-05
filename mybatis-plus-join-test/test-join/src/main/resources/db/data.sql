@@ -89,3 +89,14 @@ INSERT INTO user_dto (id, user_id, create_by, update_by, del) VALUES
 (6,1, 2, 3, false),
 (7,1, 2, 3, false),
 (8,1, 2, 3, false);
+
+DELETE FROM order_t;
+INSERT INTO order_t (id, user_id, age, name) VALUES
+(1, 1, 8, '1,8'),
+(2, 2, 7, '2,7'),
+(3, 3, 6, '3,6'),
+(4, 4, 5, '4,5'),
+(5, 5, 4, '5,4'),
+(6, 6, 3, '6,3'),
+(7, 7, 2, '7,2'),
+(8, 8, 1, '8,1');

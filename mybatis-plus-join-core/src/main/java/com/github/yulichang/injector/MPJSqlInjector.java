@@ -19,8 +19,6 @@ import com.github.yulichang.toolkit.VersionUtils;
 import com.github.yulichang.toolkit.reflect.GenericTypeUtils;
 import lombok.Getter;
 import org.apache.ibatis.builder.MapperBuilderAssistant;
-import org.mybatis.logging.Logger;
-import org.mybatis.logging.LoggerFactory;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -41,8 +39,6 @@ import static java.util.stream.Collectors.toList;
  * @see DefaultSqlInjector
  */
 public class MPJSqlInjector extends DefaultSqlInjector {
-
-    private static final Logger logger = LoggerFactory.getLogger(MPJSqlInjector.class);
 
     @Getter
     private AbstractSqlInjector sqlInjector;

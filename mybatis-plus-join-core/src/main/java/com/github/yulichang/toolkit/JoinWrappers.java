@@ -58,7 +58,7 @@ public class JoinWrappers {
      * JoinWrappers.lambda("t", User.class)
      */
     public static <T> MPJLambdaWrapper<T> lambda(String alias, Class<T> clazz) {
-        return new MPJLambdaWrapper<T>(clazz, alias);
+        return new MPJLambdaWrapper<>(clazz, alias);
     }
 
     /**
@@ -72,7 +72,7 @@ public class JoinWrappers {
      * JoinWrappers.lambda("t", user)
      */
     public static <T> MPJLambdaWrapper<T> lambda(String alias, T entity) {
-        return new MPJLambdaWrapper<T>(entity, alias);
+        return new MPJLambdaWrapper<>(entity, alias);
     }
 
     /**
@@ -80,6 +80,13 @@ public class JoinWrappers {
      */
     public static <T> DeleteJoinWrapper<T> delete(Class<T> clazz) {
         return new DeleteJoinWrapper<>(clazz);
+    }
+
+    /**
+     * JoinWrappers.delete(User.class)
+     */
+    public static <T> DeleteJoinWrapper<T> delete(String alias, Class<T> clazz) {
+        return new DeleteJoinWrapper<>(clazz, alias);
     }
 
     /**

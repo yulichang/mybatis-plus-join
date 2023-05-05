@@ -55,6 +55,7 @@ public class MybatisPlusConfig {
     public ISqlInjector sqlInjector() {
         return new MPJSqlInjector() {
             @Override
+            @SuppressWarnings("deprecation")
             public List<AbstractMethod> getMethodList(Class<?> mapperClass) {
                 List<AbstractMethod> list = super.getMethodList(mapperClass);
                 //添加你的方法

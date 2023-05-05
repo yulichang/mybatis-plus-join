@@ -2,12 +2,9 @@ package com.github.yulichang.base.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.core.toolkit.Assert;
 import com.baomidou.mybatisplus.core.toolkit.Constants;
 import com.github.yulichang.interfaces.MPJBaseJoin;
 import com.github.yulichang.toolkit.Constant;
-import com.github.yulichang.wrapper.DeleteJoinWrapper;
-import com.github.yulichang.wrapper.UpdateJoinWrapper;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;

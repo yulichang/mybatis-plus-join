@@ -638,6 +638,7 @@ class LambdaWrapperTest {
      * 忽略个别查询字段
      */
     @Test
+    @SuppressWarnings("deprecation")
     void test6() {
         MPJLambdaWrapper<UserDO> wrapper = new MPJLambdaWrapper<UserDO>()
                 .selectAll(UserDO.class)

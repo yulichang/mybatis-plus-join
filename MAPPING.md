@@ -63,7 +63,7 @@ public class UserDO {
 /**
  * 一对一，一对多关系映射查询
  * 如果不需要关系映射就使用mybatis plus原生方法即可，比如 getById listByIds 等
- *
+ * <p>
  * 注意：关系映射不会去关联查询，而是执行多次单表查询（对结果汇总后使用in语句查询,再对结果进行匹配）
  */
 @SpringBootTest
@@ -90,9 +90,9 @@ class MappingTest {
         result.getRecords().forEach(System.out::println);
     }
 
-    /**
-     * 更多方法请查阅 MPJDeepMapper 或者 MPJDeepService
-     * 使用方式与 mybatis plus 一致
+    /*
+      更多方法请查阅 MPJDeepMapper 或者 MPJDeepService
+      使用方式与 mybatis plus 一致
      */
 }
 ```

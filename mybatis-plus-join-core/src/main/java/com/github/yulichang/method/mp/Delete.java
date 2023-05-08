@@ -1,6 +1,5 @@
 package com.github.yulichang.method.mp;
 
-import com.baomidou.mybatisplus.core.metadata.MPJTableInfoHelper;
 import com.baomidou.mybatisplus.core.metadata.TableInfo;
 import com.baomidou.mybatisplus.core.toolkit.Constants;
 import com.baomidou.mybatisplus.core.toolkit.sql.SqlScriptUtils;
@@ -24,7 +23,7 @@ public class Delete extends com.baomidou.mybatisplus.core.injector.methods.Delet
     @Override
     public MappedStatement injectMappedStatement(Class<?> mapperClass, Class<?> modelClass, TableInfo tableInfo) {
         return super.injectMappedStatement(mapperClass, modelClass,
-                MPJTableInfoHelper.copyAndSetTableName(tableInfo, getTableName(tableInfo)));
+                copyAndSetTableName(tableInfo, getTableName(tableInfo)));
     }
 
     @Override

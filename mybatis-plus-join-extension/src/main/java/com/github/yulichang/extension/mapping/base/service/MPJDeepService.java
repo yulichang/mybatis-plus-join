@@ -1,4 +1,4 @@
-package com.github.yulichang.base.service;
+package com.github.yulichang.extension.mapping.base.service;
 
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -7,7 +7,7 @@ import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.github.yulichang.annotation.EntityMapping;
 import com.github.yulichang.annotation.FieldMapping;
-import com.github.yulichang.base.mapper.MPJDeepMapper;
+import com.github.yulichang.extension.mapping.base.MPJDeepMapper;
 
 import java.io.Serializable;
 import java.util.Arrays;

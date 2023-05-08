@@ -4,7 +4,6 @@ package com.github.yulichang.toolkit;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.toolkit.Assert;
 import com.baomidou.mybatisplus.extension.toolkit.SqlHelper;
-import com.github.yulichang.mapper.MPJTableMapperHelper;
 import org.apache.ibatis.session.SqlSession;
 
 import java.util.Objects;

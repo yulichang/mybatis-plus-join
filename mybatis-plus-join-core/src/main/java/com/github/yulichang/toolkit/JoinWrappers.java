@@ -83,7 +83,7 @@ public class JoinWrappers {
     }
 
     /**
-     * JoinWrappers.delete(User.class)
+     * JoinWrappers.delete("t", User.class)
      */
     public static <T> DeleteJoinWrapper<T> delete(String alias, Class<T> clazz) {
         return new DeleteJoinWrapper<>(clazz, alias);

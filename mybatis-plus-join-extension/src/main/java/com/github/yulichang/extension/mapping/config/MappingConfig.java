@@ -1,8 +1,8 @@
-package com.github.yulichang.config;
+package com.github.yulichang.extension.mapping.config;
 
-import com.baomidou.mybatisplus.core.metadata.MPJTableInfoHelper;
+import com.github.yulichang.extension.mapping.mapper.MPJTableInfoHelper;
 import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
-import com.github.yulichang.mapper.MPJTableMapperHelper;
+import com.github.yulichang.toolkit.MPJTableMapperHelper;
 
 /**
  * 关系映射配置

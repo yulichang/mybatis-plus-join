@@ -6,9 +6,10 @@ import com.github.yulichang.autoconfigure.conditional.MPJSqlInjectorCondition;
 import com.github.yulichang.config.ConfigProperties;
 import com.github.yulichang.config.MPJInterceptorConfig;
 import com.github.yulichang.config.enums.LogicDelTypeEnum;
+import com.github.yulichang.extension.mapping.config.MappingConfig;
+import com.github.yulichang.toolkit.SpringContentUtils;
 import com.github.yulichang.injector.MPJSqlInjector;
 import com.github.yulichang.interceptor.MPJInterceptor;
-import com.github.yulichang.toolkit.SpringContentUtils;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.mybatis.spring.SqlSessionFactoryBean;
 import org.slf4j.Logger;
@@ -127,7 +128,7 @@ public class MybatisPlusJoinAutoConfiguration {
         @Override
         @SuppressWarnings("NullableProblems")
         public void onApplicationEvent(ApplicationReadyEvent applicationReadyEvent) {
-            new com.github.yulichang.config.MappingConfig();
+            new MappingConfig();
         }
     }
 

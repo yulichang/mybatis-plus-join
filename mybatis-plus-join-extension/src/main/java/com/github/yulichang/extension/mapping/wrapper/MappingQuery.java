@@ -1,10 +1,10 @@
-package com.github.yulichang.base.mapper.wrapper;
+package com.github.yulichang.extension.mapping.wrapper;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.enums.SqlKeyword;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.github.yulichang.mapper.MPJMappingWrapper;
-import com.github.yulichang.mapper.MPJTableFieldInfo;
+import com.github.yulichang.extension.mapping.mapper.MPJMappingWrapper;
+import com.github.yulichang.extension.mapping.mapper.MPJTableFieldInfo;
 
 import java.util.List;
 

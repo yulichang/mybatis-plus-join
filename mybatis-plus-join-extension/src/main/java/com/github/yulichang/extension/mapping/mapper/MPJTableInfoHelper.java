@@ -1,15 +1,13 @@
-package com.baomidou.mybatisplus.core.metadata;
+package com.github.yulichang.extension.mapping.mapper;
 
+import com.baomidou.mybatisplus.core.metadata.TableInfo;
+import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
 import com.baomidou.mybatisplus.core.toolkit.ClassUtils;
 import com.baomidou.mybatisplus.core.toolkit.ReflectionKit;
 import com.github.yulichang.annotation.EntityMapping;
 import com.github.yulichang.annotation.FieldMapping;
-import com.github.yulichang.exception.MPJException;
-import com.github.yulichang.mapper.MPJTableFieldInfo;
-import com.github.yulichang.mapper.MPJTableInfo;
 import com.github.yulichang.toolkit.MPJReflectionKit;
 import com.github.yulichang.toolkit.TableHelper;
-import org.apache.ibatis.session.Configuration;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -20,12 +18,6 @@ import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * 拷贝 {@link TableInfoHelper}
- *
- * <p>用于构建resultType(DTO)对应的TableInfo
- * <p>拷贝这个类用于更好的兼容mybatis-plus的全部功能
- * <p>由于 {@link TableInfo} 权限限制,所以新建 com.baomidou.mybatisplus.core.metadata 这个包
- * <p>为什么不把 {@link TableInfo} 这个类拷贝出来? 因为无法限制用户使用那个版本, 而TableInfo会随着版本而改动,
- * 使用 mybatis-plus 的TableInfo能够兼容所有版本,也能跟好的维护
  *
  * @author yulichang
  * @see TableInfoHelper
@@ -130,28 +122,5 @@ public class MPJTableInfoHelper {
         mpjTableInfo.setFieldList(mpjFieldList);
     }
 
-    /**
-     * 复制tableInfo对象
-     * 由于各个版本的MP的TableInfo对象存在差异，为了兼容性采用反射，而不是getter setter
-     */
-    public static TableInfo copyAndSetTableName(TableInfo tableInfo, String tableName) {
-        try {
-            TableInfo table;
-            try {
-                table = TableInfo.class.getDeclaredConstructor(Class.class).newInstance(tableInfo.getEntityType());
-            } catch (Exception e) {
-                table = TableInfo.class.getDeclaredConstructor(Configuration.class, Class.class).newInstance(tableInfo.getConfiguration(), tableInfo.getEntityType());
-            }
-            //反射拷贝对象
-            Field[] fields = TableInfo.class.getDeclaredFields();
-            for (Field f : fields) {
-                f.setAccessible(true);
-                f.set(table, f.get(tableInfo));
-            }
-            table.setTableName(tableName);
-            return table;
-        } catch (Exception e) {
-            throw new MPJException("TableInfo 对象拷贝失败 -> " + tableInfo.getEntityType().getName());
-        }
-    }
+
 }

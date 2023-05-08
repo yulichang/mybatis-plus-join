@@ -1,14 +1,15 @@
-package com.github.yulichang.base.mapper;
+package com.github.yulichang.extension.mapping.base;
 
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.enums.SqlKeyword;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.baomidou.mybatisplus.core.metadata.*;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.github.yulichang.extension.mapping.mapper.MPJTableInfoHelper;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
-import com.github.yulichang.base.mapper.wrapper.MappingQuery;
-import com.github.yulichang.mapper.MPJTableFieldInfo;
-import com.github.yulichang.mapper.MPJTableInfo;
+import com.github.yulichang.extension.mapping.mapper.MPJTableFieldInfo;
+import com.github.yulichang.extension.mapping.mapper.MPJTableInfo;
+import com.github.yulichang.extension.mapping.wrapper.MappingQuery;
 import com.github.yulichang.toolkit.LambdaUtils;
 
 import java.io.Serializable;
@@ -195,41 +196,6 @@ public interface MPJDeepMapper<T> extends BaseMapper<T> {
     }
 
     /**
-     * 根据 Wrapper 条件，查询全部记录
-     *
-     * @param queryWrapper 实体对象封装操作类（可以为 null）
-     */
-    default List<Map<String, Object>> selectMapsDeep(Class<T> clazz, Wrapper<T> queryWrapper) {
-        return mpjQueryMapMapping(selectMaps(queryWrapper), clazz, null);
-    }
-
-    /**
-     * 根据 entity 条件，查询全部记录（并翻页）
-     * <p>
-     * JDK 默认不推荐泛型数组，会引起 Java堆污染(Heap Pollution)
-     *
-     * @param clazz        实体类class
-     * @param queryWrapper 实体对象封装操作类（可以为 null）
-     * @param property     需要关联的字段
-     */
-    default <R> List<Map<String, Object>> selectMapsDeep(Class<T> clazz, Wrapper<T> queryWrapper, SFunction<T, R>... property) {
-        return mpjQueryMapMapping(selectMaps(queryWrapper), clazz, Arrays.asList(property));
-    }
-
-    /**
-     * 针对可变参数堆污染提供的重载
-     * list为null或空，会查询全部映射关系
-     * <p>
-     * 例： selectMapsDeep(UserDO.class, queryWrapper, Arrays.asList(User::getId, ... ))
-     *
-     * @param queryWrapper 实体对象封装操作类（可以为 null）
-     * @param property     需要关联的字段
-     */
-    default <R> List<Map<String, Object>> selectMapsDeep(Class<T> clazz, Wrapper<T> queryWrapper, List<SFunction<T, R>> property) {
-        return mpjQueryMapMapping(selectMaps(queryWrapper), clazz, property);
-    }
-
-    /**
      * 根据 entity 条件，查询全部记录（并翻页）
      *
      * @param page         分页查询条件（可以为 RowBounds.DEFAULT）
@@ -269,54 +235,6 @@ public interface MPJDeepMapper<T> extends BaseMapper<T> {
     default <R, E extends IPage<T>> E selectPageDeep(E page, Wrapper<T> queryWrapper, List<SFunction<T, R>> property) {
         E e = selectPage(page, queryWrapper);
         mpjQueryMapping(e.getRecords(), property);
-        return e;
-    }
-
-
-    /**
-     * 根据 entity 条件，查询全部记录（并翻页）
-     *
-     * @param page         分页查询条件（可以为 RowBounds.DEFAULT）
-     * @param queryWrapper 实体对象封装操作类（可以为 null）
-     */
-    default <R, E extends IPage<Map<String, Object>>> E selectMapsPageDeep(E page, Class<T> clazz, Wrapper<T> queryWrapper) {
-        E e = selectMapsPage(page, queryWrapper);
-        mpjQueryMapMapping(e.getRecords(), clazz, null);
-        return e;
-    }
-
-
-    /**
-     * 根据 entity 条件，查询全部记录（并翻页）
-     * <p>
-     * JDK 默认不推荐泛型数组，会引起 Java堆污染(Heap Pollution)
-     *
-     * @param page         分页查询条件（可以为 RowBounds.DEFAULT）
-     * @param queryWrapper 实体对象封装操作类（可以为 null）
-     * @param property     需要关联的字段
-     */
-    default <R, E extends IPage<Map<String, Object>>> E selectMapsPageDeep(E page, Class<T> clazz, Wrapper<T> queryWrapper,
-                                                                           SFunction<T, R>... property) {
-        E e = selectMapsPage(page, queryWrapper);
-        mpjQueryMapMapping(e.getRecords(), clazz, Arrays.asList(property));
-        return e;
-    }
-
-
-    /**
-     * 针对可变参数堆污染提供的重载
-     * list为null或空，会查询全部映射关系
-     * <p>
-     * 例： selectMapsPage(page, UserDO.class, queryWrapper, Arrays.asList(User::getId, ... ))
-     *
-     * @param page         分页查询条件（可以为 RowBounds.DEFAULT）
-     * @param queryWrapper 实体对象封装操作类（可以为 null）
-     * @param property     需要关联的字段
-     */
-    default <R, E extends IPage<Map<String, Object>>> E selectMapsPageDeep(E page, Class<T> clazz, Wrapper<T> queryWrapper,
-                                                                           List<SFunction<T, R>> property) {
-        E e = selectMapsPage(page, queryWrapper);
-        mpjQueryMapMapping(e.getRecords(), clazz, property);
         return e;
     }
 

@@ -1,4 +1,4 @@
-package com.github.yulichang.mapper;
+package com.github.yulichang.extension.mapping.mapper;
 
 import com.baomidou.mybatisplus.core.metadata.TableInfo;
 import lombok.Data;

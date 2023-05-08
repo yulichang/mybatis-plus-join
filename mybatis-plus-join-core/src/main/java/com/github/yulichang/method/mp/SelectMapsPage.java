@@ -1,6 +1,5 @@
 package com.github.yulichang.method.mp;
 
-import com.baomidou.mybatisplus.core.metadata.MPJTableInfoHelper;
 import com.baomidou.mybatisplus.core.metadata.TableInfo;
 import com.baomidou.mybatisplus.core.toolkit.Constants;
 import com.baomidou.mybatisplus.core.toolkit.StringPool;
@@ -25,7 +24,7 @@ public class SelectMapsPage extends com.baomidou.mybatisplus.core.injector.metho
     @Override
     public MappedStatement injectMappedStatement(Class<?> mapperClass, Class<?> modelClass, TableInfo tableInfo) {
         return super.injectMappedStatement(mapperClass, modelClass,
-                MPJTableInfoHelper.copyAndSetTableName(tableInfo, getTableName(tableInfo)));
+                copyAndSetTableName(tableInfo, getTableName(tableInfo)));
     }
 
     @Override

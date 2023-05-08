@@ -1,12 +1,12 @@
-package com.github.yulichang.relation;
+package com.github.yulichang.extension.mapping.relation;
 
 import com.baomidou.mybatisplus.core.enums.SqlKeyword;
-import com.baomidou.mybatisplus.core.metadata.MPJTableInfoHelper;
+import com.github.yulichang.extension.mapping.mapper.MPJTableInfoHelper;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
-import com.github.yulichang.base.mapper.wrapper.MappingQuery;
-import com.github.yulichang.mapper.MPJTableFieldInfo;
-import com.github.yulichang.mapper.MPJTableInfo;
+import com.github.yulichang.extension.mapping.mapper.MPJTableFieldInfo;
+import com.github.yulichang.extension.mapping.mapper.MPJTableInfo;
+import com.github.yulichang.extension.mapping.wrapper.MappingQuery;
 import com.github.yulichang.toolkit.LambdaUtils;
 
 import java.util.ArrayList;

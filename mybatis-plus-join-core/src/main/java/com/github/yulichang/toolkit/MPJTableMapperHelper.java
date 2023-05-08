@@ -1,4 +1,4 @@
-package com.github.yulichang.mapper;
+package com.github.yulichang.toolkit;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;

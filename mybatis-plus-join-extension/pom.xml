@@ -1,12 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>com.github.yulichang</groupId>
-    <artifactId>mybatis-plus-join-root</artifactId>
-    <packaging>pom</packaging>
+    <parent>
+        <groupId>com.github.yulichang</groupId>
+        <artifactId>mybatis-plus-join-root</artifactId>
+        <version>1.4.4.1</version>
+    </parent>
+    <artifactId>mybatis-plus-join-extension</artifactId>
     <version>1.4.4.1</version>
-    <name>mybatis-plus-join-root</name>
+    <name>mybatis-plus-join-extension</name>
 
     <description>An enhanced toolkit of Mybatis-Plus to simplify development.</description>
     <url>https://github.com/yulichang/mybatis-plus-join</url>
@@ -29,15 +33,6 @@
         <url>https://github.com/yulichang/mybatis-plus-join</url>
     </scm>
 
-    <modules>
-        <module>mybatis-plus-join-boot-starter</module>
-        <module>mybatis-plus-join-adapter</module>
-        <module>mybatis-plus-join-core</module>
-        <module>mybatis-plus-join-annotation</module>
-        <module>mybatis-plus-join-extension</module>
-        <module>mybatis-plus-join-test</module>
-    </modules>
-
     <properties>
         <jdkVersion>1.8</jdkVersion>
         <jdkVersion.test>1.8</jdkVersion.test>
@@ -46,4 +41,24 @@
         <github.global.server>github</github.global.server>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.github.yulichang</groupId>
+            <artifactId>mybatis-plus-join-core</artifactId>
+            <version>1.4.4.1</version>
+        </dependency>
+        <dependency>
+            <groupId>com.baomidou</groupId>
+            <artifactId>mybatis-plus-extension</artifactId>
+            <version>3.5.3.1</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.18.24</version>
+            <scope>provided</scope>
+        </dependency>
+    </dependencies>
 </project>

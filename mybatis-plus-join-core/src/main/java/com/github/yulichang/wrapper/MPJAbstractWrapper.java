@@ -51,6 +51,7 @@ public abstract class MPJAbstractWrapper<T, Children extends MPJAbstractWrapper<
     /**
      * 必要度量
      */
+    @Getter
     protected AtomicInteger paramNameSeq;
     protected Map<String, Object> paramNameValuePairs;
     /**
@@ -103,6 +104,7 @@ public abstract class MPJAbstractWrapper<T, Children extends MPJAbstractWrapper<
     /**
      * 关联的表
      */
+    @Getter
     protected TableList tableList;
 
     @Override

@@ -44,6 +44,10 @@ public abstract class MPJAbstractLambdaWrapper<T, Children extends MPJAbstractLa
      */
     protected String alias = ConfigProperties.tableAlias;
     /**
+     * 副表别名
+     */
+    protected String subTableAlias = ConfigProperties.tableAlias;
+    /**
      * 是否构建是否存在一对多
      */
     @Getter
@@ -378,8 +382,8 @@ public abstract class MPJAbstractLambdaWrapper<T, Children extends MPJAbstractLa
         instance.isMain = false;
         onWrappers.add(instance);
         if (StringUtils.isBlank(tableAlias)) {
-            tableList.put(oldIndex, clazz, false, ConfigProperties.tableAlias, newIndex);
-            instance.alias = ConfigProperties.tableAlias;
+            tableList.put(oldIndex, clazz, false, subTableAlias, newIndex);
+            instance.alias = subTableAlias;
             instance.hasAlias = false;
         } else {
             tableList.put(oldIndex, clazz, true, tableAlias, newIndex);

@@ -1011,4 +1011,20 @@ class LambdaWrapperTest {
             //忽略异常 h2不支持连表删除
         }
     }
+
+    /**
+     * select 子查询
+     */
+    @Test
+    void sub() {
+        ThreadLocalUtils.set("SELECT ( SELECT st.id FROM `user` st WHERE st.del=false AND (st.id <= ?) limit 1 ) AS pid FROM `user` t LEFT JOIN address t1 ON (t1.user_id = t.id) WHERE t.del=false AND t1.del=false AND (t.id <= ?)");
+        MPJLambdaWrapper<UserDO> wrapper = JoinWrappers.lambda(UserDO.class)
+                .selectSub(UserDO.class, w -> w.select(UserDO::getId)
+                        .le(UserDO::getId,1000)
+                        .last("limit 1"), UserDO::getPid)
+                .leftJoin(AddressDO.class,AddressDO::getUserId,UserDO::getId)
+                .le(UserDO::getId,100);
+        wrapper.list();
+        System.out.println(1);
+    }
 }

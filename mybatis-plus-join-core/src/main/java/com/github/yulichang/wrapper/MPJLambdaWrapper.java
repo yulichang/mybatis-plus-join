@@ -10,6 +10,7 @@ import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.github.yulichang.toolkit.Constant;
 import com.github.yulichang.toolkit.LambdaUtils;
 import com.github.yulichang.toolkit.TableList;
+import com.github.yulichang.toolkit.WrapperUtils;
 import com.github.yulichang.toolkit.support.ColumnCache;
 import com.github.yulichang.wrapper.interfaces.Chain;
 import com.github.yulichang.wrapper.interfaces.Query;
@@ -18,10 +19,12 @@ import com.github.yulichang.wrapper.resultmap.Label;
 import com.github.yulichang.wrapper.segments.Select;
 import com.github.yulichang.wrapper.segments.SelectCache;
 import com.github.yulichang.wrapper.segments.SelectNormal;
+import com.github.yulichang.wrapper.segments.SelectString;
 import lombok.Getter;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 /**
@@ -171,6 +174,24 @@ public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWr
                 getSelectColum().add(new SelectNormal(cache, index, hasAlias, alias));
             }
         }
+        return typedThis;
+    }
+
+    /**
+     * 子查询
+     */
+    public <E, F> MPJLambdaWrapper<T> selectSub(Class<E> clazz, Consumer<MPJLambdaWrapper<E>> consumer, SFunction<F, ?> alias) {
+        MPJLambdaWrapper<E> wrapper = new MPJLambdaWrapper<E>(null, clazz, SharedString.emptyString(), paramNameSeq, paramNameValuePairs,
+                new MergeSegments(), SharedString.emptyString(), SharedString.emptyString(), SharedString.emptyString(),
+                new TableList(), null, null, null, null) {
+        };
+        String st = "st";
+        wrapper.tableList.setAlias(st);
+        wrapper.alias = st;
+        wrapper.subTableAlias = st;
+        consumer.accept(wrapper);
+        String sql = WrapperUtils.buildSqlByWrapper(clazz, wrapper, alias);
+        this.selectColumns.add(new SelectString(sql, hasAlias, this.alias));
         return typedThis;
     }
 

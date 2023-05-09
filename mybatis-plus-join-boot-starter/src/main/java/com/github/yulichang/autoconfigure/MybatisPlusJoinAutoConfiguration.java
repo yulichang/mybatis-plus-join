@@ -65,6 +65,7 @@ public class MybatisPlusJoinAutoConfiguration {
         ConfigProperties.joinPrefix = properties.getJoinPrefix();
         ConfigProperties.logicDelType = "where".equalsIgnoreCase(properties.getLogicDelType()) ?
                 LogicDelTypeEnum.WHERE : LogicDelTypeEnum.ON;
+        ConfigProperties.mappingMaxCount = properties.getMappingMaxCount();
     }
 
     /**

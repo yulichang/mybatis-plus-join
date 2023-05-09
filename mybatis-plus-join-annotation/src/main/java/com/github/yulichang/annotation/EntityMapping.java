@@ -10,7 +10,7 @@ import java.lang.annotation.*;
  * @since 1.2.0
  */
 @Documented
-@SuppressWarnings("unused")
+@SuppressWarnings({"unused"})
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.FIELD, ElementType.ANNOTATION_TYPE})
 public @interface EntityMapping {
@@ -39,25 +39,6 @@ public @interface EntityMapping {
      * false 不抛异常，获取列表第一条数据<br/>
      */
     boolean isThrowExp() default true;
-
-    /**
-     * 针对查询结果map的时候使用<br/>
-     * 默认为thisField对应的数据库列名<br/>
-     * <p>
-     * 如果此类是以map方式查询的<br/>
-     * 并且查询出来的map的key不是thisField对应的数据库列名就需要设置<br/>
-     */
-    String thisMapKey() default "";
-
-    /**
-     * isMap为true时生效<br/>
-     * 针对查询结果map的时候使用<br/>
-     * 默认为joinField对应的数据库列名<br/>
-     * <p>
-     * 如果此类是以map方式查询的<br/>
-     * 并且查询出来的map的key不是thisField对应的数据库列名就需要设置<br/>
-     */
-    String joinMapKey() default "";
 
     /**
      * 映射表查询条件之 select<br/>

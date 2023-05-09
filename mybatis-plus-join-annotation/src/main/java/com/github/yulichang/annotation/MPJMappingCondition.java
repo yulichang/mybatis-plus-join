@@ -1,6 +1,7 @@
 package com.github.yulichang.annotation;
 
-import com.baomidou.mybatisplus.core.enums.SqlKeyword;
+
+import com.github.yulichang.annotation.enums.SqlKeyword;
 
 /**
  * 映射表条件

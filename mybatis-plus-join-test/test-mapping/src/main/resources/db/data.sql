@@ -29,21 +29,21 @@ INSERT INTO area (id, province, city, area, postcode, del) VALUES (10022, 'åŒ—äº
 
 DELETE FROM `user`;
 
-INSERT INTO `user` (id, pid, `name`, `address_id`, sex, head_img, del) VALUES ( 1, 1, '{"aa":"aaa","bb":"bbb"}', 1, 1, 'https://url-01', false);
+INSERT INTO `user` (id, pid, `name`, `address_id`, sex, head_img, del) VALUES ( 1, null, '{"aa":"aaa","bb":"bbb"}', 1, 1, 'https://url-01', false);
 INSERT INTO `user` (id, pid, `name`, `address_id`, sex, head_img, del) VALUES ( 2, 1, '{"aa":"aaa","bb":"bbb"}', 1, 0, 'https://url-02', false);
-INSERT INTO `user` (id, pid, `name`, `address_id`, sex, head_img, del) VALUES ( 3, 1, '{"aa":"aaa","bb":"bbb"}', 1, 0, 'https://url-03', false);
-INSERT INTO `user` (id, pid, `name`, `address_id`, sex, head_img, del) VALUES ( 4, 1, '{"aa":"aaa","bb":"bbb"}', 1, 0, 'https://url-04', false);
-INSERT INTO `user` (id, pid, `name`, `address_id`, sex, head_img, del) VALUES ( 5, 1, '{"aa":"aaa","bb":"bbb"}', 1, 0, 'https://url-05', false);
-INSERT INTO `user` (id, pid, `name`, `address_id`, sex, head_img, del) VALUES ( 6, 1, '{"aa":"aaa","bb":"bbb"}', 1, 0, 'https://url-06', false);
-INSERT INTO `user` (id, pid, `name`, `address_id`, sex, head_img, del) VALUES ( 7, 1, '{"aa":"aaa","bb":"bbb"}', 1, 0, 'https://url-07', false);
-INSERT INTO `user` (id, pid, `name`, `address_id`, sex, head_img, del) VALUES ( 8, 1, '{"aa":"aaa","bb":"bbb"}', 1, 0, 'https://url-08', false);
+INSERT INTO `user` (id, pid, `name`, `address_id`, sex, head_img, del) VALUES ( 3, 2, '{"aa":"aaa","bb":"bbb"}', 1, 0, 'https://url-03', false);
+INSERT INTO `user` (id, pid, `name`, `address_id`, sex, head_img, del) VALUES ( 4, 3, '{"aa":"aaa","bb":"bbb"}', 1, 0, 'https://url-04', false);
+INSERT INTO `user` (id, pid, `name`, `address_id`, sex, head_img, del) VALUES ( 5, 4, '{"aa":"aaa","bb":"bbb"}', 1, 0, 'https://url-05', false);
+INSERT INTO `user` (id, pid, `name`, `address_id`, sex, head_img, del) VALUES ( 6, 5, '{"aa":"aaa","bb":"bbb"}', 1, 0, 'https://url-06', false);
+INSERT INTO `user` (id, pid, `name`, `address_id`, sex, head_img, del) VALUES ( 7, 6, '{"aa":"aaa","bb":"bbb"}', 1, 0, 'https://url-07', false);
+INSERT INTO `user` (id, pid, `name`, `address_id`, sex, head_img, del) VALUES ( 8, 7, '{"aa":"aaa","bb":"bbb"}', 1, 0, 'https://url-08', false);
 INSERT INTO `user` (id, pid, `name`, `address_id`, sex, head_img, del) VALUES ( 9, 1, '{"aa":"aaa","bb":"bbb"}', 1, 0, 'https://url-09', false);
 INSERT INTO `user` (id, pid, `name`, `address_id`, sex, head_img, del) VALUES (10, 1, '{"aa":"aaa","bb":"bbb"}', 1, 0, 'https://url-10', false);
 INSERT INTO `user` (id, pid, `name`, `address_id`, sex, head_img, del) VALUES (11, 1, '{"aa":"aaa","bb":"bbb"}', 1, 0, 'https://url-11', false);
 INSERT INTO `user` (id, pid, `name`, `address_id`, sex, head_img, del) VALUES (12, 1, '{"aa":"aaa","bb":"bbb"}', 1, 0, 'https://url-12', false);
 INSERT INTO `user` (id, pid, `name`, `address_id`, sex, head_img, del) VALUES (13, 1, '{"aa":"aaa","bb":"bbb"}', 1, 0, 'https://url-13', false);
-INSERT INTO `user` (id, pid, `name`, `address_id`, sex, head_img, del) VALUES (14, 1, '{"aa":"aaa","bb":"bbb"}', 1, 0, 'https://url-14', false);
-INSERT INTO `user` (id, pid, `name`, `address_id`, sex, head_img, del) VALUES (15, 1, '{"aa":"aaa","bb":"bbb"}', 1, 0, 'https://url-15', false);
+INSERT INTO `user` (id, pid, `name`, `address_id`, sex, head_img, del) VALUES (14, 7, '{"aa":"aaa","bb":"bbb"}', 1, 0, 'https://url-14', false);
+INSERT INTO `user` (id, pid, `name`, `address_id`, sex, head_img, del) VALUES (15, 7, '{"aa":"aaa","bb":"bbb"}', 1, 0, 'https://url-15', false);
 INSERT INTO `user` (id, pid, `name`, `address_id`, sex, head_img, del) VALUES (16, 1, '{"aa":"aaa","bb":"bbb"}', 1, 0, 'https://url-16', false);
 INSERT INTO `user` (id, pid, `name`, `address_id`, sex, head_img, del) VALUES (17, 1, '{"aa":"aaa","bb":"bbb"}', 1, 0, 'https://url-17', false);
 INSERT INTO `user` (id, pid, `name`, `address_id`, sex, head_img, del) VALUES (18, 1, '{"aa":"aaa","bb":"bbb"}', 1, 0, 'https://url-18', false);

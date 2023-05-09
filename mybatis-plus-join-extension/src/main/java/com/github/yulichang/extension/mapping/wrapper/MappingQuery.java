@@ -22,7 +22,7 @@ public class MappingQuery<T> extends QueryWrapper<T> {
      * 映射 wrapper 构造器
      * 仅对使用映射注解时使用
      */
-    public static <T> List<?> mpjQueryList(BaseMapper<T> baseMapper, boolean selectMap, SqlKeyword keyword,
+    public static <T> List<?> mpjQueryList(BaseMapper<T> baseMapper, SqlKeyword keyword,
                                            String column, Object val, MPJTableFieldInfo fieldInfo) {
         MPJMappingWrapper infoWrapper = fieldInfo.getWrapper();
         MappingQuery<T> wrapper = new MappingQuery<>();
@@ -62,9 +62,6 @@ public class MappingQuery<T> extends QueryWrapper<T> {
         }
         if (infoWrapper.isHasApply()) {
             infoWrapper.getApplyList().forEach(a -> wrapper.apply(a.getSql(), (Object[]) a.getVal()));
-        }
-        if (selectMap) {
-            return baseMapper.selectMaps(wrapper);
         }
         return baseMapper.selectList(wrapper);
     }

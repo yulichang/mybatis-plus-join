@@ -61,10 +61,6 @@ public class MPJTableFieldInfo {
      */
     private String property;
     /**
-     * 数据结构是否是Map或者List<Map>
-     */
-    private boolean fieldIsMap;
-    /**
      * 属性是否是集合
      */
     private boolean isCollection;
@@ -80,10 +76,6 @@ public class MPJTableFieldInfo {
      * 当前字段信息
      */
     private String thisColumn;
-    /**
-     * 当前字段信息
-     */
-    private String thisMapKey;
     /**
      * 映射实体类
      */
@@ -101,12 +93,6 @@ public class MPJTableFieldInfo {
      */
     private Field joinField;
     /**
-     * fieldIsMap 为true时使用
-     * 映射查询Map 的key
-     * 默认为 关联字段的数据库列名
-     */
-    private String joinMapKey;
-    /**
      * 关联的mapper引用
      */
     private BaseMapper<?> joinMapper;
@@ -123,16 +109,16 @@ public class MPJTableFieldInfo {
      * 初始化关联字段信息
      */
     public MPJTableFieldInfo(Class<?> entityType, EntityMapping mapping, Field field) {
+        this.entityType = entityType;
         this.isMappingEntity = true;
         this.isMappingField = false;
         initField(field);
         if (mapping.tag() != Object.class) {
             this.joinClass = mapping.tag();
         }
-        this.entityType = entityType;
         this.isThrowExp = mapping.isThrowExp();
-        initThisField(mapping.thisMapKey(), mapping.thisField());
-        initJoinField(mapping.joinMapKey(), mapping.joinField());
+        initThisField(mapping.thisField());
+        initJoinField(mapping.joinField());
         this.isRemoveBindField = StringUtils.isNotBlank(mapping.select()) && (!Arrays.asList(mapping.select().split(
                 StringPool.COMMA)).contains(this.joinColumn.trim()));
         this.wrapper = new MPJMappingWrapper(mapping.first(), StringUtils.isBlank(mapping.select()) ? null :
@@ -141,6 +127,7 @@ public class MPJTableFieldInfo {
     }
 
     public MPJTableFieldInfo(Class<?> entityType, FieldMapping mappingField, Field field) {
+        this.entityType = entityType;
         this.isMappingEntity = false;
         this.isMappingField = true;
         field.setAccessible(true);
@@ -151,10 +138,9 @@ public class MPJTableFieldInfo {
             throw new MPJException("对多关系的数据结构目前只支持 <List> 暂不支持其他Collection实现 " + this.field.getType().getTypeName());
         }
         this.joinClass = mappingField.tag();
-        this.entityType = entityType;
         this.isThrowExp = mappingField.isThrowExp();
-        initThisField(mappingField.thisMapKey(), mappingField.thisField());
-        initJoinField(mappingField.joinMapKey(), mappingField.joinField());
+        initThisField(mappingField.thisField());
+        initJoinField(mappingField.joinField());
         this.isRemoveBindField = !mappingField.select().equals(this.joinColumn.trim());
         this.wrapper = new MPJMappingWrapper(mappingField.first(), this.isRemoveBindField ? this.joinColumn +
                 StringPool.COMMA + mappingField.select() : mappingField.select(), mappingField.apply(),
@@ -178,7 +164,7 @@ public class MPJTableFieldInfo {
         this.bindField = field;
     }
 
-    private void initJoinField(String joinMapKey, String joinField) {
+    private void initJoinField(String joinField) {
         if (StringUtils.isNotBlank(joinField)) {
             this.joinProperty = joinField;
         } else {
@@ -205,10 +191,9 @@ public class MPJTableFieldInfo {
         Assert.notNull(this.joinColumn, "注解属性thisField不存在 %s , %s", this.joinClass.getName(),
                 StringUtils.isBlank(this.joinProperty) ? "主键" : this.joinProperty);
         this.joinField.setAccessible(true);
-        this.joinMapKey = StringUtils.isBlank(joinMapKey) ? this.joinColumn : joinMapKey;
     }
 
-    private void initThisField(String thisMapKey, String thisField) {
+    private void initThisField(String thisField) {
         if (StringUtils.isNotBlank(thisField)) {
             this.thisProperty = thisField;
         } else {
@@ -233,7 +218,6 @@ public class MPJTableFieldInfo {
             this.thisColumn = fieldInfo.getColumn();
         }
         this.thisField.setAccessible(true);
-        this.thisMapKey = StringUtils.isBlank(thisMapKey) ? this.thisColumn : thisMapKey;
     }
 
     private void initField(Field field) {
@@ -245,30 +229,26 @@ public class MPJTableFieldInfo {
             throw new MPJException("对多关系的数据结构目前只支持 <List> 暂不支持其他Collection实现 " + this.field.getType().getTypeName());
         }
         if (Map.class.isAssignableFrom(field.getType())) {
-            this.fieldIsMap = true;
+            throw ExceptionUtils.mpe("映射查询不支持Map结构 <%s.%s>", this.entityType.getSimpleName(), field.getName());
         } else {
             if (field.getGenericType() instanceof ParameterizedType) {
                 ParameterizedType t = (ParameterizedType) field.getGenericType();
                 Type type = t.getActualTypeArguments()[0];
                 if (type instanceof ParameterizedType) {
-                    this.fieldIsMap = ((ParameterizedType) type).getRawType() == Map.class;
-                } else {
-                    this.fieldIsMap = false;
+                    if (((ParameterizedType) type).getRawType() == Map.class) {
+                        throw ExceptionUtils.mpe("映射查询不支持Map结构 <%s.%s>", this.entityType.getSimpleName(), field.getName());
+                    }
                 }
-            } else {
-                this.fieldIsMap = false;
             }
         }
 
-        if (!this.fieldIsMap) {
-            if (List.class.isAssignableFrom(field.getType())) {
-                if (field.getGenericType() instanceof ParameterizedType) {
-                    ParameterizedType t = (ParameterizedType) field.getGenericType();
-                    this.joinClass = (Class<?>) t.getActualTypeArguments()[0];
-                }
-            } else {
-                this.joinClass = field.getType();
+        if (List.class.isAssignableFrom(field.getType())) {
+            if (field.getGenericType() instanceof ParameterizedType) {
+                ParameterizedType t = (ParameterizedType) field.getGenericType();
+                this.joinClass = (Class<?>) t.getActualTypeArguments()[0];
             }
+        } else {
+            this.joinClass = field.getType();
         }
     }
 
@@ -338,14 +318,9 @@ public class MPJTableFieldInfo {
         }
     }
 
-    @SuppressWarnings({"unchecked", "RedundantCast"})
     public void removeJoinField(List<?> joinList) {
         if (this.isMappingEntity() && this.isRemoveBindField()) {
-            if (this.isFieldIsMap()) {
-                ((List<Map<String, Object>>) joinList).forEach(m -> m.remove(this.getJoinMapKey()));
-            } else {
-                joinList.forEach(this::joinFieldSetNull);
-            }
+            joinList.forEach(this::joinFieldSetNull);
         }
     }
 
@@ -358,19 +333,6 @@ public class MPJTableFieldInfo {
                         data.size() + " , " + fieldInfo.getField().getName());
             } else {
                 fieldInfo.fieldSet(i, data.stream().findFirst().orElse(null));
-            }
-        }
-    }
-
-    public static void bindMap(MPJTableFieldInfo fieldInfo, Map<String, Object> i, List<?> data) {
-        if (fieldInfo.isCollection()) {
-            i.put(fieldInfo.getField().getName(), data);
-        } else {
-            if (data.size() > 1 && fieldInfo.isThrowExp()) {
-                throw new MPJException("Expected one result (or null) to be returned by select, but found: " +
-                        data.size() + " , " + fieldInfo.getField().getName());
-            } else {
-                i.put(fieldInfo.getField().getName(), data.stream().findFirst().orElse(null));
             }
         }
     }

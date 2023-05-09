@@ -16,5 +16,4 @@ public class MappingConfig {
         TableInfoHelper.getTableInfos().forEach(i ->
                 MPJTableInfoHelper.initTableInfo(i.getEntityType(), MPJTableMapperHelper.getMapper(i.getEntityType())));
     }
-
 }

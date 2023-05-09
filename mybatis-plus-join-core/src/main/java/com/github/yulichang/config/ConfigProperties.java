@@ -31,6 +31,10 @@ public class ConfigProperties {
      */
     public static LogicDelTypeEnum logicDelType = LogicDelTypeEnum.WHERE;
     /**
+     * 逻辑删除类型 支持 where on
+     */
+    public static int mappingMaxCount = 5;
+    /**
      * TableInfo适配器
      */
     public static ITableInfoAdapter tableInfoAdapter = AdapterHelper.getTableInfoAdapter();

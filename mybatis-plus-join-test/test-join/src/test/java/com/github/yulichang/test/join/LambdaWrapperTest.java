@@ -16,7 +16,9 @@ import com.github.yulichang.toolkit.JoinWrappers;
 import com.github.yulichang.wrapper.DeleteJoinWrapper;
 import com.github.yulichang.wrapper.MPJLambdaWrapper;
 import com.github.yulichang.wrapper.UpdateJoinWrapper;
+import org.h2.engine.User;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.BadSqlGrammarException;
@@ -120,6 +122,7 @@ class LambdaWrapperTest {
                 "  AND t1.del = false\n" +
                 "  AND (t.id <= ?)\n" +
                 "ORDER BY t.id DESC");
+        String s = UserDO.Fields.addressId;
         MPJLambdaWrapper<UserDO> wrapper = new MPJLambdaWrapper<UserDO>()
                 .selectAll(UserDO.class)
 

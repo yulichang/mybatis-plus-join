@@ -5,11 +5,13 @@ import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import com.github.yulichang.annotation.DynamicTableName;
+import com.github.yulichang.annotation.EntityMapping;
 import com.github.yulichang.test.join.enums.Sex;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import lombok.experimental.Accessors;
+import lombok.experimental.FieldNameConstants;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -21,6 +23,7 @@ import java.util.Map;
 @Accessors(chain = true)
 @EqualsAndHashCode(callSuper = true)
 @DynamicTableName
+@FieldNameConstants
 @TableName(value = "`user`", autoResultMap = true)
 public class UserDO extends ID<Integer> implements Serializable {
 
@@ -55,7 +58,6 @@ public class UserDO extends ID<Integer> implements Serializable {
 
     @TableField(exist = false)
     private String updateName;
-
 
     @TableField(exist = false)
     private String alias;

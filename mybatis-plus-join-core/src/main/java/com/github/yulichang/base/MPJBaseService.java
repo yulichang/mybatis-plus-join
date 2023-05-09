@@ -14,7 +14,7 @@ import java.util.Map;
  *
  * @author yulichang
  */
-@SuppressWarnings({"unused", "unchecked"})
+@SuppressWarnings({"unused"})
 public interface MPJBaseService<T> extends IService<T> {
 
 

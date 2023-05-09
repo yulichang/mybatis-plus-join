@@ -31,6 +31,7 @@ public interface TableAlias extends Constants, MPJBaseMethod {
      * 复制tableInfo对象
      * 由于各个版本的MP的TableInfo对象存在差异，为了兼容性采用反射，而不是getter setter
      */
+    @SuppressWarnings("JavaReflectionMemberAccess")
     default TableInfo copyAndSetTableName(TableInfo tableInfo, String tableName) {
         try {
             TableInfo table;

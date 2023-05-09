@@ -6,9 +6,10 @@ import com.baomidou.mybatisplus.core.metadata.TableInfo;
 import com.baomidou.mybatisplus.core.toolkit.*;
 import com.github.yulichang.annotation.EntityMapping;
 import com.github.yulichang.annotation.FieldMapping;
-import com.github.yulichang.exception.MPJException;
 import com.github.yulichang.toolkit.SpringContentUtils;
 import com.github.yulichang.toolkit.TableHelper;
+import com.github.yulichang.toolkit.support.ColumnCache;
+import com.github.yulichang.wrapper.segments.SelectCache;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
@@ -16,10 +17,8 @@ import lombok.ToString;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * 字段属性
@@ -119,10 +118,12 @@ public class MPJTableFieldInfo {
         this.isThrowExp = mapping.isThrowExp();
         initThisField(mapping.thisField());
         initJoinField(mapping.joinField());
-        this.isRemoveBindField = StringUtils.isNotBlank(mapping.select()) && (!Arrays.asList(mapping.select().split(
-                StringPool.COMMA)).contains(this.joinColumn.trim()));
-        this.wrapper = new MPJMappingWrapper(mapping.first(), StringUtils.isBlank(mapping.select()) ? null :
-                (this.isRemoveBindField ? this.joinColumn + StringPool.COMMA + mapping.select() : mapping.select()),
+        this.isRemoveBindField = checkArr(mapping.select()) &&
+                (!Arrays.asList(mapping.select()).contains(this.joinProperty.trim()) &&
+                        !Arrays.asList(mapping.select()).contains(this.joinColumn.trim()));
+        this.wrapper = new MPJMappingWrapper(mapping.first(), checkArr(mapping.select()) ?
+                (this.isRemoveBindField ? propToColumn(this.joinClass, mapping.select(), this.joinColumn) :
+                        propToColumn(this.joinClass, mapping.select(), null)) : null,
                 mapping.apply(), mapping.condition(), mapping.last(), mapping.orderByAsc(), mapping.orderByDesc());
     }
 
@@ -135,15 +136,17 @@ public class MPJTableFieldInfo {
         this.property = field.getName();
         this.isCollection = Collection.class.isAssignableFrom(field.getType());
         if (this.isCollection && !List.class.isAssignableFrom(this.field.getType())) {
-            throw new MPJException("对多关系的数据结构目前只支持 <List> 暂不支持其他Collection实现 " + this.field.getType().getTypeName());
+            throw ExceptionUtils.mpe("对多关系的数据结构目前只支持 <List> 暂不支持其他Collection实现 " + this.field.getType().getTypeName());
         }
         this.joinClass = mappingField.tag();
         this.isThrowExp = mappingField.isThrowExp();
         initThisField(mappingField.thisField());
         initJoinField(mappingField.joinField());
-        this.isRemoveBindField = !mappingField.select().equals(this.joinColumn.trim());
-        this.wrapper = new MPJMappingWrapper(mappingField.first(), this.isRemoveBindField ? this.joinColumn +
-                StringPool.COMMA + mappingField.select() : mappingField.select(), mappingField.apply(),
+        this.isRemoveBindField = !mappingField.select().equals(this.joinColumn.trim()) &&
+                !mappingField.select().equals(this.joinProperty.trim());
+        this.wrapper = new MPJMappingWrapper(mappingField.first(), this.isRemoveBindField ?
+                propToColumn(this.joinClass, new String[]{mappingField.select()}, this.joinColumn) :
+                propToColumn(this.joinClass, new String[]{mappingField.select()}, null), mappingField.apply(),
                 mappingField.condition(), mappingField.last(), mappingField.orderByAsc(), mappingField.orderByDesc());
         initBindField(mappingField.select());
     }
@@ -151,15 +154,25 @@ public class MPJTableFieldInfo {
     private void initBindField(String bindName) {
         TableInfo info = TableHelper.get(this.joinClass);
         Assert.notNull(info, "未注册的实体类 <%s>", this.joinClass.getSimpleName());
-        Field field = info.getFieldList().stream()
-                .filter(i -> i.getColumn().equals(bindName))
-                .map(TableFieldInfo::getField).findFirst().orElse(null);
-        if (field == null && bindName.equals(info.getKeyColumn())) {
+        //根据属性名查询
+        Field field = info.getFieldList().stream().filter(i -> i.getProperty().equals(bindName))
+                .findFirst().map(TableFieldInfo::getField).orElse(null);
+        if (field == null && bindName.equals(info.getKeyProperty())) {
             field = ReflectionKit.getFieldList(joinClass).stream().filter(f ->
                     f.getName().equals(info.getKeyProperty())).findFirst().orElse(null);
         }
         if (field == null) {
-            throw new MPJException("字段不存在 " + this.joinClass.getName() + " ，" + bindName);
+            //根据字段查询
+            field = info.getFieldList().stream()
+                    .filter(i -> i.getColumn().equals(bindName))
+                    .map(TableFieldInfo::getField).findFirst().orElse(null);
+            if (field == null && bindName.equals(info.getKeyColumn())) {
+                field = ReflectionKit.getFieldList(joinClass).stream().filter(f ->
+                        f.getName().equals(info.getKeyProperty())).findFirst().orElse(null);
+            }
+            if (field == null) {
+                throw ExceptionUtils.mpe("字段不存在 " + this.joinClass.getName() + " ，" + bindName);
+            }
         }
         this.bindField = field;
     }
@@ -226,7 +239,7 @@ public class MPJTableFieldInfo {
         this.property = field.getName();
         this.isCollection = Collection.class.isAssignableFrom(field.getType());
         if (this.isCollection && !List.class.isAssignableFrom(this.field.getType())) {
-            throw new MPJException("对多关系的数据结构目前只支持 <List> 暂不支持其他Collection实现 " + this.field.getType().getTypeName());
+            throw ExceptionUtils.mpe("对多关系的数据结构目前只支持 <List> 暂不支持其他Collection实现 " + this.field.getType().getTypeName());
         }
         if (Map.class.isAssignableFrom(field.getType())) {
             throw ExceptionUtils.mpe("映射查询不支持Map结构 <%s.%s>", this.entityType.getSimpleName(), field.getName());
@@ -252,12 +265,38 @@ public class MPJTableFieldInfo {
         }
     }
 
+    private boolean checkArr(String[] arr) {
+        if (Objects.isNull(arr) || arr.length <= 0) {
+            return false;
+        }
+        return Arrays.stream(arr).anyMatch(StringUtils::isNotBlank);
+    }
+
+    private String propToColumn(Class<?> tag, String[] arr, String joinC) {
+        Map<String, SelectCache> mapField = ColumnCache.getMapField(tag);
+        List<String> args = null;
+        if (checkArr(arr)) {
+            args = Arrays.stream(arr).filter(StringUtils::isNotBlank).map(c -> {
+                if (mapField.containsKey(c)) {
+                    return mapField.get(c).getColumn();
+                }
+                return c;
+            }).collect(Collectors.toList());
+            if (StringUtils.isNotBlank(joinC)) {
+                if (mapField.containsKey(joinC)) {
+                    args.add(mapField.get(joinC).getColumn());
+                }
+            }
+        }
+        return Optional.ofNullable(args).map(i -> String.join(StringPool.COMMA, i)).orElse(null);
+    }
+
     public BaseMapper<?> getJoinMapper() {
         if (this.joinMapper == null) {
             MPJTableInfo joinTableInfo = MPJTableInfoHelper.getTableInfos().stream().filter(table ->
                     table.getTableInfo().getEntityType() == this.joinClass).findFirst().orElse(null);
             if (joinTableInfo == null) {
-                throw new MPJException("未注册 mapper " + this.joinClass.getName());
+                throw ExceptionUtils.mpe("未注册 mapper " + this.joinClass.getName());
             }
             this.joinMapper = SpringContentUtils.getMapper(joinTableInfo.getEntityClass());
         }
@@ -267,17 +306,16 @@ public class MPJTableFieldInfo {
     private TableInfo getTableInfo(Class<?> clazz) {
         TableInfo tableInfo = TableHelper.get(clazz);
         if (tableInfo == null) {
-            throw new MPJException("未注册 mapper " + clazz.getName());
+            throw ExceptionUtils.mpe("未注册 mapper " + clazz.getName());
         }
         return tableInfo;
     }
-
 
     public void fieldSet(Object o, Object val) {
         try {
             this.field.set(o, val);
         } catch (Exception e) {
-            throw new MPJException("无法设置关联字段，请检查关联字段数据类型是否匹配 " + this.entityType.getName() +
+            throw ExceptionUtils.mpe("无法设置关联字段，请检查关联字段数据类型是否匹配 " + this.entityType.getName() +
                     " , " + this.field.getName() + " , " + o.getClass().getName());
         }
     }
@@ -286,7 +324,7 @@ public class MPJTableFieldInfo {
         try {
             return getThisField().get(o);
         } catch (Exception e) {
-            throw new MPJException("无法获取当前关联字段，请检查关联字段是否匹配 " + this.entityType.getName() + " , " +
+            throw ExceptionUtils.mpe("无法获取当前关联字段，请检查关联字段是否匹配 " + this.entityType.getName() + " , " +
                     this.thisField.getName() + " , " + o.getClass().getName());
         }
     }
@@ -295,7 +333,7 @@ public class MPJTableFieldInfo {
         try {
             return getJoinField().get(o);
         } catch (Exception e) {
-            throw new MPJException("无法设置关联字段，请检查关联字段数据类型是否匹配 " + this.joinClass.getName() + " , " +
+            throw ExceptionUtils.mpe("无法设置关联字段，请检查关联字段数据类型是否匹配 " + this.joinClass.getName() + " , " +
                     this.joinField.getName() + " , " + o.getClass().getName());
         }
     }
@@ -304,7 +342,7 @@ public class MPJTableFieldInfo {
         try {
             return getBindField().get(o);
         } catch (Exception e) {
-            throw new MPJException("无法设置关联字段，请检查关联字段数据类型是否匹配 " + this.joinClass.getName() + " , " +
+            throw ExceptionUtils.mpe("无法设置关联字段，请检查关联字段数据类型是否匹配 " + this.joinClass.getName() + " , " +
                     this.bindField.getName() + " , " + o.getClass().getName());
         }
     }
@@ -313,7 +351,7 @@ public class MPJTableFieldInfo {
         try {
             this.joinField.set(o, null);
         } catch (Exception e) {
-            throw new MPJException("无法设置关联字段，请检查关联字段数据类型是否匹配 " + this.entityType.getName() +
+            throw ExceptionUtils.mpe("无法设置关联字段，请检查关联字段数据类型是否匹配 " + this.entityType.getName() +
                     " , " + this.joinField.getName() + " , " + o.getClass().getName());
         }
     }
@@ -329,7 +367,7 @@ public class MPJTableFieldInfo {
             fieldInfo.fieldSet(i, data);
         } else {
             if (data.size() > 1 && fieldInfo.isThrowExp()) {
-                throw new MPJException("Expected one result (or null) to be returned by select, but found: " +
+                throw ExceptionUtils.mpe("Expected one result (or null) to be returned by select, but found: " +
                         data.size() + " , " + fieldInfo.getField().getName());
             } else {
                 fieldInfo.fieldSet(i, data.stream().findFirst().orElse(null));

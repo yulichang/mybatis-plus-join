@@ -1,5 +1,6 @@
 package com.github.yulichang.extension.mapping.config;
 
+import com.baomidou.mybatisplus.core.toolkit.Assert;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.github.yulichang.config.ConfigProperties;
 import lombok.Getter;
@@ -24,7 +25,7 @@ public class DeepConfig<T> {
 
     @Getter
     @Setter
-    private List<SFunction<T, ?>> prop;
+    private List<SFunction<T, ?>> property;
 
     @Getter
     @Setter
@@ -32,7 +33,11 @@ public class DeepConfig<T> {
 
     @Getter
     @Setter
-    private int maxCount = ConfigProperties.mappingMaxCount;
+    private int deep = ConfigProperties.mappingMaxCount;
+
+    @Getter
+    @Setter
+    private int maxDeep = ConfigProperties.mappingMaxCount;
 
     public static <T> Builder<T> builder() {
         return new Builder<>();
@@ -43,16 +48,17 @@ public class DeepConfig<T> {
         return (DeepConfig<T>) defaultConfig;
     }
 
+    @SuppressWarnings("unused")
     public static class Builder<T> {
 
         private final DeepConfig<T> conf = new DeepConfig<>();
 
         @SafeVarargs
-        public final Builder<T> prop(SFunction<T, ?>... prop) {
-            if (Objects.isNull(conf.prop)) {
-                conf.prop = new ArrayList<>();
+        public final Builder<T> property(SFunction<T, ?>... prop) {
+            if (Objects.isNull(conf.property)) {
+                conf.property = new ArrayList<>();
             }
-            conf.prop.addAll(Arrays.asList(prop));
+            conf.property.addAll(Arrays.asList(prop));
             return this;
         }
 
@@ -61,8 +67,17 @@ public class DeepConfig<T> {
             return this;
         }
 
-        public Builder<T> maxCount(int maxCount) {
-            conf.maxCount = maxCount;
+        public Builder<T> deep(int deep) {
+            Assert.isTrue(deep > 0, "查询深度必须大于0");
+            conf.deep = deep;
+            if (deep > conf.maxDeep) {
+                conf.maxDeep = deep;
+            }
+            return this;
+        }
+
+        public Builder<T> maxDeep(int maxDeep) {
+            conf.maxDeep = maxDeep;
             return this;
         }
 

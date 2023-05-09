@@ -5,7 +5,6 @@ import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import com.github.yulichang.annotation.DynamicTableName;
-import com.github.yulichang.annotation.EntityMapping;
 import com.github.yulichang.test.join.enums.Sex;
 import lombok.Data;
 import lombok.EqualsAndHashCode;

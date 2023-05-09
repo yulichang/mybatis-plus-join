@@ -4,8 +4,6 @@ import com.baomidou.mybatisplus.core.enums.SqlKeyword;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.core.toolkit.ExceptionUtils;
-import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
-import com.github.yulichang.config.ConfigProperties;
 import com.github.yulichang.extension.mapping.config.DeepConfig;
 import com.github.yulichang.extension.mapping.mapper.MPJTableFieldInfo;
 import com.github.yulichang.extension.mapping.mapper.MPJTableInfo;
@@ -13,7 +11,10 @@ import com.github.yulichang.extension.mapping.mapper.MPJTableInfoHelper;
 import com.github.yulichang.extension.mapping.wrapper.MappingQuery;
 import com.github.yulichang.toolkit.LambdaUtils;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @SuppressWarnings("unchecked")
@@ -28,7 +29,7 @@ public class Relation {
      * @see com.github.yulichang.annotation.FieldMapping
      */
     public static <R, T> R mpjGetRelation(R r, DeepConfig<T> config) {
-        int start = ConfigProperties.mappingMaxCount - config.getMaxCount();
+        int start = 1;
         if (Objects.isNull(r)) {
             return null;
         } else if (r instanceof List) {
@@ -43,7 +44,7 @@ public class Relation {
                 if (Object.class == t.getClass()) {
                     return r;
                 }
-                return (R) Relation.list(data, config.getProp(), config.isLoop(), start);
+                return (R) Relation.list(data, start, config);
             }
         } else if (r instanceof IPage) {
             IPage<T> data = (IPage<T>) r;
@@ -55,7 +56,7 @@ public class Relation {
                 if (Object.class == t.getClass()) {
                     return r;
                 }
-                Relation.list(data.getRecords(), config.getProp(), config.isLoop(), start);
+                Relation.list(data.getRecords(), start, config);
             }
             return r;
         } else if (r instanceof Integer) {
@@ -67,19 +68,19 @@ public class Relation {
         } else if (Object.class == r.getClass()) {
             return r;
         } else {
-            return (R) Relation.one((T) r, config.getProp(), config.isLoop(), start);
+            return (R) Relation.one((T) r, start, config);
         }
     }
 
-    public static <T> List<T> list(List<T> data, List<SFunction<T, ?>> property, boolean loop, int count) {
+    public static <T> List<T> list(List<T> data, int currDeep, DeepConfig<T> config) {
         if (CollectionUtils.isEmpty(data)) {
             return data;
         }
         Class<?> entityClass = data.get(0).getClass();
         MPJTableInfo tableInfo = MPJTableInfoHelper.getTableInfo(entityClass);
         if (tableInfo.isHasMappingOrField()) {
-            boolean hasProperty = CollectionUtils.isNotEmpty(property);
-            List<String> listProperty = hasProperty ? property.stream().map(LambdaUtils::getName).collect(
+            boolean hasProperty = CollectionUtils.isNotEmpty(config.getProperty());
+            List<String> listProperty = hasProperty ? config.getProperty().stream().map(LambdaUtils::getName).collect(
                     Collectors.toList()) : null;
             for (MPJTableFieldInfo fieldInfo : tableInfo.getFieldList()) {
                 if (!hasProperty || listProperty.contains(fieldInfo.getProperty())) {
@@ -87,11 +88,8 @@ public class Relation {
                     if (CollectionUtils.isNotEmpty(itemList)) {
                         List<?> joinList = MappingQuery.mpjQueryList(fieldInfo.getJoinMapper(), SqlKeyword.IN,
                                 fieldInfo.getJoinColumn(), itemList, fieldInfo);
-                        data.forEach(i -> mpjBindData(i, property, fieldInfo, joinList, loop, count));
+                        data.forEach(i -> mpjBindData(i, fieldInfo, joinList, currDeep, config));
                         fieldInfo.removeJoinField(joinList);
-                        if (CollectionUtils.isEmpty(joinList)) {
-                            continue;
-                        }
                     } else {
                         data.forEach(i -> fieldInfo.fieldSet(i, new ArrayList<>()));
                     }
@@ -110,14 +108,14 @@ public class Relation {
      *
      * @param t 第一次查询结果
      */
-    public static <T> T one(T t, List<SFunction<T, ?>> property, boolean loop, int count) {
+    public static <T> T one(T t, int currDeep, DeepConfig<T> config) {
         if (t == null) {
             return null;
         }
         MPJTableInfo tableInfo = MPJTableInfoHelper.getTableInfo(t.getClass());
         if (tableInfo.isHasMappingOrField()) {
-            boolean hasProperty = CollectionUtils.isNotEmpty(property);
-            List<String> list = hasProperty ? property.stream().map(LambdaUtils::getName).collect(
+            boolean hasProperty = CollectionUtils.isNotEmpty(config.getProperty());
+            List<String> list = hasProperty ? config.getProperty().stream().map(LambdaUtils::getName).collect(
                     Collectors.toList()) : null;
             for (MPJTableFieldInfo fieldInfo : tableInfo.getFieldList()) {
                 if (!hasProperty || list.contains(fieldInfo.getProperty())) {
@@ -125,7 +123,7 @@ public class Relation {
                     if (obj != null) {
                         List<?> joinList = MappingQuery.mpjQueryList(fieldInfo.getJoinMapper(), SqlKeyword.EQ,
                                 fieldInfo.getJoinColumn(), obj, fieldInfo);
-                        mpjBindData(t, property, fieldInfo, joinList, loop, count);
+                        mpjBindData(t, fieldInfo, joinList, currDeep, config);
                         fieldInfo.removeJoinField(joinList);
                     }
                 }
@@ -134,21 +132,28 @@ public class Relation {
         return t;
     }
 
-    public static <R, T, E> void mpjBindData(R t, List<SFunction<T, ?>> property, MPJTableFieldInfo fieldInfo, List<?> joinList, boolean loop, int count) {
+    public static <R, T, E> void mpjBindData(R t, MPJTableFieldInfo fieldInfo,
+                                             List<?> joinList, int currDeep, DeepConfig<T> config) {
+        if (currDeep >= config.getDeep()) {
+            return;
+        }
+        if (currDeep >= config.getMaxDeep()) {
+            throw ExceptionUtils.mpe("超过最大查询深度");
+        }
         if (fieldInfo.isMappingEntity()) {
-            if (count > ConfigProperties.mappingMaxCount) {
-                throw ExceptionUtils.mpe("超过最大查询深度");
-            }
             List<E> list = (List<E>) joinList.stream().filter(j -> fieldInfo.joinFieldGet(j).equals(fieldInfo.thisFieldGet(t)))
                     .collect(Collectors.toList());
             MPJTableFieldInfo.bind(fieldInfo, t, list);
-            if (loop && CollectionUtils.isNotEmpty(list)) {
-                int newCount = count + 1;
-                if (CollectionUtils.isNotEmpty(property) && LambdaUtils.getEntityClass(property.get(0)).isAssignableFrom(list.get(0).getClass())) {
-                    List<SFunction<E, ?>> property1 = ((List<SFunction<E, ?>>) ((Object) property));
-                    list(list, property1, loop, count);
+            if (config.isLoop() && CollectionUtils.isNotEmpty(list)) {
+                int newCount = currDeep + 1;
+                if (CollectionUtils.isNotEmpty(config.getProperty()) && LambdaUtils.getEntityClass(config.getProperty().get(0)).isAssignableFrom(list.get(0).getClass())) {
+                    list(list, newCount, (DeepConfig<E>) config);
                 } else {
-                    list(list, Collections.EMPTY_LIST, loop, newCount);
+                    DeepConfig<E> deepConfig = new DeepConfig<>();
+                    deepConfig.setDeep(config.getDeep());
+                    deepConfig.setLoop(config.isLoop());
+                    deepConfig.setMaxDeep(config.getMaxDeep());
+                    list(list, newCount, deepConfig);
                 }
             }
         }

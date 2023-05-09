@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import com.github.yulichang.annotation.EntityMapping;
+import com.github.yulichang.annotation.FieldMapping;
 import com.github.yulichang.test.mapping.enums.Sex;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -44,6 +45,7 @@ public class UserDO {
     private UserDO pUser;
 
     @TableField(exist = false)
-    @EntityMapping(thisField = "id", joinField = "pid")
-    private List<UserDO> userList;
+//    @EntityMapping(thisField = "id", joinField = "pid")
+    @FieldMapping(tag = UserDO.class, thisField = "id", joinField = "pid", select = "head_img")
+    private List<String> pName;
 }

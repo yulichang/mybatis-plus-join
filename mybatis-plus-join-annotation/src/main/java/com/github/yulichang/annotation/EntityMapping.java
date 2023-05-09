@@ -41,10 +41,11 @@ public @interface EntityMapping {
     boolean isThrowExp() default true;
 
     /**
+     * 注意!!! 填 属性名
      * 映射表查询条件之 select<br/>
      * 等效于 Wrappers.<T>query().select(xxx);
      */
-    String select() default "";
+    String[] select() default "";
 
     /**
      * 映射表查询条件之 first<br/>

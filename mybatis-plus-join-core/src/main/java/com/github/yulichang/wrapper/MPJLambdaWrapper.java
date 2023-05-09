@@ -2,10 +2,7 @@ package com.github.yulichang.wrapper;
 
 import com.baomidou.mybatisplus.core.conditions.SharedString;
 import com.baomidou.mybatisplus.core.conditions.segments.MergeSegments;
-import com.baomidou.mybatisplus.core.toolkit.ArrayUtils;
-import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
-import com.baomidou.mybatisplus.core.toolkit.StringPool;
-import com.baomidou.mybatisplus.core.toolkit.StringUtils;
+import com.baomidou.mybatisplus.core.toolkit.*;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.github.yulichang.toolkit.Constant;
 import com.github.yulichang.toolkit.LambdaUtils;
@@ -55,6 +52,11 @@ public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWr
      */
     @Getter
     private final List<Label<?>> resultMapMybatisLabel = new ArrayList<>();
+
+    /**
+     * union sql
+     */
+    private SharedString unionSql;
 
 
     /**
@@ -190,8 +192,46 @@ public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWr
         wrapper.alias = st;
         wrapper.subTableAlias = st;
         consumer.accept(wrapper);
-        String sql = WrapperUtils.buildSqlByWrapper(clazz, wrapper, alias);
+        String sql = WrapperUtils.buildSubSqlByWrapper(clazz, wrapper, alias);
         this.selectColumns.add(new SelectString(sql, hasAlias, this.alias));
+        return typedThis;
+    }
+
+    /**
+     * union
+     */
+    @SuppressWarnings("UnusedReturnValue")
+    public final MPJLambdaWrapper<T> union(MPJLambdaWrapper<?>... wrappers) {
+        StringBuilder sb = new StringBuilder();
+        for (MPJLambdaWrapper<?> wrapper : wrappers) {
+            Class<?> entityClass = wrapper.getEntityClass();
+            Assert.notNull(entityClass, "请使用 new MPJLambdaWrapper(主表.class) 或 JoinWrappers.lambda(主表.class) 构造方法");
+            sb.append(" UNION ")
+                    .append(WrapperUtils.buildUnionSqlByWrapper(entityClass, wrapper));
+        }
+        if (Objects.isNull(unionSql)) {
+            unionSql = SharedString.emptyString();
+        }
+        unionSql.setStringValue(unionSql.getStringValue() + sb);
+        return typedThis;
+    }
+
+    /**
+     * union all
+     */
+    @SafeVarargs
+    public final <E, F> MPJLambdaWrapper<T> unionAll(MPJLambdaWrapper<T>... wrappers) {
+        StringBuilder sb = new StringBuilder();
+        for (MPJLambdaWrapper<?> wrapper : wrappers) {
+            Class<?> entityClass = wrapper.getEntityClass();
+            Assert.notNull(entityClass, "请使用 new MPJLambdaWrapper(主表.class) 或 JoinWrappers.lambda(主表.class) 构造方法");
+            sb.append(" UNION ALL ")
+                    .append(WrapperUtils.buildUnionSqlByWrapper(entityClass, wrapper));
+        }
+        if (Objects.isNull(unionSql)) {
+            unionSql = SharedString.emptyString();
+        }
+        unionSql.setStringValue(unionSql.getStringValue() + sb);
         return typedThis;
     }
 
@@ -242,6 +282,10 @@ public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWr
         return sqlSelect.getStringValue();
     }
 
+    @Override
+    public String getUnionSql() {
+        return Optional.ofNullable(unionSql).map(SharedString::getStringValue).orElse(StringPool.EMPTY);
+    }
 
     public boolean getSelectDistinct() {
         return selectDistinct;

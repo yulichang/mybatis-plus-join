@@ -1020,10 +1020,28 @@ class LambdaWrapperTest {
         ThreadLocalUtils.set("SELECT ( SELECT st.id FROM `user` st WHERE st.del=false AND (st.id <= ?) limit 1 ) AS pid FROM `user` t LEFT JOIN address t1 ON (t1.user_id = t.id) WHERE t.del=false AND t1.del=false AND (t.id <= ?)");
         MPJLambdaWrapper<UserDO> wrapper = JoinWrappers.lambda(UserDO.class)
                 .selectSub(UserDO.class, w -> w.select(UserDO::getId)
-                        .le(UserDO::getId,1000)
+                        .le(UserDO::getId, 1000)
                         .last("limit 1"), UserDO::getPid)
-                .leftJoin(AddressDO.class,AddressDO::getUserId,UserDO::getId)
-                .le(UserDO::getId,100);
+                .leftJoin(AddressDO.class, AddressDO::getUserId, UserDO::getId)
+                .le(UserDO::getId, 100);
+        wrapper.list();
+        System.out.println(1);
+    }
+
+
+    /**
+     * select 子查询
+     */
+    @Test
+    void union() {
+        MPJLambdaWrapper<UserDO> wrapper = JoinWrappers.lambda(UserDO.class)
+                .selectAll(UserDO.class);
+        MPJLambdaWrapper<UserDO> wrapper1 = JoinWrappers.lambda(UserDO.class)
+                .selectAll(UserDO.class);
+        MPJLambdaWrapper<UserDO> wrapper2 = JoinWrappers.lambda(UserDO.class)
+                .selectAll(UserDO.class);
+
+        wrapper.union(wrapper1, wrapper2);
         wrapper.list();
         System.out.println(1);
     }

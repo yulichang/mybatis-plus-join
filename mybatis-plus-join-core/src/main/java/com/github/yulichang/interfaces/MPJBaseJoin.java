@@ -15,4 +15,8 @@ public interface MPJBaseJoin<T> {
     default String getDeleteLogicSql() {
         return StringPool.EMPTY;
     }
+
+    default String getUnionSql(){
+        return StringPool.EMPTY;
+    }
 }

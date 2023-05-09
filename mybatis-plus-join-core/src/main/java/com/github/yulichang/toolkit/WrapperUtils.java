@@ -19,7 +19,7 @@ import java.util.Optional;
  */
 public class WrapperUtils {
 
-    public static <T, R> String buildSqlByWrapper(Class<T> clazz, MPJLambdaWrapper<T> wrapper, SFunction<R, ?> alias) {
+    public static <T, R> String buildSubSqlByWrapper(Class<T> clazz, MPJLambdaWrapper<T> wrapper, SFunction<R, ?> alias) {
         TableInfo tableInfo = TableHelper.get(clazz);
         Asserts.hasTable(tableInfo, clazz);
         String first = Optional.ofNullable(wrapper.getSqlFirst()).orElse(StringPool.EMPTY);
@@ -40,7 +40,7 @@ public class WrapperUtils {
                 ((wrapper.isEmptyOfNormal() ? StringPool.EMPTY : (hasWhere ? " AND " : " WHERE ")) + wrapper.getSqlSegment()) : StringPool.EMPTY;
 
         String sqlComment = Optional.ofNullable(wrapper.getSqlComment()).orElse(StringPool.EMPTY);
-        return String.format("(%s SELECT %s FROM %s %s %s %s %s %s %s) AS %s",
+        return String.format(" (%s SELECT %s FROM %s %s %s %s %s %s %s) AS %s ",
                 first,
                 wrapper.getSqlSelect(),
                 tableInfo.getTableName(),
@@ -53,6 +53,39 @@ public class WrapperUtils {
                 LambdaUtils.getName(alias));
     }
 
+    public static String buildUnionSqlByWrapper(Class<?> clazz, MPJLambdaWrapper<?> wrapper) {
+        TableInfo tableInfo = TableHelper.get(clazz);
+        Asserts.hasTable(tableInfo, clazz);
+        String first = Optional.ofNullable(wrapper.getSqlFirst()).orElse(StringPool.EMPTY);
+        boolean hasWhere = false;
+        String entityWhere = getEntitySql(tableInfo, wrapper);
+        if (StringUtils.isNotBlank(entityWhere)) {
+            hasWhere = true;
+        }
+        String mainLogic = mainLogic(hasWhere, clazz, wrapper);
+        if (StringUtils.isNotBlank(mainLogic)) {
+            hasWhere = true;
+        }
+        String subLogic = subLogic(hasWhere, wrapper);
+        if (StringUtils.isNotBlank(subLogic)) {
+            hasWhere = true;
+        }
+        String sqlSegment = (wrapper.getSqlSegment() != null && StringUtils.isNotBlank(wrapper.getSqlSegment())) ?
+                ((wrapper.isEmptyOfNormal() ? StringPool.EMPTY : (hasWhere ? " AND " : " WHERE ")) + wrapper.getSqlSegment()) : StringPool.EMPTY;
+
+        String sqlComment = Optional.ofNullable(wrapper.getSqlComment()).orElse(StringPool.EMPTY);
+        return String.format(" %s SELECT %s FROM %s %s %s %s %s %s %s ",
+                first,
+                wrapper.getSqlSelect(),
+                tableInfo.getTableName(),
+                wrapper.getAlias(),
+                wrapper.getFrom(),
+                mainLogic,
+                subLogic,
+                sqlSegment,
+                sqlComment);
+    }
+
     private static <T> String formatParam(MPJLambdaWrapper<T> wrapper, Object param) {
         final String genParamName = Constants.WRAPPER_PARAM + wrapper.getParamNameSeq().incrementAndGet();
         final String paramStr = wrapper.getParamAlias() + ".paramNameValuePairs." + genParamName;
@@ -60,8 +93,8 @@ public class WrapperUtils {
         return SqlScriptUtils.safeParam(paramStr, null);
     }
 
-    private static <T> String getEntitySql(TableInfo tableInfo, MPJLambdaWrapper<T> wrapper) {
-        T obj = wrapper.getEntity();
+    private static String getEntitySql(TableInfo tableInfo, MPJLambdaWrapper<?> wrapper) {
+        Object obj = wrapper.getEntity();
         if (Objects.isNull(obj)) {
             return StringPool.EMPTY;
         }
@@ -90,7 +123,7 @@ public class WrapperUtils {
         return sb.toString();
     }
 
-    private static <T> String mainLogic(boolean hasWhere, Class<T> clazz, MPJLambdaWrapper<T> wrapper) {
+    private static String mainLogic(boolean hasWhere, Class<?> clazz, MPJLambdaWrapper<?> wrapper) {
         String info = LogicInfoUtils.getLogicInfo(null, clazz, true, wrapper.getAlias());
         if (StringUtils.isNotBlank(info)) {
             if (hasWhere) {
@@ -101,7 +134,7 @@ public class WrapperUtils {
         return StringPool.EMPTY;
     }
 
-    private static <T> String subLogic(boolean hasWhere, MPJLambdaWrapper<T> wrapper) {
+    private static String subLogic(boolean hasWhere, MPJLambdaWrapper<?> wrapper) {
         String sql = wrapper.getSubLogicSql();
         if (StringUtils.isNotBlank(sql)) {
             if (hasWhere) {

@@ -45,4 +45,10 @@ public class SelectPage extends com.baomidou.mybatisplus.core.injector.methods.S
         return SqlScriptUtils.convertChoose(String.format("%s == null or !(%s instanceof %s)", Constants.WRAPPER, Constants.WRAPPER, MPJBaseJoin.class.getName()),
                 selectColumns, mpjSqlSelectColumns() + StringPool.SPACE + selectColumns);
     }
+
+    @Override
+    protected String sqlComment() {
+        return super.sqlComment() + StringPool.NEWLINE + SqlScriptUtils.convertIf("${ew.unionSql}", String.format("%s != null and (%s instanceof %s)",
+                Constants.WRAPPER, Constants.WRAPPER, MPJBaseJoin.class.getName()), true);
+    }
 }

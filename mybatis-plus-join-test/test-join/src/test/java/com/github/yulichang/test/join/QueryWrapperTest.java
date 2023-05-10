@@ -37,7 +37,8 @@ class QueryWrapperTest {
      */
     @Test
     void table() {
-        ThreadLocalUtils.set("SELECT t.id,t.pid,t.`name`,t.`json`,t.sex,t.head_img,t.create_time,t.address_id,t.address_id2,t.del,t.create_by,t.update_by,name AS nameName FROM `user`fwear t WHERE t.del=false LIMIT 1");
+        ThreadLocalUtils.set("SELECT t.id,t.pid,t.`name`,t.`json`,t.sex,t.head_img,t.create_time,t.address_id,t.address_id2,t.del,t.create_by,t.update_by,name AS nameName FROM `user`fwear t WHERE t.del=false LIMIT 1",
+                "SELECT t.id,t.pid,t.`name`,t.`json`,t.sex,t.head_img AS img,t.create_time,t.address_id,t.address_id2,t.del,t.create_by,t.update_by,name AS nameName FROM `user`fwear t WHERE t.del=false LIMIT 1");
         MPJQueryWrapper<UserDO> wrapper = new MPJQueryWrapper<UserDO>()
                 .selectAll(UserDO.class)
                 .setTableName(name -> name + "fwear")

@@ -940,11 +940,13 @@ class LambdaWrapperTest {
      */
     @Test
     void joinOrder() {
-        ThreadLocalUtils.set("SELECT id,user_id,name FROM order_t t ORDER BY t.name DESC");
+        ThreadLocalUtils.set("SELECT id,user_id,name FROM order_t t ORDER BY t.name DESC",
+                "SELECT id,user_id,name FROM order_t t ORDER BY t.name desc");
         MPJLambdaWrapper<OrderDO> wrapper = JoinWrappers.lambda(OrderDO.class);
         List<OrderDO> list = wrapper.list();
 
-        ThreadLocalUtils.set("SELECT t.id,t.user_id,t.name,t1.`name` AS userName FROM order_t t LEFT JOIN `user` t1 ON (t1.id = t.user_id) WHERE t1.del=false ORDER BY t.name DESC");
+        ThreadLocalUtils.set("SELECT t.id,t.user_id,t.name,t1.`name` AS userName FROM order_t t LEFT JOIN `user` t1 ON (t1.id = t.user_id) WHERE t1.del=false ORDER BY t.name DESC",
+                "SELECT t.id,t.user_id,t.name,t1.`name` AS userName FROM order_t t LEFT JOIN `user` t1 ON (t1.id = t.user_id) WHERE t1.del=false ORDER BY t.name desc");
         MPJLambdaWrapper<OrderDO> w = JoinWrappers.lambda(OrderDO.class)
                 .selectAll(OrderDO.class)
                 .selectAs(UserDO::getName, OrderDO::getUserName)

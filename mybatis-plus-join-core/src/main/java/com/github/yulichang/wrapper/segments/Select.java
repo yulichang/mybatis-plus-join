@@ -5,13 +5,15 @@ import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.github.yulichang.wrapper.enums.BaseFuncEnum;
 import org.apache.ibatis.type.TypeHandler;
 
+import java.io.Serializable;
+
 /**
  * 查询列
  *
  * @author yulichang
  * @since 1.3.10
  */
-public interface Select {
+public interface Select extends Serializable {
 
     Class<?> getClazz();
 

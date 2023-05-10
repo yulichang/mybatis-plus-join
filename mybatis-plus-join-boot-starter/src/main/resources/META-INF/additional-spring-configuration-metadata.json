@@ -49,6 +49,12 @@
       "defaultValue": 5,
       "type": "java.lang.Integer",
       "description": "映射查询最大深度."
+    },
+    {
+      "name": "mybatis-plus-join.sub-query-alias",
+      "defaultValue": "st",
+      "type": "java.lang.String",
+      "description": "子查询表别名."
     }
   ],
   "hints": [

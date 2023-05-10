@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.toolkit.Assert;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import lombok.Data;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -13,7 +14,12 @@ import java.util.stream.Collectors;
  * @author yulichang
  */
 @Data
-public class TableList {
+public class TableList implements Serializable {
+
+    /**
+     * 上级
+     */
+    private TableList parent;
 
     /**
      * 所有关联的的表
@@ -65,7 +71,7 @@ public class TableList {
             }
             Node node = getByClassFirst(clazz);
             if (Objects.isNull(node)) {
-                return alias;
+                return Objects.isNull(parent) ? alias : parent.getPrefixByClassParent(clazz);
             }
             return node.isHasAlias() ? node.getAlias() : (node.getAlias() + node.getIndex());
         }
@@ -104,7 +110,7 @@ public class TableList {
                     }
                 }
             }
-            return alias;
+            return Objects.isNull(parent) ? alias : parent.getPrefixByClassParent(clazz);
         }
         Node node = getByIndex(index);
         Node dg = dg(node, node.getClazz());
@@ -118,7 +124,7 @@ public class TableList {
             if (list.size() == 1) {
                 Node n = list.get(0);
                 if (n.getClazz() == node.getClazz()) {
-                    return alias;
+                    return Objects.isNull(parent) ? alias : parent.getPrefixByClassParent(clazz);
                 } else {
                     return n.isHasAlias() ? n.getAlias() : (n.getAlias() + n.getIndex());
                 }
@@ -128,9 +134,9 @@ public class TableList {
                         return n.isHasAlias() ? n.getAlias() : (n.getAlias() + n.getIndex());
                     }
                 }
-                return alias;
+                return Objects.isNull(parent) ? alias : parent.getPrefixByClassParent(clazz);
             } else {
-                return alias;
+                return Objects.isNull(parent) ? alias : parent.getPrefixByClassParent(clazz);
             }
         }
     }
@@ -150,7 +156,11 @@ public class TableList {
     public String getPrefixByClass(Class<?> clazz) {
         Node node = getByClassFirst(clazz);
         if (Objects.isNull(node)) {
-            return alias;
+            if (Objects.equals(rootClass, clazz)) {
+                return alias;
+            } else {
+                return Objects.isNull(parent) ? alias : parent.getPrefixByClassParent(clazz);
+            }
         } else {
             return node.hasAlias ? node.getAlias() : (node.getAlias() + node.getIndex());
         }
@@ -162,6 +172,21 @@ public class TableList {
         }
         Node node = getByClassFirst(clazz);
         Assert.notNull(node, "sql 中无法找到 <%s> 类对应的表", clazz.getSimpleName());
+        return node.hasAlias ? node.getAlias() : (node.getAlias() + node.getIndex());
+    }
+
+    public String getPrefixByClassParent(Class<?> clazz) {
+        if (Objects.equals(clazz, rootClass)) {
+            return alias;
+        }
+        Node node = getByClassFirst(clazz);
+        if (Objects.isNull(node)) {
+            if (Objects.nonNull(parent)) {
+                return parent.getPrefixByClassParent(clazz);
+            } else {
+                return alias;
+            }
+        }
         return node.hasAlias ? node.getAlias() : (node.getAlias() + node.getIndex());
     }
 
@@ -194,7 +219,7 @@ public class TableList {
     }
 
     @Data
-    public static class Node {
+    public static class Node implements Serializable {
 
         /**
          * 关联表类型

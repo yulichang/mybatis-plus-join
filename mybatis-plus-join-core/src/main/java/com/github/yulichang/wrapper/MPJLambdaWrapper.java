@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.SharedString;
 import com.baomidou.mybatisplus.core.conditions.segments.MergeSegments;
 import com.baomidou.mybatisplus.core.toolkit.*;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
+import com.github.yulichang.config.ConfigProperties;
 import com.github.yulichang.toolkit.Constant;
 import com.github.yulichang.toolkit.LambdaUtils;
 import com.github.yulichang.toolkit.TableList;
@@ -183,12 +184,20 @@ public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWr
      * 子查询
      */
     public <E, F> MPJLambdaWrapper<T> selectSub(Class<E> clazz, Consumer<MPJLambdaWrapper<E>> consumer, SFunction<F, ?> alias) {
+        return selectSub(clazz, ConfigProperties.subQueryAlias, consumer, alias);
+    }
+
+    /**
+     * 子查询
+     */
+    public <E, F> MPJLambdaWrapper<T> selectSub(Class<E> clazz, String st, Consumer<MPJLambdaWrapper<E>> consumer, SFunction<F, ?> alias) {
         MPJLambdaWrapper<E> wrapper = new MPJLambdaWrapper<E>(null, clazz, SharedString.emptyString(), paramNameSeq, paramNameValuePairs,
                 new MergeSegments(), SharedString.emptyString(), SharedString.emptyString(), SharedString.emptyString(),
                 new TableList(), null, null, null, null) {
         };
-        String st = "st";
         wrapper.tableList.setAlias(st);
+        wrapper.tableList.setRootClass(clazz);
+        wrapper.tableList.setParent(this.tableList);
         wrapper.alias = st;
         wrapper.subTableAlias = st;
         consumer.accept(wrapper);

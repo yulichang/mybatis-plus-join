@@ -49,4 +49,9 @@ public class MybatisPlusJoinProperties {
      * 映射查询最大深度
      */
     private int mappingMaxCount = 5;
+
+    /**
+     * 子查询别名
+     */
+    private String subQueryAlias = "st";
 }

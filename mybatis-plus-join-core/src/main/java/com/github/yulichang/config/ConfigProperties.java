@@ -38,4 +38,8 @@ public class ConfigProperties {
      * TableInfo适配器
      */
     public static ITableInfoAdapter tableInfoAdapter = AdapterHelper.getTableInfoAdapter();
+    /**
+     * 子查询别名
+     */
+    public static String subQueryAlias = "st";
 }

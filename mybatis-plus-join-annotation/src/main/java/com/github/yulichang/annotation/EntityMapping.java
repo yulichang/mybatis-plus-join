@@ -57,12 +57,12 @@ public @interface EntityMapping {
      * 映射表查询条件之 apply<br/>
      * 等效于 Wrappers.<T>query().apply(xxx);
      */
-    MPJMappingApply[] apply() default {};
+    Apply[] apply() default {};
 
     /**
      * 映射表查询条件
      */
-    MPJMappingCondition[] condition() default {};
+    Condition[] condition() default {};
 
     /**
      * 映射表查询条件之 orderBy<br/>

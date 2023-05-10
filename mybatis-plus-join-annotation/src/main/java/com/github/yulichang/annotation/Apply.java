@@ -8,7 +8,7 @@ package com.github.yulichang.annotation;
  * @since 1.2.0
  */
 @SuppressWarnings("unused")
-public @interface MPJMappingApply {
+public @interface Apply {
 
     /**
      * sql片段

@@ -10,7 +10,7 @@ import com.github.yulichang.annotation.enums.SqlKeyword;
  * @since 1.2.0
  */
 @SuppressWarnings("unused")
-public @interface MPJMappingCondition {
+public @interface Condition {
 
     /**
      * 条件枚举

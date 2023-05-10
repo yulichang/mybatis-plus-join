@@ -4,8 +4,6 @@ package com.github.yulichang.extension.mapping.mapper;
 import com.baomidou.mybatisplus.core.enums.SqlKeyword;
 import com.baomidou.mybatisplus.core.toolkit.StringPool;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
-import com.github.yulichang.annotation.MPJMappingApply;
-import com.github.yulichang.annotation.MPJMappingCondition;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -44,8 +42,8 @@ public class MPJMappingWrapper {
     private final boolean hasOrderByDesc;
     private List<String> orderByDesc;
 
-    public MPJMappingWrapper(String first, String select, MPJMappingApply[] applys,
-                             MPJMappingCondition[] conditions, String last, String orderByAsc, String orderByDesc) {
+    public MPJMappingWrapper(String first, String select, com.github.yulichang.annotation.Apply[] applys,
+                             com.github.yulichang.annotation.Condition[] conditions, String last, String orderByAsc, String orderByDesc) {
         this.hasFirst = StringUtils.isNotBlank(first);
         if (this.hasFirst) {
             this.first = first;
@@ -59,7 +57,7 @@ public class MPJMappingWrapper {
         this.hasApply = applys.length > 0;
         if (this.hasApply) {
             this.applyList = new ArrayList<>();
-            for (MPJMappingApply apply : applys) {
+            for (com.github.yulichang.annotation.Apply apply : applys) {
                 this.applyList.add(new Apply(apply.value(), apply.args()));
             }
         }
@@ -67,7 +65,7 @@ public class MPJMappingWrapper {
         this.hasCondition = conditions.length > 0;
         if (this.hasCondition) {
             this.conditionList = new ArrayList<>();
-            for (MPJMappingCondition condition : conditions) {
+            for (com.github.yulichang.annotation.Condition condition : conditions) {
                 conditionList.add(new Condition(convert(condition.keyWord()), condition.column(), condition.value()));
             }
         }

@@ -38,7 +38,17 @@ public class UpdateJoin extends MPJAbstractMethod {
 
     @Override
     public String mpjConvertIfEwParam(String param, boolean newLine) {
-        return super.convertIfEwParam(param, newLine);
+        try {
+            return super.convertIfEwParam(param, newLine);
+        } catch (Throwable t) {
+            return convertIfEwParamOverride(param, newLine);
+        }
+    }
+
+
+    private String convertIfEwParamOverride(final String param, final boolean newLine) {
+        return SqlScriptUtils.convertIf(SqlScriptUtils.unSafeParam(param),
+                String.format("%s != null and %s != null", WRAPPER, param), newLine);
     }
 
     /**

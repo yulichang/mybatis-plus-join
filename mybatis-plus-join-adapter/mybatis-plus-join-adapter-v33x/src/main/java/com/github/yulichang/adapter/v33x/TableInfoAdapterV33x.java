@@ -6,7 +6,9 @@ import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.github.yulichang.adapter.base.ITableInfoAdapter;
 import org.apache.ibatis.session.Configuration;
 
+import java.lang.reflect.Field;
 import java.util.Objects;
+import java.util.function.Supplier;
 
 /**
  * @author yulichang
@@ -39,5 +41,10 @@ public class TableInfoAdapterV33x implements ITableInfoAdapter {
     @Override
     public Configuration mpjGetConfiguration(TableInfo tableInfo) {
         return tableInfo.getConfiguration();
+    }
+
+    @Override
+    public Field mpjGetField(TableFieldInfo fieldInfo, Supplier<Field> supplier) {
+        return supplier.get();
     }
 }

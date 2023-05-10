@@ -3,6 +3,7 @@ package com.github.yulichang.method;
 import com.baomidou.mybatisplus.annotation.FieldStrategy;
 import com.baomidou.mybatisplus.core.metadata.TableFieldInfo;
 import com.baomidou.mybatisplus.core.metadata.TableInfo;
+import com.baomidou.mybatisplus.core.toolkit.sql.SqlScriptUtils;
 import org.apache.ibatis.mapping.MappedStatement;
 import org.apache.ibatis.mapping.SqlSource;
 
@@ -35,7 +36,17 @@ public class UpdateJoinAndNull extends MPJAbstractMethod {
 
     @Override
     public String mpjConvertIfEwParam(String param, boolean newLine) {
-        return super.convertIfEwParam(param, newLine);
+        try {
+            return super.convertIfEwParam(param, newLine);
+        } catch (Throwable t) {
+            return convertIfEwParamOverride(param, newLine);
+        }
+    }
+
+
+    private String convertIfEwParamOverride(final String param, final boolean newLine) {
+        return SqlScriptUtils.convertIf(SqlScriptUtils.unSafeParam(param),
+                String.format("%s != null and %s != null", WRAPPER, param), newLine);
     }
 
     /**

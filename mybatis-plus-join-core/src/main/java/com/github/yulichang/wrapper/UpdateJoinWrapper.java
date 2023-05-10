@@ -15,6 +15,7 @@ import com.github.yulichang.wrapper.interfaces.Update;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -206,7 +207,12 @@ public class UpdateJoinWrapper<T> extends MPJAbstractLambdaWrapper<T, UpdateJoin
                 }
                 Object val;
                 try {
-                    val = fieldInfo.getField().get(obj);
+                    Field field = AdapterHelper.getTableInfoAdapter().mpjGetField(fieldInfo, () -> {
+                        Field field1 = ReflectionKit.getFieldMap(obj.getClass()).get(fieldInfo.getProperty());
+                        field1.setAccessible(true);
+                        return field1;
+                    });
+                    val = field.get(obj);
                 } catch (IllegalAccessException e) {
                     throw new RuntimeException(e);
                 }

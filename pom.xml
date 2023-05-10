@@ -5,7 +5,7 @@
     <groupId>com.github.yulichang</groupId>
     <artifactId>mybatis-plus-join-root</artifactId>
     <packaging>pom</packaging>
-    <version>1.4.4.1</version>
+    <version>1.4.5</version>
     <name>mybatis-plus-join-root</name>
 
     <description>An enhanced toolkit of Mybatis-Plus to simplify development.</description>
@@ -35,7 +35,6 @@
         <module>mybatis-plus-join-core</module>
         <module>mybatis-plus-join-annotation</module>
         <module>mybatis-plus-join-extension</module>
-        <module>mybatis-plus-join-test</module>
     </modules>
 
     <properties>

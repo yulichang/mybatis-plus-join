@@ -76,6 +76,7 @@ public class DeleteJoinWrapper<T> extends MPJAbstractLambdaWrapper<T, DeleteJoin
         }
         String delete = null;
         if (deleteAll) {
+            check();
             List<String> tables = tableList.getAll().stream().map(i -> i.isHasAlias() ? i.getAlias() :
                     (i.getAlias() + i.getIndex())).collect(Collectors.toList());
             tables.add(0, this.alias);
@@ -105,6 +106,7 @@ public class DeleteJoinWrapper<T> extends MPJAbstractLambdaWrapper<T, DeleteJoin
         }
         String delete = null;
         if (deleteAll) {
+            check();
             delete = tableList.getAll().stream().map(i -> LogicInfoUtils.getLogicInfoInvert(i.getIndex(), i.getClazz(),
                     i.isHasAlias(), i.getAlias())).collect(Collectors.joining(StringPool.COMMA));
         } else {
@@ -119,7 +121,7 @@ public class DeleteJoinWrapper<T> extends MPJAbstractLambdaWrapper<T, DeleteJoin
         }
         if (StringUtils.isNotBlank(delete)) {
             delete = StringPool.COMMA + delete;
-        }else {
+        } else {
             delete = StringPool.EMPTY;
         }
         deleteSql.setStringValue(delete);
@@ -136,6 +138,9 @@ public class DeleteJoinWrapper<T> extends MPJAbstractLambdaWrapper<T, DeleteJoin
 
     /**
      * 删除表
+     * 注意!!!
+     * 字符串不支持逻辑删除校验
+     * 也就算说此方法不管副表有没有逻辑删除 都按照主表的方式执行delete或update
      */
     public DeleteJoinWrapper<T> delete(String... tables) {
         if (CollectionUtils.isEmpty(deleteTableName)) {
@@ -154,26 +159,41 @@ public class DeleteJoinWrapper<T> extends MPJAbstractLambdaWrapper<T, DeleteJoin
         if (CollectionUtils.isEmpty(deleteTableList)) {
             deleteTableList = new ArrayList<>();
         }
+        check(Arrays.asList(deleteClass));
+        deleteTableList.addAll(Arrays.asList(deleteClass));
+        return typedThis;
+    }
+
+    private void check(List<Class<?>> classList) {
+        Class<T> entityClass = getEntityClass();
         TableInfo tableInfo = TableHelper.get(entityClass);
         Asserts.hasTable(tableInfo, entityClass);
         //检查
         boolean mainLogic = AdapterHelper.getTableInfoAdapter().mpjHasLogic(tableInfo);
-        boolean check = Arrays.stream(deleteClass).allMatch(t -> {
+        boolean check = classList.stream().allMatch(t -> {
             TableInfo ti = TableHelper.get(t);
             Asserts.hasTable(ti, t);
             return mainLogic == AdapterHelper.getTableInfoAdapter().mpjHasLogic(ti);
         });
         if (!check) {
-            List<Class<?>> list = Arrays.stream(deleteClass).collect(Collectors.toList());
             throw ExceptionUtils.mpe("连表删除只适用于全部表(主表和副表)都是物理删除或全部都是逻辑删除, " +
                             "不支持同时存在物理删除和逻辑删除 [物理删除->(%s)] [逻辑删除->(%s)]",
-                    list.stream().filter(t -> !AdapterHelper.getTableInfoAdapter().mpjHasLogic(TableHelper.get(t)))
+                    classList.stream().filter(t -> !AdapterHelper.getTableInfoAdapter().mpjHasLogic(TableHelper.get(t)))
                             .map(Class::getSimpleName).collect(Collectors.joining(StringPool.COMMA)),
-                    list.stream().filter(t -> AdapterHelper.getTableInfoAdapter().mpjHasLogic(TableHelper.get(t)))
+                    classList.stream().filter(t -> AdapterHelper.getTableInfoAdapter().mpjHasLogic(TableHelper.get(t)))
                             .map(Class::getSimpleName).collect(Collectors.joining(StringPool.COMMA)));
         }
-        deleteTableList.addAll(Arrays.asList(deleteClass));
-        return typedThis;
+    }
+
+    private void check(){
+        if (CollectionUtils.isNotEmpty(tableList.getAll())) {
+            Class<T> entityClass = getEntityClass();
+            Assert.notNull(entityClass, "缺少主表类型, 请使用 new MPJLambdaWrapper<>(主表.class) 或 JoinWrappers.lambda(主表.class) 构造方法");
+            ArrayList<Class<?>> list = tableList.getAll().stream().map(TableList.Node::getClazz)
+                    .collect(Collectors.toCollection(ArrayList::new));
+            list.add(entityClass);
+            check(list);
+        }
     }
 
     /**

@@ -86,7 +86,7 @@ public class MPJInterceptor implements Interceptor {
         if (ew instanceof MPJLambdaWrapper) {
             MPJLambdaWrapper wrapper = (MPJLambdaWrapper) ew;
             if (wrapper.getEntityClass() == null) {
-                wrapper.setEntityClass(MPJTableMapperHelper.getEntity(getEntity(ms.getId())));
+                wrapper.setEntityClass(MPJTableMapperHelper.getEntity(getEntity(ms.getId(), ms.getResource())));
             }
             if (wrapper.getSelectColumns().isEmpty() && wrapper.getEntityClass() != null) {
                 wrapper.selectAll(wrapper.getEntityClass());
@@ -359,12 +359,30 @@ public class MPJInterceptor implements Interceptor {
         }
     }
 
-    private Class<?> getEntity(String id) {
+    private Class<?> getEntity(String id, String resource) {
+        Class<?> clazz = null;
         try {
-            return Class.forName(id.substring(0, id.lastIndexOf(StringPool.DOT)));
-        } catch (ClassNotFoundException e) {
-            return null;
+            String className = id.substring(0, id.lastIndexOf(StringPool.DOT));
+            try {
+                clazz = Class.forName(className);
+            } catch (ClassNotFoundException e) {
+                clazz = MPJTableMapperHelper.getMapperForName(className);
+            }
+        } catch (Exception ignored) {
         }
+        if (Objects.nonNull(clazz)) {
+            return clazz;
+        }
+        try {
+            String className = resource.substring(0, id.lastIndexOf(StringPool.DOT)).replaceAll("/",StringPool.DOT);
+            try {
+                clazz = Class.forName(className);
+            } catch (ClassNotFoundException e) {
+                clazz = MPJTableMapperHelper.getMapperForName(className);
+            }
+        } catch (Exception ignored) {
+        }
+        return clazz;
     }
 
     private String removeDot(String str) {

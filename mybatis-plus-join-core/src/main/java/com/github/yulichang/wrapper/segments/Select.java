@@ -1,7 +1,6 @@
 package com.github.yulichang.wrapper.segments;
 
 import com.baomidou.mybatisplus.core.metadata.TableFieldInfo;
-import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.github.yulichang.wrapper.enums.BaseFuncEnum;
 import org.apache.ibatis.type.TypeHandler;
 
@@ -45,7 +44,7 @@ public interface Select extends Serializable {
 
     boolean isFunc();
 
-    SFunction<?, ?>[] getArgs();
+    SelectFunc.Arg[] getArgs();
 
     BaseFuncEnum getFunc();
 

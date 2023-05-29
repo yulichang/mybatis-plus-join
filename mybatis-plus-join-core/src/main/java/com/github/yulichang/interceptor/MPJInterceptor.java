@@ -10,9 +10,9 @@ import com.github.yulichang.toolkit.MPJReflectionKit;
 import com.github.yulichang.toolkit.MPJTableMapperHelper;
 import com.github.yulichang.toolkit.TableHelper;
 import com.github.yulichang.toolkit.support.FieldCache;
-import com.github.yulichang.wrapper.MPJLambdaWrapper;
+import com.github.yulichang.wrapper.interfaces.SelectWrapper;
+import com.github.yulichang.wrapper.resultmap.IResult;
 import com.github.yulichang.wrapper.resultmap.Label;
-import com.github.yulichang.wrapper.resultmap.Result;
 import com.github.yulichang.wrapper.segments.Select;
 import com.github.yulichang.wrapper.segments.SelectLabel;
 import org.apache.ibatis.executor.Executor;
@@ -83,8 +83,8 @@ public class MPJInterceptor implements Interceptor {
     @SuppressWarnings("rawtypes")
     public MappedStatement getMappedStatement(MappedStatement ms, Class<?> resultType, Object ew) {
         String id = ms.getId() + StringPool.DASH + (resultType.getName().replaceAll("\\.", StringPool.DASH));
-        if (ew instanceof MPJLambdaWrapper) {
-            MPJLambdaWrapper wrapper = (MPJLambdaWrapper) ew;
+        if (ew instanceof SelectWrapper) {
+            SelectWrapper wrapper = (SelectWrapper) ew;
             if (wrapper.getEntityClass() == null) {
                 wrapper.setEntityClass(MPJTableMapperHelper.getEntity(getEntity(ms.getId(), ms.getResource())));
             }
@@ -160,12 +160,12 @@ public class MPJInterceptor implements Interceptor {
         if (MPJReflectionKit.isPrimitiveOrWrapper(resultType)) {
             return Collections.singletonList(new ResultMap.Builder(ms.getConfiguration(), id, resultType, EMPTY_RESULT_MAPPING).build());
         }
-        if (!(obj instanceof MPJLambdaWrapper) || Map.class.isAssignableFrom(resultType) ||
+        if (!(obj instanceof SelectWrapper) || Map.class.isAssignableFrom(resultType) ||
                 Collection.class.isAssignableFrom(resultType)) {
             result.add(getDefaultResultMap(tableInfo, ms, resultType, id));
             return result;
         }
-        MPJLambdaWrapper wrapper = (MPJLambdaWrapper) obj;
+        SelectWrapper wrapper = (SelectWrapper) obj;
         Map<String, FieldCache> fieldMap = MPJReflectionKit.getFieldMap(resultType);
         List<Select> columnList = wrapper.getSelectColumns();
         //移除对多查询列，为了可重复使用wrapper
@@ -219,7 +219,7 @@ public class MPJInterceptor implements Interceptor {
      */
     private ResultMapping buildResult(MappedStatement ms, Label<?> mybatisLabel, Set<String> columnSet,
                                       List<Select> columnList) {
-        List<Result> resultList = mybatisLabel.getResultList();
+        List<IResult> resultList = mybatisLabel.getResultList();
         if (CollectionUtils.isEmpty(resultList)) {
             return null;
         }
@@ -229,7 +229,7 @@ public class MPJInterceptor implements Interceptor {
                 .append(mybatisLabel.getProperty())
                 .append(StringPool.UNDERSCORE);
         List<ResultMapping> childMapping = new ArrayList<>(resultList.size());
-        for (Result r : resultList) {
+        for (IResult r : resultList) {
             childId.append("(");
             Map<String, FieldCache> ofTypeField = MPJReflectionKit.getFieldMap(mybatisLabel.getOfType());
             //列名去重
@@ -374,7 +374,7 @@ public class MPJInterceptor implements Interceptor {
             return clazz;
         }
         try {
-            String className = resource.substring(0, id.lastIndexOf(StringPool.DOT)).replaceAll("/",StringPool.DOT);
+            String className = resource.substring(0, id.lastIndexOf(StringPool.DOT)).replaceAll("/", StringPool.DOT);
             try {
                 clazz = Class.forName(className);
             } catch (ClassNotFoundException e) {

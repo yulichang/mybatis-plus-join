@@ -12,6 +12,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import lombok.experimental.Accessors;
+import lombok.experimental.FieldNameConstants;
 
 import java.util.List;
 import java.util.Map;
@@ -20,6 +21,7 @@ import java.util.Map;
 @ToString
 @Accessors(chain = true)
 @EqualsAndHashCode
+@FieldNameConstants
 @TableName(value = "`user`", autoResultMap = true)
 public class UserDO {
 
@@ -41,7 +43,8 @@ public class UserDO {
     private Boolean del;
 
     @TableField(exist = false)
-    @EntityMapping(thisField = "pid", joinField = "id")
+//    @EntityMapping(thisField = "pid", joinField = "id")
+    @EntityMapping(thisField = Fields.pid, joinField = "id")
     private UserDO pUser;
 
     @TableField(exist = false)

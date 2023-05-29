@@ -5,10 +5,12 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>com.github.yulichang</groupId>
-        <artifactId>mybatis-plus-join-root</artifactId>
-        <version>1.4.5</version>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>2.7.2</version>
+        <relativePath/>
     </parent>
+    <groupId>com.github.yulichang</groupId>
     <artifactId>mybatis-plus-join-test</artifactId>
     <packaging>pom</packaging>
     <version>1.4.5</version>
@@ -18,9 +20,10 @@
     <modules>
         <module>test-base</module>
         <module>test-join</module>
+        <module>test-kotlin</module>
         <module>test-collection</module>
         <module>test-mapping</module>
-        <module>test-springboot3-jdk17</module>
+<!--        <module>test-springboot3-jdk17</module>-->
     </modules>
 
     <description>An enhanced toolkit of Mybatis-Plus to simplify development.</description>
@@ -45,11 +48,8 @@
     </scm>
 
     <properties>
-        <springboot.version>2.5.4</springboot.version>
-
         <jdkVersion>1.8</jdkVersion>
         <jdkVersion.test>1.8</jdkVersion.test>
-        <maven.deploy.skip>true</maven.deploy.skip>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
         <github.global.server>github</github.global.server>
@@ -60,12 +60,10 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter</artifactId>
-            <version>${springboot.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
-            <version>${springboot.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>

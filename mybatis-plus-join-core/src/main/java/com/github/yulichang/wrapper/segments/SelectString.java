@@ -1,7 +1,6 @@
 package com.github.yulichang.wrapper.segments;
 
 import com.baomidou.mybatisplus.core.metadata.TableFieldInfo;
-import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.github.yulichang.wrapper.enums.BaseFuncEnum;
 import org.apache.ibatis.type.TypeHandler;
 
@@ -100,7 +99,7 @@ public class SelectString implements Select {
     }
 
     @Override
-    public SFunction<?, ?>[] getArgs() {
+    public SelectFunc.Arg[] getArgs() {
         return null;
     }
 

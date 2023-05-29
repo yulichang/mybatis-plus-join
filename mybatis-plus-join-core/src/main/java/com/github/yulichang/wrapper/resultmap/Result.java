@@ -23,7 +23,7 @@ import java.util.Optional;
  */
 @Getter
 @Setter(AccessLevel.PACKAGE)
-public class Result {
+public class Result implements IResult {
 
     private boolean isId;
 

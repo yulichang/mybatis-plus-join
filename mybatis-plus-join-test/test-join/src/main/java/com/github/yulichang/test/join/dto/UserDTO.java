@@ -18,7 +18,7 @@ public class UserDTO {
     /** user */
     private Integer id;
     /** user */
-    private String name;
+    private String PName;
     /** user */
     private Map<String,String> json;
     /** user */

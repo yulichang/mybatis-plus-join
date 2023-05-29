@@ -13,7 +13,7 @@ import java.lang.reflect.Field;
 @Data
 public class FieldCache {
 
-    private Field field;
+    public Field field;
 
-    private Class<?> type;
+    public Class<?> type;
 }

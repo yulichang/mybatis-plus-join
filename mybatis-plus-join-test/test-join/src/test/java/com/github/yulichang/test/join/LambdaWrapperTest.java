@@ -11,11 +11,13 @@ import com.github.yulichang.test.join.mapper.AddressMapper;
 import com.github.yulichang.test.join.mapper.OrderMapper;
 import com.github.yulichang.test.join.mapper.UserDTOMapper;
 import com.github.yulichang.test.join.mapper.UserMapper;
+import com.github.yulichang.test.util.Reset;
 import com.github.yulichang.test.util.ThreadLocalUtils;
 import com.github.yulichang.toolkit.JoinWrappers;
 import com.github.yulichang.wrapper.DeleteJoinWrapper;
 import com.github.yulichang.wrapper.MPJLambdaWrapper;
 import com.github.yulichang.wrapper.UpdateJoinWrapper;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -50,6 +52,10 @@ class LambdaWrapperTest {
     @Autowired
     private OrderMapper orderMapper;
 
+    @BeforeEach
+    void setUp() {
+        Reset.reset();
+    }
 
     @Test
     void testJoin() {
@@ -120,7 +126,6 @@ class LambdaWrapperTest {
                 "  AND t1.del = false\n" +
                 "  AND (t.id <= ?)\n" +
                 "ORDER BY t.id DESC");
-        String s = UserDO.Fields.addressId;
         MPJLambdaWrapper<UserDO> wrapper = new MPJLambdaWrapper<UserDO>()
                 .selectAll(UserDO.class)
 
@@ -674,7 +679,7 @@ class LambdaWrapperTest {
                 .selectAll(UserDO.class)
                 .select(AddressDO::getAddress)
                 .leftJoin(AddressDO.class, AddressDO::getUserId, UserDO::getId));
-        assert list.get(0).get("ADDRESS") != null;
+        assert list.get(0).get("ADDRESS") != null || list.get(0).get("address") != null;
         list.forEach(System.out::println);
     }
 

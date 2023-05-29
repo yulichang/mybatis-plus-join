@@ -16,7 +16,7 @@ public interface Label<T> {
 
     Class<T> getOfType();
 
-    List<Result> getResultList();
+    List<IResult> getResultList();
 
     List<?> getMybatisLabels();
 }

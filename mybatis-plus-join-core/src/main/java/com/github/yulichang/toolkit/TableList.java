@@ -224,32 +224,32 @@ public class TableList implements Serializable {
         /**
          * 关联表类型
          */
-        private Class<?> clazz;
+        public Class<?> clazz;
 
         /**
          * 是否有别名
          */
-        private boolean hasAlias;
+        public boolean hasAlias;
 
         /**
          * 表别名
          */
-        private String alias;
+        public String alias;
 
         /**
          * 上级index
          */
-        private Integer pIndex;
+        public Integer pIndex;
 
         /**
          * 表序号
          */
-        private int index;
+        public int index;
 
         /**
          * 子集
          */
-        private List<Node> list;
+        public List<Node> list;
 
         public Node(Class<?> clazz, boolean hasAlias, String alias, Integer pIndex, int index) {
             this.clazz = clazz;

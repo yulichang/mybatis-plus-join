@@ -3,10 +3,13 @@ package com.github.yulichang.wrapper.segments;
 
 import com.baomidou.mybatisplus.core.metadata.TableFieldInfo;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
+import com.github.yulichang.toolkit.LambdaUtils;
 import com.github.yulichang.wrapper.enums.BaseFuncEnum;
+import lombok.Data;
 import lombok.Getter;
 import org.apache.ibatis.type.TypeHandler;
 
+import java.util.Arrays;
 import java.util.Objects;
 
 /**
@@ -24,7 +27,7 @@ public class SelectFunc implements Select {
 
     private final String column;
 
-    private final SFunction<?, ?>[] args;
+    private final Arg[] args;
 
     private final boolean hasAlias;
 
@@ -66,6 +69,22 @@ public class SelectFunc implements Select {
     }
 
     public SelectFunc(String alias, Integer index, BaseFuncEnum func, SFunction<?, ?>[] args, boolean hasTableAlias, String tableAlias) {
+        this.index = index;
+        this.column = null;
+        this.args = Arrays.stream(args).map(i -> new Arg(LambdaUtils.getEntityClass(i), LambdaUtils.getName(i))).toArray(Arg[]::new);
+        this.cache = null;
+        this.hasAlias = true;
+        this.alias = alias;
+        this.isFunc = true;
+        this.func = func;
+        this.hasTableAlias = hasTableAlias;
+        this.tableAlias = tableAlias;
+    }
+
+    /**
+     * kt
+     */
+    public SelectFunc(String alias, Integer index, BaseFuncEnum func, Arg[] args, boolean hasTableAlias, String tableAlias) {
         this.index = index;
         this.column = null;
         this.args = args;
@@ -130,6 +149,17 @@ public class SelectFunc implements Select {
         return false;
     }
 
+    @Data
+    public static class Arg {
+        public Class<?> clazz;
+
+        public String prop;
+
+        public Arg(Class<?> clazz, String prop) {
+            this.clazz = clazz;
+            this.prop = prop;
+        }
+    }
 
     /**
      * 泛型不同不能使用可变参数

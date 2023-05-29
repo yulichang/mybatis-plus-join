@@ -5,7 +5,6 @@ import com.baomidou.mybatisplus.core.metadata.TableInfo;
 import com.baomidou.mybatisplus.core.toolkit.Constants;
 import com.baomidou.mybatisplus.core.toolkit.StringPool;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
-import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.github.yulichang.adapter.AdapterHelper;
 import com.github.yulichang.toolkit.sql.SqlScriptUtils;
 import com.github.yulichang.wrapper.MPJLambdaWrapper;
@@ -19,7 +18,7 @@ import java.util.Optional;
  */
 public class WrapperUtils {
 
-    public static <T, R> String buildSubSqlByWrapper(Class<T> clazz, MPJLambdaWrapper<T> wrapper, SFunction<R, ?> alias) {
+    public static <T> String buildSubSqlByWrapper(Class<T> clazz, MPJLambdaWrapper<T> wrapper, String alias) {
         TableInfo tableInfo = TableHelper.get(clazz);
         Asserts.hasTable(tableInfo, clazz);
         String first = Optional.ofNullable(wrapper.getSqlFirst()).orElse(StringPool.EMPTY);
@@ -50,7 +49,7 @@ public class WrapperUtils {
                 subLogic,
                 sqlSegment,
                 sqlComment,
-                LambdaUtils.getName(alias));
+                alias);
     }
 
     public static String buildUnionSqlByWrapper(Class<?> clazz, MPJLambdaWrapper<?> wrapper) {

@@ -4,13 +4,13 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
-public class ResultList extends ArrayList<Result> {
+public class ResultList extends ArrayList<IResult> {
 
     private final Set<String> propertySet = new HashSet<>();
 
 
     @Override
-    public boolean add(Result result) {
+    public boolean add(IResult result) {
         if (propertySet.contains(result.getProperty())) {
             super.removeIf(i -> i.getProperty().equals(result.getProperty()));
         } else {

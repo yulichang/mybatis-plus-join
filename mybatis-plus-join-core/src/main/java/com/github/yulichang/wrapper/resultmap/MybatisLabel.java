@@ -36,7 +36,7 @@ public class MybatisLabel<E, T> implements Label<T> {
 
     private Class<T> ofType;
 
-    private List<Result> resultList;
+    private List<IResult> resultList;
 
     /**
      * wrapper里面的引用

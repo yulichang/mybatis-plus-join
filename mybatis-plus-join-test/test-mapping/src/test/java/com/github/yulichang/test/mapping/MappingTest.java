@@ -47,7 +47,7 @@ class MappingTest {
         MPJLambdaWrapper<UserDO> wrapper = new MPJLambdaWrapper<UserDO>()
                 .selectAll(UserDO.class)
                 .leftJoin(AddressDO.class, AddressDO::getId, UserDO::getAddressId);
-        List<UserDO> dos = userService.listDeep(wrapper);
+        List<UserDO> dos = userService.listDeep(wrapper, conf -> conf.loop(true));
         System.out.println(1);
     }
 }

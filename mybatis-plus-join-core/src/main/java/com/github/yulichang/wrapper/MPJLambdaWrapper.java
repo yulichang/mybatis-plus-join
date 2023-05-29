@@ -13,11 +13,9 @@ import com.github.yulichang.toolkit.support.ColumnCache;
 import com.github.yulichang.wrapper.interfaces.Chain;
 import com.github.yulichang.wrapper.interfaces.Query;
 import com.github.yulichang.wrapper.interfaces.QueryLabel;
+import com.github.yulichang.wrapper.interfaces.SelectWrapper;
 import com.github.yulichang.wrapper.resultmap.Label;
-import com.github.yulichang.wrapper.segments.Select;
-import com.github.yulichang.wrapper.segments.SelectCache;
-import com.github.yulichang.wrapper.segments.SelectNormal;
-import com.github.yulichang.wrapper.segments.SelectString;
+import com.github.yulichang.wrapper.segments.*;
 import lombok.Getter;
 
 import java.util.*;
@@ -33,7 +31,7 @@ import java.util.stream.Collectors;
  */
 @SuppressWarnings({"unused"})
 public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWrapper<T>> implements
-        Query<MPJLambdaWrapper<T>>, QueryLabel<MPJLambdaWrapper<T>>, Chain<T> {
+        Query<MPJLambdaWrapper<T>>, QueryLabel<MPJLambdaWrapper<T>>, Chain<T>, SelectWrapper<T, MPJLambdaWrapper<T>> {
 
     /**
      * 查询字段 sql
@@ -180,6 +178,11 @@ public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWr
         return typedThis;
     }
 
+    @Override
+    public MPJLambdaWrapper<T> selectAll(Class<?> clazz) {
+        return Query.super.selectAll(clazz);
+    }
+
     /**
      * 子查询
      */
@@ -201,7 +204,7 @@ public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWr
         wrapper.alias = st;
         wrapper.subTableAlias = st;
         consumer.accept(wrapper);
-        String sql = WrapperUtils.buildSubSqlByWrapper(clazz, wrapper, alias);
+        String sql = WrapperUtils.buildSubSqlByWrapper(clazz, wrapper, LambdaUtils.getName(alias));
         this.selectColumns.add(new SelectString(sql, hasAlias, this.alias));
         return typedThis;
     }
@@ -270,15 +273,14 @@ public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWr
                 }
                 String str = prefix + StringPool.DOT + i.getColumn();
                 if (i.isFunc()) {
-                    SFunction<?, ?>[] args = i.getArgs();
+                    SelectFunc.Arg[] args = i.getArgs();
                     if (Objects.isNull(args) || args.length == 0) {
                         return String.format(i.getFunc().getSql(), str) + Constant.AS + i.getAlias();
                     } else {
                         return String.format(i.getFunc().getSql(), Arrays.stream(args).map(arg -> {
-                            Class<?> entityClass = LambdaUtils.getEntityClass(arg);
-                            String prefixByClass = tableList.getPrefixByClass(entityClass);
-                            Map<String, SelectCache> mapField = ColumnCache.getMapField(entityClass);
-                            SelectCache cache = mapField.get(LambdaUtils.getName(arg));
+                            String prefixByClass = tableList.getPrefixByClass(arg.getClazz());
+                            Map<String, SelectCache> mapField = ColumnCache.getMapField(arg.getClazz());
+                            SelectCache cache = mapField.get(arg.getProp());
                             return prefixByClass + StringPool.DOT + cache.getColumn();
                         }).toArray()) + Constant.AS + i.getAlias();
                     }

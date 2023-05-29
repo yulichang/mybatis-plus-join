@@ -23,6 +23,7 @@
 
 
     <dependencies>
+        <!--suppress VulnerableLibrariesLocal -->
         <dependency>
             <groupId>com.github.yulichang</groupId>
             <artifactId>test-base</artifactId>

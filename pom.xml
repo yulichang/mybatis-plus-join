@@ -42,7 +42,7 @@
         <jdkVersion>1.8</jdkVersion>
         <jdkVersion.test>1.8</jdkVersion.test>
         <maven.compiler.source>1.8</maven.compiler.source>
-        <maven.compiler.taraget>1.8</maven.compiler.taraget>
+        <maven.compiler.target>1.8</maven.compiler.target>
         <github.global.server>github</github.global.server>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>

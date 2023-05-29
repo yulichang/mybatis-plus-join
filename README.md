@@ -78,7 +78,7 @@ class test {
 
     void testJoin() {
         //和Mybatis plus一致，MPJLambdaWrapper的泛型必须是主表的泛型，并且要用主表的Mapper来调用
-        MPJLambdaWrapper<UserDO> wrapper = JoinWrappers.lambda(User.class)
+        MPJLambdaWrapper<UserDO> wrapper = JoinWrappers.lambda(UserDO.class)
                 .selectAll(UserDO.class)//查询user表全部字段
                 .select(UserAddressDO::getTel)//查询user_address tel 字段
                 .selectAs(UserAddressDO::getAddress, UserDTO::getUserAddress)//别名

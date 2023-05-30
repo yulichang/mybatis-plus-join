@@ -30,8 +30,8 @@ import java.util.stream.Collectors;
  * @author yulichang
  * @since 1.4.6
  */
-@SuppressWarnings("ALL")
-public class KtLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, KtLambdaWrapper<T>> implements
+@SuppressWarnings({"unused", "unchecked", "rawtypes"})
+public class KtLambdaWrapper<T> extends KtAbstractLambdaWrapper<T, KtLambdaWrapper<T>> implements
         Query<KtLambdaWrapper<T>>, QueryLabel<KtLambdaWrapper<T>>, Chain<T>, SelectWrapper<T, KtLambdaWrapper<T>> {
 
     /**
@@ -250,6 +250,7 @@ public class KtLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, KtLambdaWrap
      * 查询条件 SQL 片段
      */
     @Override
+    @SuppressWarnings("DuplicatedCode")
     public String getSqlSelect() {
         if (StringUtils.isBlank(sqlSelect.getStringValue()) && CollectionUtils.isNotEmpty(selectColumns)) {
             String s = selectColumns.stream().map(i -> {

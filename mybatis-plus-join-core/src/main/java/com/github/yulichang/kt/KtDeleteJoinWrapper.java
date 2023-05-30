@@ -21,7 +21,8 @@ import java.util.stream.Collectors;
  * @author yulichang
  * @since 1.4.5
  */
-public class KtDeleteJoinWrapper<T> extends MPJAbstractLambdaWrapper<T, KtDeleteJoinWrapper<T>> {
+@SuppressWarnings({"unused", "DuplicatedCode"})
+public class KtDeleteJoinWrapper<T> extends KtAbstractLambdaWrapper<T, KtDeleteJoinWrapper<T>> {
 
     /**
      * 删除表
@@ -69,7 +70,6 @@ public class KtDeleteJoinWrapper<T> extends MPJAbstractLambdaWrapper<T, KtDelete
      * 获取删除的表
      */
     @Override
-    @SuppressWarnings("UnusedReturnValue")
     public String getDeleteSql() {
         if (StringUtils.isNotBlank(this.deleteSql.getStringValue())) {
             return this.deleteSql.getStringValue();
@@ -185,7 +185,7 @@ public class KtDeleteJoinWrapper<T> extends MPJAbstractLambdaWrapper<T, KtDelete
         }
     }
 
-    private void check(){
+    private void check() {
         if (CollectionUtils.isNotEmpty(tableList.getAll())) {
             Class<T> entityClass = getEntityClass();
             Assert.notNull(entityClass, "缺少主表类型, 请使用 new MPJLambdaWrapper<>(主表.class) 或 JoinWrappers.lambda(主表.class) 构造方法");

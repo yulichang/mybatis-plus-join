@@ -38,7 +38,7 @@ import static java.util.stream.Collectors.joining;
  * @author yulichang
  */
 @SuppressWarnings("ALL")
-public abstract class MPJAbstractWrapper<T, Children extends MPJAbstractWrapper<T, Children>> extends Wrapper<T>
+public abstract class KtAbstractWrapper<T, Children extends KtAbstractWrapper<T, Children>> extends Wrapper<T>
         implements Compare<Children>, Nested<Children, Children>, Join<Children>, Func<Children>, OnCompare<Children>,
         CompareStr<Children, String>, FuncStr<Children, String> {
 

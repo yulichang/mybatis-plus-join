@@ -7,12 +7,7 @@
         <artifactId>mybatis-plus-join-test</artifactId>
         <version>1.4.5</version>
     </parent>
-
     <artifactId>test-kotlin</artifactId>
-    <version>1.4.5</version>
-
-    <name>test-kotlin</name>
-    <description>test-kotlin</description>
 
     <properties>
         <maven.compiler.source>17</maven.compiler.source>

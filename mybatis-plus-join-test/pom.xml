@@ -20,9 +20,11 @@
     <modules>
         <module>test-base</module>
         <module>test-join</module>
-        <module>test-kotlin</module>
         <module>test-collection</module>
         <module>test-mapping</module>
+
+        <!-- 以下两个模块需要jdk17+, 使用jdk8会出现编译错误, 如果有安装jdk17+可以打开这两个模块 -->
+<!--        <module>test-kotlin</module>-->
 <!--        <module>test-springboot3-jdk17</module>-->
     </modules>
 
@@ -83,11 +85,11 @@
             <version>1.4.5</version>
         </dependency>
         <!-- PageHelper 兼容性测试 -->
-<!--        <dependency>-->
-<!--            <groupId>com.github.pagehelper</groupId>-->
-<!--            <artifactId>pagehelper-spring-boot-starter</artifactId>-->
-<!--            <version>1.4.6</version>-->
-<!--        </dependency>-->
+        <!--        <dependency>-->
+        <!--            <groupId>com.github.pagehelper</groupId>-->
+        <!--            <artifactId>pagehelper-spring-boot-starter</artifactId>-->
+        <!--            <version>1.4.6</version>-->
+        <!--        </dependency>-->
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>

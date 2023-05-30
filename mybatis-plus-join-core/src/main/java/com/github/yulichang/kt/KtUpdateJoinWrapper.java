@@ -27,8 +27,8 @@ import java.util.stream.Collectors;
  * @author yulichang
  * @since 1.4.6
  */
-@SuppressWarnings("unused")
-public class KtUpdateJoinWrapper<T> extends MPJAbstractLambdaWrapper<T, KtUpdateJoinWrapper<T>>
+@SuppressWarnings({"unused", "DuplicatedCode"})
+public class KtUpdateJoinWrapper<T> extends KtAbstractLambdaWrapper<T, KtUpdateJoinWrapper<T>>
         implements Update<KtUpdateJoinWrapper<T>> {
     /**
      * SQL 更新字段内容，例如：name='1', age=2

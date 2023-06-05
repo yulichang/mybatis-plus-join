@@ -17,8 +17,8 @@ import com.github.yulichang.wrapper.segments.SelectCache;
 import kotlin.reflect.KProperty;
 import lombok.Getter;
 
-import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -204,11 +204,7 @@ public abstract class KtAbstractLambdaWrapper<T, Children extends KtAbstractLamb
             }
         }
         String decode;
-        try {
-            decode = URLDecoder.decode(tableName, "UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            decode = tableName;
-        }
+        decode = URLDecoder.decode(tableName, StandardCharsets.UTF_8);
         if (dynamicTableName) {
             return tableFunc.apply(decode);
         }
@@ -334,7 +330,7 @@ public abstract class KtAbstractLambdaWrapper<T, Children extends KtAbstractLamb
             StringBuilder value = new StringBuilder();
             for (Children wrapper : onWrappers) {
                 if (StringUtils.isBlank(wrapper.from.getStringValue())) {
-                    if (wrapper.subLogicSql && this.logicDelType == LogicDelTypeEnum.ON) {
+                    if (this.subLogicSql && this.logicDelType == LogicDelTypeEnum.ON) {
                         TableInfo tableInfo = TableHelper.get(wrapper.getJoinClass());
                         if (ConfigProperties.tableInfoAdapter.mpjHasLogic(tableInfo)) {
                             wrapper.appendSqlSegments(APPLY, () -> LogicInfoUtils.getLogicInfoNoAnd(

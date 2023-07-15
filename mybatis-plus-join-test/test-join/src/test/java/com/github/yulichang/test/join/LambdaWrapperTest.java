@@ -516,6 +516,19 @@ class LambdaWrapperTest {
         System.out.println(list);
     }
 
+    /**
+     * 别名测试
+     */
+    @Test
+    void testObj() {
+        ThreadLocalUtils.set("SELECT DISTINCT t1.id FROM `user` t LEFT JOIN `user` t1 ON (t1.pid = t.id) WHERE t.del=false AND t1.del=false");
+        MPJLambdaWrapper<UserDO> wrapper = new MPJLambdaWrapper<UserDO>()
+                .distinct()
+                .select(UserDO::getId)
+                .leftJoin(UserDO.class, UserDO::getPid, UserDO::getId);
+        List<Object> list = userMapper.selectObjs(wrapper);
+    }
+
     @Test
     void testTableAlias() {
         ThreadLocalUtils.set("SELECT t.id,\n" +

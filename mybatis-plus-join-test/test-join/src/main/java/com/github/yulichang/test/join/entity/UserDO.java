@@ -23,7 +23,7 @@ import java.util.Map;
 @EqualsAndHashCode(callSuper = true)
 @DynamicTableName
 @FieldNameConstants
-@TableName(value = "`user`")
+@TableName(value = "`user`", autoResultMap = true)
 public class UserDO extends ID<Integer> implements Serializable {
 
     private Integer pid;

@@ -28,6 +28,14 @@ public class SelectObjs extends com.baomidou.mybatisplus.core.injector.methods.S
     }
 
     @Override
+    protected String sqlSelectObjsColumns(TableInfo table) {
+        String selectColumns = super.sqlSelectObjsColumns(table);
+        return SqlScriptUtils.convertChoose(String.format("%s == null or !(%s instanceof %s)", Constants.WRAPPER, Constants.WRAPPER, MPJBaseJoin.class.getName()),
+                selectColumns, mpjSqlSelectColumns() + StringPool.SPACE + selectColumns);
+    }
+
+
+    @Override
     protected String sqlWhereEntityWrapper(boolean newLine, TableInfo table) {
         return SqlScriptUtils.convertChoose(String.format("%s == null or !(%s instanceof %s)", Constants.WRAPPER, Constants.WRAPPER, MPJBaseJoin.class.getName()),
                 super.sqlWhereEntityWrapper(newLine, table), mpjSqlWhereEntityWrapper(newLine, table));

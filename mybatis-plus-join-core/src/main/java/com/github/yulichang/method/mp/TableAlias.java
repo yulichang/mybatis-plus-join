@@ -9,6 +9,7 @@ import com.github.yulichang.method.MPJBaseMethod;
 import org.apache.ibatis.session.Configuration;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 
 /**
  * 兼容原生方法
@@ -43,6 +44,10 @@ public interface TableAlias extends Constants, MPJBaseMethod {
             //反射拷贝对象
             Field[] fields = TableInfo.class.getDeclaredFields();
             for (Field f : fields) {
+                if (Modifier.isStatic(f.getModifiers()) ||
+                        Modifier.isFinal(f.getModifiers())) {
+                    continue;
+                }
                 f.setAccessible(true);
                 f.set(table, f.get(tableInfo));
             }

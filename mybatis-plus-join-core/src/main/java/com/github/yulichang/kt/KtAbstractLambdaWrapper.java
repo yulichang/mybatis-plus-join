@@ -17,6 +17,7 @@ import com.github.yulichang.wrapper.segments.SelectCache;
 import kotlin.reflect.KProperty;
 import lombok.Getter;
 
+import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
@@ -204,7 +205,11 @@ public abstract class KtAbstractLambdaWrapper<T, Children extends KtAbstractLamb
             }
         }
         String decode;
-        decode = URLDecoder.decode(tableName, StandardCharsets.UTF_8);
+        try {
+            decode = URLDecoder.decode(tableName, StandardCharsets.UTF_8.name());
+        } catch (UnsupportedEncodingException e) {
+            throw new RuntimeException(e);
+        }
         if (dynamicTableName) {
             return tableFunc.apply(decode);
         }

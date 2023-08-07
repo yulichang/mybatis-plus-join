@@ -1,8 +1,5 @@
 package com.github.yulichang.toolkit;
 
-import com.github.yulichang.kt.KtDeleteJoinWrapper;
-import com.github.yulichang.kt.KtLambdaWrapper;
-import com.github.yulichang.kt.KtUpdateJoinWrapper;
 import com.github.yulichang.query.MPJQueryWrapper;
 import com.github.yulichang.wrapper.DeleteJoinWrapper;
 import com.github.yulichang.wrapper.MPJLambdaWrapper;
@@ -104,75 +101,5 @@ public class JoinWrappers {
      */
     public static <T> UpdateJoinWrapper<T> update(String alias, Class<T> clazz) {
         return new UpdateJoinWrapper<>(clazz, alias);
-    }
-
-    /**
-     * JoinWrappers.kt(User.class)
-     */
-    public static <T> KtLambdaWrapper<T> kt(Class<T> clazz) {
-        return new KtLambdaWrapper<>(clazz);
-    }
-
-    /**
-     * JoinWrappers.kt("t", User.class)
-     */
-    public static <T> KtLambdaWrapper<T> kt(String alias, Class<T> clazz) {
-        return new KtLambdaWrapper<>(clazz, alias);
-    }
-
-    /**
-     * JoinWrappers.kt(user)
-     */
-    public static <T> KtLambdaWrapper<T> kt(T entity) {
-        return new KtLambdaWrapper<>(entity);
-    }
-
-    /**
-     * JoinWrappers.kt("t", user)
-     */
-    public static <T> KtLambdaWrapper<T> kt(String alias, T entity) {
-        return new KtLambdaWrapper<>(entity, alias);
-    }
-
-    /**
-     * JoinWrappers.ktUpdate(User.class)
-     */
-    public static <T> KtUpdateJoinWrapper<T> ktUpdate(Class<T> clazz) {
-        return new KtUpdateJoinWrapper<>(clazz);
-    }
-
-    /**
-     * JoinWrappers.ktUpdate("t", User.class)
-     */
-    public static <T> KtUpdateJoinWrapper<T> ktUpdate(String alias, Class<T> clazz) {
-        return new KtUpdateJoinWrapper<>(clazz, alias);
-    }
-
-    /**
-     * JoinWrappers.ktUpdate(user)
-     */
-    public static <T> KtUpdateJoinWrapper<T> ktUpdate(T entity) {
-        return new KtUpdateJoinWrapper<>(entity);
-    }
-
-    /**
-     * JoinWrappers.ktUpdate("t", user)
-     */
-    public static <T> KtUpdateJoinWrapper<T> ktUpdate(String alias, T entity) {
-        return new KtUpdateJoinWrapper<>(entity, alias);
-    }
-
-    /**
-     * JoinWrappers.ktDelete(User.class)
-     */
-    public static <T> KtDeleteJoinWrapper<T> ktDelete(Class<T> clazz) {
-        return new KtDeleteJoinWrapper<>(clazz);
-    }
-
-    /**
-     * JoinWrappers.ktUpdate("t", User.class)
-     */
-    public static <T> KtDeleteJoinWrapper<T> ktDelete(String alias, Class<T> clazz) {
-        return new KtDeleteJoinWrapper<>(clazz, alias);
     }
 }

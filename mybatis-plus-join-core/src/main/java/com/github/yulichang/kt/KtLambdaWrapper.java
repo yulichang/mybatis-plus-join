@@ -8,7 +8,7 @@ import com.github.yulichang.kt.interfaces.Query;
 import com.github.yulichang.kt.interfaces.QueryLabel;
 import com.github.yulichang.toolkit.Constant;
 import com.github.yulichang.toolkit.KtUtils;
-import com.github.yulichang.toolkit.KtwWrapperUtils;
+import com.github.yulichang.toolkit.KtWrapperUtils;
 import com.github.yulichang.toolkit.TableList;
 import com.github.yulichang.toolkit.support.ColumnCache;
 import com.github.yulichang.wrapper.interfaces.Chain;
@@ -203,7 +203,7 @@ public class KtLambdaWrapper<T> extends KtAbstractLambdaWrapper<T, KtLambdaWrapp
         wrapper.alias = st;
         wrapper.subTableAlias = st;
         consumer.accept(wrapper);
-        String sql = KtwWrapperUtils.buildSubSqlByWrapper(clazz, wrapper, alias.getName());
+        String sql = KtWrapperUtils.buildSubSqlByWrapper(clazz, wrapper, alias.getName());
         this.selectColumns.add(new SelectString(sql, hasAlias, this.alias));
         return typedThis;
     }
@@ -218,7 +218,7 @@ public class KtLambdaWrapper<T> extends KtAbstractLambdaWrapper<T, KtLambdaWrapp
             Class<?> entityClass = wrapper.getEntityClass();
             Assert.notNull(entityClass, "请使用 new MPJLambdaWrapper(主表.class) 或 JoinWrappers.lambda(主表.class) 构造方法");
             sb.append(" UNION ")
-                    .append(KtwWrapperUtils.buildUnionSqlByWrapper(entityClass, wrapper));
+                    .append(KtWrapperUtils.buildUnionSqlByWrapper(entityClass, wrapper));
         }
         if (Objects.isNull(unionSql)) {
             unionSql = SharedString.emptyString();
@@ -237,7 +237,7 @@ public class KtLambdaWrapper<T> extends KtAbstractLambdaWrapper<T, KtLambdaWrapp
             Class<?> entityClass = wrapper.getEntityClass();
             Assert.notNull(entityClass, "请使用 new MPJLambdaWrapper(主表.class) 或 JoinWrappers.lambda(主表.class) 构造方法");
             sb.append(" UNION ALL ")
-                    .append(KtwWrapperUtils.buildUnionSqlByWrapper(entityClass, wrapper));
+                    .append(KtWrapperUtils.buildUnionSqlByWrapper(entityClass, wrapper));
         }
         if (Objects.isNull(unionSql)) {
             unionSql = SharedString.emptyString();

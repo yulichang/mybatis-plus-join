@@ -12,6 +12,7 @@ import java.util.Arrays;
  * @author yulichang
  * @since 1.4.6
  */
+@SuppressWarnings("unused")
 public class FuncArgs {
 
     public SelectFunc.Arg[] accept(KProperty<?>... kProperty) {

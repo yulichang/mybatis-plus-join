@@ -16,8 +16,9 @@ import java.util.Optional;
  * @author yulichang
  * @since 1.4.6
  */
-public class KtwWrapperUtils {
+public class KtWrapperUtils {
 
+    @SuppressWarnings("DuplicatedCode")
     public static String buildSubSqlByWrapper(Class<?> clazz, KtLambdaWrapper<?> wrapper, String alias) {
         TableInfo tableInfo = TableHelper.get(clazz);
         Asserts.hasTable(tableInfo, clazz);
@@ -52,6 +53,7 @@ public class KtwWrapperUtils {
                 alias);
     }
 
+    @SuppressWarnings("DuplicatedCode")
     public static String buildUnionSqlByWrapper(Class<?> clazz, KtLambdaWrapper<?> wrapper) {
         TableInfo tableInfo = TableHelper.get(clazz);
         Asserts.hasTable(tableInfo, clazz);
@@ -92,6 +94,7 @@ public class KtwWrapperUtils {
         return SqlScriptUtils.safeParam(paramStr, null);
     }
 
+    @SuppressWarnings("DuplicatedCode")
     private static String getEntitySql(TableInfo tableInfo, KtLambdaWrapper<?> wrapper) {
         Object obj = wrapper.getEntity();
         if (Objects.isNull(obj)) {

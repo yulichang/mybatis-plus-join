@@ -7,9 +7,9 @@
     <parent>
         <groupId>com.github.yulichang</groupId>
         <artifactId>mybatis-plus-join-root</artifactId>
-        <version>1.4.5</version>
+        <version>1.4.6</version>
     </parent>
-    <version>1.4.5</version>
+    <version>1.4.6</version>
     <artifactId>mybatis-plus-join-annotation</artifactId>
     <name>mybatis-plus-join-annotation</name>
 

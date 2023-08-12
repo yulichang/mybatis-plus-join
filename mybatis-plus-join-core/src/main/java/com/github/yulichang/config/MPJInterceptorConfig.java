@@ -30,7 +30,7 @@ public class MPJInterceptorConfig {
             System.out.println(" _ _   |_  _ _|_. ___ _ |    _  .  _  .  _  \n" +
                     "| | |\\/|_)(_| | |_\\  |_)||_|_\\  | (_) | | | \n" +
                     "     /               |          /\n" +
-                    "                                    1.4.5");
+                    "                                    1.4.6");
         }
     }
 
@@ -54,8 +54,7 @@ public class MPJInterceptorConfig {
                 }
                 chain.addInterceptor(new MPJInterceptor());
             } catch (NoSuchFieldException | IllegalAccessException e) {
-                logger.error("初始化 MPJ 拦截器失败");
-                e.printStackTrace();
+                logger.error("初始化 MPJ 拦截器失败", e);
             }
         }
     }

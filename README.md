@@ -1,3 +1,4 @@
+<!--suppress HtmlDeprecatedAttribute -->
 <p align="center">
   <a href="https://github.com/yulichang/mybatis-plus-join" target="_blank">
    <img alt="Mybatis-Plus-Join-Logo" src="https://mybatisplusjoin.com/lg.png">
@@ -49,12 +50,12 @@ QQ群:1022221898  或者
   <dependency>
       <groupId>com.github.yulichang</groupId>
       <artifactId>mybatis-plus-join-boot-starter</artifactId>
-      <version>1.4.5</version>
+      <version>1.4.6</version>
   </dependency>
   ```
 - Gradle
   ```
-   implementation 'com.github.yulichang:mybatis-plus-join-boot-starter:1.4.5'
+   implementation 'com.github.yulichang:mybatis-plus-join-boot-starter:1.4.6'
   ```
   或者clone代码到本地执行 mvn install, 再引入以上依赖  
   <br>

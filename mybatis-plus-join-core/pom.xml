@@ -7,9 +7,9 @@
     <parent>
         <groupId>com.github.yulichang</groupId>
         <artifactId>mybatis-plus-join-root</artifactId>
-        <version>1.4.5</version>
+        <version>1.4.6</version>
     </parent>
-    <version>1.4.5</version>
+    <version>1.4.6</version>
     <artifactId>mybatis-plus-join-core</artifactId>
     <name>mybatis-plus-join-core</name>
 
@@ -47,22 +47,22 @@
         <dependency>
             <groupId>com.github.yulichang</groupId>
             <artifactId>mybatis-plus-join-annotation</artifactId>
-            <version>1.4.5</version>
+            <version>1.4.6</version>
         </dependency>
         <dependency>
             <groupId>com.github.yulichang</groupId>
             <artifactId>mybatis-plus-join-adapter-v33x</artifactId>
-            <version>1.4.5</version>
+            <version>1.4.6</version>
         </dependency>
         <dependency>
             <groupId>com.github.yulichang</groupId>
             <artifactId>mybatis-plus-join-adapter-v3431</artifactId>
-            <version>1.4.5</version>
+            <version>1.4.6</version>
         </dependency>
         <dependency>
             <groupId>com.github.yulichang</groupId>
             <artifactId>mybatis-plus-join-adapter-v352</artifactId>
-            <version>1.4.5</version>
+            <version>1.4.6</version>
         </dependency>
         <dependency>
             <groupId>com.baomidou</groupId>
@@ -79,7 +79,7 @@
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-aop</artifactId>
-            <version>5.3.23</version>
+            <version>5.3.29</version>
             <scope>provided</scope>
         </dependency>
         <dependency>

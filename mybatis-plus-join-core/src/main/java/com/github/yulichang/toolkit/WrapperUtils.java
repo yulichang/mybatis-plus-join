@@ -16,6 +16,7 @@ import java.util.Optional;
  * @author yulichang
  * @since 1.4.5
  */
+@SuppressWarnings("DuplicatedCode")
 public class WrapperUtils {
 
     public static <T> String buildSubSqlByWrapper(Class<T> clazz, MPJLambdaWrapper<T> wrapper, String alias) {

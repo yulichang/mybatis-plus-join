@@ -57,7 +57,6 @@ public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWr
      */
     private SharedString unionSql;
 
-
     /**
      * 推荐使用 带 class 的构造方法
      */

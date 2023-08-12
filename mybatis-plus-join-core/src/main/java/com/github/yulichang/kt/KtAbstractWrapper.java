@@ -7,12 +7,15 @@ import com.baomidou.mybatisplus.core.conditions.interfaces.Nested;
 import com.baomidou.mybatisplus.core.conditions.segments.MergeSegments;
 import com.baomidou.mybatisplus.core.enums.SqlKeyword;
 import com.baomidou.mybatisplus.core.enums.SqlLike;
+import com.baomidou.mybatisplus.core.exceptions.MybatisPlusException;
 import com.baomidou.mybatisplus.core.toolkit.*;
 import com.baomidou.mybatisplus.core.toolkit.sql.SqlUtils;
 import com.baomidou.mybatisplus.core.toolkit.sql.StringEscape;
-import com.github.yulichang.kt.interfaces.*;
+import com.github.yulichang.kt.interfaces.Compare;
+import com.github.yulichang.kt.interfaces.Func;
+import com.github.yulichang.kt.interfaces.OnCompare;
 import com.github.yulichang.toolkit.KtUtils;
-import com.github.yulichang.toolkit.MPJStringUtils;
+import com.github.yulichang.toolkit.MPJSqlInjectionUtils;
 import com.github.yulichang.toolkit.TableList;
 import com.github.yulichang.toolkit.sql.SqlScriptUtils;
 import com.github.yulichang.wrapper.enums.PrefixEnum;
@@ -110,6 +113,11 @@ public abstract class KtAbstractWrapper<T, Children extends KtAbstractWrapper<T,
     @Getter
     protected TableList tableList;
 
+    /**
+     * 检查 SQL 注入过滤
+     */
+    protected boolean checkSqlInjection = false;
+
     @Override
     public T getEntity() {
         return entity;
@@ -138,8 +146,16 @@ public abstract class KtAbstractWrapper<T, Children extends KtAbstractWrapper<T,
         return typedThis;
     }
 
+    /**
+     * 开启检查 SQL 注入
+     */
+    public Children checkSqlInjection() {
+        this.checkSqlInjection = true;
+        return typedThis;
+    }
+
     @Override
-    public  Children allEq(boolean condition, Map<KProperty<?>, ?> params, boolean null2IsNull) {
+    public Children allEq(boolean condition, Map<KProperty<?>, ?> params, boolean null2IsNull) {
         if (condition && CollectionUtils.isNotEmpty(params)) {
             params.forEach((k, v) -> {
                 if (StringUtils.checkValNotNull(v)) {
@@ -155,17 +171,17 @@ public abstract class KtAbstractWrapper<T, Children extends KtAbstractWrapper<T,
     }
 
     @Override
-    public  Children eq(boolean condition, KProperty<?> column, Object val) {
+    public Children eq(boolean condition, KProperty<?> column, Object val) {
         return addCondition(condition, column, EQ, val);
     }
 
     @Override
-    public  Children ne(boolean condition, KProperty<?> column, Object val) {
+    public Children ne(boolean condition, KProperty<?> column, Object val) {
         return addCondition(condition, column, NE, val);
     }
 
     @Override
-    public  Children gt(boolean condition, KProperty<?> column, Object val) {
+    public Children gt(boolean condition, KProperty<?> column, Object val) {
         return addCondition(condition, column, GT, val);
     }
 
@@ -175,27 +191,27 @@ public abstract class KtAbstractWrapper<T, Children extends KtAbstractWrapper<T,
     }
 
     @Override
-    public  Children lt(boolean condition, KProperty<?> column, Object val) {
+    public Children lt(boolean condition, KProperty<?> column, Object val) {
         return addCondition(condition, column, LT, val);
     }
 
     @Override
-    public  Children le(boolean condition, KProperty<?> column, Object val) {
+    public Children le(boolean condition, KProperty<?> column, Object val) {
         return addCondition(condition, column, LE, val);
     }
 
     @Override
-    public  Children like(boolean condition, KProperty<?> column, Object val) {
+    public Children like(boolean condition, KProperty<?> column, Object val) {
         return likeValue(condition, LIKE, column, val, SqlLike.DEFAULT);
     }
 
     @Override
-    public  Children notLike(boolean condition, KProperty<?> column, Object val) {
+    public Children notLike(boolean condition, KProperty<?> column, Object val) {
         return likeValue(condition, NOT_LIKE, column, val, SqlLike.DEFAULT);
     }
 
     @Override
-    public  Children likeLeft(boolean condition, KProperty<?> column, Object val) {
+    public Children likeLeft(boolean condition, KProperty<?> column, Object val) {
         return likeValue(condition, LIKE, column, val, SqlLike.LEFT);
     }
 
@@ -205,13 +221,13 @@ public abstract class KtAbstractWrapper<T, Children extends KtAbstractWrapper<T,
     }
 
     @Override
-    public  Children between(boolean condition, KProperty<?> column, Object val1, Object val2) {
+    public Children between(boolean condition, KProperty<?> column, Object val1, Object val2) {
         return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(index, column, false), BETWEEN,
                 () -> formatParam(null, val1), AND, () -> formatParam(null, val2)));
     }
 
     @Override
-    public  Children notBetween(boolean condition, KProperty<?> column, Object val1, Object val2) {
+    public Children notBetween(boolean condition, KProperty<?> column, Object val1, Object val2) {
         return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(index, column, false), NOT_BETWEEN,
                 () -> formatParam(null, val1), AND, () -> formatParam(null, val2)));
     }
@@ -283,7 +299,7 @@ public abstract class KtAbstractWrapper<T, Children extends KtAbstractWrapper<T,
     }
 
     @Override
-    public  Children isNull(boolean condition, KProperty<?> column) {
+    public Children isNull(boolean condition, KProperty<?> column) {
         return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(index, column, false), IS_NULL));
     }
 
@@ -677,7 +693,7 @@ public abstract class KtAbstractWrapper<T, Children extends KtAbstractWrapper<T,
     }
 
     protected final ISqlSegment columnToSqlSegment(String column) {
-        return () -> (String) column;
+        return () -> columnsToString(column);
     }
 
     /**
@@ -688,6 +704,9 @@ public abstract class KtAbstractWrapper<T, Children extends KtAbstractWrapper<T,
     }
 
     protected String columnToString(String column) {
+        if (checkSqlInjection && MPJSqlInjectionUtils.check(column)) {
+            throw new MybatisPlusException("Discovering SQL injection column: " + column);
+        }
         return column;
     }
 
@@ -941,16 +960,12 @@ public abstract class KtAbstractWrapper<T, Children extends KtAbstractWrapper<T,
     public final Children orderBy(boolean condition, boolean isAsc, String column, String... columns) {
         return maybeDo(condition, () -> {
             final SqlKeyword mode = isAsc ? ASC : DESC;
-            appendSqlSegments(ORDER_BY, columnToSqlSegment(columnSqlInjectFilter(column)), mode);
+            appendSqlSegments(ORDER_BY, columnToSqlSegment(column), mode);
             if (ArrayUtils.isNotEmpty(columns)) {
                 Arrays.stream(columns).forEach(c -> appendSqlSegments(ORDER_BY,
-                        columnToSqlSegment(columnSqlInjectFilter(c)), mode));
+                        columnToSqlSegment(c), mode));
             }
         });
-    }
-
-    protected String columnSqlInjectFilter(String column) {
-        return MPJStringUtils.sqlInjectionReplaceBlank(column);
     }
 
     @Override
@@ -965,13 +980,13 @@ public abstract class KtAbstractWrapper<T, Children extends KtAbstractWrapper<T,
 
     @Override
     public Children orderBy(boolean condition, boolean isAsc, String column) {
-        return maybeDo(condition, () -> appendSqlSegments(ORDER_BY, columnToSqlSegment(columnSqlInjectFilter(column)),
+        return maybeDo(condition, () -> appendSqlSegments(ORDER_BY, columnToSqlSegment(column),
                 isAsc ? ASC : DESC));
     }
 
     @Override
     public Children orderByStr(boolean condition, boolean isAsc, List<String> columns) {
         return maybeDo(condition, () -> columns.forEach(c -> appendSqlSegments(ORDER_BY,
-                columnToSqlSegment(columnSqlInjectFilter(c)), isAsc ? ASC : DESC)));
+                columnToSqlSegment(c), isAsc ? ASC : DESC)));
     }
 }

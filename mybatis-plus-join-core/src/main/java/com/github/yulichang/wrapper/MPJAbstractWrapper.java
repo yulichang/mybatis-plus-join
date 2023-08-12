@@ -7,12 +7,13 @@ import com.baomidou.mybatisplus.core.conditions.interfaces.Nested;
 import com.baomidou.mybatisplus.core.conditions.segments.MergeSegments;
 import com.baomidou.mybatisplus.core.enums.SqlKeyword;
 import com.baomidou.mybatisplus.core.enums.SqlLike;
+import com.baomidou.mybatisplus.core.exceptions.MybatisPlusException;
 import com.baomidou.mybatisplus.core.toolkit.*;
 import com.baomidou.mybatisplus.core.toolkit.sql.SqlUtils;
 import com.baomidou.mybatisplus.core.toolkit.sql.StringEscape;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.github.yulichang.toolkit.LambdaUtils;
-import com.github.yulichang.toolkit.MPJStringUtils;
+import com.github.yulichang.toolkit.MPJSqlInjectionUtils;
 import com.github.yulichang.toolkit.TableList;
 import com.github.yulichang.toolkit.sql.SqlScriptUtils;
 import com.github.yulichang.wrapper.enums.PrefixEnum;
@@ -107,6 +108,11 @@ public abstract class MPJAbstractWrapper<T, Children extends MPJAbstractWrapper<
     @Getter
     protected TableList tableList;
 
+    /**
+     * 检查 SQL 注入过滤
+     */
+    protected boolean checkSqlInjection = false;
+
     @Override
     public T getEntity() {
         return entity;
@@ -132,6 +138,14 @@ public abstract class MPJAbstractWrapper<T, Children extends MPJAbstractWrapper<
         if (tableList != null) {
             tableList.setRootClass(entityClass);
         }
+        return typedThis;
+    }
+
+    /**
+     * 开启检查 SQL 注入
+     */
+    public Children checkSqlInjection() {
+        this.checkSqlInjection = true;
         return typedThis;
     }
 
@@ -692,7 +706,7 @@ public abstract class MPJAbstractWrapper<T, Children extends MPJAbstractWrapper<
     }
 
     protected final <X> ISqlSegment columnToSqlSegment(String column) {
-        return () -> (String) column;
+        return () -> columnsToString(column);
     }
 
     /**
@@ -703,6 +717,9 @@ public abstract class MPJAbstractWrapper<T, Children extends MPJAbstractWrapper<
     }
 
     protected String columnToString(String column) {
+        if (checkSqlInjection && MPJSqlInjectionUtils.check(column)) {
+            throw new MybatisPlusException("Discovering SQL injection column: " + column);
+        }
         return column;
     }
 
@@ -956,16 +973,12 @@ public abstract class MPJAbstractWrapper<T, Children extends MPJAbstractWrapper<
     public final Children orderBy(boolean condition, boolean isAsc, String column, String... columns) {
         return maybeDo(condition, () -> {
             final SqlKeyword mode = isAsc ? ASC : DESC;
-            appendSqlSegments(ORDER_BY, columnToSqlSegment(columnSqlInjectFilter(column)), mode);
+            appendSqlSegments(ORDER_BY, columnToSqlSegment(column), mode);
             if (ArrayUtils.isNotEmpty(columns)) {
                 Arrays.stream(columns).forEach(c -> appendSqlSegments(ORDER_BY,
-                        columnToSqlSegment(columnSqlInjectFilter(c)), mode));
+                        columnToSqlSegment(c), mode));
             }
         });
-    }
-
-    protected String columnSqlInjectFilter(String column) {
-        return MPJStringUtils.sqlInjectionReplaceBlank(column);
     }
 
     @Override
@@ -980,13 +993,13 @@ public abstract class MPJAbstractWrapper<T, Children extends MPJAbstractWrapper<
 
     @Override
     public Children orderBy(boolean condition, boolean isAsc, String column) {
-        return maybeDo(condition, () -> appendSqlSegments(ORDER_BY, columnToSqlSegment(columnSqlInjectFilter(column)),
+        return maybeDo(condition, () -> appendSqlSegments(ORDER_BY, columnToSqlSegment(column),
                 isAsc ? ASC : DESC));
     }
 
     @Override
     public Children orderByStr(boolean condition, boolean isAsc, List<String> columns) {
         return maybeDo(condition, () -> columns.forEach(c -> appendSqlSegments(ORDER_BY,
-                columnToSqlSegment(columnSqlInjectFilter(c)), isAsc ? ASC : DESC)));
+                columnToSqlSegment(c), isAsc ? ASC : DESC)));
     }
 }

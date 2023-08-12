@@ -4,14 +4,17 @@ import com.baomidou.mybatisplus.core.conditions.AbstractWrapper;
 import com.baomidou.mybatisplus.core.conditions.SharedString;
 import com.baomidou.mybatisplus.core.conditions.query.Query;
 import com.baomidou.mybatisplus.core.conditions.segments.MergeSegments;
+import com.baomidou.mybatisplus.core.exceptions.MybatisPlusException;
 import com.baomidou.mybatisplus.core.metadata.TableFieldInfo;
 import com.baomidou.mybatisplus.core.metadata.TableInfo;
 import com.baomidou.mybatisplus.core.toolkit.*;
 import com.github.yulichang.config.ConfigProperties;
 import com.github.yulichang.query.interfaces.StringJoin;
 import com.github.yulichang.toolkit.Asserts;
+import com.github.yulichang.toolkit.MPJSqlInjectionUtils;
 import com.github.yulichang.toolkit.TableHelper;
 import com.github.yulichang.wrapper.interfaces.Chain;
+import lombok.Getter;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
@@ -48,6 +51,7 @@ public class MPJQueryWrapper<T> extends AbstractWrapper<T, String, MPJQueryWrapp
     /**
      * 主表别名
      */
+    @Getter
     private String alias = ConfigProperties.tableAlias;
 
     /**
@@ -73,6 +77,11 @@ public class MPJQueryWrapper<T> extends AbstractWrapper<T, String, MPJQueryWrapp
      * 动态表名
      */
     private Function<String, String> tableNameFunc;
+
+    /**
+     * 检查 SQL 注入过滤
+     */
+    private boolean checkSqlInjection = false;
 
 
     public MPJQueryWrapper() {
@@ -115,6 +124,22 @@ public class MPJQueryWrapper<T> extends AbstractWrapper<T, String, MPJQueryWrapp
     }
 
     /**
+     * 开启检查 SQL 注入
+     */
+    public MPJQueryWrapper<T> checkSqlInjection() {
+        this.checkSqlInjection = true;
+        return this;
+    }
+
+    @Override
+    protected String columnToString(String column) {
+        if (checkSqlInjection && MPJSqlInjectionUtils.check(column)) {
+            throw new MybatisPlusException("Discovering SQL injection column: " + column);
+        }
+        return column;
+    }
+
+    /**
      * sql去重
      * select distinct
      */
@@ -127,6 +152,14 @@ public class MPJQueryWrapper<T> extends AbstractWrapper<T, String, MPJQueryWrapp
     public MPJQueryWrapper<T> select(String... columns) {
         if (ArrayUtils.isNotEmpty(columns)) {
             selectColumns.addAll(Arrays.asList(columns));
+        }
+        return typedThis;
+    }
+
+    @Override
+    public MPJQueryWrapper<T> select(boolean condition, List<String> columns) {
+        if (condition && CollectionUtils.isNotEmpty(columns)) {
+            selectColumns.addAll(columns);
         }
         return typedThis;
     }
@@ -206,10 +239,6 @@ public class MPJQueryWrapper<T> extends AbstractWrapper<T, String, MPJQueryWrapp
 
     public String getFrom() {
         return from.getStringValue();
-    }
-
-    public String getAlias() {
-        return alias;
     }
 
     /**

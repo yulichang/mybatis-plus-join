@@ -1,6 +1,7 @@
 package com.github.yulichang.kt;
 
 import com.baomidou.mybatisplus.core.conditions.SharedString;
+import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.segments.MergeSegments;
 import com.baomidou.mybatisplus.core.toolkit.*;
 import com.github.yulichang.config.ConfigProperties;
@@ -11,6 +12,7 @@ import com.github.yulichang.toolkit.KtUtils;
 import com.github.yulichang.toolkit.KtWrapperUtils;
 import com.github.yulichang.toolkit.TableList;
 import com.github.yulichang.toolkit.support.ColumnCache;
+import com.github.yulichang.wrapper.MPJLambdaWrapper;
 import com.github.yulichang.wrapper.interfaces.Chain;
 import com.github.yulichang.wrapper.interfaces.SelectWrapper;
 import com.github.yulichang.wrapper.resultmap.Label;
@@ -57,6 +59,17 @@ public class KtLambdaWrapper<T> extends KtAbstractLambdaWrapper<T, KtLambdaWrapp
      * union sql
      */
     private SharedString unionSql;
+
+    /**
+     * 自定义wrapper索引
+     */
+    private AtomicInteger wrapperIndex;
+
+    /**
+     * 自定义wrapper
+     */
+    @Getter
+    private Map<String, Wrapper<?>> wrapperMap;
 
 
     /**
@@ -192,6 +205,7 @@ public class KtLambdaWrapper<T> extends KtAbstractLambdaWrapper<T, KtLambdaWrapp
     /**
      * 子查询
      */
+    @SuppressWarnings("DuplicatedCode")
     public KtLambdaWrapper<T> selectSub(Class<?> clazz, String st, Consumer<KtLambdaWrapper<?>> consumer, KProperty<?> alias) {
         KtLambdaWrapper<?> wrapper = new KtLambdaWrapper(null, clazz, SharedString.emptyString(), paramNameSeq, paramNameValuePairs,
                 new MergeSegments(), SharedString.emptyString(), SharedString.emptyString(), SharedString.emptyString(),
@@ -203,6 +217,7 @@ public class KtLambdaWrapper<T> extends KtAbstractLambdaWrapper<T, KtLambdaWrapp
         wrapper.alias = st;
         wrapper.subTableAlias = st;
         consumer.accept(wrapper);
+        addCustomWrapper(wrapper);
         String sql = KtWrapperUtils.buildSubSqlByWrapper(clazz, wrapper, alias.getName());
         this.selectColumns.add(new SelectString(sql, hasAlias, this.alias));
         return typedThis;
@@ -215,6 +230,7 @@ public class KtLambdaWrapper<T> extends KtAbstractLambdaWrapper<T, KtLambdaWrapp
     public final KtLambdaWrapper<T> union(KtLambdaWrapper<?>... wrappers) {
         StringBuilder sb = new StringBuilder();
         for (KtLambdaWrapper<?> wrapper : wrappers) {
+            addCustomWrapper(wrapper);
             Class<?> entityClass = wrapper.getEntityClass();
             Assert.notNull(entityClass, "请使用 new MPJLambdaWrapper(主表.class) 或 JoinWrappers.lambda(主表.class) 构造方法");
             sb.append(" UNION ")
@@ -234,6 +250,7 @@ public class KtLambdaWrapper<T> extends KtAbstractLambdaWrapper<T, KtLambdaWrapp
     public final <E, F> KtLambdaWrapper<T> unionAll(KtLambdaWrapper<T>... wrappers) {
         StringBuilder sb = new StringBuilder();
         for (KtLambdaWrapper<?> wrapper : wrappers) {
+            addCustomWrapper(wrapper);
             Class<?> entityClass = wrapper.getEntityClass();
             Assert.notNull(entityClass, "请使用 new MPJLambdaWrapper(主表.class) 或 JoinWrappers.lambda(主表.class) 构造方法");
             sb.append(" UNION ALL ")
@@ -244,6 +261,20 @@ public class KtLambdaWrapper<T> extends KtAbstractLambdaWrapper<T, KtLambdaWrapp
         }
         unionSql.setStringValue(unionSql.getStringValue() + sb);
         return typedThis;
+    }
+
+    @SuppressWarnings("DuplicatedCode")
+    private void addCustomWrapper(KtLambdaWrapper<?> wrapper) {
+        if (Objects.isNull(wrapperIndex)) {
+            wrapperIndex = new AtomicInteger(0);
+        }
+        int index = wrapperIndex.incrementAndGet();
+        if (Objects.isNull(wrapperMap)) {
+            wrapperMap = new HashMap<>();
+        }
+        String key = "ew" + index;
+        wrapper.setParamAlias(wrapper.getParamAlias() + ".wrapperMap." + key);
+        wrapperMap.put(key, wrapper);
     }
 
     /**
@@ -329,6 +360,8 @@ public class KtLambdaWrapper<T> extends KtAbstractLambdaWrapper<T, KtLambdaWrapp
         selectDistinct = false;
         sqlSelect.toNull();
         selectColumns.clear();
+        wrapperIndex = new AtomicInteger(0);
+        wrapperMap.clear();
         resultMapMybatisLabel.clear();
     }
 }

@@ -1128,16 +1128,18 @@ class LambdaWrapperTest {
      */
     @Test
     fun union() {
-        ThreadLocalUtils.set("SELECT t.id,t.pid,t.`name`,t.`json`,t.sex,t.head_img,t.create_time,t.address_id,t.address_id2,t.del,t.create_by,t.update_by FROM `user` t WHERE t.del=false UNION SELECT t.id,t.pid,t.`name`,t.`json`,t.sex,t.head_img,t.create_time,t.address_id,t.address_id2,t.del,t.create_by,t.update_by FROM `user` t WHERE t.del=false UNION SELECT t.id,t.pid,t.`name`,t.`json`,t.sex,t.head_img,t.create_time,t.address_id,t.address_id2,t.del,t.create_by,t.update_by FROM `user` t WHERE t.del=false")
         val wrapper: KtLambdaWrapper<UserDO> = KtWrappers.query(UserDO::class.java)
             .selectAll(UserDO::class.java)
+            .eq(UserDO::id, 1)
         val wrapper1: KtLambdaWrapper<UserDO> = KtWrappers.query(UserDO::class.java)
             .selectAll(UserDO::class.java)
+            .eq(UserDO::name, "张三 2")
         val wrapper2: KtLambdaWrapper<UserDO> = KtWrappers.query(UserDO::class.java)
             .selectAll(UserDO::class.java)
+            .eq(UserDO::pid, 2)
 
         wrapper.union(wrapper1, wrapper2)
-        wrapper.list()
-        println(1)
+        val list = wrapper.list()
+        assert(list.size == 7)
     }
 }

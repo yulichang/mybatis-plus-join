@@ -106,6 +106,16 @@ public class MPJLambdaQueryWrapper<T> extends AbstractLambdaWrapper<T, MPJLambda
         return typedThis;
     }
 
+    @Override
+    public MPJLambdaQueryWrapper<T> select(boolean condition, List<SFunction<T, ?>> columns) {
+        if (condition && CollectionUtils.isNotEmpty(columns)) {
+            for (SFunction<T, ?> s : columns) {
+                selectColumns.add(columnToString(s, false));
+            }
+        }
+        return typedThis;
+    }
+
     /**
      * 忽略查询字段
      * <p>

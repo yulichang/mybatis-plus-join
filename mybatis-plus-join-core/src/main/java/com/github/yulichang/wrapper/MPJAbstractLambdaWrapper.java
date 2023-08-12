@@ -36,13 +36,14 @@ import static java.util.stream.Collectors.joining;
  *
  * @author yulichang
  */
-@SuppressWarnings({"DuplicatedCode", "unused"})
+@SuppressWarnings({"DuplicatedCode", "unused", "LombokGetterMayBeUsed"})
 public abstract class MPJAbstractLambdaWrapper<T, Children extends MPJAbstractLambdaWrapper<T, Children>>
         extends MPJAbstractWrapper<T, Children> implements QueryJoin<Children, T> {
 
     /**
      * 主表别名
      */
+    @Getter
     protected String alias = ConfigProperties.tableAlias;
     /**
      * 副表别名
@@ -365,10 +366,6 @@ public abstract class MPJAbstractLambdaWrapper<T, Children extends MPJAbstractLa
         return from.getStringValue();
     }
 
-    public String getAlias() {
-        return alias;
-    }
-
     /**
      * 内部调用, 不建议使用
      */
@@ -462,6 +459,7 @@ public abstract class MPJAbstractLambdaWrapper<T, Children extends MPJAbstractLa
         this.hasAlias = false;
         this.keyWord = null;
         this.logicSql = true;
+        this.checkSqlInjection = false;
         this.onWrappers.clear();
     }
 }

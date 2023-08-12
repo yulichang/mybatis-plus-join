@@ -1,6 +1,7 @@
 package com.github.yulichang.wrapper;
 
 import com.baomidou.mybatisplus.core.conditions.SharedString;
+import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.segments.MergeSegments;
 import com.baomidou.mybatisplus.core.toolkit.*;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
@@ -56,6 +57,17 @@ public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWr
      * union sql
      */
     private SharedString unionSql;
+
+    /**
+     * 自定义wrapper索引
+     */
+    private AtomicInteger wrapperIndex;
+
+    /**
+     * 自定义wrapper
+     */
+    @Getter
+    private Map<String, Wrapper<?>> wrapperMap;
 
     /**
      * 推荐使用 带 class 的构造方法
@@ -192,6 +204,7 @@ public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWr
     /**
      * 子查询
      */
+    @SuppressWarnings("DuplicatedCode")
     public <E, F> MPJLambdaWrapper<T> selectSub(Class<E> clazz, String st, Consumer<MPJLambdaWrapper<E>> consumer, SFunction<F, ?> alias) {
         MPJLambdaWrapper<E> wrapper = new MPJLambdaWrapper<E>(null, clazz, SharedString.emptyString(), paramNameSeq, paramNameValuePairs,
                 new MergeSegments(), SharedString.emptyString(), SharedString.emptyString(), SharedString.emptyString(),
@@ -203,6 +216,7 @@ public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWr
         wrapper.alias = st;
         wrapper.subTableAlias = st;
         consumer.accept(wrapper);
+        addCustomWrapper(wrapper);
         String sql = WrapperUtils.buildSubSqlByWrapper(clazz, wrapper, LambdaUtils.getName(alias));
         this.selectColumns.add(new SelectString(sql, hasAlias, this.alias));
         return typedThis;
@@ -215,6 +229,7 @@ public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWr
     public final MPJLambdaWrapper<T> union(MPJLambdaWrapper<?>... wrappers) {
         StringBuilder sb = new StringBuilder();
         for (MPJLambdaWrapper<?> wrapper : wrappers) {
+            addCustomWrapper(wrapper);
             Class<?> entityClass = wrapper.getEntityClass();
             Assert.notNull(entityClass, "请使用 new MPJLambdaWrapper(主表.class) 或 JoinWrappers.lambda(主表.class) 构造方法");
             sb.append(" UNION ")
@@ -234,6 +249,7 @@ public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWr
     public final <E, F> MPJLambdaWrapper<T> unionAll(MPJLambdaWrapper<T>... wrappers) {
         StringBuilder sb = new StringBuilder();
         for (MPJLambdaWrapper<?> wrapper : wrappers) {
+            addCustomWrapper(wrapper);
             Class<?> entityClass = wrapper.getEntityClass();
             Assert.notNull(entityClass, "请使用 new MPJLambdaWrapper(主表.class) 或 JoinWrappers.lambda(主表.class) 构造方法");
             sb.append(" UNION ALL ")
@@ -244,6 +260,20 @@ public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWr
         }
         unionSql.setStringValue(unionSql.getStringValue() + sb);
         return typedThis;
+    }
+
+    @SuppressWarnings("DuplicatedCode")
+    private void addCustomWrapper(MPJLambdaWrapper<?> wrapper) {
+        if (Objects.isNull(wrapperIndex)) {
+            wrapperIndex = new AtomicInteger(0);
+        }
+        int index = wrapperIndex.incrementAndGet();
+        if (Objects.isNull(wrapperMap)) {
+            wrapperMap = new HashMap<>();
+        }
+        String key = "ew" + index;
+        wrapper.setParamAlias(wrapper.getParamAlias() + ".wrapperMap." + key);
+        wrapperMap.put(key, wrapper);
     }
 
     /**
@@ -329,6 +359,8 @@ public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWr
         selectDistinct = false;
         sqlSelect.toNull();
         selectColumns.clear();
+        wrapperIndex = new AtomicInteger(0);
+        wrapperMap.clear();
         resultMapMybatisLabel.clear();
     }
 }

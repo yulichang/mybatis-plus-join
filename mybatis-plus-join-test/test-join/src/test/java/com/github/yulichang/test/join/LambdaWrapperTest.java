@@ -1057,21 +1057,38 @@ class LambdaWrapperTest {
         wrapper1.list();
     }
 
+    /**
+     * select 子查询
+     */
+    @Test
+    void checkOrderBy() {
+        MPJLambdaWrapper<UserDO> wrapper = JoinWrappers.lambda(UserDO.class)
+                .selectAll(UserDO.class)
+                .leftJoin(AddressDO.class, AddressDO::getUserId, UserDO::getId)
+                .le(UserDO::getId, 100)
+                .checkSqlInjection()
+                .orderByDesc("t.id");
+        wrapper.list();
+    }
 
     /**
      * select 子查询
      */
     @Test
     void union() {
+        ThreadLocalUtils.set();
         MPJLambdaWrapper<UserDO> wrapper = JoinWrappers.lambda(UserDO.class)
-                .selectAll(UserDO.class);
+                .selectAll(UserDO.class)
+                .eq(UserDO::getId, 1);
         MPJLambdaWrapper<UserDO> wrapper1 = JoinWrappers.lambda(UserDO.class)
-                .selectAll(UserDO.class);
+                .selectAll(UserDO.class)
+                .eq(UserDO::getName, "张三 2");
         MPJLambdaWrapper<UserDO> wrapper2 = JoinWrappers.lambda(UserDO.class)
-                .selectAll(UserDO.class);
-
+                .selectAll(UserDO.class)
+                .eq(UserDO::getPid, 2);
         wrapper.union(wrapper1, wrapper2);
-        wrapper.list();
-        System.out.println(1);
+        List<UserDO> list = wrapper.list();
+
+        assert list.size() == 7;
     }
 }

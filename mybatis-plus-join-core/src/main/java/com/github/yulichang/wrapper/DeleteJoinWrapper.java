@@ -69,7 +69,7 @@ public class DeleteJoinWrapper<T> extends MPJAbstractLambdaWrapper<T, DeleteJoin
      * 获取删除的表
      */
     @Override
-    @SuppressWarnings("UnusedReturnValue")
+    @SuppressWarnings({"UnusedReturnValue", "DuplicatedCode"})
     public String getDeleteSql() {
         if (StringUtils.isNotBlank(this.deleteSql.getStringValue())) {
             return this.deleteSql.getStringValue();

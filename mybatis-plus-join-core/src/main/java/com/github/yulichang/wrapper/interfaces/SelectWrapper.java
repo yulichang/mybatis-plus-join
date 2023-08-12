@@ -1,8 +1,10 @@
 package com.github.yulichang.wrapper.interfaces;
 
+import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.github.yulichang.wrapper.segments.Select;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author yulichang
@@ -21,4 +23,6 @@ public interface SelectWrapper<Entity, Children> {
     boolean isResultMap();
 
     List<?> getResultMapMybatisLabel();
+
+    Map<String, Wrapper<?>> getWrapperMap();
 }

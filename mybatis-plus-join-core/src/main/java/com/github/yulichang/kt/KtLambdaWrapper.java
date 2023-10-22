@@ -12,7 +12,6 @@ import com.github.yulichang.toolkit.KtUtils;
 import com.github.yulichang.toolkit.KtWrapperUtils;
 import com.github.yulichang.toolkit.TableList;
 import com.github.yulichang.toolkit.support.ColumnCache;
-import com.github.yulichang.wrapper.MPJLambdaWrapper;
 import com.github.yulichang.wrapper.interfaces.Chain;
 import com.github.yulichang.wrapper.interfaces.SelectWrapper;
 import com.github.yulichang.wrapper.resultmap.Label;
@@ -218,8 +217,7 @@ public class KtLambdaWrapper<T> extends KtAbstractLambdaWrapper<T, KtLambdaWrapp
         wrapper.subTableAlias = st;
         consumer.accept(wrapper);
         addCustomWrapper(wrapper);
-        String sql = KtWrapperUtils.buildSubSqlByWrapper(clazz, wrapper, alias.getName());
-        this.selectColumns.add(new SelectString(sql, hasAlias, this.alias));
+        this.selectColumns.add(new SelectSub(() -> KtWrapperUtils.buildSubSqlByWrapper(clazz, wrapper, alias.getName()), hasAlias, this.alias));
         return typedThis;
     }
 

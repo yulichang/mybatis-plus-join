@@ -24,9 +24,9 @@
     <img alt="code style" src="https://img.shields.io/badge/license-Apache%202-4EB1BA.svg?style=flat-square">
   </a>
 </p>
-<h1 align="center">mybatis-plus-join</h1>
+<h1 align="center">MyBatis-Plus-Join</h1>
 <p align="center">
-对 <a href="https://gitee.com/baomidou/mybatis-plus" target="_blank">mybatis-plus</a> 多表查询的扩展 |
+对 <a href="https://gitee.com/baomidou/mybatis-plus" target="_blank">MyBatis-Plus</a> 多表查询的扩展 |
 <a href="https://gitee.com/best_handsome/mybatis-plus-join-demo" target="_blank">演示工程</a> |
 <a href="https://www.baidu.com/link?url=wdmhssysW-Mj19Gkcc2CBOzNVoimHat57mlnH78SEU_6y0awYgDKTBy7es9BXnAH&wd=&eqid=908484020001866e000000056440b5e3" target="_blank">使用文档</a> |
 点个Star支持一下吧 (☆▽☆)
@@ -59,7 +59,7 @@ QQ群:1022221898  或者
   ```
   或者clone代码到本地执行 mvn install, 再引入以上依赖  
   <br>
-  注意: mybatis plus version >= 3.3.0
+  注意: MyBatis Plus版本需要3.3.0+
   <br>
 
 ### 使用

@@ -1,4 +1,4 @@
-package com.github.yulichang.toolkit;
+package com.github.yulichang.adapter.base.tookit;
 
 /**
  * 版本工具类

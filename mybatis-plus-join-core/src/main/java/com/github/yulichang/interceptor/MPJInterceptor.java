@@ -1,14 +1,14 @@
 package com.github.yulichang.interceptor;
 
+import com.baomidou.mybatisplus.core.MybatisPlusVersion;
 import com.baomidou.mybatisplus.core.metadata.TableInfo;
+import com.baomidou.mybatisplus.core.toolkit.ReflectionKit;
 import com.baomidou.mybatisplus.core.toolkit.*;
+import com.github.yulichang.adapter.base.tookit.VersionUtils;
 import com.github.yulichang.config.ConfigProperties;
 import com.github.yulichang.method.MPJResultType;
 import com.github.yulichang.query.MPJQueryWrapper;
-import com.github.yulichang.toolkit.Constant;
-import com.github.yulichang.toolkit.MPJReflectionKit;
-import com.github.yulichang.toolkit.MPJTableMapperHelper;
-import com.github.yulichang.toolkit.TableHelper;
+import com.github.yulichang.toolkit.*;
 import com.github.yulichang.toolkit.support.FieldCache;
 import com.github.yulichang.wrapper.interfaces.SelectWrapper;
 import com.github.yulichang.wrapper.resultmap.IResult;
@@ -41,6 +41,7 @@ import java.util.concurrent.ConcurrentHashMap;
 @Intercepts(@Signature(type = Executor.class, method = "query", args = {MappedStatement.class, Object.class, RowBounds.class, ResultHandler.class}))
 public class MPJInterceptor implements Interceptor {
 
+    private static final boolean v = VersionUtils.compare(MybatisPlusVersion.getVersion(), "3.4.3.1") > 0;
 
     private static final List<ResultMapping> EMPTY_RESULT_MAPPING = new ArrayList<>(0);
 
@@ -286,7 +287,7 @@ public class MPJInterceptor implements Interceptor {
             childId.append("]");
         }
         //双检
-        String id = childId.toString();
+        String id = v ? childId.toString() : childId.toString().replaceAll("\\.", "~");
         if (!ms.getConfiguration().hasResultMap(id)) {
             ResultMap build = new ResultMap.Builder(ms.getConfiguration(), id, mybatisLabel.getOfType(), childMapping).build();
             MPJInterceptor.addResultMap(ms, id, build);

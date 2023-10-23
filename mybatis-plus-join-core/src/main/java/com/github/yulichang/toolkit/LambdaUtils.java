@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.github.yulichang.toolkit.support.*;
 import org.apache.ibatis.reflection.property.PropertyNamer;
 
+import java.lang.invoke.SerializedLambda;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.Map;
@@ -50,10 +51,11 @@ public final class LambdaUtils {
         // 2. 反射读取
         try {
             Method method = func.getClass().getDeclaredMethod("writeReplace");
-            return new ReflectLambdaMeta((java.lang.invoke.SerializedLambda) ReflectionKit.setAccessible(method).invoke(func));
+            method.setAccessible(true);
+            return new ReflectLambdaMeta((SerializedLambda) method.invoke(func), func.getClass().getClassLoader());
         } catch (Throwable e) {
             // 3. 反射失败使用序列化的方式读取
-            return new ShadowLambdaMeta(SerializedLambda.extract(func));
+            return new ShadowLambdaMeta(com.github.yulichang.toolkit.support.SerializedLambda.extract(func));
         }
     }
 }

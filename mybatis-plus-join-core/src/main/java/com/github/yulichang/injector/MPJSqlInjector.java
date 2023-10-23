@@ -15,7 +15,7 @@ import com.github.yulichang.adapter.v3431.AbstractMethodV3431;
 import com.github.yulichang.method.*;
 import com.github.yulichang.toolkit.MPJTableMapperHelper;
 import com.github.yulichang.toolkit.TableHelper;
-import com.github.yulichang.toolkit.VersionUtils;
+import com.github.yulichang.adapter.base.tookit.VersionUtils;
 import com.github.yulichang.toolkit.reflect.GenericTypeUtils;
 import lombok.Getter;
 import org.apache.ibatis.builder.MapperBuilderAssistant;
@@ -38,9 +38,9 @@ import static java.util.stream.Collectors.toList;
  * @author yulichang
  * @see DefaultSqlInjector
  */
+@Getter
 public class MPJSqlInjector extends DefaultSqlInjector {
 
-    @Getter
     private AbstractSqlInjector sqlInjector;
 
     public MPJSqlInjector() {

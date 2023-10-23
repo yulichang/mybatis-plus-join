@@ -2,10 +2,13 @@ package com.github.yulichang.adapter.base;
 
 import com.baomidou.mybatisplus.core.metadata.TableFieldInfo;
 import com.baomidou.mybatisplus.core.metadata.TableInfo;
+import com.github.yulichang.adapter.base.metadata.OrderFieldInfo;
 import org.apache.ibatis.session.Configuration;
 
 import java.lang.reflect.Field;
+import java.util.List;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 /**
  * @author yulichang
@@ -13,15 +16,32 @@ import java.util.function.Supplier;
  */
 public interface ITableInfoAdapter {
 
-    boolean mpjHasLogic(TableInfo tableInfo);
+    default boolean mpjHasLogic(TableInfo tableInfo) {
+        return tableInfo.isWithLogicDelete();
+    }
 
-    boolean mpjIsPrimitive(TableFieldInfo tableFieldInfo);
+    default boolean mpjIsPrimitive(TableFieldInfo tableFieldInfo) {
+        return tableFieldInfo.isPrimitive();
+    }
 
-    TableFieldInfo mpjGetLogicField(TableInfo tableInfo);
+    default TableFieldInfo mpjGetLogicField(TableInfo tableInfo) {
+        return tableInfo.getLogicDeleteFieldInfo();
+    }
 
-    boolean mpjHasPK(TableInfo tableInfo);
+    default boolean mpjHasPK(TableInfo tableInfo) {
+        return tableInfo.havePK();
+    }
 
-    Configuration mpjGetConfiguration(TableInfo tableInfo);
+    default Configuration mpjGetConfiguration(TableInfo tableInfo) {
+        return tableInfo.getConfiguration();
+    }
 
-    Field mpjGetField(TableFieldInfo fieldInfo, Supplier<Field> supplier);
+    default Field mpjGetField(TableFieldInfo fieldInfo, Supplier<Field> supplier) {
+        return fieldInfo.getField();
+    }
+
+    default List<OrderFieldInfo> mpjGetOrderField(TableInfo tableInfo) {
+        return tableInfo.getOrderByFields().stream().map(f ->
+                new OrderFieldInfo(f.getColumn(), f.getType(), f.getSort())).collect(Collectors.toList());
+    }
 }

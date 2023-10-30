@@ -1094,11 +1094,14 @@ class LambdaWrapperTest {
                 .eq(UserDO::getId, 1);
         MPJLambdaWrapper<UserDO> wrapper1 = JoinWrappers.lambda(UserDO.class)
                 .selectAll(UserDO.class)
-                .eq(UserDO::getName, "张三 2");
+                .eq(UserDO::getName, "张三 2")
+                .and(w -> w.eq(UserDO::getName, "张三 2"));
         MPJLambdaWrapper<UserDO> wrapper2 = JoinWrappers.lambda(UserDO.class)
                 .selectAll(UserDO.class)
                 .eq(UserDO::getPid, 2);
         wrapper.union(wrapper1, wrapper2);
+
+        System.out.println(wrapper.getUnionSql());
         List<UserDO> list = wrapper.list();
 
         assert list.size() == 7;

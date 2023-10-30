@@ -1146,6 +1146,7 @@ class LambdaWrapperTest {
         val wrapper1: KtLambdaWrapper<UserDO> = KtWrappers.query(UserDO::class.java)
                 .selectAll(UserDO::class.java)
                 .eq(UserDO::name, "张三 2")
+                .and { a -> a.eq(UserDO::name, "张三 2") }
         val wrapper2: KtLambdaWrapper<UserDO> = KtWrappers.query(UserDO::class.java)
                 .selectAll(UserDO::class.java)
                 .eq(UserDO::pid, 2)

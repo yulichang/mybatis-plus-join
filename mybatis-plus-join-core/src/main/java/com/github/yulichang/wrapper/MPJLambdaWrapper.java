@@ -123,7 +123,7 @@ public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWr
      * 不建议直接 new 该实例，使用 JoinWrappers.lambda(UserDO.class)
      */
     MPJLambdaWrapper(T entity, Class<T> entityClass, SharedString sqlSelect, AtomicInteger paramNameSeq,
-                     Map<String, Object> paramNameValuePairs, MergeSegments mergeSegments,
+                     Map<String, Object> paramNameValuePairs, MergeSegments mergeSegments, SharedString paramAlias,
                      SharedString lastSql, SharedString sqlComment, SharedString sqlFirst,
                      TableList tableList, Integer index, String keyWord, Class<?> joinClass, String tableName) {
         super.setEntity(entity);
@@ -132,6 +132,7 @@ public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWr
         this.paramNameValuePairs = paramNameValuePairs;
         this.expression = mergeSegments;
         this.sqlSelect = sqlSelect;
+        this.paramAlias = paramAlias;
         this.lastSql = lastSql;
         this.sqlComment = sqlComment;
         this.sqlFirst = sqlFirst;
@@ -207,7 +208,7 @@ public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWr
     @SuppressWarnings("DuplicatedCode")
     public <E, F> MPJLambdaWrapper<T> selectSub(Class<E> clazz, String st, Consumer<MPJLambdaWrapper<E>> consumer, SFunction<F, ?> alias) {
         MPJLambdaWrapper<E> wrapper = new MPJLambdaWrapper<E>(null, clazz, SharedString.emptyString(), paramNameSeq, paramNameValuePairs,
-                new MergeSegments(), SharedString.emptyString(), SharedString.emptyString(), SharedString.emptyString(),
+                new MergeSegments(), this.paramAlias, SharedString.emptyString(), SharedString.emptyString(), SharedString.emptyString(),
                 new TableList(), null, null, null, null) {
         };
         wrapper.tableList.setAlias(st);
@@ -348,7 +349,7 @@ public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWr
     @Override
     protected MPJLambdaWrapper<T> instance(Integer index, String keyWord, Class<?> joinClass, String tableName) {
         return new MPJLambdaWrapper<>(getEntity(), getEntityClass(), null, paramNameSeq, paramNameValuePairs,
-                new MergeSegments(), SharedString.emptyString(), SharedString.emptyString(), SharedString.emptyString(),
+                new MergeSegments(), this.paramAlias, SharedString.emptyString(), SharedString.emptyString(), SharedString.emptyString(),
                 this.tableList, index, keyWord, joinClass, tableName);
     }
 
@@ -359,7 +360,8 @@ public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWr
         sqlSelect.toNull();
         selectColumns.clear();
         wrapperIndex = new AtomicInteger(0);
-        wrapperMap.clear();
+        if (Objects.nonNull(wrapperMap)) wrapperMap.clear();
+        if (Objects.nonNull(unionSql)) unionSql.toEmpty();
         resultMapMybatisLabel.clear();
     }
 }

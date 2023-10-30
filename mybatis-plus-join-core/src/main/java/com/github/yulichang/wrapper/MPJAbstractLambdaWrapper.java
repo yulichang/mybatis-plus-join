@@ -23,6 +23,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
@@ -36,7 +37,7 @@ import static java.util.stream.Collectors.joining;
  *
  * @author yulichang
  */
-@SuppressWarnings({"DuplicatedCode", "unused", "LombokGetterMayBeUsed"})
+@SuppressWarnings({"DuplicatedCode", "unused"})
 public abstract class MPJAbstractLambdaWrapper<T, Children extends MPJAbstractLambdaWrapper<T, Children>>
         extends MPJAbstractWrapper<T, Children> implements QueryJoin<Children, T> {
 
@@ -455,7 +456,7 @@ public abstract class MPJAbstractLambdaWrapper<T, Children extends MPJAbstractLa
         this.dynamicTableName = false;
         this.tableFunc = null;
         this.logicDelType = ConfigProperties.logicDelType;
-        this.from.toNull();
+        this.from.toEmpty();
         this.hasAlias = false;
         this.keyWord = null;
         this.logicSql = true;

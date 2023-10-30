@@ -64,7 +64,7 @@ public abstract class KtAbstractWrapper<T, Children extends KtAbstractWrapper<T,
      * 其他
      */
     /* mybatis plus 3.4.3新增 这个时wrapper的别名 不是MPJ的别名 */
-    protected SharedString paramAlias;
+    protected SharedString paramAlias = new SharedString(null);
     protected SharedString lastSql;
     /**
      * SQL注释
@@ -607,9 +607,10 @@ public abstract class KtAbstractWrapper<T, Children extends KtAbstractWrapper<T,
         paramNameSeq.set(0);
         paramNameValuePairs.clear();
         expression.clear();
-        lastSql.toEmpty();
-        sqlComment.toEmpty();
-        sqlFirst.toEmpty();
+        paramAlias.toNull();
+        if (Objects.nonNull(lastSql)) lastSql.toEmpty();
+        if (Objects.nonNull(sqlComment)) sqlComment.toEmpty();
+        if (Objects.nonNull(sqlFirst)) sqlFirst.toEmpty();
         tableList.clear();
         entityClass = null;
         onWrappers.clear();
@@ -658,7 +659,7 @@ public abstract class KtAbstractWrapper<T, Children extends KtAbstractWrapper<T,
     }
 
     public String getParamAlias() {
-        return paramAlias == null ? Constants.WRAPPER : paramAlias.getStringValue();
+        return paramAlias.getStringValue() == null ? Constants.WRAPPER : paramAlias.getStringValue();
     }
 
     /**
@@ -669,9 +670,8 @@ public abstract class KtAbstractWrapper<T, Children extends KtAbstractWrapper<T,
      */
     public Children setParamAlias(String paramAlias) {
         Assert.notEmpty(paramAlias, "paramAlias can not be empty!");
-        Assert.isTrue(CollectionUtils.isEmpty(paramNameValuePairs), "Please call this method before working!");
-        Assert.isNull(this.paramAlias, "Please do not call the method repeatedly!");
-        this.paramAlias = new SharedString(paramAlias);
+        Assert.isNull(this.paramAlias.getStringValue(), "Please do not call the method repeatedly!");
+        this.paramAlias.setStringValue(paramAlias);
         return typedThis;
     }
 

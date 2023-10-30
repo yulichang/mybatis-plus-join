@@ -125,7 +125,7 @@ public class KtLambdaWrapper<T> extends KtAbstractLambdaWrapper<T, KtLambdaWrapp
      * 不建议直接 new 该实例，使用 JoinWrappers.lambda(UserDO.class)
      */
     KtLambdaWrapper(T entity, Class<T> entityClass, SharedString sqlSelect, AtomicInteger paramNameSeq,
-                    Map<String, Object> paramNameValuePairs, MergeSegments mergeSegments,
+                    Map<String, Object> paramNameValuePairs, MergeSegments mergeSegments, SharedString paramAlias,
                     SharedString lastSql, SharedString sqlComment, SharedString sqlFirst,
                     TableList tableList, Integer index, String keyWord, Class<?> joinClass, String tableName) {
         super.setEntity(entity);
@@ -134,6 +134,7 @@ public class KtLambdaWrapper<T> extends KtAbstractLambdaWrapper<T, KtLambdaWrapp
         this.paramNameValuePairs = paramNameValuePairs;
         this.expression = mergeSegments;
         this.sqlSelect = sqlSelect;
+        this.paramAlias = paramAlias;
         this.lastSql = lastSql;
         this.sqlComment = sqlComment;
         this.sqlFirst = sqlFirst;
@@ -207,7 +208,7 @@ public class KtLambdaWrapper<T> extends KtAbstractLambdaWrapper<T, KtLambdaWrapp
     @SuppressWarnings("DuplicatedCode")
     public KtLambdaWrapper<T> selectSub(Class<?> clazz, String st, Consumer<KtLambdaWrapper<?>> consumer, KProperty<?> alias) {
         KtLambdaWrapper<?> wrapper = new KtLambdaWrapper(null, clazz, SharedString.emptyString(), paramNameSeq, paramNameValuePairs,
-                new MergeSegments(), SharedString.emptyString(), SharedString.emptyString(), SharedString.emptyString(),
+                new MergeSegments(), SharedString.emptyString(), this.paramAlias, SharedString.emptyString(), SharedString.emptyString(),
                 new TableList(), null, null, null, null) {
         };
         wrapper.tableList.setAlias(st);
@@ -348,7 +349,7 @@ public class KtLambdaWrapper<T> extends KtAbstractLambdaWrapper<T, KtLambdaWrapp
     @Override
     protected KtLambdaWrapper<T> instance(Integer index, String keyWord, Class<?> joinClass, String tableName) {
         return new KtLambdaWrapper<>(getEntity(), getEntityClass(), null, paramNameSeq, paramNameValuePairs,
-                new MergeSegments(), SharedString.emptyString(), SharedString.emptyString(), SharedString.emptyString(),
+                new MergeSegments(), SharedString.emptyString(), this.paramAlias, SharedString.emptyString(), SharedString.emptyString(),
                 this.tableList, index, keyWord, joinClass, tableName);
     }
 
@@ -356,7 +357,8 @@ public class KtLambdaWrapper<T> extends KtAbstractLambdaWrapper<T, KtLambdaWrapp
     public void clear() {
         super.clear();
         selectDistinct = false;
-        sqlSelect.toNull();
+        sqlSelect.toEmpty();
+        if (Objects.nonNull(unionSql)) unionSql.toEmpty();
         selectColumns.clear();
         wrapperIndex = new AtomicInteger(0);
         wrapperMap.clear();

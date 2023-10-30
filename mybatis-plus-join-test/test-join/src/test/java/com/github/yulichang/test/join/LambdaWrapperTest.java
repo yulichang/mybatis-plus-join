@@ -1088,20 +1088,19 @@ class LambdaWrapperTest {
      */
     @Test
     void union() {
-        ThreadLocalUtils.set();
+        ThreadLocalUtils.set("SELECT t.id,t.pid,t.`name`,t.`json`,t.sex,t.head_img,t.create_time,t.address_id,t.address_id2,t.del,t.create_by,t.update_by FROM `user` t WHERE t.del=false AND (t.id = ?) UNION SELECT t.id,t.pid,t.`name`,t.`json`,t.sex,t.head_img,t.create_time,t.address_id,t.address_id2,t.del,t.create_by,t.update_by FROM `user` t WHERE (t.`name` = ? AND (t.`name` = ?)) UNION SELECT t.id,t.pid,t.`name`,t.`json`,t.sex,t.head_img,t.create_time,t.address_id,t.address_id2,t.del,t.create_by,t.update_by FROM `user` t WHERE t.del=false AND (t.pid = ?)");
         MPJLambdaWrapper<UserDO> wrapper = JoinWrappers.lambda(UserDO.class)
                 .selectAll(UserDO.class)
                 .eq(UserDO::getId, 1);
         MPJLambdaWrapper<UserDO> wrapper1 = JoinWrappers.lambda(UserDO.class)
                 .selectAll(UserDO.class)
+                .disableLogicDel()
                 .eq(UserDO::getName, "张三 2")
                 .and(w -> w.eq(UserDO::getName, "张三 2"));
         MPJLambdaWrapper<UserDO> wrapper2 = JoinWrappers.lambda(UserDO.class)
                 .selectAll(UserDO.class)
                 .eq(UserDO::getPid, 2);
         wrapper.union(wrapper1, wrapper2);
-
-        System.out.println(wrapper.getUnionSql());
         List<UserDO> list = wrapper.list();
 
         assert list.size() == 7;

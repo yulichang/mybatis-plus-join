@@ -124,6 +124,9 @@ public class WrapperUtils {
     }
 
     private static String mainLogic(boolean hasWhere, Class<?> clazz, MPJLambdaWrapper<?> wrapper) {
+        if (!wrapper.getLogicSql()) {
+            return StringPool.EMPTY;
+        }
         String info = LogicInfoUtils.getLogicInfo(null, clazz, true, wrapper.getAlias());
         if (StringUtils.isNotBlank(info)) {
             if (hasWhere) {

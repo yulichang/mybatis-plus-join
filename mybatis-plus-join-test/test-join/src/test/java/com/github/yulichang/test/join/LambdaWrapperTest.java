@@ -680,7 +680,9 @@ class LambdaWrapperTest {
                 .eq(UserDO::getName, "ref");
         userMapper.selectList(wrapper);
         try {
-            userMapper.insertBatchSomeColumn(new ArrayList<>());
+            userMapper.insertBatchSomeColumn(new ArrayList<UserDO>() {{
+                add(new UserDO());
+            }});
         } catch (BadSqlGrammarException ignored) {
         }
     }
@@ -774,7 +776,7 @@ class LambdaWrapperTest {
      */
     @Test
     void testTable() {
-        ThreadLocalUtils.set("SELECT t.id FROM `user`bbbbbbb t LEFT JOIN addressaaaaaaaaaa t1 ON (t1.user_id = t.id) LEFT JOIN area t2 ON (t2.id = t1.area_id) WHERE t.del=false AND t1.del=false AND t2.del=false AND (t.id <= ?) ORDER BY t.id DESC");
+        ThreadLocalUtils.set("SELECT t.id FROM bbbbbbb t LEFT JOIN addressaaaaaaaaaa t1 ON (t1.user_id = t.id) LEFT JOIN area t2 ON (t2.id = t1.area_id) WHERE t.del=false AND t1.del=false AND t2.del=false AND (t.id <= ?) ORDER BY t.id DESC");
         MPJLambdaWrapper<UserDO> wrapper = new MPJLambdaWrapper<UserDO>()
                 .select(UserDO::getId)
                 .leftJoin(AddressDO.class, on -> on
@@ -783,10 +785,11 @@ class LambdaWrapperTest {
                 .leftJoin(AreaDO.class, AreaDO::getId, AddressDO::getAreaId)
                 .le(UserDO::getId, 10000)
                 .orderByDesc(UserDO::getId)
-                .setTableName(name -> name + "bbbbbbb");
+                .setTableName(name -> "bbbbbbb");
         try {
             List<UserDTO> list = userMapper.selectJoinList(UserDTO.class, wrapper);
         } catch (BadSqlGrammarException ignored) {
+
         }
     }
 
@@ -1050,7 +1053,7 @@ class LambdaWrapperTest {
      */
     @Test
     void sub() {
-        ThreadLocalUtils.set("SELECT ( SELECT st.id FROM `user` st WHERE st.del=false AND (st.id = t.id) limit 1 ) AS id FROM `user` t LEFT JOIN address t1 ON (t1.user_id = t.id) WHERE t.del=false AND t1.del=false AND (t.id <= ?)");
+        ThreadLocalUtils.set("SELECT (SELECT st.id FROM `user` st WHERE st.del = false AND (st.id = t.id) LIMIT 1) AS id FROM `user` t LEFT JOIN address t1 ON (t1.user_id = t.id) WHERE t.del = false AND t1.del = false AND (t.id <= ?)");
         MPJLambdaWrapper<UserDO> wrapper = JoinWrappers.lambda(UserDO.class)
                 .selectSub(UserDO.class, w -> w.select(UserDO::getId)
                         .eq(UserDO::getId, UserDO::getId)
@@ -1059,7 +1062,7 @@ class LambdaWrapperTest {
                 .le(UserDO::getId, 100);
         wrapper.list();
 
-        ThreadLocalUtils.set("SELECT ( SELECT st.id FROM area st WHERE st.del=false AND (st.id = t1.id) limit 1 ) AS id FROM `user` t LEFT JOIN address t1 ON (t1.user_id = t.id) WHERE t.del=false AND t1.del=false AND (t.id <= ?)");
+        ThreadLocalUtils.set("SELECT (SELECT st.id FROM area st WHERE st.del = false AND (st.id = t1.id) LIMIT 1) AS id FROM `user` t LEFT JOIN address t1 ON (t1.user_id = t.id) WHERE t.del = false AND t1.del = false AND (t.id <= ?)");
         MPJLambdaWrapper<UserDO> wrapper1 = JoinWrappers.lambda(UserDO.class)
                 .selectSub(AreaDO.class, w -> w.select(AreaDO::getId)
                         .eq(AreaDO::getId, AddressDO::getId)

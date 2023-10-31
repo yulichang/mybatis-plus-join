@@ -5,8 +5,11 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.github.yulichang.query.MPJQueryWrapper;
 import com.github.yulichang.test.join.dto.UserDTO;
 import com.github.yulichang.test.join.entity.UserDO;
+import com.github.yulichang.test.join.entity.UserTenantDO;
 import com.github.yulichang.test.join.mapper.UserMapper;
+import com.github.yulichang.test.join.mapper.UserTenantMapper;
 import com.github.yulichang.test.util.ThreadLocalUtils;
+import com.github.yulichang.toolkit.JoinWrappers;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.BadSqlGrammarException;
@@ -20,6 +23,10 @@ class QueryWrapperTest {
     @Resource
     private UserMapper userMapper;
 
+    @Resource
+    private UserTenantMapper userTenantMapper;
+
+
     /**
      * 链表查询
      */
@@ -30,6 +37,16 @@ class QueryWrapperTest {
                 .select("name AS nameName")
                 .last("LIMIT 1"));
         System.out.println(dto);
+
+
+        IPage<UserDTO> iPage1 = userTenantMapper.selectJoinPage(new Page<>(1, 10), UserDTO.class,
+                JoinWrappers.query(UserTenantDO.class)
+                        .selectAll(UserTenantDO.class)
+                        .select("t1.name as PName")
+                        .leftJoin("(select * from `user` where id <> -1) t1 on t1.id = t.user_id")
+                        .apply("t.id <> -1"));
+
+        iPage1.getRecords().forEach(System.out::println);
     }
 
     /**
@@ -37,11 +54,11 @@ class QueryWrapperTest {
      */
     @Test
     void table() {
-        ThreadLocalUtils.set("SELECT t.id,t.pid,t.`name`,t.`json`,t.sex,t.head_img,t.create_time,t.address_id,t.address_id2,t.del,t.create_by,t.update_by,name AS nameName FROM `user`fwear t WHERE t.del=false LIMIT 1",
-                "SELECT t.id,t.pid,t.`name`,t.`json`,t.sex,t.head_img AS img,t.create_time,t.address_id,t.address_id2,t.del,t.create_by,t.update_by,name AS nameName FROM `user`fwear t WHERE t.del=false LIMIT 1");
+        ThreadLocalUtils.set("SELECT t.id,t.pid,t.`name`,t.`json`,t.sex,t.head_img,t.create_time,t.address_id,t.address_id2,t.del,t.create_by,t.update_by,name AS nameName FROM fwear t WHERE t.del=false LIMIT 1",
+                "SELECT t.id,t.pid,t.`name`,t.`json`,t.sex,t.head_img AS img,t.create_time,t.address_id,t.address_id2,t.del,t.create_by,t.update_by,name AS nameName FROM fwear t WHERE t.del=false LIMIT 1");
         MPJQueryWrapper<UserDO> wrapper = new MPJQueryWrapper<UserDO>()
                 .selectAll(UserDO.class)
-                .setTableName(name -> name + "fwear")
+                .setTableName(name -> "fwear")
                 .select("name AS nameName")
                 .last("LIMIT 1");
         try {

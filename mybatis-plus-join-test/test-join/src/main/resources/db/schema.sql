@@ -64,3 +64,12 @@ create table order_t
     age     int           null,
     name    varchar(255)  null
 );
+
+DROP TABLE IF EXISTS user_tenant;
+create table user_tenant
+(
+    id      int auto_increment
+        primary key,
+    user_id int           null,
+    tenant_id int           null
+);

@@ -1,5 +1,6 @@
 package com.github.yulichang.query;
 
+import com.baomidou.mybatisplus.core.MybatisPlusVersion;
 import com.baomidou.mybatisplus.core.conditions.AbstractWrapper;
 import com.baomidou.mybatisplus.core.conditions.SharedString;
 import com.baomidou.mybatisplus.core.conditions.query.Query;
@@ -8,6 +9,7 @@ import com.baomidou.mybatisplus.core.exceptions.MybatisPlusException;
 import com.baomidou.mybatisplus.core.metadata.TableFieldInfo;
 import com.baomidou.mybatisplus.core.metadata.TableInfo;
 import com.baomidou.mybatisplus.core.toolkit.*;
+import com.github.yulichang.adapter.base.tookit.VersionUtils;
 import com.github.yulichang.config.ConfigProperties;
 import com.github.yulichang.query.interfaces.StringJoin;
 import com.github.yulichang.toolkit.Asserts;
@@ -89,7 +91,13 @@ public class MPJQueryWrapper<T> extends AbstractWrapper<T, String, MPJQueryWrapp
     }
 
     public MPJQueryWrapper(Class<T> clazz) {
-        super.setEntityClass(clazz);
+        try {
+            super.setEntityClass(clazz);
+        } catch (NoSuchMethodError error) {
+            if (VersionUtils.compare(MybatisPlusVersion.getVersion(), "3.3.0") > 0) {
+                throw error;
+            }
+        }
         super.initNeed();
     }
 

@@ -100,3 +100,14 @@ INSERT INTO order_t (id, user_id, age, name) VALUES
 (6, 6, 3, '6,3'),
 (7, 7, 2, '7,2'),
 (8, 8, 1, '8,1');
+
+DELETE FROM user_tenant;
+INSERT INTO user_tenant (id,user_id, tenant_id) VALUES
+(1, 1, 1),
+(2, 2, 1),
+(3, 3, 1),
+(4, 4, 1),
+(5, 5, 1),
+(6, 6, 2),
+(7, 7, 2),
+(8, 8, 2);

@@ -6,9 +6,11 @@ import com.baomidou.mybatisplus.core.toolkit.StringPool;
 import com.baomidou.mybatisplus.core.toolkit.sql.SqlScriptUtils;
 import com.github.yulichang.adapter.v352.AbstractMethod352;
 import com.github.yulichang.config.ConfigProperties;
+import org.apache.ibatis.builder.SqlSourceBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.StringTokenizer;
 
 /**
  * @author yulichang
@@ -80,6 +82,24 @@ public abstract class MPJAbstractMethod extends AbstractMethod352 implements MPJ
             return super.sqlFirst();
         } catch (Throwable e) {
             return "";
+        }
+    }
+
+    public String removeExtraWhitespaces(String sql) {
+        try {
+            return SqlSourceBuilder.removeExtraWhitespaces(sql);
+        } catch (Throwable t) {
+            StringTokenizer tokenizer = new StringTokenizer(sql);
+            StringBuilder builder = new StringBuilder();
+            boolean hasMoreTokens = tokenizer.hasMoreTokens();
+            while (hasMoreTokens) {
+                builder.append(tokenizer.nextToken());
+                hasMoreTokens = tokenizer.hasMoreTokens();
+                if (hasMoreTokens) {
+                    builder.append(' ');
+                }
+            }
+            return builder.toString();
         }
     }
 }

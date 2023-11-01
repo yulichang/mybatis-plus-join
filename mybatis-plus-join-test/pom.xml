@@ -13,7 +13,7 @@
     <groupId>com.github.yulichang</groupId>
     <artifactId>mybatis-plus-join-test</artifactId>
     <packaging>pom</packaging>
-    <version>1.4.7</version>
+    <version>1.4.7.1</version>
 
     <name>mybatis-plus-join-test</name>
 
@@ -24,7 +24,7 @@
         <module>test-mapping</module>
 
         <!-- 以下两个模块需要jdk17+, 使用jdk8会出现编译错误, 如果有安装jdk17+可以打开这两个模块 -->
-<!--        <module>test-kotlin</module>-->
+        <module>test-kotlin</module>
 <!--        <module>test-springboot3-jdk17</module>-->
     </modules>
 
@@ -82,7 +82,7 @@
         <dependency>
             <groupId>com.github.yulichang</groupId>
             <artifactId>mybatis-plus-join-boot-starter</artifactId>
-            <version>1.4.7</version>
+            <version>1.4.7.1</version>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>

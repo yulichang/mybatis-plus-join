@@ -4,10 +4,10 @@
    <img alt="Mybatis-Plus-Join-Logo" src="https://mybatisplusjoin.com/lg.png">
   </a>
 </p>
+<h1 align="center">MyBatis-Plus-Join</h1>
 <p align="center">
   为简化开发工作、提高生产率而生
 </p>
-
 <p align="center">
   <a href="https://github.com/yulichang/mybatis-plus-join" target="_blank">
     <img src="https://img.shields.io/github/stars/yulichang/mybatis-plus-join.svg?style=social&label=Stars" alt=""/>
@@ -24,7 +24,6 @@
     <img alt="code style" src="https://img.shields.io/badge/license-Apache%202-4EB1BA.svg?style=flat-square">
   </a>
 </p>
-<h1 align="center">MyBatis-Plus-Join</h1>
 <p align="center">
 对 <a href="https://gitee.com/baomidou/mybatis-plus" target="_blank">MyBatis-Plus</a> 多表查询的扩展 |
 <a href="https://gitee.com/best_handsome/mybatis-plus-join-demo" target="_blank">演示工程</a> |
@@ -50,12 +49,12 @@ QQ群:1022221898  或者
   <dependency>
       <groupId>com.github.yulichang</groupId>
       <artifactId>mybatis-plus-join-boot-starter</artifactId>
-      <version>1.4.7</version>
+      <version>1.4.7.1</version>
   </dependency>
   ```
 - Gradle
   ```
-   implementation 'com.github.yulichang:mybatis-plus-join-boot-starter:1.4.7'
+   implementation 'com.github.yulichang:mybatis-plus-join-boot-starter:1.4.7.1'
   ```
   或者clone代码到本地执行 mvn install, 再引入以上依赖  
   <br>

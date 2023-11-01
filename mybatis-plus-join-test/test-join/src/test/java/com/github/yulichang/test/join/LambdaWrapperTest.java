@@ -9,10 +9,7 @@ import com.github.yulichang.adapter.base.tookit.VersionUtils;
 import com.github.yulichang.test.join.dto.AddressDTO;
 import com.github.yulichang.test.join.dto.UserDTO;
 import com.github.yulichang.test.join.entity.*;
-import com.github.yulichang.test.join.mapper.AddressMapper;
-import com.github.yulichang.test.join.mapper.OrderMapper;
-import com.github.yulichang.test.join.mapper.UserDTOMapper;
-import com.github.yulichang.test.join.mapper.UserMapper;
+import com.github.yulichang.test.join.mapper.*;
 import com.github.yulichang.test.util.Reset;
 import com.github.yulichang.test.util.ThreadLocalUtils;
 import com.github.yulichang.toolkit.JoinWrappers;
@@ -54,9 +51,21 @@ class LambdaWrapperTest {
     @Autowired
     private OrderMapper orderMapper;
 
+    @Autowired
+    private UserTenantMapper userTenantMapper;
+
     @BeforeEach
     void setUp() {
         Reset.reset();
+    }
+
+    @Test
+    void testSimple() {
+        MPJLambdaWrapper<UserTenantDO> lambda = JoinWrappers.lambda(UserTenantDO.class);
+        lambda.selectAs(UserTenantDO::getIdea, UserTenantDO::getIdea);
+        List<UserTenantDO> list = userTenantMapper.selectList(lambda);
+
+        assert list.size() == 5 && list.get(0).getIdea() != null;
     }
 
     @Test
@@ -985,7 +994,6 @@ class LambdaWrapperTest {
                 .selectAll(OrderDO.class)
                 .selectAs(UserDO::getName, OrderDO::getUserName)
                 .leftJoin(UserDO.class, UserDO::getId, OrderDO::getUserId);
-        System.out.println(wrapper.getFrom());
         List<OrderDO> l = w.list();
     }
 

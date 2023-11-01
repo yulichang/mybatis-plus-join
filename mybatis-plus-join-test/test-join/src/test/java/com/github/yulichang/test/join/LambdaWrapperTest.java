@@ -8,6 +8,8 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.github.yulichang.adapter.base.tookit.VersionUtils;
 import com.github.yulichang.test.join.dto.AddressDTO;
 import com.github.yulichang.test.join.dto.UserDTO;
+import com.github.yulichang.test.join.dto.UserTenantDTO;
+import com.github.yulichang.test.join.dto.UserTenantDescDTO;
 import com.github.yulichang.test.join.entity.*;
 import com.github.yulichang.test.join.mapper.*;
 import com.github.yulichang.test.util.Reset;
@@ -57,6 +59,22 @@ class LambdaWrapperTest {
     @BeforeEach
     void setUp() {
         Reset.reset();
+    }
+
+    @Test
+    void testSelectSort(){
+        ThreadLocalUtils.set("SELECT t.id, t.user_id, t.tenant_id FROM user_tenant t WHERE t.tenant_id = 1");
+        MPJLambdaWrapper<UserTenantDO> lambda = JoinWrappers.lambda(UserTenantDO.class);
+        lambda.selectAsClass(UserTenantDO.class, UserTenantDTO.class);
+        List<UserTenantDO> list = userTenantMapper.selectJoinList(UserTenantDO.class,lambda);
+        assert list.size() == 5 && list.get(0).getIdea() != null;
+
+
+        ThreadLocalUtils.set("SELECT t.tenant_id, t.user_id, t.id FROM user_tenant t WHERE t.tenant_id = 1");
+        MPJLambdaWrapper<UserTenantDO> lambda1 = JoinWrappers.lambda(UserTenantDO.class);
+        lambda1.selectAsClass(UserTenantDO.class, UserTenantDescDTO.class);
+        List<UserTenantDO> list1 = userTenantMapper.selectJoinList(UserTenantDO.class,lambda1);
+        assert list1.size() == 5 && list1.get(0).getIdea() != null;
     }
 
     @Test

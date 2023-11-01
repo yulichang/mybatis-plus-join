@@ -28,7 +28,7 @@ import java.util.stream.Collectors;
  *
  * @author yulichang
  */
-@SuppressWarnings("unused")
+@SuppressWarnings({"unused", "DuplicatedCode"})
 public interface Query<Children> extends Serializable {
 
 
@@ -129,11 +129,12 @@ public interface Query<Children> extends Serializable {
      * @return children
      */
     default Children selectAsClass(Class<?> source, Class<?> tag) {
-        List<SelectCache> normalList = ColumnCache.getListField(source);
-        Map<String, FieldCache> fieldMap = MPJReflectionKit.getFieldMap(tag);
-        for (SelectCache cache : normalList) {
-            if (fieldMap.containsKey(cache.getColumProperty())) {
-                getSelectColum().add(new SelectNormal(cache, getIndex(), isHasAlias(), getAlias()));
+        Map<String, SelectCache> normalMap = ColumnCache.getMapField(source);
+        List<FieldCache> fieldList = MPJReflectionKit.getFieldList(tag);
+        for (FieldCache cache : fieldList) {
+            if (normalMap.containsKey(cache.getField().getName())) {
+                SelectCache selectCache = normalMap.get(cache.getField().getName());
+                getSelectColum().add(new SelectNormal(selectCache, getIndex(), isHasAlias(), getAlias()));
             }
         }
         return getChildren();

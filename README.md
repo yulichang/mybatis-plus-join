@@ -33,9 +33,7 @@
 
 <p align="center">
 QQ群:1022221898  或者 
-<a href="https://gitee.com/best_handsome/mybatis-plus-join/issues/I65N2M" target="_blank">添加作者微信，备注MPJ，加入微信群</a>  
-<br/>
-<img width="200px" src="https://mybatisplusjoin.com/qr.png"  alt="添加作者微信，备注MPJ，加入微信群"/>
+<a href="https://gitee.com/best_handsome/mybatis-plus-join/issues/I65N2M" target="_blank">添加作者微信，备注MPJ，加入微信群</a>
 </p>
 
 ### <a href="https://www.baidu.com/link?url=6NtKqbGKUIIdwoBUaqNkQnLiG3d5y03L6Pfg6ODId0VKfPifpB1xqdQzsBprm-0h&wd=&eqid=d26e7f1600004777000000056440ade6" target="_blank">使用文档WIKI</a>

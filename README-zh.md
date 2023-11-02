@@ -49,7 +49,7 @@ QQ群:1022221898  或者
   <dependency>
       <groupId>com.github.yulichang</groupId>
       <artifactId>mybatis-plus-join-boot-starter</artifactId>
-      <version>1.4.7.2</version>
+      <version>1.4.7.1</version>
   </dependency>
   ```
 - Gradle

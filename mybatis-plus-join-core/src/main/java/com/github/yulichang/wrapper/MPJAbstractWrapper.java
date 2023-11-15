@@ -14,6 +14,7 @@ import com.baomidou.mybatisplus.core.toolkit.sql.StringEscape;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.github.yulichang.toolkit.LambdaUtils;
 import com.github.yulichang.toolkit.MPJSqlInjectionUtils;
+import com.github.yulichang.toolkit.Ref;
 import com.github.yulichang.toolkit.TableList;
 import com.github.yulichang.toolkit.sql.SqlScriptUtils;
 import com.github.yulichang.wrapper.enums.PrefixEnum;
@@ -24,6 +25,8 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiPredicate;
 import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
 import static com.baomidou.mybatisplus.core.enums.SqlKeyword.*;
 import static com.baomidou.mybatisplus.core.enums.WrapperKeyword.APPLY;
@@ -139,6 +142,21 @@ public abstract class MPJAbstractWrapper<T, Children extends MPJAbstractWrapper<
             tableList.setRootClass(entityClass);
         }
         return typedThis;
+    }
+
+    /**
+     * 转为子类，方便自定义继承扩展
+     */
+    public <C extends Children> C toChildren(Ref<C> children) {
+        return (C) this;
+    }
+
+    /**
+     * 转为子类，方便自定义继承扩展
+     * 需要子类自定义字段
+     */
+    public <C extends Children> C toChildren(Supplier<C> s) {
+        return (C) this;
     }
 
     /**

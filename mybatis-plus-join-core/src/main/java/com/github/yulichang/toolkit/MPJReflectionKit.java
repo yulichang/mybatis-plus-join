@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 @SuppressWarnings("unused")
 public final class MPJReflectionKit {
 
-    private static final Map<Class<?>, Map<String, FieldCache>> CLASS_FIELD_CACHE = new ConcurrentHashMap<>();
+    private static final Map<Class<?>, FieldStringMap<FieldCache>> CLASS_FIELD_CACHE = new ConcurrentHashMap<>();
     private static final Map<Class<?>, List<FieldCache>> CLASS_FIELD_LIST_CACHE = new ConcurrentHashMap<>();
 
     private static final Map<String, FieldCache> EMPTY_MAP = new HashMap<>();
@@ -78,7 +78,7 @@ public final class MPJReflectionKit {
      */
     public static Map<String, FieldCache> getFieldMap(Class<?> clazz) {
         return CLASS_FIELD_CACHE.computeIfAbsent(clazz, key -> getFieldList(key).stream().collect(Collectors.toMap(f ->
-                f.getField().getName(), Function.identity())));
+                f.getField().getName(), Function.identity(), (o, n) -> n, FieldStringMap::new)));
     }
 
     public static List<FieldCache> getFieldList(Class<?> clazz) {

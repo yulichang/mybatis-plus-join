@@ -33,26 +33,16 @@
         <url>https://github.com/yulichang/mybatis-plus-join</url>
     </scm>
 
-    <properties>
-        <jdkVersion>1.8</jdkVersion>
-        <jdkVersion.test>1.8</jdkVersion.test>
-        <maven.compiler.source>1.8</maven.compiler.source>
-        <maven.compiler.target>1.8</maven.compiler.target>
-        <github.global.server>github</github.global.server>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    </properties>
-
     <dependencies>
         <dependency>
             <groupId>com.baomidou</groupId>
             <artifactId>mybatis-plus-extension</artifactId>
-            <version>3.5.4.1</version>
+            <version>${mpj.mybatis.plus.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>1.18.28</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>

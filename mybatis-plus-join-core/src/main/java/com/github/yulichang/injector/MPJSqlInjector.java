@@ -56,7 +56,7 @@ public class MPJSqlInjector extends DefaultSqlInjector {
      * 升级到 mybatis plus 3.4.3.2 后对之前的版本兼容
      */
     @Deprecated
-    @SuppressWarnings({"unused"})
+    @SuppressWarnings({"unused", "DeprecatedIsStillUsed"})
     public List<AbstractMethod> getMethodList(Class<?> mapperClass) {
         if (VersionUtils.compare(MybatisPlusVersion.getVersion(), "3.4.3.2") >= 0) {
             throw ExceptionUtils.mpe("DefaultSqlInjector 的 getMethodList(Class<?> mapperClass) 方法已在 3.4.3.2+ 改为" +

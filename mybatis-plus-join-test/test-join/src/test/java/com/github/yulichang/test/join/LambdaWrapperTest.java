@@ -62,18 +62,18 @@ class LambdaWrapperTest {
     }
 
     @Test
-    void testSelectSort(){
+    void testSelectSort() {
         ThreadLocalUtils.set("SELECT t.id, t.user_id, t.tenant_id FROM user_tenant t WHERE t.tenant_id = 1");
         MPJLambdaWrapper<UserTenantDO> lambda = JoinWrappers.lambda(UserTenantDO.class);
         lambda.selectAsClass(UserTenantDO.class, UserTenantDTO.class);
-        List<UserTenantDO> list = userTenantMapper.selectJoinList(UserTenantDO.class,lambda);
+        List<UserTenantDO> list = userTenantMapper.selectJoinList(UserTenantDO.class, lambda);
         assert list.size() == 5 && list.get(0).getIdea() != null;
 
 
         ThreadLocalUtils.set("SELECT t.tenant_id, t.user_id, t.id FROM user_tenant t WHERE t.tenant_id = 1");
         MPJLambdaWrapper<UserTenantDO> lambda1 = JoinWrappers.lambda(UserTenantDO.class);
         lambda1.selectAsClass(UserTenantDO.class, UserTenantDescDTO.class);
-        List<UserTenantDO> list1 = userTenantMapper.selectJoinList(UserTenantDO.class,lambda1);
+        List<UserTenantDO> list1 = userTenantMapper.selectJoinList(UserTenantDO.class, lambda1);
         assert list1.size() == 5 && list1.get(0).getIdea() != null;
     }
 
@@ -1133,5 +1133,23 @@ class LambdaWrapperTest {
         List<UserDO> list = wrapper.list();
 
         assert list.size() == 7;
+    }
+
+    @Test
+    void unionAll() {
+        ThreadLocalUtils.set("SELECT t.id FROM `user` t WHERE t.del = false AND (t.id = ?) UNION ALL SELECT t.id FROM address t UNION ALL SELECT t.id FROM area t WHERE t.del = false AND (t.id = ?)");
+        MPJLambdaWrapper<UserDO> wrapper = JoinWrappers.lambda(UserDO.class)
+                .select(UserDO::getId)
+                .eq(UserDO::getId, 1);
+        MPJLambdaWrapper<AddressDO> wrapper1 = JoinWrappers.lambda(AddressDO.class)
+                .select(AddressDO::getId)
+                .disableLogicDel();
+        MPJLambdaWrapper<AreaDO> wrapper2 = JoinWrappers.lambda(AreaDO.class)
+                .select(AreaDO::getId)
+                .eq(AreaDO::getId, 2);
+        wrapper.unionAll(wrapper1, wrapper2);
+        List<UserDO> list = wrapper.list();
+
+        assert list.size() == 23 && list.get(0).getId() != null;
     }
 }

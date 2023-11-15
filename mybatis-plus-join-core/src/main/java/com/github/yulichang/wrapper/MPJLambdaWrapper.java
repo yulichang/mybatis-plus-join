@@ -245,8 +245,8 @@ public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWr
     /**
      * union all
      */
-    @SafeVarargs
-    public final <E, F> MPJLambdaWrapper<T> unionAll(MPJLambdaWrapper<T>... wrappers) {
+    @SuppressWarnings("UnusedReturnValue")
+    public final MPJLambdaWrapper<T> unionAll(MPJLambdaWrapper<?>... wrappers) {
         StringBuilder sb = new StringBuilder();
         for (MPJLambdaWrapper<?> wrapper : wrappers) {
             addCustomWrapper(wrapper);

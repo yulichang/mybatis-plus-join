@@ -13,7 +13,7 @@
     <groupId>com.github.yulichang</groupId>
     <artifactId>mybatis-plus-join-test</artifactId>
     <packaging>pom</packaging>
-    <version>1.4.7.1</version>
+    <version>${revision}</version>
 
     <name>mybatis-plus-join-test</name>
 
@@ -56,6 +56,7 @@
         <maven.compiler.target>1.8</maven.compiler.target>
         <github.global.server>github</github.global.server>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <revision>1.4.7.2</revision>
     </properties>
 
     <dependencies>
@@ -82,7 +83,7 @@
         <dependency>
             <groupId>com.github.yulichang</groupId>
             <artifactId>mybatis-plus-join-boot-starter</artifactId>
-            <version>1.4.7.1</version>
+            <version>${revision}</version>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>

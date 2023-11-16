@@ -427,7 +427,7 @@ public class MPJInterceptor implements Interceptor {
     public Object plugin(Object target) {
         try {
             return Interceptor.super.plugin(target);
-        } catch (Exception e) {
+        } catch (Throwable e) {
             return Plugin.wrap(target, this);
         }
     }

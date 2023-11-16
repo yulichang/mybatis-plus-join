@@ -31,13 +31,13 @@ public class DeleteJoin extends MPJAbstractMethod {
         if (AdapterHelper.getTableInfoAdapter().mpjHasLogic(tableInfo)) {
             String sql = String.format(sqlMethod.getSql(), sqlFirst(), mpjTableName(tableInfo), sqlAlias(), sqlFrom(),
                     mpjDeleteLogic(tableInfo), sqlWhereEntityWrapper(true, tableInfo), sqlComment());
-            SqlSource sqlSource = languageDriver.createSqlSource(configuration, sql, modelClass);
+            SqlSource sqlSource = languageDriver.createSqlSource(configuration, removeExtraWhitespaces(sql), modelClass);
             return this.addUpdateMappedStatement(mapperClass, modelClass, sqlMethod.getMethod(), sqlSource);
         } else {
             sqlMethod = SqlMethod.DELETE_JOIN;
             String sql = String.format(sqlMethod.getSql(), sqlFirst(), mpjDelete(), mpjTableName(tableInfo),
                     sqlAlias(), sqlFrom(), sqlWhereEntityWrapper(true, tableInfo), sqlComment());
-            SqlSource sqlSource = languageDriver.createSqlSource(configuration, sql, modelClass);
+            SqlSource sqlSource = languageDriver.createSqlSource(configuration, removeExtraWhitespaces(sql), modelClass);
             return this.addDeleteMappedStatement(mapperClass, sqlMethod.getMethod(), sqlSource);
         }
     }

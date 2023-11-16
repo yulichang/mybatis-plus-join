@@ -9,6 +9,7 @@ import com.github.yulichang.wrapper.segments.SelectCache;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
@@ -43,6 +44,7 @@ public class ColumnCache {
 
     public static Map<String, SelectCache> getMapField(Class<?> clazz) {
         return MAP_CACHE.computeIfAbsent(clazz, c -> getListField(c).stream().collect(Collectors.toMap(
-                SelectCache::getColumProperty, Function.identity(), (i, j) -> j, FieldStringMap::new)));
+                i -> i.getColumProperty().toUpperCase(Locale.ENGLISH),
+                Function.identity(), (i, j) -> j, FieldStringMap::new)));
     }
 }

@@ -78,7 +78,7 @@ public final class MPJReflectionKit {
      */
     public static Map<String, FieldCache> getFieldMap(Class<?> clazz) {
         return CLASS_FIELD_CACHE.computeIfAbsent(clazz, key -> getFieldList(key).stream().collect(Collectors.toMap(f ->
-                f.getField().getName(), Function.identity(), (o, n) -> n, FieldStringMap::new)));
+                f.getField().getName().toUpperCase(Locale.ENGLISH), Function.identity(), (o, n) -> n, FieldStringMap::new)));
     }
 
     public static List<FieldCache> getFieldList(Class<?> clazz) {

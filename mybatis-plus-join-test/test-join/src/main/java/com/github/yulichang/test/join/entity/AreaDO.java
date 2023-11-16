@@ -26,7 +26,7 @@ public class AreaDO implements Serializable {
 
     private String area;
 
-    private String postcode;
+    private String Postcode;
 
     @TableLogic
     private Boolean del;

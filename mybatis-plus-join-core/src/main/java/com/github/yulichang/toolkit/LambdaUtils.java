@@ -2,32 +2,24 @@ package com.github.yulichang.toolkit;
 
 
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
-import com.github.yulichang.toolkit.support.*;
+import com.github.yulichang.toolkit.support.IdeaProxyLambdaMeta;
+import com.github.yulichang.toolkit.support.LambdaMeta;
+import com.github.yulichang.toolkit.support.ReflectLambdaMeta;
+import com.github.yulichang.toolkit.support.ShadowLambdaMeta;
 import org.apache.ibatis.reflection.property.PropertyNamer;
 
 import java.lang.invoke.SerializedLambda;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
-import java.util.Map;
 
 /**
  * copy {@link com.baomidou.mybatisplus.core.toolkit.LambdaUtils}
  */
-@SuppressWarnings("unused")
 public final class LambdaUtils {
 
     public static <T> String getName(SFunction<T, ?> fn) {
         LambdaMeta extract = extract(fn);
-        String name = PropertyNamer.methodToProperty(extract.getImplMethodName());
-        if (Character.isUpperCase(name.charAt(0))) {
-            Map<String, FieldCache> map = MPJReflectionKit.getFieldMap(extract.getInstantiatedClass());
-            if (map.containsKey(name)) {
-                return name;
-            } else {
-                return map.keySet().stream().filter(i -> i.equalsIgnoreCase(name)).findFirst().orElse(null);
-            }
-        }
-        return name;
+        return PropertyNamer.methodToProperty(extract.getImplMethodName());
     }
 
 

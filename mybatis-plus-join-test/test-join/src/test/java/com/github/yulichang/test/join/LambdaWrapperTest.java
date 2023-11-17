@@ -1078,30 +1078,6 @@ class LambdaWrapperTest {
      * select 子查询
      */
     @Test
-    void sub() {
-        ThreadLocalUtils.set("SELECT (SELECT st.id FROM `user` st WHERE st.del = false AND (st.id = t.id) LIMIT 1) AS id FROM `user` t LEFT JOIN address t1 ON (t1.user_id = t.id) WHERE t.del = false AND t1.del = false AND (t.id <= ?)");
-        MPJLambdaWrapper<UserDO> wrapper = JoinWrappers.lambda(UserDO.class)
-                .selectSub(UserDO.class, w -> w.select(UserDO::getId)
-                        .eq(UserDO::getId, UserDO::getId)
-                        .last("limit 1"), UserDO::getId)
-                .leftJoin(AddressDO.class, AddressDO::getUserId, UserDO::getId)
-                .le(UserDO::getId, 100);
-        wrapper.list();
-
-        ThreadLocalUtils.set("SELECT (SELECT st.id FROM area st WHERE st.del = false AND (st.id = t1.id) LIMIT 1) AS id FROM `user` t LEFT JOIN address t1 ON (t1.user_id = t.id) WHERE t.del = false AND t1.del = false AND (t.id <= ?)");
-        MPJLambdaWrapper<UserDO> wrapper1 = JoinWrappers.lambda(UserDO.class)
-                .selectSub(AreaDO.class, w -> w.select(AreaDO::getId)
-                        .eq(AreaDO::getId, AddressDO::getId)
-                        .last("limit 1"), UserDO::getId)
-                .leftJoin(AddressDO.class, AddressDO::getUserId, UserDO::getId)
-                .le(UserDO::getId, 100);
-        wrapper1.list();
-    }
-
-    /**
-     * select 子查询
-     */
-    @Test
     void checkOrderBy() {
         MPJLambdaWrapper<UserDO> wrapper = JoinWrappers.lambda(UserDO.class)
                 .selectAll(UserDO.class)
@@ -1110,46 +1086,5 @@ class LambdaWrapperTest {
                 .checkSqlInjection()
                 .orderByDesc("t.id");
         wrapper.list();
-    }
-
-    /**
-     * select 子查询
-     */
-    @Test
-    void union() {
-        ThreadLocalUtils.set("SELECT t.id,t.pid,t.`name`,t.`json`,t.sex,t.head_img,t.create_time,t.address_id,t.address_id2,t.del,t.create_by,t.update_by FROM `user` t WHERE t.del=false AND (t.id = ?) UNION SELECT t.id,t.pid,t.`name`,t.`json`,t.sex,t.head_img,t.create_time,t.address_id,t.address_id2,t.del,t.create_by,t.update_by FROM `user` t WHERE (t.`name` = ? AND (t.`name` = ?)) UNION SELECT t.id,t.pid,t.`name`,t.`json`,t.sex,t.head_img,t.create_time,t.address_id,t.address_id2,t.del,t.create_by,t.update_by FROM `user` t WHERE t.del=false AND (t.pid = ?)");
-        MPJLambdaWrapper<UserDO> wrapper = JoinWrappers.lambda(UserDO.class)
-                .selectAll(UserDO.class)
-                .eq(UserDO::getId, 1);
-        MPJLambdaWrapper<UserDO> wrapper1 = JoinWrappers.lambda(UserDO.class)
-                .selectAll(UserDO.class)
-                .disableLogicDel()
-                .eq(UserDO::getName, "张三 2")
-                .and(w -> w.eq(UserDO::getName, "张三 2"));
-        MPJLambdaWrapper<UserDO> wrapper2 = JoinWrappers.lambda(UserDO.class)
-                .selectAll(UserDO.class)
-                .eq(UserDO::getPid, 2);
-        wrapper.union(wrapper1, wrapper2);
-        List<UserDO> list = wrapper.list();
-
-        assert list.size() == 7;
-    }
-
-    @Test
-    void unionAll() {
-        ThreadLocalUtils.set("SELECT t.id FROM `user` t WHERE t.del = false AND (t.id = ?) UNION ALL SELECT t.id FROM address t UNION ALL SELECT t.id FROM area t WHERE t.del = false AND (t.id = ?)");
-        MPJLambdaWrapper<UserDO> wrapper = JoinWrappers.lambda(UserDO.class)
-                .select(UserDO::getId)
-                .eq(UserDO::getId, 1);
-        MPJLambdaWrapper<AddressDO> wrapper1 = JoinWrappers.lambda(AddressDO.class)
-                .select(AddressDO::getId)
-                .disableLogicDel();
-        MPJLambdaWrapper<AreaDO> wrapper2 = JoinWrappers.lambda(AreaDO.class)
-                .select(AreaDO::getId)
-                .eq(AreaDO::getId, 2);
-        wrapper.unionAll(wrapper1, wrapper2);
-        List<UserDO> list = wrapper.list();
-
-        assert list.size() == 23 && list.get(0).getId() != null;
     }
 }

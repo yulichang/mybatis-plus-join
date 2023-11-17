@@ -16,6 +16,7 @@ import com.github.yulichang.kt.interfaces.Func;
 import com.github.yulichang.kt.interfaces.OnCompare;
 import com.github.yulichang.toolkit.KtUtils;
 import com.github.yulichang.toolkit.MPJSqlInjectionUtils;
+import com.github.yulichang.toolkit.Ref;
 import com.github.yulichang.toolkit.TableList;
 import com.github.yulichang.toolkit.sql.SqlScriptUtils;
 import com.github.yulichang.wrapper.enums.PrefixEnum;
@@ -29,6 +30,7 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiPredicate;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 import static com.baomidou.mybatisplus.core.enums.SqlKeyword.*;
 import static com.baomidou.mybatisplus.core.enums.WrapperKeyword.APPLY;
@@ -144,6 +146,21 @@ public abstract class KtAbstractWrapper<T, Children extends KtAbstractWrapper<T,
             tableList.setRootClass(entityClass);
         }
         return typedThis;
+    }
+
+    /**
+     * 转为子类，方便自定义继承扩展
+     */
+    public <C extends Children> C toChildren(Ref<C> children) {
+        return (C) this;
+    }
+
+    /**
+     * 转为子类，方便自定义继承扩展
+     * 需要子类自定义字段
+     */
+    public <C extends Children> C toChildren(Supplier<C> s) {
+        return (C) this;
     }
 
     /**
@@ -670,7 +687,6 @@ public abstract class KtAbstractWrapper<T, Children extends KtAbstractWrapper<T,
      */
     public Children setParamAlias(String paramAlias) {
         Assert.notEmpty(paramAlias, "paramAlias can not be empty!");
-        Assert.isNull(this.paramAlias.getStringValue(), "Please do not call the method repeatedly!");
         this.paramAlias.setStringValue(paramAlias);
         return typedThis;
     }

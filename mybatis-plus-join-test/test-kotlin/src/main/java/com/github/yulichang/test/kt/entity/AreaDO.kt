@@ -13,7 +13,7 @@ class AreaDO : Serializable {
     var province: String? = null
     var city: String? = null
     var area: String? = null
-    var postcode: String? = null
+    var Postcode: String? = null
 
     @TableLogic
     var del: Boolean? = null

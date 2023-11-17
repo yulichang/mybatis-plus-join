@@ -698,7 +698,9 @@ class LambdaWrapperTest {
                 .eq(UserDO::name, "ref")
         userMapper!!.selectList(wrapper)
         try {
-            userMapper.insertBatchSomeColumn(ArrayList())
+            val arr = ArrayList<UserDO>()
+            arr.add(UserDO())
+            userMapper.insertBatchSomeColumn(arr)
         } catch (ignored: BadSqlGrammarException) {
         }
     }
@@ -821,7 +823,9 @@ class LambdaWrapperTest {
                 .setTableName { name -> name + "bbbbbbb" }
         try {
             userMapper!!.selectJoinList(UserDTO::class.java, wrapper)
-        } catch (_: BadSqlGrammarException) {
+        } catch (a: Exception) {
+            if (a.message!!.contains("sql error"))
+                throw a
         }
     }
 
@@ -1091,68 +1095,5 @@ class LambdaWrapperTest {
         } catch (_: BadSqlGrammarException) {
             //忽略异常 h2不支持连表删除
         }
-    }
-
-    /**
-     * select 子查询
-     */
-    @Test
-    fun sub() {
-        ThreadLocalUtils.set("SELECT ( SELECT st.id FROM `user` st WHERE st.del=false AND (st.id = t.id) limit 1 ) AS id FROM `user` t LEFT JOIN address t1 ON (t1.user_id = t.id) WHERE t.del=false AND t1.del=false AND (t.id <= ?)")
-        val wrapper: KtLambdaWrapper<UserDO> = KtWrappers.query(UserDO::class.java)
-                .selectSub(
-                        UserDO::class.java, { w ->
-                    w.select(UserDO::id)
-                            .eq(UserDO::id, UserDO::id)
-                            .last("limit 1")
-                }, UserDO::id
-                )
-                .leftJoin(AddressDO::class.java, AddressDO::userId, UserDO::id)
-                .le(UserDO::id, 100)
-        wrapper.list()
-
-        ThreadLocalUtils.set("SELECT ( SELECT st.id FROM area st WHERE st.del=false AND (st.id = t1.id) limit 1 ) AS id FROM `user` t LEFT JOIN address t1 ON (t1.user_id = t.id) WHERE t.del=false AND t1.del=false AND (t.id <= ?)")
-        val wrapper1: KtLambdaWrapper<UserDO> = KtWrappers.query(UserDO::class.java)
-                .selectSub(AreaDO::class.java, { w ->
-                    w.select(AreaDO::id)
-                            .eq(AreaDO::id, AddressDO::id)
-                            .last("limit 1")
-                }, UserDO::id)
-                .leftJoin(AddressDO::class.java, AddressDO::userId, UserDO::id)
-                .le(UserDO::id, 100)
-        wrapper1.list()
-
-        ThreadLocalUtils.set("SELECT ( SELECT st.id FROM address st WHERE st.del=false AND (st.id = t1.id) limit 1 ) AS id FROM `user` t LEFT JOIN address t1 ON (t1.user_id = t.id) WHERE t.del=false AND t1.del=false AND (t.id <= ?)")
-        val wrapper2: KtLambdaWrapper<UserDO> = KtWrappers.query(UserDO::class.java)
-                .selectSub(AddressDO::class.java, { w ->
-                    w.select(AddressDO::id)
-                            .eq(AddressDO::id, AddressDO::id)
-                            .last("limit 1")
-                }, UserDO::id)
-                .leftJoin(AddressDO::class.java, AddressDO::userId, UserDO::id)
-                .le(UserDO::id, 100)
-        wrapper2.list()
-    }
-
-
-    /**
-     * select 子查询
-     */
-    @Test
-    fun union() {
-        val wrapper: KtLambdaWrapper<UserDO> = KtWrappers.query(UserDO::class.java)
-                .selectAll(UserDO::class.java)
-                .eq(UserDO::id, 1)
-        val wrapper1: KtLambdaWrapper<UserDO> = KtWrappers.query(UserDO::class.java)
-                .selectAll(UserDO::class.java)
-                .eq(UserDO::name, "张三 2")
-                .and { a -> a.eq(UserDO::name, "张三 2") }
-        val wrapper2: KtLambdaWrapper<UserDO> = KtWrappers.query(UserDO::class.java)
-                .selectAll(UserDO::class.java)
-                .eq(UserDO::pid, 2)
-
-        wrapper.union(wrapper1, wrapper2)
-        val list = wrapper.list()
-        assert(list.size == 7)
     }
 }

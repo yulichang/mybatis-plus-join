@@ -700,7 +700,6 @@ public abstract class MPJAbstractWrapper<T, Children extends MPJAbstractWrapper<
      */
     public Children setParamAlias(String paramAlias) {
         Assert.notEmpty(paramAlias, "paramAlias can not be empty!");
-        Assert.isTrue(StringUtils.isBlank(this.paramAlias.getStringValue()), "Please do not call the method repeatedly!");
         this.paramAlias.setStringValue(paramAlias);
         return typedThis;
     }

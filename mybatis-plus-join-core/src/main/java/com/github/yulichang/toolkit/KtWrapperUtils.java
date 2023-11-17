@@ -16,9 +16,9 @@ import java.util.Optional;
  * @author yulichang
  * @since 1.4.6
  */
+@SuppressWarnings("DuplicatedCode")
 public class KtWrapperUtils {
 
-    @SuppressWarnings("DuplicatedCode")
     public static String buildSubSqlByWrapper(Class<?> clazz, KtLambdaWrapper<?> wrapper, String alias) {
         TableInfo tableInfo = TableHelper.get(clazz);
         Asserts.hasTable(tableInfo, clazz);
@@ -53,7 +53,6 @@ public class KtWrapperUtils {
                 alias);
     }
 
-    @SuppressWarnings("DuplicatedCode")
     public static String buildUnionSqlByWrapper(Class<?> clazz, KtLambdaWrapper<?> wrapper) {
         TableInfo tableInfo = TableHelper.get(clazz);
         Asserts.hasTable(tableInfo, clazz);
@@ -94,7 +93,6 @@ public class KtWrapperUtils {
         return SqlScriptUtils.safeParam(paramStr, null);
     }
 
-    @SuppressWarnings("DuplicatedCode")
     private static String getEntitySql(TableInfo tableInfo, KtLambdaWrapper<?> wrapper) {
         Object obj = wrapper.getEntity();
         if (Objects.isNull(obj)) {
@@ -126,6 +124,9 @@ public class KtWrapperUtils {
     }
 
     private static String mainLogic(boolean hasWhere, Class<?> clazz, KtLambdaWrapper<?> wrapper) {
+        if (!wrapper.getLogicSql()) {
+            return StringPool.EMPTY;
+        }
         String info = LogicInfoUtils.getLogicInfo(null, clazz, true, wrapper.getAlias());
         if (StringUtils.isNotBlank(info)) {
             if (hasWhere) {

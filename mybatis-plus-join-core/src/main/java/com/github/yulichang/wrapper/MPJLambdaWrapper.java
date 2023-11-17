@@ -6,10 +6,8 @@ import com.baomidou.mybatisplus.core.conditions.segments.MergeSegments;
 import com.baomidou.mybatisplus.core.toolkit.*;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.github.yulichang.config.ConfigProperties;
-import com.github.yulichang.toolkit.Constant;
 import com.github.yulichang.toolkit.LambdaUtils;
-import com.github.yulichang.toolkit.TableList;
-import com.github.yulichang.toolkit.WrapperUtils;
+import com.github.yulichang.toolkit.*;
 import com.github.yulichang.toolkit.support.ColumnCache;
 import com.github.yulichang.wrapper.interfaces.Chain;
 import com.github.yulichang.wrapper.interfaces.Query;
@@ -30,7 +28,7 @@ import java.util.stream.Collectors;
  *
  * @author yulichang
  */
-@SuppressWarnings({"unused"})
+@SuppressWarnings({"unused", "DuplicatedCode"})
 public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWrapper<T>> implements
         Query<MPJLambdaWrapper<T>>, QueryLabel<MPJLambdaWrapper<T>>, Chain<T>, SelectWrapper<T, MPJLambdaWrapper<T>> {
 
@@ -205,10 +203,10 @@ public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWr
     /**
      * 子查询
      */
-    @SuppressWarnings("DuplicatedCode")
     public <E, F> MPJLambdaWrapper<T> selectSub(Class<E> clazz, String st, Consumer<MPJLambdaWrapper<E>> consumer, SFunction<F, ?> alias) {
-        MPJLambdaWrapper<E> wrapper = new MPJLambdaWrapper<E>(null, clazz, SharedString.emptyString(), paramNameSeq, paramNameValuePairs,
-                new MergeSegments(), this.paramAlias, SharedString.emptyString(), SharedString.emptyString(), SharedString.emptyString(),
+        MPJLambdaWrapper<E> wrapper = new MPJLambdaWrapper<E>(null, clazz, SharedString.emptyString(),
+                paramNameSeq, paramNameValuePairs, new MergeSegments(), new SharedString(this.paramAlias
+                .getStringValue()), SharedString.emptyString(), SharedString.emptyString(), SharedString.emptyString(),
                 new TableList(), null, null, null, null) {
         };
         wrapper.tableList.setAlias(st);
@@ -224,16 +222,22 @@ public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWr
 
     /**
      * union
+     * <p>
+     * 推荐使用 union(Class<U> clazz, Consumer<MPJLambdaWrapper<U>> consumer)
+     * 例： wrapper.union(UserDO.class, union -> union.selectAll(UserDO.class))
+     *
+     * @see #union(Class, Consumer)
+     * @deprecated union 不支持子查询
      */
-    @SuppressWarnings("UnusedReturnValue")
+    @Deprecated
+    @SuppressWarnings({"UnusedReturnValue", "DeprecatedIsStillUsed"})
     public final MPJLambdaWrapper<T> union(MPJLambdaWrapper<?>... wrappers) {
         StringBuilder sb = new StringBuilder();
         for (MPJLambdaWrapper<?> wrapper : wrappers) {
             addCustomWrapper(wrapper);
             Class<?> entityClass = wrapper.getEntityClass();
             Assert.notNull(entityClass, "请使用 new MPJLambdaWrapper(主表.class) 或 JoinWrappers.lambda(主表.class) 构造方法");
-            sb.append(" UNION ")
-                    .append(WrapperUtils.buildUnionSqlByWrapper(entityClass, wrapper));
+            sb.append(" UNION ").append(WrapperUtils.buildUnionSqlByWrapper(entityClass, wrapper));
         }
         if (Objects.isNull(unionSql)) {
             unionSql = SharedString.emptyString();
@@ -243,17 +247,45 @@ public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWr
     }
 
     /**
-     * union all
+     * union
+     * <p>
+     * 例： wrapper.union(UserDO.class, union -> union.selectAll(UserDO.class))
+     *
+     * @param clazz union语句的主表类型
+     * @since 1.4.7.3
      */
-    @SuppressWarnings("UnusedReturnValue")
-    public final MPJLambdaWrapper<T> unionAll(MPJLambdaWrapper<?>... wrappers) {
+    public <U> MPJLambdaWrapper<T> union(Class<U> clazz, Consumer<MPJLambdaWrapper<U>> consumer) {
+        MPJLambdaWrapper<U> unionWrapper = JoinWrappers.lambda(clazz);
+        addCustomWrapper(unionWrapper);
+        consumer.accept(unionWrapper);
+
+        String sb = " UNION " + WrapperUtils.buildUnionSqlByWrapper(clazz, unionWrapper);
+
+        if (Objects.isNull(unionSql)) {
+            unionSql = SharedString.emptyString();
+        }
+        unionSql.setStringValue(unionSql.getStringValue() + sb);
+        return typedThis;
+    }
+
+    /**
+     * union
+     * <p>
+     * 推荐使用 unionAll(Class<U> clazz, Consumer<MPJLambdaWrapper<U>> consumer)
+     * 例： wrapper.unionAll(UserDO.class, union -> union.selectAll(UserDO.class))
+     *
+     * @see #unionAll(Class, Consumer)
+     * @deprecated union 不支持子查询
+     */
+    @Deprecated
+    @SuppressWarnings("DeprecatedIsStillUsed")
+    public MPJLambdaWrapper<T> unionAll(MPJLambdaWrapper<?>... wrappers) {
         StringBuilder sb = new StringBuilder();
         for (MPJLambdaWrapper<?> wrapper : wrappers) {
             addCustomWrapper(wrapper);
             Class<?> entityClass = wrapper.getEntityClass();
             Assert.notNull(entityClass, "请使用 new MPJLambdaWrapper(主表.class) 或 JoinWrappers.lambda(主表.class) 构造方法");
-            sb.append(" UNION ALL ")
-                    .append(WrapperUtils.buildUnionSqlByWrapper(entityClass, wrapper));
+            sb.append(" UNION ALL ").append(WrapperUtils.buildUnionSqlByWrapper(entityClass, wrapper));
         }
         if (Objects.isNull(unionSql)) {
             unionSql = SharedString.emptyString();
@@ -262,7 +294,28 @@ public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWr
         return typedThis;
     }
 
-    @SuppressWarnings("DuplicatedCode")
+    /**
+     * union
+     * <p>
+     * 例： wrapper.unionAll(UserDO.class, union -> union.selectAll(UserDO.class))
+     *
+     * @param clazz union语句的主表类型
+     * @since 1.4.7.3
+     */
+    public <U> MPJLambdaWrapper<T> unionAll(Class<U> clazz, Consumer<MPJLambdaWrapper<U>> consumer) {
+        MPJLambdaWrapper<U> unionWrapper = JoinWrappers.lambda(clazz);
+        addCustomWrapper(unionWrapper);
+        consumer.accept(unionWrapper);
+
+        String sb = " UNION ALL " + WrapperUtils.buildUnionSqlByWrapper(clazz, unionWrapper);
+
+        if (Objects.isNull(unionSql)) {
+            unionSql = SharedString.emptyString();
+        }
+        unionSql.setStringValue(unionSql.getStringValue() + sb);
+        return typedThis;
+    }
+
     private void addCustomWrapper(MPJLambdaWrapper<?> wrapper) {
         if (Objects.isNull(wrapperIndex)) {
             wrapperIndex = new AtomicInteger(0);
@@ -280,7 +333,6 @@ public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWr
      * 查询条件 SQL 片段
      */
     @Override
-    @SuppressWarnings("DuplicatedCode")
     public String getSqlSelect() {
         if (StringUtils.isBlank(sqlSelect.getStringValue()) && CollectionUtils.isNotEmpty(selectColumns)) {
             String s = selectColumns.stream().map(i -> {

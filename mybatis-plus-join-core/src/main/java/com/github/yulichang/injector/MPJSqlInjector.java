@@ -195,6 +195,18 @@ public class MPJSqlInjector extends DefaultSqlInjector {
                 break;
             }
         }
-        return target == null ? null : (Class<?>) target.getActualTypeArguments()[0];
+        if (target == null) {
+            return null;
+        }
+
+        Type actualTypeArgument = target.getActualTypeArguments()[0];
+        if (actualTypeArgument instanceof Class) {
+            return (Class<?>) actualTypeArgument;
+        } else if (actualTypeArgument instanceof ParameterizedType) {
+            return (Class<?>) ((ParameterizedType) actualTypeArgument).getRawType();
+        } else {
+            // Handle other types or throw an exception
+            return null;
+        }
     }
 }

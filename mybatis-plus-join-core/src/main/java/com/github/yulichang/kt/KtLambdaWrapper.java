@@ -253,7 +253,7 @@ public class KtLambdaWrapper<T> extends KtAbstractLambdaWrapper<T, KtLambdaWrapp
      * 例： wrapper.union(UserDO.class, union -> union.selectAll(UserDO.class))
      *
      * @param clazz union语句的主表类型
-     * @since 1.4.7.3
+     * @since 1.4.8
      */
     public <U> KtLambdaWrapper<T> union(Class<U> clazz, Consumer<KtLambdaWrapper<U>> consumer) {
         KtLambdaWrapper<U> unionWrapper = KtWrappers.query(clazz);
@@ -301,7 +301,7 @@ public class KtLambdaWrapper<T> extends KtAbstractLambdaWrapper<T, KtLambdaWrapp
      * 例： wrapper.unionAll(UserDO.class, union -> union.selectAll(UserDO.class))
      *
      * @param clazz union语句的主表类型
-     * @since 1.4.7.3
+     * @since 1.4.8
      */
     public <U> KtLambdaWrapper<T> unionAll(Class<U> clazz, Consumer<KtLambdaWrapper<U>> consumer) {
         KtLambdaWrapper<U> unionWrapper = KtWrappers.query(clazz);

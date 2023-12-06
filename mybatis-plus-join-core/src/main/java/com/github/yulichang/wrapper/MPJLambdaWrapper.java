@@ -252,7 +252,7 @@ public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWr
      * 例： wrapper.union(UserDO.class, union -> union.selectAll(UserDO.class))
      *
      * @param clazz union语句的主表类型
-     * @since 1.4.7.3
+     * @since 1.4.8
      */
     public <U> MPJLambdaWrapper<T> union(Class<U> clazz, Consumer<MPJLambdaWrapper<U>> consumer) {
         MPJLambdaWrapper<U> unionWrapper = JoinWrappers.lambda(clazz);
@@ -300,7 +300,7 @@ public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWr
      * 例： wrapper.unionAll(UserDO.class, union -> union.selectAll(UserDO.class))
      *
      * @param clazz union语句的主表类型
-     * @since 1.4.7.3
+     * @since 1.4.8
      */
     public <U> MPJLambdaWrapper<T> unionAll(Class<U> clazz, Consumer<MPJLambdaWrapper<U>> consumer) {
         MPJLambdaWrapper<U> unionWrapper = JoinWrappers.lambda(clazz);

@@ -6,7 +6,7 @@ import java.util.Locale;
 /**
  * @author yulichang
  * @see HashMap
- * @since 1.4.7.3
+ * @since 1.4.8
  */
 public class FieldStringMap<V> extends HashMap<String, V> {
 

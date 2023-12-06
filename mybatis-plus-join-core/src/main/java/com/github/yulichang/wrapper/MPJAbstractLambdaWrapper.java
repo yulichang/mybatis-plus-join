@@ -219,19 +219,19 @@ public abstract class MPJAbstractLambdaWrapper<T, Children extends MPJAbstractLa
     }
 
     @Override
-    protected <X> String columnToString(Integer index, X column, boolean isJoin, PrefixEnum prefixEnum) {
-        return columnToString(index, (SFunction<?, ?>) column, isJoin, prefixEnum);
+    protected <X> String columnToString(Integer index, String alias, X column, boolean isJoin, PrefixEnum prefixEnum) {
+        return columnToString(index, alias, (SFunction<?, ?>) column, isJoin, prefixEnum);
     }
 
     @Override
     @SafeVarargs
-    protected final <X> String columnsToString(Integer index, boolean isJoin, PrefixEnum prefixEnum, X... columns) {
-        return Arrays.stream(columns).map(i -> columnToString(index, (SFunction<?, ?>) i, isJoin, prefixEnum)).collect(joining(StringPool.COMMA));
+    protected final <X> String columnsToString(Integer index, PrefixEnum prefixEnum, String alias, X... columns) {
+        return Arrays.stream(columns).map(i -> columnToString(index, alias, (SFunction<?, ?>) i, false, prefixEnum)).collect(joining(StringPool.COMMA));
     }
 
-    protected String columnToString(Integer index, SFunction<?, ?> column, boolean isJoin, PrefixEnum prefixEnum) {
+    protected String columnToString(Integer index, String alias, SFunction<?, ?> column, boolean isJoin, PrefixEnum prefixEnum) {
         Class<?> entityClass = LambdaUtils.getEntityClass(column);
-        return getDefault(index, entityClass, isJoin, prefixEnum) + StringPool.DOT + getCache(column).getColumn();
+        return (alias == null ? getDefault(index, entityClass, isJoin, prefixEnum) : alias) + StringPool.DOT + getCache(column).getColumn();
     }
 
     protected SelectCache getCache(SFunction<?, ?> fn) {
@@ -378,7 +378,7 @@ public abstract class MPJAbstractLambdaWrapper<T, Children extends MPJAbstractLa
         TableInfo info = TableHelper.get(clazz);
         Asserts.hasTable(info, clazz);
         Children instance = instance(newIndex, keyWord, clazz, info.getTableName());
-        instance.isNo = true;
+        instance.isOn = true;
         instance.isMain = false;
         onWrappers.add(instance);
         if (StringUtils.isBlank(tableAlias)) {

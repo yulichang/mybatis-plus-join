@@ -37,7 +37,7 @@ import static java.util.stream.Collectors.joining;
  *
  * @author yulichang
  */
-@SuppressWarnings("ALL")
+@SuppressWarnings({"unchecked", "unused", "DuplicatedCode"})
 public abstract class MPJAbstractWrapper<T, Children extends MPJAbstractWrapper<T, Children>> extends Wrapper<T>
         implements Compare<Children>, Nested<Children, Children>, Join<Children>, Func<Children>, OnCompare<Children>,
         CompareStr<Children, String>, FuncStr<Children, String> {
@@ -56,6 +56,7 @@ public abstract class MPJAbstractWrapper<T, Children extends MPJAbstractWrapper<
      */
     @Getter
     protected AtomicInteger paramNameSeq;
+    @Getter
     protected Map<String, Object> paramNameValuePairs;
     /**
      * 其他
@@ -102,7 +103,7 @@ public abstract class MPJAbstractWrapper<T, Children extends MPJAbstractWrapper<
     /**
      * 是否是OnWrapper
      */
-    protected boolean isNo = false;
+    protected boolean isOn = false;
 
     /**
      * 关联的表
@@ -201,64 +202,64 @@ public abstract class MPJAbstractWrapper<T, Children extends MPJAbstractWrapper<
     }
 
     @Override
-    public <X> Children eq(boolean condition, SFunction<X, ?> column, Object val) {
-        return addCondition(condition, column, EQ, val);
+    public <X> Children eq(boolean condition, String alias, SFunction<X, ?> column, Object val) {
+        return addCondition(condition, alias, column, EQ, val);
     }
 
     @Override
-    public <X> Children ne(boolean condition, SFunction<X, ?> column, Object val) {
-        return addCondition(condition, column, NE, val);
+    public <X> Children ne(boolean condition, String alias, SFunction<X, ?> column, Object val) {
+        return addCondition(condition, alias, column, NE, val);
     }
 
     @Override
-    public <X> Children gt(boolean condition, SFunction<X, ?> column, Object val) {
-        return addCondition(condition, column, GT, val);
+    public <X> Children gt(boolean condition, String alias, SFunction<X, ?> column, Object val) {
+        return addCondition(condition, alias, column, GT, val);
     }
 
     @Override
-    public <X> Children ge(boolean condition, SFunction<X, ?> column, Object val) {
-        return addCondition(condition, column, GE, val);
+    public <X> Children ge(boolean condition, String alias, SFunction<X, ?> column, Object val) {
+        return addCondition(condition, alias, column, GE, val);
     }
 
     @Override
-    public <X> Children lt(boolean condition, SFunction<X, ?> column, Object val) {
-        return addCondition(condition, column, LT, val);
+    public <X> Children lt(boolean condition, String alias, SFunction<X, ?> column, Object val) {
+        return addCondition(condition, alias, column, LT, val);
     }
 
     @Override
-    public <X> Children le(boolean condition, SFunction<X, ?> column, Object val) {
-        return addCondition(condition, column, LE, val);
+    public <X> Children le(boolean condition, String alias, SFunction<X, ?> column, Object val) {
+        return addCondition(condition, alias, column, LE, val);
     }
 
     @Override
-    public <X> Children like(boolean condition, SFunction<X, ?> column, Object val) {
-        return likeValue(condition, LIKE, column, val, SqlLike.DEFAULT);
+    public <X> Children like(boolean condition, String alias, SFunction<X, ?> column, Object val) {
+        return likeValue(condition, LIKE, alias, column, val, SqlLike.DEFAULT);
     }
 
     @Override
-    public <X> Children notLike(boolean condition, SFunction<X, ?> column, Object val) {
-        return likeValue(condition, NOT_LIKE, column, val, SqlLike.DEFAULT);
+    public <X> Children notLike(boolean condition, String alias, SFunction<X, ?> column, Object val) {
+        return likeValue(condition, NOT_LIKE, alias, column, val, SqlLike.DEFAULT);
     }
 
     @Override
-    public <X> Children likeLeft(boolean condition, SFunction<X, ?> column, Object val) {
-        return likeValue(condition, LIKE, column, val, SqlLike.LEFT);
+    public <X> Children likeLeft(boolean condition, String alias, SFunction<X, ?> column, Object val) {
+        return likeValue(condition, LIKE, alias, column, val, SqlLike.LEFT);
     }
 
     @Override
-    public <X> Children likeRight(boolean condition, SFunction<X, ?> column, Object val) {
-        return likeValue(condition, LIKE, column, val, SqlLike.RIGHT);
+    public <X> Children likeRight(boolean condition, String alias, SFunction<X, ?> column, Object val) {
+        return likeValue(condition, LIKE, alias, column, val, SqlLike.RIGHT);
     }
 
     @Override
-    public <X> Children between(boolean condition, SFunction<X, ?> column, Object val1, Object val2) {
-        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(index, column, false), BETWEEN,
+    public <X> Children between(boolean condition, String alias, SFunction<X, ?> column, Object val1, Object val2) {
+        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(index, alias, column), BETWEEN,
                 () -> formatParam(null, val1), AND, () -> formatParam(null, val2)));
     }
 
     @Override
-    public <X> Children notBetween(boolean condition, SFunction<X, ?> column, Object val1, Object val2) {
-        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(index, column, false), NOT_BETWEEN,
+    public <X> Children notBetween(boolean condition, String alias, SFunction<X, ?> column, Object val1, Object val2) {
+        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(index, alias, column), NOT_BETWEEN,
                 () -> formatParam(null, val1), AND, () -> formatParam(null, val2)));
     }
 
@@ -329,89 +330,89 @@ public abstract class MPJAbstractWrapper<T, Children extends MPJAbstractWrapper<
     }
 
     @Override
-    public <X> Children isNull(boolean condition, SFunction<X, ?> column) {
-        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(index, column, false), IS_NULL));
+    public <X> Children isNull(boolean condition, String alias, SFunction<X, ?> column) {
+        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(index, alias, column), IS_NULL));
     }
 
     @Override
-    public <X> Children isNotNull(boolean condition, SFunction<X, ?> column) {
-        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(index, column, false), IS_NOT_NULL));
+    public <X> Children isNotNull(boolean condition, String alias, SFunction<X, ?> column) {
+        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(index, alias, column), IS_NOT_NULL));
     }
 
     @Override
-    public <X> Children in(boolean condition, SFunction<X, ?> column, Collection<?> coll) {
-        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(index, column, false), IN, inExpression(coll)));
+    public <X> Children in(boolean condition, String alias, SFunction<X, ?> column, Collection<?> coll) {
+        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(index, alias, column), IN, inExpression(coll)));
     }
 
     @Override
-    public <X> Children in(boolean condition, SFunction<X, ?> column, Object... values) {
-        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(index, column, false), IN, inExpression(values)));
+    public <X> Children in(boolean condition, String alias, SFunction<X, ?> column, Object... values) {
+        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(index, alias, column), IN, inExpression(values)));
     }
 
     @Override
-    public <X> Children notIn(boolean condition, SFunction<X, ?> column, Collection<?> coll) {
-        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(index, column, false), NOT_IN, inExpression(coll)));
+    public <X> Children notIn(boolean condition, String alias, SFunction<X, ?> column, Collection<?> coll) {
+        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(index, alias, column), NOT_IN, inExpression(coll)));
     }
 
     @Override
-    public <X> Children notIn(boolean condition, SFunction<X, ?> column, Object... values) {
-        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(index, column, false), NOT_IN, inExpression(values)));
+    public <X> Children notIn(boolean condition, String alias, SFunction<X, ?> column, Object... values) {
+        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(index, alias, column), NOT_IN, inExpression(values)));
     }
 
     @Override
-    public <X> Children inSql(boolean condition, SFunction<X, ?> column, String inValue) {
-        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(index, column, false), IN,
+    public <X> Children inSql(boolean condition, String alias, SFunction<X, ?> column, String inValue) {
+        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(index, alias, column), IN,
                 () -> String.format("(%s)", inValue)));
     }
 
     @Override
-    public <X> Children notInSql(boolean condition, SFunction<X, ?> column, String inValue) {
-        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(index, column, false), NOT_IN,
+    public <X> Children notInSql(boolean condition, String alias, SFunction<X, ?> column, String inValue) {
+        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(index, alias, column), NOT_IN,
                 () -> String.format("(%s)", inValue)));
     }
 
 
     @Override
-    public <X> Children gtSql(boolean condition, SFunction<X, ?> column, String inValue) {
-        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(index, column, false), GT,
+    public <X> Children gtSql(boolean condition, String alias, SFunction<X, ?> column, String inValue) {
+        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(index, alias, column), GT,
                 () -> String.format("(%s)", inValue)));
     }
 
     @Override
-    public <X> Children geSql(boolean condition, SFunction<X, ?> column, String inValue) {
-        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(index, column, false), GE,
+    public <X> Children geSql(boolean condition, String alias, SFunction<X, ?> column, String inValue) {
+        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(index, alias, column), GE,
                 () -> String.format("(%s)", inValue)));
     }
 
     @Override
-    public <X> Children ltSql(boolean condition, SFunction<X, ?> column, String inValue) {
-        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(index, column, false), LT,
+    public <X> Children ltSql(boolean condition, String alias, SFunction<X, ?> column, String inValue) {
+        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(index, alias, column), LT,
                 () -> String.format("(%s)", inValue)));
     }
 
     @Override
-    public <X> Children leSql(boolean condition, SFunction<X, ?> column, String inValue) {
-        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(index, column, false), LE,
+    public <X> Children leSql(boolean condition, String alias, SFunction<X, ?> column, String inValue) {
+        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(index, alias, column), LE,
                 () -> String.format("(%s)", inValue)));
     }
 
     @Override
-    public <R> Children groupBy(boolean condition, List<SFunction<R, ?>> columns) {
+    public <R> Children groupBy(boolean condition, String alias, List<SFunction<R, ?>> columns) {
         return maybeDo(condition, () -> {
             if (CollectionUtils.isNotEmpty(columns)) {
-                String one = (StringPool.COMMA + columnsToString(index, false, isNo ? PrefixEnum.ON_FIRST : PrefixEnum.CD_FIRST, columns));
-                final String finalOne = one;
+                final String finalOne = (StringPool.COMMA + columnsToString(index, isOn ? PrefixEnum.ON_FIRST : PrefixEnum.CD_FIRST, alias, columns));
                 appendSqlSegments(GROUP_BY, () -> finalOne);
             }
         });
     }
 
+    @SafeVarargs
     @Override
-    public <X> Children groupBy(boolean condition, SFunction<X, ?> column, SFunction<X, ?>... columns) {
+    public final <X> Children groupBy(boolean condition, String alias, SFunction<X, ?> column, SFunction<X, ?>... columns) {
         return maybeDo(condition, () -> {
-            String one = columnToString(index, column, false, isNo ? PrefixEnum.ON_FIRST : PrefixEnum.CD_FIRST);
+            String one = columnToString(index, alias, column, false, isOn ? PrefixEnum.ON_FIRST : PrefixEnum.CD_FIRST);
             if (ArrayUtils.isNotEmpty(columns)) {
-                one += (StringPool.COMMA + columnsToString(index, false, isNo ? PrefixEnum.ON_FIRST : PrefixEnum.CD_FIRST, columns));
+                one += (StringPool.COMMA + columnsToString(index, isOn ? PrefixEnum.ON_FIRST : PrefixEnum.CD_FIRST, alias, columns));
             }
             final String finalOne = one;
             appendSqlSegments(GROUP_BY, () -> finalOne);
@@ -419,35 +420,33 @@ public abstract class MPJAbstractWrapper<T, Children extends MPJAbstractWrapper<
     }
 
     @Override
-    public <R> Children orderByAsc(boolean condition, List<SFunction<R, ?>> columns) {
+    public <R> Children orderByAsc(boolean condition, String alias, List<SFunction<R, ?>> columns) {
         return maybeDo(condition, () -> {
-            final SqlKeyword mode = ASC;
             if (CollectionUtils.isNotEmpty(columns)) {
                 columns.forEach(c -> appendSqlSegments(ORDER_BY,
-                        columnToSqlSegment(index, columnSqlInjectFilter(c), false), mode));
+                        columnToSqlSegment(index, alias, columnSqlInjectFilter(c)), ASC));
             }
         });
     }
 
     @Override
-    public <R> Children orderByDesc(boolean condition, List<SFunction<R, ?>> columns) {
+    public <R> Children orderByDesc(boolean condition, String alias, List<SFunction<R, ?>> columns) {
         return maybeDo(condition, () -> {
-            final SqlKeyword mode = DESC;
             if (CollectionUtils.isNotEmpty(columns)) {
                 columns.forEach(c -> appendSqlSegments(ORDER_BY,
-                        columnToSqlSegment(index, columnSqlInjectFilter(c), false), mode));
+                        columnToSqlSegment(index, alias, columnSqlInjectFilter(c)), DESC));
             }
         });
     }
 
     @Override
-    public <X> Children orderBy(boolean condition, boolean isAsc, SFunction<X, ?> column, SFunction<X, ?>... columns) {
+    public <X> Children orderBy(boolean condition, boolean isAsc, String alias, SFunction<X, ?> column, SFunction<X, ?>... columns) {
         return maybeDo(condition, () -> {
             final SqlKeyword mode = isAsc ? ASC : DESC;
-            appendSqlSegments(ORDER_BY, columnToSqlSegment(index, column, false), mode);
+            appendSqlSegments(ORDER_BY, columnToSqlSegment(index, alias, column), mode);
             if (ArrayUtils.isNotEmpty(columns)) {
                 Arrays.stream(columns).forEach(c -> appendSqlSegments(ORDER_BY,
-                        columnToSqlSegment(index, columnSqlInjectFilter(c), false), mode));
+                        columnToSqlSegment(index, alias, columnSqlInjectFilter(c)), mode));
             }
         });
     }
@@ -456,7 +455,6 @@ public abstract class MPJAbstractWrapper<T, Children extends MPJAbstractWrapper<
      * 字段 SQL 注入过滤处理，子类重写实现过滤逻辑
      *
      * @param column 字段内容
-     * @return
      */
     protected <X> SFunction<X, ?> columnSqlInjectFilter(SFunction<X, ?> column) {
         return column;
@@ -493,8 +491,8 @@ public abstract class MPJAbstractWrapper<T, Children extends MPJAbstractWrapper<
      * 内部自用
      * <p>拼接 LIKE 以及 值</p>
      */
-    protected <X> Children likeValue(boolean condition, SqlKeyword keyword, SFunction<X, ?> column, Object val, SqlLike sqlLike) {
-        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(index, column, false), keyword,
+    protected <X> Children likeValue(boolean condition, SqlKeyword keyword, String alias, SFunction<X, ?> column, Object val, SqlLike sqlLike) {
+        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(index, alias, column), keyword,
                 () -> formatParam(null, SqlUtils.concatLike(val, sqlLike))));
     }
 
@@ -511,18 +509,18 @@ public abstract class MPJAbstractWrapper<T, Children extends MPJAbstractWrapper<
      * @param sqlKeyword SQL 关键词
      * @param val        条件值
      */
-    protected <X> Children addCondition(boolean condition, SFunction<X, ?> column, SqlKeyword sqlKeyword, Object val) {
-        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(index, column, false), sqlKeyword,
+    protected <X> Children addCondition(boolean condition, String alias, SFunction<X, ?> column, SqlKeyword sqlKeyword, Object val) {
+        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(index, alias, column), sqlKeyword,
                 () -> formatParam(null, val)));
     }
 
-    protected <X, S> Children addCondition(boolean condition, SFunction<X, ?> column, SqlKeyword sqlKeyword, SFunction<S, ?> val) {
+    protected <X, S> Children addCondition(boolean condition, String alias, SFunction<X, ?> column,
+                                           SqlKeyword sqlKeyword, String rightAlias, SFunction<S, ?> val) {
         Class<X> c = LambdaUtils.getEntityClass(column);
         Class<S> v = LambdaUtils.getEntityClass(val);
-        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(index, column, false), sqlKeyword,
-                isNo ?
-                        columnToSqlSegmentS(index, val, v == c && v == joinClass) :
-                        columnToSqlSegmentS(index, val, v == c)
+        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(index, alias, column), sqlKeyword,
+                isOn ? columnToSqlSegmentS(index, rightAlias, val, v == c && v == joinClass) :
+                        columnToSqlSegmentS(index, rightAlias, val, v == c)
         ));
     }
 
@@ -563,6 +561,7 @@ public abstract class MPJAbstractWrapper<T, Children extends MPJAbstractWrapper<
      * @param params  参数
      * @return sql片段
      */
+    @SuppressWarnings("SameParameterValue")
     protected final String formatSqlMaybeWithParam(String sqlStr, String mapping, Object... params) {
         if (StringUtils.isBlank(sqlStr)) {
             // todo 何时会这样?
@@ -646,7 +645,7 @@ public abstract class MPJAbstractWrapper<T, Children extends MPJAbstractWrapper<
         onWrappers.clear();
         index = null;
         isMain = true;
-        isNo = false;
+        isOn = false;
     }
 
     /**
@@ -684,10 +683,6 @@ public abstract class MPJAbstractWrapper<T, Children extends MPJAbstractWrapper<
         return expression;
     }
 
-    public Map<String, Object> getParamNameValuePairs() {
-        return paramNameValuePairs;
-    }
-
     public String getParamAlias() {
         return paramAlias.getStringValue() == null ? Constants.WRAPPER : paramAlias.getStringValue();
     }
@@ -698,6 +693,7 @@ public abstract class MPJAbstractWrapper<T, Children extends MPJAbstractWrapper<
      * @param paramAlias 参数别名
      * @return Children
      */
+    @SuppressWarnings("UnusedReturnValue")
     public Children setParamAlias(String paramAlias) {
         Assert.notEmpty(paramAlias, "paramAlias can not be empty!");
         this.paramAlias.setStringValue(paramAlias);
@@ -707,28 +703,28 @@ public abstract class MPJAbstractWrapper<T, Children extends MPJAbstractWrapper<
     /**
      * 获取 columnName
      */
-    protected final <X> ISqlSegment columnToSqlSegment(Integer index, SFunction<X, ?> column, boolean isJoin) {
-        return () -> columnToString(index, column, isJoin, isNo ? PrefixEnum.ON_FIRST : PrefixEnum.CD_FIRST);
+    protected final <X> ISqlSegment columnToSqlSegment(Integer index, String alias, SFunction<X, ?> column) {
+        return () -> columnToString(index, alias, column, false, isOn ? PrefixEnum.ON_FIRST : PrefixEnum.CD_FIRST);
     }
 
-    protected final <X> ISqlSegment columnToSqlSegmentS(Integer index, SFunction<X, ?> column, boolean isJoin) {
+    protected final <X> ISqlSegment columnToSqlSegmentS(Integer index, String alias, SFunction<X, ?> column, boolean isJoin) {
         PrefixEnum prefixEnum;
         if (isMain) {
-            prefixEnum = isNo ? PrefixEnum.ON_SECOND /* 理论上不可能有这种情况 */ : PrefixEnum.CD_SECOND;
+            prefixEnum = isOn ? PrefixEnum.ON_SECOND /* 理论上不可能有这种情况 */ : PrefixEnum.CD_SECOND;
         } else {
-            prefixEnum = isNo ? PrefixEnum.ON_SECOND : PrefixEnum.CD_ON_SECOND;
+            prefixEnum = isOn ? PrefixEnum.ON_SECOND : PrefixEnum.CD_ON_SECOND;
         }
-        return () -> columnToString(index, column, isJoin, prefixEnum);
+        return () -> columnToString(index, alias, column, isJoin, prefixEnum);
     }
 
-    protected final <X> ISqlSegment columnToSqlSegment(String column) {
+    protected final ISqlSegment columnToSqlSegment(String column) {
         return () -> columnsToString(column);
     }
 
     /**
      * 获取 columnName
      */
-    protected <X> String columnToString(Integer index, X column, boolean isJoin, PrefixEnum prefixEnum) {
+    protected <X> String columnToString(Integer index, String alias, X column, boolean isJoin, PrefixEnum prefixEnum) {
         return (String) column;
     }
 
@@ -753,12 +749,10 @@ public abstract class MPJAbstractWrapper<T, Children extends MPJAbstractWrapper<
      *
      * @param columns 多字段
      */
-    protected <X> String columnsToString(Integer index, boolean isJoin, PrefixEnum prefixEnum, X... columns) {
-        return Arrays.stream(columns).map(i -> this.columnToString(index, i, isJoin, prefixEnum)).collect(joining(StringPool.COMMA));
-    }
+    abstract <X> String columnsToString(Integer index, PrefixEnum prefixEnum, String alias, X... columns);
 
     @Override
-    @SuppressWarnings("all")
+    @SuppressWarnings("MethodDoesntCallSuperMethod")
     public Children clone() {
         return SerializationUtils.clone(typedThis);
     }
@@ -775,33 +769,33 @@ public abstract class MPJAbstractWrapper<T, Children extends MPJAbstractWrapper<
     /* ************************* on语句重载 *************************** */
 
     @Override
-    public <R, S> Children eq(boolean condition, SFunction<R, ?> column, SFunction<S, ?> val) {
-        return addCondition(condition, column, EQ, val);
+    public <R, S> Children eq(boolean condition, String alias, SFunction<R, ?> column, String rightAlias, SFunction<S, ?> val) {
+        return addCondition(condition, alias, column, EQ, rightAlias, val);
     }
 
     @Override
-    public <R, S> Children ne(boolean condition, SFunction<R, ?> column, SFunction<S, ?> val) {
-        return addCondition(condition, column, NE, val);
+    public <R, S> Children ne(boolean condition, String alias, SFunction<R, ?> column, String rightAlias, SFunction<S, ?> val) {
+        return addCondition(condition, alias, column, NE, rightAlias, val);
     }
 
     @Override
-    public <R, S> Children gt(boolean condition, SFunction<R, ?> column, SFunction<S, ?> val) {
-        return addCondition(condition, column, GT, val);
+    public <R, S> Children gt(boolean condition, String alias, SFunction<R, ?> column, String rightAlias, SFunction<S, ?> val) {
+        return addCondition(condition, alias, column, GT, rightAlias, val);
     }
 
     @Override
-    public <R, S> Children ge(boolean condition, SFunction<R, ?> column, SFunction<S, ?> val) {
-        return addCondition(condition, column, GE, val);
+    public <R, S> Children ge(boolean condition, String alias, SFunction<R, ?> column, String rightAlias, SFunction<S, ?> val) {
+        return addCondition(condition, alias, column, GE, rightAlias, val);
     }
 
     @Override
-    public <R, S> Children lt(boolean condition, SFunction<R, ?> column, SFunction<S, ?> val) {
-        return addCondition(condition, column, LT, val);
+    public <R, S> Children lt(boolean condition, String alias, SFunction<R, ?> column, String rightAlias, SFunction<S, ?> val) {
+        return addCondition(condition, alias, column, LT, rightAlias, val);
     }
 
     @Override
-    public <R, S> Children le(boolean condition, SFunction<R, ?> column, SFunction<S, ?> val) {
-        return addCondition(condition, column, LE, val);
+    public <R, S> Children le(boolean condition, String alias, SFunction<R, ?> column, String rightAlias, SFunction<S, ?> val) {
+        return addCondition(condition, alias, column, LE, rightAlias, val);
     }
 
     /* ****************************************** **/

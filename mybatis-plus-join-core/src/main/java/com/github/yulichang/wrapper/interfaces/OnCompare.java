@@ -14,11 +14,34 @@ import java.io.Serializable;
  */
 @SuppressWarnings("unused")
 public interface OnCompare<Children> extends Serializable {
-    /**
-     * ignore
-     */
+
     default <R, S> Children eq(SFunction<R, ?> column, SFunction<S, ?> val) {
         return eq(true, column, val);
+    }
+
+
+    default <R, S> Children eq(String alias, SFunction<R, ?> column, SFunction<S, ?> val) {
+        return eq(true, alias, column, val);
+    }
+
+    default <R, S> Children eq(SFunction<R, ?> column, String rightAlias, SFunction<S, ?> val) {
+        return eq(true, column, rightAlias, val);
+    }
+
+    default <R, S> Children eq(String alias, SFunction<R, ?> column, String rightAlias, SFunction<S, ?> val) {
+        return eq(true, alias, column, rightAlias, val);
+    }
+
+    default <R, S> Children eq(boolean condition, SFunction<R, ?> column, SFunction<S, ?> val) {
+        return eq(condition, null, column, null, val);
+    }
+
+    default <R, S> Children eq(boolean condition, String alias, SFunction<R, ?> column, SFunction<S, ?> val) {
+        return eq(condition, alias, column, null, val);
+    }
+
+    default <R, S> Children eq(boolean condition, SFunction<R, ?> column, String rightAlias, SFunction<S, ?> val) {
+        return eq(condition, null, column, rightAlias, val);
     }
 
     /**
@@ -29,13 +52,34 @@ public interface OnCompare<Children> extends Serializable {
      * @param val       值
      * @return children
      */
-    <R, S> Children eq(boolean condition, SFunction<R, ?> column, SFunction<S, ?> val);
+    <R, S> Children eq(boolean condition, String alias, SFunction<R, ?> column, String rightAlias, SFunction<S, ?> val);
 
-    /**
-     * ignore
-     */
     default <R, S> Children ne(SFunction<R, ?> column, SFunction<S, ?> val) {
-        return ne(true, column, val);
+        return ne(true, null, column, null, val);
+    }
+
+    default <R, S> Children ne(String alias, SFunction<R, ?> column, SFunction<S, ?> val) {
+        return ne(true, alias, column, null, val);
+    }
+
+    default <R, S> Children ne(SFunction<R, ?> column, String rightAlias, SFunction<S, ?> val) {
+        return ne(true, null, column, rightAlias, val);
+    }
+
+    default <R, S> Children ne(String alias, SFunction<R, ?> column, String rightAlias, SFunction<S, ?> val) {
+        return ne(true, alias, column, rightAlias, val);
+    }
+
+    default <R, S> Children ne(boolean condition, SFunction<R, ?> column, SFunction<S, ?> val) {
+        return ne(condition, null, column, null, val);
+    }
+
+    default <R, S> Children ne(boolean condition, String alias, SFunction<R, ?> column, SFunction<S, ?> val) {
+        return ne(condition, alias, column, null, val);
+    }
+
+    default <R, S> Children ne(boolean condition, SFunction<R, ?> column, String rightAlias, SFunction<S, ?> val) {
+        return ne(condition, null, column, rightAlias, val);
     }
 
     /**
@@ -46,13 +90,34 @@ public interface OnCompare<Children> extends Serializable {
      * @param val       值
      * @return children
      */
-    <R, S> Children ne(boolean condition, SFunction<R, ?> column, SFunction<S, ?> val);
+    <R, S> Children ne(boolean condition, String alias, SFunction<R, ?> column, String rightAlias, SFunction<S, ?> val);
 
-    /**
-     * ignore
-     */
     default <R, S> Children gt(SFunction<R, ?> column, SFunction<S, ?> val) {
-        return gt(true, column, val);
+        return gt(true, null, column, null, val);
+    }
+
+    default <R, S> Children gt(String alias, SFunction<R, ?> column, SFunction<S, ?> val) {
+        return gt(true, alias, column, null, val);
+    }
+
+    default <R, S> Children gt(SFunction<R, ?> column, String rightAlias, SFunction<S, ?> val) {
+        return gt(true, null, column, rightAlias, val);
+    }
+
+    default <R, S> Children gt(String alias, SFunction<R, ?> column, String rightAlias, SFunction<S, ?> val) {
+        return gt(true, alias, column, rightAlias, val);
+    }
+
+    default <R, S> Children gt(boolean condition, SFunction<R, ?> column, SFunction<S, ?> val) {
+        return gt(condition, null, column, null, val);
+    }
+
+    default <R, S> Children gt(boolean condition, String alias, SFunction<R, ?> column, SFunction<S, ?> val) {
+        return gt(condition, alias, column, null, val);
+    }
+
+    default <R, S> Children gt(boolean condition, SFunction<R, ?> column, String rightAlias, SFunction<S, ?> val) {
+        return gt(condition, null, column, rightAlias, val);
     }
 
     /**
@@ -63,13 +128,34 @@ public interface OnCompare<Children> extends Serializable {
      * @param val       值
      * @return children
      */
-    <R, S> Children gt(boolean condition, SFunction<R, ?> column, SFunction<S, ?> val);
+    <R, S> Children gt(boolean condition, String alias, SFunction<R, ?> column, String rightAlias, SFunction<S, ?> val);
 
-    /**
-     * ignore
-     */
     default <R, S> Children ge(SFunction<R, ?> column, SFunction<S, ?> val) {
-        return ge(true, column, val);
+        return ge(true, null, column, null, val);
+    }
+
+    default <R, S> Children ge(String alias, SFunction<R, ?> column, SFunction<S, ?> val) {
+        return ge(true, alias, column, null, val);
+    }
+
+    default <R, S> Children ge(SFunction<R, ?> column, String rightAlias, SFunction<S, ?> val) {
+        return ge(true, null, column, rightAlias, val);
+    }
+
+    default <R, S> Children ge(String alias, SFunction<R, ?> column, String rightAlias, SFunction<S, ?> val) {
+        return ge(true, alias, column, rightAlias, val);
+    }
+
+    default <R, S> Children ge(boolean condition, SFunction<R, ?> column, SFunction<S, ?> val) {
+        return ge(condition, null, column, null, val);
+    }
+
+    default <R, S> Children ge(boolean condition, String alias, SFunction<R, ?> column, SFunction<S, ?> val) {
+        return ge(condition, alias, column, null, val);
+    }
+
+    default <R, S> Children ge(boolean condition, SFunction<R, ?> column, String rightAlias, SFunction<S, ?> val) {
+        return ge(condition, null, column, rightAlias, val);
     }
 
     /**
@@ -80,13 +166,34 @@ public interface OnCompare<Children> extends Serializable {
      * @param val       值
      * @return children
      */
-    <R, S> Children ge(boolean condition, SFunction<R, ?> column, SFunction<S, ?> val);
+    <R, S> Children ge(boolean condition, String alias, SFunction<R, ?> column, String rightAlias, SFunction<S, ?> val);
 
-    /**
-     * ignore
-     */
     default <R, S> Children lt(SFunction<R, ?> column, SFunction<S, ?> val) {
-        return lt(true, column, val);
+        return lt(true, null, column, null, val);
+    }
+
+    default <R, S> Children lt(String alias, SFunction<R, ?> column, SFunction<S, ?> val) {
+        return lt(true, alias, column, null, val);
+    }
+
+    default <R, S> Children lt(SFunction<R, ?> column, String rightAlias, SFunction<S, ?> val) {
+        return lt(true, null, column, rightAlias, val);
+    }
+
+    default <R, S> Children lt(String alias, SFunction<R, ?> column, String rightAlias, SFunction<S, ?> val) {
+        return lt(true, alias, column, rightAlias, val);
+    }
+
+    default <R, S> Children lt(boolean condition, SFunction<R, ?> column, SFunction<S, ?> val) {
+        return lt(condition, null, column, null, val);
+    }
+
+    default <R, S> Children lt(boolean condition, String alias, SFunction<R, ?> column, SFunction<S, ?> val) {
+        return lt(condition, alias, column, null, val);
+    }
+
+    default <R, S> Children lt(boolean condition, SFunction<R, ?> column, String rightAlias, SFunction<S, ?> val) {
+        return lt(condition, null, column, rightAlias, val);
     }
 
     /**
@@ -97,13 +204,34 @@ public interface OnCompare<Children> extends Serializable {
      * @param val       值
      * @return children
      */
-    <R, S> Children lt(boolean condition, SFunction<R, ?> column, SFunction<S, ?> val);
+    <R, S> Children lt(boolean condition, String alias, SFunction<R, ?> column, String rightAlias, SFunction<S, ?> val);
 
-    /**
-     * ignore
-     */
     default <R, S> Children le(SFunction<R, ?> column, SFunction<S, ?> val) {
-        return le(true, column, val);
+        return le(true, null, column, null, val);
+    }
+
+    default <R, S> Children le(String alias, SFunction<R, ?> column, SFunction<S, ?> val) {
+        return le(true, alias, column, null, val);
+    }
+
+    default <R, S> Children le(SFunction<R, ?> column, String rightAlias, SFunction<S, ?> val) {
+        return le(true, null, column, rightAlias, val);
+    }
+
+    default <R, S> Children le(String alias, SFunction<R, ?> column, String rightAlias, SFunction<S, ?> val) {
+        return le(true, alias, column, rightAlias, val);
+    }
+
+    default <R, S> Children le(boolean condition, SFunction<R, ?> column, SFunction<S, ?> val) {
+        return le(condition, null, column, null, val);
+    }
+
+    default <R, S> Children le(boolean condition, String alias, SFunction<R, ?> column, SFunction<S, ?> val) {
+        return le(condition, alias, column, null, val);
+    }
+
+    default <R, S> Children le(boolean condition, SFunction<R, ?> column, String rightAlias, SFunction<S, ?> val) {
+        return le(condition, null, column, rightAlias, val);
     }
 
     /**
@@ -114,5 +242,5 @@ public interface OnCompare<Children> extends Serializable {
      * @param val       值
      * @return children
      */
-    <R, S> Children le(boolean condition, SFunction<R, ?> column, SFunction<S, ?> val);
+    <R, S> Children le(boolean condition, String alias, SFunction<R, ?> column, String rightAlias, SFunction<S, ?> val);
 }

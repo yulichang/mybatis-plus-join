@@ -400,14 +400,32 @@ public abstract class MPJAbstractWrapper<T, Children extends MPJAbstractWrapper<
     public <R> Children groupBy(boolean condition, String alias, List<SFunction<R, ?>> columns) {
         return maybeDo(condition, () -> {
             if (CollectionUtils.isNotEmpty(columns)) {
-                final String finalOne = (StringPool.COMMA + columnsToString(index, isOn ? PrefixEnum.ON_FIRST : PrefixEnum.CD_FIRST, alias, columns));
+                final String finalOne =  columnsToString(index, isOn ? PrefixEnum.ON_FIRST : PrefixEnum.CD_FIRST, alias, columns);
                 appendSqlSegments(GROUP_BY, () -> finalOne);
             }
         });
     }
 
-    @SafeVarargs
     @Override
+    @SafeVarargs
+    public final <R> Children groupBy(SFunction<R, ?> column, SFunction<R, ?>... columns) {
+        return groupBy(true, null, column, columns);
+    }
+
+    @Override
+    @SafeVarargs
+    public final <R> Children groupBy(String alias, SFunction<R, ?> column, SFunction<R, ?>... columns) {
+        return groupBy(true, alias, column, columns);
+    }
+
+    @Override
+    @SafeVarargs
+    public final <R> Children groupBy(boolean condition, SFunction<R, ?> column, SFunction<R, ?>... columns) {
+        return groupBy(condition, null, column, columns);
+    }
+
+    @Override
+    @SafeVarargs
     public final <X> Children groupBy(boolean condition, String alias, SFunction<X, ?> column, SFunction<X, ?>... columns) {
         return maybeDo(condition, () -> {
             String one = columnToString(index, alias, column, false, isOn ? PrefixEnum.ON_FIRST : PrefixEnum.CD_FIRST);
@@ -430,6 +448,39 @@ public abstract class MPJAbstractWrapper<T, Children extends MPJAbstractWrapper<
     }
 
     @Override
+    @SafeVarargs
+    public final <R> Children orderByAsc(SFunction<R, ?> column, SFunction<R, ?>... columns) {
+        return orderByAsc(true, null, column, columns);
+    }
+
+    @Override
+    @SafeVarargs
+    public final <R> Children orderByAsc(String alias, SFunction<R, ?> column, SFunction<R, ?>... columns) {
+        return orderByAsc(true, alias, column, columns);
+    }
+
+    @Override
+    @SafeVarargs
+    public final <R> Children orderByAsc(boolean condition, String alias, SFunction<R, ?> column, SFunction<R, ?>... columns) {
+        return orderBy(condition, true, alias, column, columns);
+    }
+
+    /**
+     * 排序：ORDER BY 字段, ... ASC
+     * <p>例: orderByAsc("id", "name")</p>
+     *
+     * @param condition 执行条件
+     * @param column    单个字段
+     * @param columns   字段数组
+     * @return children
+     */
+    @Override
+    @SafeVarargs
+    public final <R> Children orderByAsc(boolean condition, SFunction<R, ?> column, SFunction<R, ?>... columns) {
+        return orderBy(condition, true, null, column, columns);
+    }
+
+    @Override
     public <R> Children orderByDesc(boolean condition, String alias, List<SFunction<R, ?>> columns) {
         return maybeDo(condition, () -> {
             if (CollectionUtils.isNotEmpty(columns)) {
@@ -440,7 +491,41 @@ public abstract class MPJAbstractWrapper<T, Children extends MPJAbstractWrapper<
     }
 
     @Override
-    public <X> Children orderBy(boolean condition, boolean isAsc, String alias, SFunction<X, ?> column, SFunction<X, ?>... columns) {
+    @SafeVarargs
+    public final <R> Children orderByDesc(SFunction<R, ?> column, SFunction<R, ?>... columns) {
+        return orderByDesc(true, null, column, columns);
+    }
+
+    @Override
+    @SafeVarargs
+    public final <R> Children orderByDesc(String alias, SFunction<R, ?> column, SFunction<R, ?>... columns) {
+        return orderByDesc(true, alias, column, columns);
+    }
+
+    @Override
+    @SafeVarargs
+    public final <R> Children orderByDesc(boolean condition, String alias, SFunction<R, ?> column, SFunction<R, ?>... columns) {
+        return orderBy(condition, false, alias, column, columns);
+    }
+
+    /**
+     * 排序：ORDER BY 字段, ... DESC
+     * <p>例: orderByDesc("id", "name")</p>
+     *
+     * @param condition 执行条件
+     * @param column    单个字段
+     * @param columns   字段数组
+     * @return children
+     */
+    @Override
+    @SafeVarargs
+    public final <R> Children orderByDesc(boolean condition, SFunction<R, ?> column, SFunction<R, ?>... columns) {
+        return orderBy(condition, false, null, column, columns);
+    }
+
+    @Override
+    @SafeVarargs
+    public final <X> Children orderBy(boolean condition, boolean isAsc, String alias, SFunction<X, ?> column, SFunction<X, ?>... columns) {
         return maybeDo(condition, () -> {
             final SqlKeyword mode = isAsc ? ASC : DESC;
             appendSqlSegments(ORDER_BY, columnToSqlSegment(index, alias, column), mode);
@@ -449,6 +534,12 @@ public abstract class MPJAbstractWrapper<T, Children extends MPJAbstractWrapper<
                         columnToSqlSegment(index, alias, columnSqlInjectFilter(c)), mode));
             }
         });
+    }
+
+    @Override
+    @SafeVarargs
+    public final <R> Children orderBy(boolean condition, boolean isAsc, SFunction<R, ?> column, SFunction<R, ?>... columns) {
+        return orderBy(condition, isAsc, null, column, columns);
     }
 
     /**
@@ -750,6 +841,10 @@ public abstract class MPJAbstractWrapper<T, Children extends MPJAbstractWrapper<
      * @param columns 多字段
      */
     abstract <X> String columnsToString(Integer index, PrefixEnum prefixEnum, String alias, X... columns);
+
+    public <X> String columnsToString(Integer index, PrefixEnum prefixEnum, String alias, List<X> columns) {
+        return columns.stream().map(i -> columnToString(index, alias, (SFunction<?, ?>) i, false, prefixEnum)).collect(joining(StringPool.COMMA));
+    }
 
     @Override
     @SuppressWarnings("MethodDoesntCallSuperMethod")

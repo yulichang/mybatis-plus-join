@@ -43,7 +43,7 @@ public class MybatisPlusJoinProperties {
     /**
      * 逻辑删除类型 支持 where on
      */
-    private String logicDelType = "where";
+    private String logicDelType = "on";
 
     /**
      * 映射查询最大深度

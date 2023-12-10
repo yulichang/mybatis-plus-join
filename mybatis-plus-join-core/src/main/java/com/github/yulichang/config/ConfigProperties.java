@@ -29,7 +29,7 @@ public class ConfigProperties {
     /**
      * 逻辑删除类型 支持 where on
      */
-    public static LogicDelTypeEnum logicDelType = LogicDelTypeEnum.WHERE;
+    public static LogicDelTypeEnum logicDelType = LogicDelTypeEnum.ON;
     /**
      * 逻辑删除类型 支持 where on
      */

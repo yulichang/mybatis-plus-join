@@ -97,6 +97,10 @@ public class MybatisPlusConfig {
         @SneakyThrows
         public void beforeQuery(Executor executor, MappedStatement ms, Object parameter, RowBounds rowBounds, ResultHandler resultHandler, BoundSql boundSql) {
             String sql = boundSql.getSql();
+            check(sql);
+        }
+
+        private void check(String sql) {
             List<String> sqlList = ThreadLocalUtils.get();
             if (CollectionUtils.isNotEmpty(sqlList)) {
                 if (sqlList.stream().anyMatch(e -> Objects.equals(formatSql(sql), formatSql(e)))) {
@@ -122,20 +126,7 @@ public class MybatisPlusConfig {
                 if (sql.toUpperCase().startsWith("SELECT")) {
                     return;
                 }
-                List<String> sqlList = ThreadLocalUtils.get();
-                if (CollectionUtils.isNotEmpty(sqlList)) {
-                    if (sqlList.stream().anyMatch(e -> Objects.equals(formatSql(sql), formatSql(e)))) {
-                        System.out.println("===============================================");
-                        System.out.println();
-                        System.out.println("pass");
-                        System.out.println();
-                        System.out.println("===============================================");
-                    } else {
-                        System.err.println("执行sql: " + SqlSourceBuilder.removeExtraWhitespaces(sql));
-                        sqlList.forEach(i -> System.err.println("预期sql: " + SqlSourceBuilder.removeExtraWhitespaces(i)));
-                        throw new RuntimeException("sql error");
-                    }
-                }
+                check(sql);
             }
         }
 

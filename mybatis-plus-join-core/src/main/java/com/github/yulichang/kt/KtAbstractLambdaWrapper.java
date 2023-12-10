@@ -218,18 +218,13 @@ public abstract class KtAbstractLambdaWrapper<T, Children extends KtAbstractLamb
     }
 
     @Override
-    protected String columnToString(Integer index, Object column, boolean isJoin, PrefixEnum prefixEnum) {
-        return columnToString(index, (KProperty<?>) column, isJoin, prefixEnum);
+    protected final String columnsToString(Integer index, PrefixEnum prefixEnum, String alias, KProperty<?>... columns) {
+        return Arrays.stream(columns).map(i -> columnToString(index, alias, i, false, prefixEnum)).collect(joining(StringPool.COMMA));
     }
 
-    @Override
-    protected final String columnsToString(Integer index, PrefixEnum prefixEnum, KProperty<?>... columns) {
-        return Arrays.stream(columns).map(i -> columnToString(index, i, false, prefixEnum)).collect(joining(StringPool.COMMA));
-    }
-
-    protected String columnToString(Integer index, KProperty<?> column, boolean isJoin, PrefixEnum prefixEnum) {
+    protected String columnToString(Integer index, String alias, KProperty<?> column, boolean isJoin, PrefixEnum prefixEnum) {
         Class<?> entityClass = KtUtils.ref(column);
-        return getDefault(index, entityClass, isJoin, prefixEnum) + StringPool.DOT + getCache(column).getColumn();
+        return (alias == null ? getDefault(index, entityClass, isJoin, prefixEnum) : alias) + StringPool.DOT + getCache(column).getColumn();
     }
 
     protected SelectCache getCache(KProperty<?> fn) {

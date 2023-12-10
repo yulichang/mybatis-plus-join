@@ -27,6 +27,17 @@ public interface QueryJoin<Children, Entity> extends MPJBaseJoin<Entity>, String
     }
 
     /**
+     * left join
+     *
+     * @param clazz 关联的实体类
+     * @param left  条件
+     * @param right 条件
+     */
+    default Children leftJoin(Class<?> clazz, KProperty<?> left, String rightAlias, KProperty<?> right) {
+        return join(Constant.LEFT_JOIN, clazz, left, rightAlias, right);
+    }
+
+    /**
      * left join 多条件
      * <p>
      * 例 leftJoin(UserDO.class, on -> on.eq(UserDO::getId,UserAddressDO::getUserId).le().gt()...)
@@ -70,6 +81,17 @@ public interface QueryJoin<Children, Entity> extends MPJBaseJoin<Entity>, String
      */
     default Children leftJoin(Class<?> clazz, String alias, KProperty<?> left, KProperty<?> right) {
         return join(Constant.LEFT_JOIN, clazz, alias, left, right);
+    }
+
+    /**
+     * left join
+     *
+     * @param clazz 关联的实体类
+     * @param left  条件
+     * @param right 条件
+     */
+    default Children leftJoin(Class<?> clazz, String alias, KProperty<?> left, String rightAlias, KProperty<?> right) {
+        return join(Constant.LEFT_JOIN, clazz, alias, left, rightAlias, right);
     }
 
     /**
@@ -117,6 +139,13 @@ public interface QueryJoin<Children, Entity> extends MPJBaseJoin<Entity>, String
     /**
      * ignore 参考 left join
      */
+    default Children rightJoin(Class<?> clazz, KProperty<?> left, String rightAlias, KProperty<?> right) {
+        return join(Constant.RIGHT_JOIN, clazz, left, rightAlias, right);
+    }
+
+    /**
+     * ignore 参考 left join
+     */
     default Children rightJoin(Class<?> clazz, WrapperFunction<KtAbstractLambdaWrapper<?, ?>> function) {
         return join(Constant.RIGHT_JOIN, clazz, function);
     }
@@ -140,6 +169,13 @@ public interface QueryJoin<Children, Entity> extends MPJBaseJoin<Entity>, String
      */
     default Children rightJoin(Class<?> clazz, String alias, KProperty<?> left, KProperty<?> right) {
         return join(Constant.RIGHT_JOIN, clazz, alias, left, right);
+    }
+
+    /**
+     * ignore 参考 left join
+     */
+    default Children rightJoin(Class<?> clazz, String alias, KProperty<?> left, String rightAlias, KProperty<?> right) {
+        return join(Constant.RIGHT_JOIN, clazz, alias, left, rightAlias, right);
     }
 
     /**
@@ -174,6 +210,14 @@ public interface QueryJoin<Children, Entity> extends MPJBaseJoin<Entity>, String
     /**
      * ignore 参考 left join
      */
+    default Children innerJoin(Class<?> clazz, KProperty<?> left, String rightAlias, KProperty<?> right) {
+        return join(Constant.INNER_JOIN, clazz, left, rightAlias, right);
+    }
+
+
+    /**
+     * ignore 参考 left join
+     */
     default Children innerJoin(Class<?> clazz, WrapperFunction<KtAbstractLambdaWrapper<?, ?>> function) {
         return join(Constant.INNER_JOIN, clazz, function);
     }
@@ -198,6 +242,13 @@ public interface QueryJoin<Children, Entity> extends MPJBaseJoin<Entity>, String
      */
     default Children innerJoin(Class<?> clazz, String alias, KProperty<?> left, KProperty<?> right) {
         return join(Constant.INNER_JOIN, clazz, alias, on -> on.eq(left, right));
+    }
+
+    /**
+     * ignore 参考 left join
+     */
+    default Children innerJoin(Class<?> clazz, String alias, KProperty<?> left, String rightAlias, KProperty<?> right) {
+        return join(Constant.INNER_JOIN, clazz, alias, left, rightAlias, right);
     }
 
     /**
@@ -231,6 +282,13 @@ public interface QueryJoin<Children, Entity> extends MPJBaseJoin<Entity>, String
     /**
      * ignore 参考 left join
      */
+    default Children fullJoin(Class<?> clazz, KProperty<?> left, String rightAlias, KProperty<?> right) {
+        return join(Constant.FULL_JOIN, clazz, left, rightAlias, right);
+    }
+
+    /**
+     * ignore 参考 left join
+     */
     default Children fullJoin(Class<?> clazz, WrapperFunction<KtAbstractLambdaWrapper<?, ?>> function) {
         return join(Constant.FULL_JOIN, clazz, function);
     }
@@ -254,6 +312,13 @@ public interface QueryJoin<Children, Entity> extends MPJBaseJoin<Entity>, String
      */
     default Children fullJoin(Class<?> clazz, String alias, KProperty<?> left, KProperty<?> right) {
         return join(Constant.FULL_JOIN, clazz, alias, left, right);
+    }
+
+    /**
+     * ignore 参考 left join
+     */
+    default Children fullJoin(Class<?> clazz, String alias, KProperty<?> left, String rightAlias, KProperty<?> right) {
+        return join(Constant.FULL_JOIN, clazz, alias, left, rightAlias, right);
     }
 
     /**
@@ -290,6 +355,13 @@ public interface QueryJoin<Children, Entity> extends MPJBaseJoin<Entity>, String
      */
     default Children join(String keyWord, Class<?> clazz, KProperty<?> left, KProperty<?> right) {
         return join(keyWord, clazz, on -> on.eq(left, right));
+    }
+
+    /**
+     * ignore
+     */
+    default Children join(String keyWord, Class<?> clazz, KProperty<?> left, String rightAlias, KProperty<?> right) {
+        return join(keyWord, clazz, on -> on.eq(left, rightAlias, right));
     }
 
     /**
@@ -331,6 +403,13 @@ public interface QueryJoin<Children, Entity> extends MPJBaseJoin<Entity>, String
      */
     default <T, X> Children join(String keyWord, Class<?> clazz, String alias, KProperty<?> left, KProperty<?> right) {
         return join(keyWord, clazz, alias, on -> on.eq(left, right));
+    }
+
+    /**
+     * ignore
+     */
+    default <T, X> Children join(String keyWord, Class<?> clazz, String alias, KProperty<?> left, String rightAlias, KProperty<?> right) {
+        return join(keyWord, clazz, alias, on -> on.eq(left, rightAlias, right));
     }
 
     /**

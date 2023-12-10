@@ -12,15 +12,20 @@ import java.util.function.Consumer;
  * <p>
  * copy {@link com.baomidou.mybatisplus.core.conditions.interfaces.Func}
  */
-@SuppressWarnings({"unused", "JavadocDeclaration"})
+@SuppressWarnings("unused")
 public interface Func<Children> extends Serializable {
 
-    /**
-     * ignore
-     */
-    @SuppressWarnings("UnusedReturnValue")
+
     default Children isNull(KProperty<?> column) {
-        return isNull(true, column);
+        return isNull(true, null, column);
+    }
+
+    default Children isNull(String alias, KProperty<?> column) {
+        return isNull(true, alias, column);
+    }
+
+    default Children isNull(boolean condition, KProperty<?> column) {
+        return isNull(condition, null, column);
     }
 
     /**
@@ -31,13 +36,19 @@ public interface Func<Children> extends Serializable {
      * @param column    字段
      * @return children
      */
-    Children isNull(boolean condition, KProperty<?> column);
+    Children isNull(boolean condition, String alias, KProperty<?> column);
 
-    /**
-     * ignore
-     */
+
     default Children isNotNull(KProperty<?> column) {
-        return isNotNull(true, column);
+        return isNotNull(true, null, column);
+    }
+
+    default Children isNotNull(String alias, KProperty<?> column) {
+        return isNotNull(true, alias, column);
+    }
+
+    default Children isNotNull(boolean condition, KProperty<?> column) {
+        return isNotNull(condition, null, column);
     }
 
     /**
@@ -48,13 +59,19 @@ public interface Func<Children> extends Serializable {
      * @param column    字段
      * @return children
      */
-    Children isNotNull(boolean condition, KProperty<?> column);
+    Children isNotNull(boolean condition, String alias, KProperty<?> column);
 
-    /**
-     * ignore
-     */
+
     default Children in(KProperty<?> column, Collection<?> coll) {
-        return in(true, column, coll);
+        return in(true, null, column, coll);
+    }
+
+    default Children in(String alias, KProperty<?> column, Collection<?> coll) {
+        return in(true, alias, column, coll);
+    }
+
+    default Children in(boolean condition, KProperty<?> column, Collection<?> coll) {
+        return in(condition, null, column, coll);
     }
 
     /**
@@ -69,13 +86,19 @@ public interface Func<Children> extends Serializable {
      * @param coll      数据集合
      * @return children
      */
-    Children in(boolean condition, KProperty<?> column, Collection<?> coll);
+    Children in(boolean condition, String alias, KProperty<?> column, Collection<?> coll);
 
-    /**
-     * ignore
-     */
+
     default Children in(KProperty<?> column, Object... values) {
-        return in(true, column, values);
+        return in(true, null, column, values);
+    }
+
+    default Children in(String alias, KProperty<?> column, Object... values) {
+        return in(true, alias, column, values);
+    }
+
+    default Children in(boolean condition, KProperty<?> column, Object... values) {
+        return in(condition, null, column, values);
     }
 
     /**
@@ -90,13 +113,19 @@ public interface Func<Children> extends Serializable {
      * @param values    数据数组
      * @return children
      */
-    Children in(boolean condition, KProperty<?> column, Object... values);
+    Children in(boolean condition, String alias, KProperty<?> column, Object... values);
 
-    /**
-     * ignore
-     */
+
     default Children notIn(KProperty<?> column, Collection<?> coll) {
-        return notIn(true, column, coll);
+        return notIn(true, null, column, coll);
+    }
+
+    default Children notIn(String alias, KProperty<?> column, Collection<?> coll) {
+        return notIn(true, alias, column, coll);
+    }
+
+    default Children notIn(boolean condition, KProperty<?> column, Collection<?> coll) {
+        return notIn(condition, null, column, coll);
     }
 
     /**
@@ -108,13 +137,19 @@ public interface Func<Children> extends Serializable {
      * @param coll      数据集合
      * @return children
      */
-    Children notIn(boolean condition, KProperty<?> column, Collection<?> coll);
+    Children notIn(boolean condition, String alias, KProperty<?> column, Collection<?> coll);
 
-    /**
-     * ignore
-     */
+
     default Children notIn(KProperty<?> column, Object... value) {
-        return notIn(true, column, value);
+        return notIn(true, null, column, value);
+    }
+
+    default Children notIn(String alias, KProperty<?> column, Object... value) {
+        return notIn(true, alias, column, value);
+    }
+
+    default Children notIn(boolean condition, KProperty<?> column, Object... values) {
+        return notIn(condition, null, column, values);
     }
 
     /**
@@ -126,13 +161,19 @@ public interface Func<Children> extends Serializable {
      * @param values    数据数组
      * @return children
      */
-    Children notIn(boolean condition, KProperty<?> column, Object... values);
+    Children notIn(boolean condition, String alias, KProperty<?> column, Object... values);
 
-    /**
-     * ignore
-     */
+
     default Children inSql(KProperty<?> column, String inValue) {
-        return inSql(true, column, inValue);
+        return inSql(true, null, column, inValue);
+    }
+
+    default Children inSql(String alias, KProperty<?> column, String inValue) {
+        return inSql(true, alias, column, inValue);
+    }
+
+    default Children inSql(boolean condition, KProperty<?> column, String inValue) {
+        return inSql(condition, null, column, inValue);
     }
 
     /**
@@ -146,13 +187,19 @@ public interface Func<Children> extends Serializable {
      * @param inValue   sql语句
      * @return children
      */
-    Children inSql(boolean condition, KProperty<?> column, String inValue);
+    Children inSql(boolean condition, String alias, KProperty<?> column, String inValue);
 
-    /**
-     * ignore
-     */
+
     default Children notInSql(KProperty<?> column, String inValue) {
-        return notInSql(true, column, inValue);
+        return notInSql(true, null, column, inValue);
+    }
+
+    default Children notInSql(String alias, KProperty<?> column, String inValue) {
+        return notInSql(true, alias, column, inValue);
+    }
+
+    default Children notInSql(boolean condition, KProperty<?> column, String inValue) {
+        return notInSql(condition, null, column, inValue);
     }
 
     /**
@@ -166,26 +213,42 @@ public interface Func<Children> extends Serializable {
      * @param inValue   sql语句 ---&gt; 1,2,3,4,5,6 或者 select id from table where id &lt; 3
      * @return children
      */
-    Children notInSql(boolean condition, KProperty<?> column, String inValue);
+    Children notInSql(boolean condition, String alias, KProperty<?> column, String inValue);
 
+    default Children gtSql(KProperty<?> column, String inValue) {
+        return gtSql(true, null, column, inValue);
+    }
+
+    default Children gtSql(String alias, KProperty<?> column, String inValue) {
+        return gtSql(true, alias, column, inValue);
+    }
+
+    default Children gtSql(boolean condition, KProperty<?> column, String inValue) {
+        return gtSql(condition, null, column, inValue);
+    }
 
     /**
      * 字段 &gt; ( sql语句 )
      * <p>例1: gtSql("id", "1, 2, 3, 4, 5, 6")</p>
      * <p>例1: gtSql("id", "select id from table where name = 'JunJun'")</p>
      *
-     * @param condition
-     * @param column
-     * @param inValue
-     * @return
+     * @param condition 执行条件
+     * @param column    字段
+     * @param inValue   sql语句
+     * @return children
      */
-    Children gtSql(boolean condition, KProperty<?> column, String inValue);
+    Children gtSql(boolean condition, String alias, KProperty<?> column, String inValue);
 
-    /**
-     * ignore
-     */
-    default Children gtSql(KProperty<?> column, String inValue) {
-        return gtSql(true, column, inValue);
+    default Children geSql(KProperty<?> column, String inValue) {
+        return geSql(true, null, column, inValue);
+    }
+
+    default Children geSql(String alias, KProperty<?> column, String inValue) {
+        return geSql(true, alias, column, inValue);
+    }
+
+    default Children geSql(boolean condition, KProperty<?> column, String inValue) {
+        return geSql(condition, null, column, inValue);
     }
 
     /**
@@ -193,18 +256,24 @@ public interface Func<Children> extends Serializable {
      * <p>例1: geSql("id", "1, 2, 3, 4, 5, 6")</p>
      * <p>例1: geSql("id", "select id from table where name = 'JunJun'")</p>
      *
-     * @param condition
-     * @param column
-     * @param inValue
-     * @return
+     * @param condition 执行条件
+     * @param column    字段
+     * @param inValue   sql语句
+     * @return children
      */
-    Children geSql(boolean condition, KProperty<?> column, String inValue);
+    Children geSql(boolean condition, String alias, KProperty<?> column, String inValue);
 
-    /**
-     * ignore
-     */
-    default Children geSql(KProperty<?> column, String inValue) {
-        return geSql(true, column, inValue);
+
+    default Children ltSql(KProperty<?> column, String inValue) {
+        return ltSql(true, null, column, inValue);
+    }
+
+    default Children ltSql(String alias, KProperty<?> column, String inValue) {
+        return ltSql(true, alias, column, inValue);
+    }
+
+    default Children ltSql(boolean condition, KProperty<?> column, String inValue) {
+        return ltSql(condition, null, column, inValue);
     }
 
     /**
@@ -212,18 +281,23 @@ public interface Func<Children> extends Serializable {
      * <p>例1: ltSql("id", "1, 2, 3, 4, 5, 6")</p>
      * <p>例1: ltSql("id", "select id from table where name = 'JunJun'")</p>
      *
-     * @param condition
-     * @param column
-     * @param inValue
-     * @return
+     * @param condition 执行条件
+     * @param column    字段
+     * @param inValue   sql语句
+     * @return children
      */
-    Children ltSql(boolean condition, KProperty<?> column, String inValue);
+    Children ltSql(boolean condition, String alias, KProperty<?> column, String inValue);
 
-    /**
-     * ignore
-     */
-    default Children ltSql(KProperty<?> column, String inValue) {
-        return ltSql(true, column, inValue);
+    default Children leSql(KProperty<?> column, String inValue) {
+        return leSql(true, null, column, inValue);
+    }
+
+    default Children leSql(String alias, KProperty<?> column, String inValue) {
+        return leSql(true, alias, column, inValue);
+    }
+
+    default Children leSql(boolean condition, KProperty<?> column, String inValue) {
+        return leSql(condition, null, column, inValue);
     }
 
     /**
@@ -231,44 +305,40 @@ public interface Func<Children> extends Serializable {
      * <p>例1: leSql("id", "1, 2, 3, 4, 5, 6")</p>
      * <p>例1: leSql("id", "select id from table where name = 'JunJun'")</p>
      *
-     * @param condition
-     * @param column
-     * @param inValue
-     * @return
+     * @param condition 执行条件
+     * @param column    字段
+     * @param inValue   sql语句
+     * @return children
      */
-    Children leSql(boolean condition, KProperty<?> column, String inValue);
+    Children leSql(boolean condition, String alias, KProperty<?> column, String inValue);
 
-    /**
-     * ignore
-     */
-    default Children leSql(KProperty<?> column, String inValue) {
-        return leSql(true, column, inValue);
-    }
 
-    /**
-     * ignore
-     */
-    default Children groupBy(KProperty<?> column) {
-        return groupBy(true, column);
-    }
-
-    /**
-     * ignore
-     */
     default Children groupBy(List<KProperty<?>> column) {
-        return groupBy(true, column);
+        return groupBy(true, null, column);
     }
 
-    /**
-     * ignore
-     */
-    Children groupBy(boolean condition, List<KProperty<?>> columns);
+    default Children groupBy(String alias, List<KProperty<?>> column) {
+        return groupBy(true, alias, column);
+    }
 
-    /**
-     * ignore
-     */
-    default Children groupBy(KProperty<?> column, KProperty<?>... columns) {
-        return groupBy(true, column, columns);
+    default Children groupBy(boolean condition, List<KProperty<?>> columns) {
+        return groupBy(condition, null, columns);
+    }
+
+
+    Children groupBy(boolean condition, String alias, List<KProperty<?>> columns);
+
+
+    default Children groupBy(KProperty<?>... columns) {
+        return groupBy(true, null, columns);
+    }
+
+    default Children groupBy(String alias, KProperty<?>... columns) {
+        return groupBy(true, alias, columns);
+    }
+
+    default Children groupBy(boolean condition, KProperty<?>... columns) {
+        return groupBy(condition, null, columns);
     }
 
     /**
@@ -276,36 +346,42 @@ public interface Func<Children> extends Serializable {
      * <p>例: groupBy("id", "name")</p>
      *
      * @param condition 执行条件
-     * @param column    单个字段
      * @param columns   字段数组
      * @return children
      */
-    Children groupBy(boolean condition, KProperty<?> column, KProperty<?>... columns);
+    Children groupBy(boolean condition, String alias, KProperty<?>... columns);
 
-    /**
-     * ignore
-     */
+
     default Children orderByAsc(KProperty<?> column) {
-        return orderByAsc(true, column);
+        return orderByAsc(true, (String) null, column);
     }
 
-    /**
-     * ignore
-     */
+    default Children orderByAsc(String alias, KProperty<?> column) {
+        return orderByAsc(true, alias, column);
+    }
+
+
     default Children orderByAsc(List<KProperty<?>> columns) {
-        return orderByAsc(true, columns);
+        return orderByAsc(true, null, columns);
     }
 
-    /**
-     * ignore
-     */
-    Children orderByAsc(boolean condition, List<KProperty<?>> columns);
+    default Children orderByAsc(String alias, List<KProperty<?>> columns) {
+        return orderByAsc(true, alias, columns);
+    }
 
-    /**
-     * ignore
-     */
-    default Children orderByAsc(KProperty<?> column, KProperty<?>... columns) {
-        return orderByAsc(true, column, columns);
+    default Children orderByAsc(boolean condition, List<KProperty<?>> columns) {
+        return orderByAsc(condition, null, columns);
+    }
+
+    Children orderByAsc(boolean condition, String alias, List<KProperty<?>> columns);
+
+
+    default Children orderByAsc(KProperty<?>... columns) {
+        return orderByAsc(true, null, columns);
+    }
+
+    default Children orderByAsc(String alias, KProperty<?>... columns) {
+        return orderByAsc(true, alias, columns);
     }
 
     /**
@@ -313,38 +389,38 @@ public interface Func<Children> extends Serializable {
      * <p>例: orderByAsc("id", "name")</p>
      *
      * @param condition 执行条件
-     * @param column    单个字段
      * @param columns   字段数组
      * @return children
      */
-    default Children orderByAsc(boolean condition, KProperty<?> column, KProperty<?>... columns) {
-        return orderBy(condition, true, column, columns);
+    default Children orderByAsc(boolean condition, KProperty<?>... columns) {
+        return orderBy(condition, true, null, columns);
     }
 
-    /**
-     * ignore
-     */
-    default Children orderByDesc(KProperty<?> column) {
-        return orderByDesc(true, column);
+    default Children orderByAsc(boolean condition, String alias, KProperty<?>... columns) {
+        return orderBy(condition, true, alias, columns);
     }
 
-    /**
-     * ignore
-     */
     default Children orderByDesc(List<KProperty<?>> columns) {
-        return orderByDesc(true, columns);
+        return orderByDesc(true, null, columns);
     }
 
-    /**
-     * ignore
-     */
-    Children orderByDesc(boolean condition, List<KProperty<?>> columns);
+    default Children orderByDesc(String alias, List<KProperty<?>> columns) {
+        return orderByDesc(true, alias, columns);
+    }
 
-    /**
-     * ignore
-     */
-    default Children orderByDesc(KProperty<?> column, KProperty<?>... columns) {
-        return orderByDesc(true, column, columns);
+    default Children orderByDesc(boolean condition, List<KProperty<?>> columns) {
+        return orderByDesc(condition, null, columns);
+    }
+
+    Children orderByDesc(boolean condition, String alias, List<KProperty<?>> columns);
+
+
+    default Children orderByDesc(KProperty<?>... columns) {
+        return orderByDesc(true, null, columns);
+    }
+
+    default Children orderByDesc(String alias, KProperty<?>... columns) {
+        return orderByDesc(true, alias, columns);
     }
 
     /**
@@ -352,12 +428,19 @@ public interface Func<Children> extends Serializable {
      * <p>例: orderByDesc("id", "name")</p>
      *
      * @param condition 执行条件
-     * @param column    单个字段
      * @param columns   字段数组
      * @return children
      */
-    default Children orderByDesc(boolean condition, KProperty<?> column, KProperty<?>... columns) {
-        return orderBy(condition, false, column, columns);
+    default Children orderByDesc(boolean condition, KProperty<?>... columns) {
+        return orderBy(condition, false, null, columns);
+    }
+
+    default Children orderByDesc(boolean condition, String alias, KProperty<?>... columns) {
+        return orderBy(condition, false, alias, columns);
+    }
+
+    default Children orderBy(boolean condition, boolean isAsc, KProperty<?>... columns) {
+        return orderBy(condition, isAsc, null, columns);
     }
 
     /**
@@ -366,15 +449,12 @@ public interface Func<Children> extends Serializable {
      *
      * @param condition 执行条件
      * @param isAsc     是否是 ASC 排序
-     * @param column    单个字段
      * @param columns   字段数组
      * @return children
      */
-    Children orderBy(boolean condition, boolean isAsc, KProperty<?> column, KProperty<?>... columns);
+    Children orderBy(boolean condition, boolean isAsc, String alias, KProperty<?>... columns);
 
-    /**
-     * ignore
-     */
+
     default Children having(String sqlHaving, Object... params) {
         return having(true, sqlHaving, params);
     }
@@ -391,9 +471,7 @@ public interface Func<Children> extends Serializable {
      */
     Children having(boolean condition, String sqlHaving, Object... params);
 
-    /**
-     * ignore
-     */
+
     default Children func(Consumer<Children> consumer) {
         return func(true, consumer);
     }

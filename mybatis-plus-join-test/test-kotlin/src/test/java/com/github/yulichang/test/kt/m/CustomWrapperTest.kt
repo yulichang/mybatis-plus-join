@@ -25,8 +25,9 @@ class CustomWrapperTest {
 
     //自定义wrapper扩展
     class CWrapper<T> : KtLambdaWrapper<T>() {
+
         fun eqIfAbsent(column: KProperty<*>, `val`: Any?): CWrapper<T> {
-            super.eq(Objects.nonNull(`val`), column, `val`)
+            eq(Objects.nonNull(`val`), column, `val`)
             return this
         }
 

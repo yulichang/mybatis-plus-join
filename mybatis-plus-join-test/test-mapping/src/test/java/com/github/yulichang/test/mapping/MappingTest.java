@@ -6,9 +6,9 @@ import com.github.yulichang.test.mapping.entity.UserDO;
 import com.github.yulichang.test.mapping.service.UserService;
 import com.github.yulichang.wrapper.MPJLambdaWrapper;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import javax.annotation.Resource;
 import java.util.List;
 
 /**
@@ -18,7 +18,7 @@ import java.util.List;
 @SuppressWarnings("unused")
 class MappingTest {
 
-    @Resource
+    @Autowired
     private UserService userService;
 
     @Test
@@ -47,7 +47,7 @@ class MappingTest {
         MPJLambdaWrapper<UserDO> wrapper = new MPJLambdaWrapper<UserDO>()
                 .selectAll(UserDO.class)
                 .leftJoin(AddressDO.class, AddressDO::getId, UserDO::getAddressId);
-        List<UserDO> dos = userService.listDeep(wrapper, conf -> conf.loop(true));
+        List<UserDO> dos = userService.listDeep(wrapper, conf -> conf.loop(false));
         System.out.println(1);
     }
 }

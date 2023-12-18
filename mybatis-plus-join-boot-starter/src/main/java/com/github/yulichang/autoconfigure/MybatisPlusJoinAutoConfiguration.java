@@ -7,15 +7,18 @@ import com.github.yulichang.config.ConfigProperties;
 import com.github.yulichang.config.MPJInterceptorConfig;
 import com.github.yulichang.config.enums.LogicDelTypeEnum;
 import com.github.yulichang.extension.mapping.config.MappingConfig;
-import com.github.yulichang.toolkit.SpringContentUtils;
 import com.github.yulichang.injector.MPJSqlInjector;
 import com.github.yulichang.interceptor.MPJInterceptor;
+import com.github.yulichang.toolkit.SpringContentUtils;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.mybatis.spring.SqlSessionFactoryBean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.ListableBeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
+import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
@@ -35,6 +38,7 @@ import org.springframework.core.annotation.Order;
 
 import javax.sql.DataSource;
 import java.util.List;
+import java.util.Map;
 
 /**
  * springboot 自动配置类
@@ -42,7 +46,6 @@ import java.util.List;
  * @author yulichang
  * @since 1.3.7
  */
-@SuppressWarnings("ALL")
 @Configuration(proxyBeanMethods = false)
 @ConditionalOnClass({SqlSessionFactory.class, SqlSessionFactoryBean.class})
 @ConditionalOnSingleCandidate(DataSource.class)
@@ -52,13 +55,12 @@ public class MybatisPlusJoinAutoConfiguration {
 
     private static final Logger logger = LoggerFactory.getLogger(MybatisPlusJoinAutoConfiguration.class);
 
-
     @SuppressWarnings("FieldCanBeLocal")
     private final MybatisPlusJoinProperties properties;
 
-
     public MybatisPlusJoinAutoConfiguration(MybatisPlusJoinProperties properties) {
         this.properties = properties;
+        ConfigProperties.banner = properties.getBanner();
         ConfigProperties.subTableLogic = properties.getSubTableLogic();
         ConfigProperties.msCache = properties.isMsCache();
         ConfigProperties.tableAlias = properties.getTableAlias();
@@ -81,6 +83,7 @@ public class MybatisPlusJoinAutoConfiguration {
      * mybatis plus 拦截器配置
      */
     @Bean
+    @Order(Ordered.HIGHEST_PRECEDENCE)
     @ConditionalOnClass({SqlSessionFactory.class, SqlSessionFactoryBean.class})
     public MPJInterceptorConfig mpjInterceptorConfig(@Autowired(required = false) List<SqlSessionFactory> sqlSessionFactoryList) {
         return new MPJInterceptorConfig(sqlSessionFactoryList, properties.getBanner());
@@ -112,41 +115,52 @@ public class MybatisPlusJoinAutoConfiguration {
         return new MPJSqlInjector();
     }
 
-    /**
-     * springboot context 工具类
-     */
-    @Bean
-    @Order(Ordered.HIGHEST_PRECEDENCE)
-    @ConditionalOnClass({SqlSessionFactory.class, SqlSessionFactoryBean.class})
-    public SpringContentUtils mpjSpringContent(@Autowired(required = false) MPJSpringContext springContext) {
-        return new SpringContentUtils(springContext);
-    }
-
     @Configuration
     @Order(Ordered.HIGHEST_PRECEDENCE)
     @ConditionalOnClass({SqlSessionFactory.class, SqlSessionFactoryBean.class})
     public static class MPJMappingConfig implements ApplicationListener<ApplicationReadyEvent> {
+
         @Override
         @SuppressWarnings("NullableProblems")
         public void onApplicationEvent(ApplicationReadyEvent applicationReadyEvent) {
-            new MappingConfig();
+            MappingConfig.init();
         }
     }
 
     @Configuration
     @ConditionalOnClass({SqlSessionFactory.class, SqlSessionFactoryBean.class})
-    public static class MPJSpringContext implements SpringContentUtils.SpringContext, ApplicationContextAware {
+    public static class MPJSpringContext implements SpringContentUtils.SpringContext, BeanFactoryPostProcessor, ApplicationContextAware {
 
         private ApplicationContext applicationContext;
 
+        private ListableBeanFactory listableBeanFactory;
+
         @Override
         public <T> T getBean(Class<T> clazz) {
-            return this.applicationContext.getBean(clazz);
+            return getBeanFactory().getBean(clazz);
         }
 
         @Override
+        public <T> Map<String, T> getBeansOfType(Class<T> clazz) {
+            return getBeanFactory().getBeansOfType(clazz);
+        }
+
+        private ListableBeanFactory getBeanFactory() {
+            return applicationContext == null ? listableBeanFactory : applicationContext;
+        }
+
+        @Override
+        @SuppressWarnings("NullableProblems")
         public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
             this.applicationContext = applicationContext;
+            SpringContentUtils.setSpringContext(this);
+        }
+
+        @Override
+        @SuppressWarnings("NullableProblems")
+        public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
+            this.listableBeanFactory = beanFactory;
+            SpringContentUtils.setSpringContext(this);
         }
     }
 }

@@ -18,24 +18,21 @@ import java.util.Objects;
  * @author yulichang
  * @since 1.4.5
  */
+@Getter
 @Accessors(chain = true)
 public class DeepConfig<T> {
 
     private static final DeepConfig<?> defaultConfig = new DeepConfig<>();
 
-    @Getter
     @Setter
     private List<SFunction<T, ?>> property;
 
-    @Getter
     @Setter
     private boolean loop = false;
 
-    @Getter
     @Setter
     private int deep = ConfigProperties.mappingMaxCount;
 
-    @Getter
     @Setter
     private int maxDeep = ConfigProperties.mappingMaxCount;
 

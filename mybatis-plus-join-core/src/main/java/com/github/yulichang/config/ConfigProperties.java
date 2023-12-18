@@ -13,6 +13,10 @@ public class ConfigProperties {
     /**
      * 是否开启副表逻辑删除
      */
+    public static boolean banner = true;
+    /**
+     * 是否开启副表逻辑删除
+     */
     public static boolean subTableLogic = true;
     /**
      * 是否开启 ms 缓存

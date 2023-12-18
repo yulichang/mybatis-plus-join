@@ -295,8 +295,7 @@ public class MPJTableFieldInfo {
 
     public BaseMapper<?> getJoinMapper() {
         if (this.joinMapper == null) {
-            MPJTableInfo joinTableInfo = MPJTableInfoHelper.getTableInfos().stream().filter(table ->
-                    table.getTableInfo().getEntityType() == this.joinClass).findFirst().orElse(null);
+            MPJTableInfo joinTableInfo = MPJTableInfoHelper.getTableInfo(this.joinClass);
             if (joinTableInfo == null) {
                 throw ExceptionUtils.mpe("未注册 mapper " + this.joinClass.getName());
             }

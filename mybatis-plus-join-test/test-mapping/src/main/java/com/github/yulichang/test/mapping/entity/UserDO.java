@@ -51,4 +51,8 @@ public class UserDO {
 //    @EntityMapping(thisField = "id", joinField = "pid")
     @FieldMapping(tag = UserDO.class, thisField = "id", joinField = "pid", select = "head_img")
     private List<String> pName;
+
+    @TableField(exist = false)
+    @EntityMapping(thisField = "id", joinField = "userId")
+    private List<AddressDO> addressList;
 }

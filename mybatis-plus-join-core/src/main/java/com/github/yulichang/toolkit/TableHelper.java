@@ -1,18 +1,23 @@
 package com.github.yulichang.toolkit;
 
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.TableInfo;
 import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
 import com.baomidou.mybatisplus.core.toolkit.ClassUtils;
+import com.github.yulichang.config.MPJInterceptorConfig;
 
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * @author yulichang
  * @since 1.4.3
  */
 public class TableHelper {
+
+    private static final AtomicBoolean load = new AtomicBoolean(false);
 
     private static final Map<Class<?>, TableInfo> TABLE_INFO_CACHE = new ConcurrentHashMap<>();
 
@@ -46,6 +51,13 @@ public class TableHelper {
             }
             if (Objects.nonNull(info)) {
                 TABLE_INFO_CACHE.put(currentClass, info);
+            } else {
+                if (!load.get()) {
+                    SpringContentUtils.getBean(MPJInterceptorConfig.class);
+                    SpringContentUtils.getBeansOfType(BaseMapper.class);
+                    load.set(true);
+                    return get(clazz);
+                }
             }
             return info;
         } else {

@@ -1,20 +1,24 @@
 package com.github.yulichang.extension.mapping.mapper;
 
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.TableInfo;
 import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
 import com.baomidou.mybatisplus.core.toolkit.ClassUtils;
 import com.baomidou.mybatisplus.core.toolkit.ReflectionKit;
 import com.github.yulichang.annotation.EntityMapping;
 import com.github.yulichang.annotation.FieldMapping;
+import com.github.yulichang.extension.mapping.config.MappingConfig;
 import com.github.yulichang.toolkit.MPJReflectionKit;
+import com.github.yulichang.toolkit.SpringContentUtils;
 import com.github.yulichang.toolkit.TableHelper;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * 拷贝 {@link TableInfoHelper}
@@ -23,6 +27,8 @@ import java.util.concurrent.ConcurrentHashMap;
  * @see TableInfoHelper
  */
 public class MPJTableInfoHelper {
+
+    private static final AtomicBoolean load = new AtomicBoolean(false);
 
     /**
      * 储存反射类表信息
@@ -41,18 +47,17 @@ public class MPJTableInfoHelper {
         if (clazz == null || MPJReflectionKit.isPrimitiveOrWrapper(clazz) || clazz == String.class || clazz.isInterface()) {
             return null;
         }
-        return TABLE_INFO_CACHE.get(clazz);
-    }
-
-    /**
-     * <p>
-     * 获取所有实体映射表信息
-     * </p>
-     *
-     * @return 数据库表反射信息集合
-     */
-    public static List<MPJTableInfo> getTableInfos() {
-        return Collections.unmodifiableList(new ArrayList<>(TABLE_INFO_CACHE.values()));
+        MPJTableInfo tableInfo = TABLE_INFO_CACHE.get(clazz);
+        if (Objects.nonNull(tableInfo)) {
+            return tableInfo;
+        }
+        if (!load.get()) {
+            SpringContentUtils.getBeansOfType(BaseMapper.class);
+            MappingConfig.init();
+            load.set(true);
+            return getTableInfo(clazz);
+        }
+        return null;
     }
 
     /**
@@ -121,6 +126,4 @@ public class MPJTableInfoHelper {
         /* 映射字段列表 */
         mpjTableInfo.setFieldList(mpjFieldList);
     }
-
-
 }

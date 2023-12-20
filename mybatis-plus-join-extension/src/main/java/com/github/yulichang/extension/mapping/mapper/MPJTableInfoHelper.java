@@ -18,7 +18,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * 拷贝 {@link TableInfoHelper}
@@ -28,7 +27,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 public class MPJTableInfoHelper {
 
-    private static final AtomicBoolean load = new AtomicBoolean(false);
+    private static boolean load = false;
 
     /**
      * 储存反射类表信息
@@ -51,10 +50,10 @@ public class MPJTableInfoHelper {
         if (Objects.nonNull(tableInfo)) {
             return tableInfo;
         }
-        if (!load.get()) {
+        if (!load) {
             SpringContentUtils.getBeansOfType(BaseMapper.class);
             MappingConfig.init();
-            load.set(true);
+            load = true;
             return getTableInfo(clazz);
         }
         return null;

@@ -9,7 +9,6 @@ import com.github.yulichang.config.MPJInterceptorConfig;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * @author yulichang
@@ -17,7 +16,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 public class TableHelper {
 
-    private static final AtomicBoolean load = new AtomicBoolean(false);
+    private static boolean load = false;
 
     private static final Map<Class<?>, TableInfo> TABLE_INFO_CACHE = new ConcurrentHashMap<>();
 
@@ -52,10 +51,10 @@ public class TableHelper {
             if (Objects.nonNull(info)) {
                 TABLE_INFO_CACHE.put(currentClass, info);
             } else {
-                if (!load.get()) {
+                if (!load) {
                     SpringContentUtils.getBean(MPJInterceptorConfig.class);
                     SpringContentUtils.getBeansOfType(BaseMapper.class);
-                    load.set(true);
+                    load = true;
                     return get(clazz);
                 }
             }

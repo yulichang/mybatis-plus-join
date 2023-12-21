@@ -16,7 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.ListableBeanFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
@@ -39,6 +39,7 @@ import org.springframework.core.annotation.Order;
 import javax.sql.DataSource;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * springboot 自动配置类
@@ -58,16 +59,22 @@ public class MybatisPlusJoinAutoConfiguration {
     @SuppressWarnings("FieldCanBeLocal")
     private final MybatisPlusJoinProperties properties;
 
-    public MybatisPlusJoinAutoConfiguration(MybatisPlusJoinProperties properties) {
-        this.properties = properties;
-        ConfigProperties.banner = properties.getBanner();
-        ConfigProperties.subTableLogic = properties.getSubTableLogic();
-        ConfigProperties.msCache = properties.isMsCache();
-        ConfigProperties.tableAlias = properties.getTableAlias();
-        ConfigProperties.joinPrefix = properties.getJoinPrefix();
-        ConfigProperties.logicDelType = "where".equalsIgnoreCase(properties.getLogicDelType()) ?
+    public MybatisPlusJoinAutoConfiguration(MybatisPlusJoinProperties properties,
+                                            ObjectProvider<MybatisPlusJoinPropertiesConsumer> propertiesConsumers) {
+        MybatisPlusJoinPropertiesConsumer propertiesConsumer = propertiesConsumers.getIfAvailable();
+        if (Objects.nonNull(propertiesConsumer)) {
+            this.properties = propertiesConsumer.config(properties);
+        } else {
+            this.properties = properties;
+        }
+        ConfigProperties.banner = this.properties.getBanner();
+        ConfigProperties.subTableLogic = this.properties.getSubTableLogic();
+        ConfigProperties.msCache = this.properties.isMsCache();
+        ConfigProperties.tableAlias = this.properties.getTableAlias();
+        ConfigProperties.joinPrefix = this.properties.getJoinPrefix();
+        ConfigProperties.logicDelType = "where".equalsIgnoreCase(this.properties.getLogicDelType()) ?
                 LogicDelTypeEnum.WHERE : LogicDelTypeEnum.ON;
-        ConfigProperties.mappingMaxCount = properties.getMappingMaxCount();
+        ConfigProperties.mappingMaxCount = this.properties.getMappingMaxCount();
     }
 
     /**
@@ -85,7 +92,7 @@ public class MybatisPlusJoinAutoConfiguration {
     @Bean
     @Order(Ordered.HIGHEST_PRECEDENCE)
     @ConditionalOnClass({SqlSessionFactory.class, SqlSessionFactoryBean.class})
-    public MPJInterceptorConfig mpjInterceptorConfig(@Autowired(required = false) List<SqlSessionFactory> sqlSessionFactoryList) {
+    public MPJInterceptorConfig mpjInterceptorConfig(List<SqlSessionFactory> sqlSessionFactoryList) {
         return new MPJInterceptorConfig(sqlSessionFactoryList, properties.getBanner());
     }
 

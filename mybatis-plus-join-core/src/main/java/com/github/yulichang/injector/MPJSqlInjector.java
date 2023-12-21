@@ -11,11 +11,11 @@ import com.baomidou.mybatisplus.core.metadata.TableInfo;
 import com.baomidou.mybatisplus.core.toolkit.ArrayUtils;
 import com.baomidou.mybatisplus.core.toolkit.ClassUtils;
 import com.baomidou.mybatisplus.core.toolkit.ExceptionUtils;
+import com.github.yulichang.adapter.base.tookit.VersionUtils;
 import com.github.yulichang.adapter.v3431.AbstractMethodV3431;
 import com.github.yulichang.method.*;
 import com.github.yulichang.toolkit.MPJTableMapperHelper;
 import com.github.yulichang.toolkit.TableHelper;
-import com.github.yulichang.adapter.base.tookit.VersionUtils;
 import com.github.yulichang.toolkit.reflect.GenericTypeUtils;
 import lombok.Getter;
 import org.apache.ibatis.builder.MapperBuilderAssistant;
@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toList;
@@ -167,7 +168,14 @@ public class MPJSqlInjector extends DefaultSqlInjector {
         Class<?> modelClass = getSuperClassGenericType(mapperClass, Mapper.class, 0);
         super.inspectInject(builderAssistant, mapperClass);
         MPJTableMapperHelper.init(modelClass, mapperClass);
-        TableHelper.init(modelClass, extractModelClassOld(mapperClass));
+        Supplier<Class<?>> supplier = () -> {
+            try {
+                return extractModelClassOld(mapperClass);
+            } catch (Throwable throwable) {
+                return null;
+            }
+        };
+        TableHelper.init(modelClass, supplier.get());
     }
 
     public static Class<?> getSuperClassGenericType(final Class<?> clazz, final Class<?> genericIfc, final int index) {

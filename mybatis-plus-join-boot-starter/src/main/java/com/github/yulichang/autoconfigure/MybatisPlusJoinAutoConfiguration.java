@@ -39,7 +39,7 @@ import org.springframework.core.annotation.Order;
 import javax.sql.DataSource;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
+import java.util.Optional;
 
 /**
  * springboot 自动配置类
@@ -61,12 +61,7 @@ public class MybatisPlusJoinAutoConfiguration {
 
     public MybatisPlusJoinAutoConfiguration(MybatisPlusJoinProperties properties,
                                             ObjectProvider<MybatisPlusJoinPropertiesConsumer> propertiesConsumers) {
-        MybatisPlusJoinPropertiesConsumer propertiesConsumer = propertiesConsumers.getIfAvailable();
-        if (Objects.nonNull(propertiesConsumer)) {
-            this.properties = propertiesConsumer.config(properties);
-        } else {
-            this.properties = properties;
-        }
+        this.properties = Optional.ofNullable(propertiesConsumers.getIfAvailable()).map(c -> c.config(properties)).orElse(properties);
         ConfigProperties.banner = this.properties.getBanner();
         ConfigProperties.subTableLogic = this.properties.getSubTableLogic();
         ConfigProperties.msCache = this.properties.isMsCache();

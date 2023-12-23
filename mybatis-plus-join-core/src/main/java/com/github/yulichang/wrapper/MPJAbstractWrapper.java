@@ -12,6 +12,8 @@ import com.baomidou.mybatisplus.core.toolkit.*;
 import com.baomidou.mybatisplus.core.toolkit.sql.SqlUtils;
 import com.baomidou.mybatisplus.core.toolkit.sql.StringEscape;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
+import com.github.yulichang.config.ConfigProperties;
+import com.github.yulichang.config.MybatisPlusJoinIfAbsent;
 import com.github.yulichang.toolkit.LambdaUtils;
 import com.github.yulichang.toolkit.MPJSqlInjectionUtils;
 import com.github.yulichang.toolkit.Ref;
@@ -39,8 +41,8 @@ import static java.util.stream.Collectors.joining;
  */
 @SuppressWarnings({"unchecked", "unused", "DuplicatedCode"})
 public abstract class MPJAbstractWrapper<T, Children extends MPJAbstractWrapper<T, Children>> extends Wrapper<T>
-        implements Compare<Children>, Nested<Children, Children>, Join<Children>, Func<Children>, OnCompare<Children>,
-        CompareStr<Children, String>, FuncStr<Children, String> {
+        implements CompareIfAbsent<Children>, Nested<Children, Children>, Join<Children>, Func<Children>, OnCompare<Children>,
+        CompareStrIfAbsent<Children, String>, FuncStr<Children, String> {
 
     /**
      * 占位符
@@ -116,6 +118,12 @@ public abstract class MPJAbstractWrapper<T, Children extends MPJAbstractWrapper<
      */
     protected boolean checkSqlInjection = false;
 
+    /**
+     * ifAbsent 策略
+     */
+    @Getter
+    protected MybatisPlusJoinIfAbsent ifAbsent = ConfigProperties.ifAbsent;
+
     @Override
     public T getEntity() {
         return entity;
@@ -164,6 +172,18 @@ public abstract class MPJAbstractWrapper<T, Children extends MPJAbstractWrapper<
      */
     public Children checkSqlInjection() {
         this.checkSqlInjection = true;
+        return typedThis;
+    }
+
+    /**
+     * 设置 ifAbsent
+     * .setIfAbsent(val -> val != null && StringUtils.isNotBlank(val))
+     *
+     * @param ifAbsent 判断
+     * @return Children
+     */
+    public Children setIfAbsent(MybatisPlusJoinIfAbsent ifAbsent) {
+        this.ifAbsent = ifAbsent;
         return typedThis;
     }
 
@@ -400,7 +420,7 @@ public abstract class MPJAbstractWrapper<T, Children extends MPJAbstractWrapper<
     public <R> Children groupBy(boolean condition, String alias, List<SFunction<R, ?>> columns) {
         return maybeDo(condition, () -> {
             if (CollectionUtils.isNotEmpty(columns)) {
-                final String finalOne =  columnsToString(index, isOn ? PrefixEnum.ON_FIRST : PrefixEnum.CD_FIRST, alias, columns);
+                final String finalOne = columnsToString(index, isOn ? PrefixEnum.ON_FIRST : PrefixEnum.CD_FIRST, alias, columns);
                 appendSqlSegments(GROUP_BY, () -> finalOne);
             }
         });
@@ -737,6 +757,7 @@ public abstract class MPJAbstractWrapper<T, Children extends MPJAbstractWrapper<
         index = null;
         isMain = true;
         isOn = false;
+        ifAbsent = ConfigProperties.ifAbsent;
     }
 
     /**

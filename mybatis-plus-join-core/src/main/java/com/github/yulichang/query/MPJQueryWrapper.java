@@ -11,10 +11,13 @@ import com.baomidou.mybatisplus.core.metadata.TableInfo;
 import com.baomidou.mybatisplus.core.toolkit.*;
 import com.github.yulichang.adapter.base.tookit.VersionUtils;
 import com.github.yulichang.config.ConfigProperties;
+import com.github.yulichang.config.MybatisPlusJoinIfAbsent;
+import com.github.yulichang.query.interfaces.CompareIfAbsent;
 import com.github.yulichang.query.interfaces.StringJoin;
 import com.github.yulichang.toolkit.Asserts;
 import com.github.yulichang.toolkit.MPJSqlInjectionUtils;
 import com.github.yulichang.toolkit.TableHelper;
+import com.github.yulichang.toolkit.ThrowOptional;
 import com.github.yulichang.wrapper.interfaces.Chain;
 import lombok.Getter;
 
@@ -38,7 +41,8 @@ import java.util.stream.Collectors;
  */
 @SuppressWarnings("unused")
 public class MPJQueryWrapper<T> extends AbstractWrapper<T, String, MPJQueryWrapper<T>> implements
-        Query<MPJQueryWrapper<T>, T, String>, StringJoin<MPJQueryWrapper<T>, T>, Chain<T> {
+        Query<MPJQueryWrapper<T>, T, String>, StringJoin<MPJQueryWrapper<T>, T>, Chain<T>,
+        CompareIfAbsent<MPJQueryWrapper<T>, String> {
 
     /**
      * 查询字段
@@ -85,6 +89,9 @@ public class MPJQueryWrapper<T> extends AbstractWrapper<T, String, MPJQueryWrapp
      */
     private boolean checkSqlInjection = false;
 
+    @Getter
+    private MybatisPlusJoinIfAbsent ifAbsent = ConfigProperties.ifAbsent;
+
 
     public MPJQueryWrapper() {
         super.initNeed();
@@ -115,9 +122,10 @@ public class MPJQueryWrapper<T> extends AbstractWrapper<T, String, MPJQueryWrapp
                            Map<String, Object> paramNameValuePairs, MergeSegments mergeSegments,
                            SharedString sqlSelect, SharedString from, SharedString lastSql,
                            SharedString sqlComment, SharedString sqlFirst,
-                           List<String> selectColumns, List<String> ignoreColumns, boolean selectDistinct) {
+                           List<String> selectColumns, List<String> ignoreColumns, boolean selectDistinct,
+                           MybatisPlusJoinIfAbsent ifAbsent) {
         super.setEntity(entity);
-        super.setEntityClass(entityClass);
+        setEntityClass(entityClass);
         this.paramNameSeq = paramNameSeq;
         this.paramNameValuePairs = paramNameValuePairs;
         this.expression = mergeSegments;
@@ -125,10 +133,11 @@ public class MPJQueryWrapper<T> extends AbstractWrapper<T, String, MPJQueryWrapp
         this.lastSql = lastSql;
         this.from = from;
         this.sqlComment = sqlComment;
-        this.sqlFirst = sqlFirst;
+        ThrowOptional.tryDo(() -> this.sqlFirst = sqlFirst).catchDo();
         this.selectColumns = selectColumns;
         this.ignoreColumns = ignoreColumns;
         this.selectDistinct = selectDistinct;
+        this.ifAbsent = ifAbsent;
     }
 
     /**
@@ -136,6 +145,11 @@ public class MPJQueryWrapper<T> extends AbstractWrapper<T, String, MPJQueryWrapp
      */
     public MPJQueryWrapper<T> checkSqlInjection() {
         this.checkSqlInjection = true;
+        return this;
+    }
+
+    public MPJQueryWrapper<T> setIfAbsent(MybatisPlusJoinIfAbsent ifAbsent) {
+        this.ifAbsent = ifAbsent;
         return this;
     }
 
@@ -315,6 +329,7 @@ public class MPJQueryWrapper<T> extends AbstractWrapper<T, String, MPJQueryWrapp
         return this.tableNameFunc.apply(tableName);
     }
 
+    @SuppressWarnings("DuplicatedCode")
     public String getTableNameEnc(String tableName) {
         String decode;
         try {
@@ -333,7 +348,33 @@ public class MPJQueryWrapper<T> extends AbstractWrapper<T, String, MPJQueryWrapp
      */
     public MPJLambdaQueryWrapper<T> lambda() {
         return new MPJLambdaQueryWrapper<>(getEntity(), getEntityClass(), from, sqlSelect, paramNameSeq, paramNameValuePairs,
-                expression, lastSql, sqlComment, sqlFirst, selectColumns, ignoreColumns, selectDistinct);
+                expression, lastSql, sqlComment, getSqlFirstField(), selectColumns, ignoreColumns, selectDistinct, ifAbsent);
+    }
+
+    @Override
+    public Class<T> getEntityClass() {
+        try {
+            return super.getEntityClass();
+        } catch (Throwable throwable) {
+            return null;
+        }
+    }
+
+    @Override
+    public MPJQueryWrapper<T> setEntityClass(Class<T> entityClass) {
+        try {
+            return super.setEntityClass(entityClass);
+        } catch (Throwable throwable) {
+            return this;
+        }
+    }
+
+    public SharedString getSqlFirstField() {
+        try {
+            return sqlSelect;
+        } catch (Throwable throwable) {
+            return SharedString.emptyString();
+        }
     }
 
     /**
@@ -343,7 +384,8 @@ public class MPJQueryWrapper<T> extends AbstractWrapper<T, String, MPJQueryWrapp
     @Override
     protected MPJQueryWrapper<T> instance() {
         return new MPJQueryWrapper<>(getEntity(), getEntityClass(), paramNameSeq, paramNameValuePairs, new MergeSegments(),
-                null, null, SharedString.emptyString(), SharedString.emptyString(), SharedString.emptyString(), null, null, selectDistinct);
+                null, null, SharedString.emptyString(), SharedString.emptyString(), SharedString.emptyString(),
+                null, null, selectDistinct, ifAbsent);
     }
 
 
@@ -354,6 +396,7 @@ public class MPJQueryWrapper<T> extends AbstractWrapper<T, String, MPJQueryWrapp
         from.toNull();
         selectColumns.clear();
         ignoreColumns.clear();
+        ifAbsent = ConfigProperties.ifAbsent;
     }
 
     @Override

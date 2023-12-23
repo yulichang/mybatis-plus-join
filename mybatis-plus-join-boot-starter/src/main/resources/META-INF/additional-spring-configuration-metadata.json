@@ -40,8 +40,8 @@
     },
     {
       "name": "mybatis-plus-join.logic-del-type",
-      "defaultValue": "on",
-      "type": "java.lang.String",
+      "defaultValue": "com.github.yulichang.config.enums.LogicDelTypeEnum.ON",
+      "type": "com.github.yulichang.config.enums.LogicDelTypeEnum",
       "description": "逻辑删除的位置支持where和on两个."
     },
     {
@@ -55,21 +55,12 @@
       "defaultValue": "st",
       "type": "java.lang.String",
       "description": "子查询表别名."
-    }
-  ],
-  "hints": [
+    },
     {
-      "name": "mybatis-plus-join.logic-del-type",
-      "values": [
-        {
-          "value": "where",
-          "description": "logic delete condition to where."
-        },
-        {
-          "value": "on",
-          "description": "logic delete condition to on."
-        }
-      ]
+      "name": "mybatis-plus-join.ifAbsent",
+      "defaultValue": "com.github.yulichang.config.enums.IfAbsentEnum.NOT_EMPTY",
+      "type": "com.github.yulichang.config.enums.IfAbsentEnum",
+      "description": "IfAbsent方法判断策略,如需自定义请用@Bean形式MybatisPlusJoinIfAbsent."
     }
   ]
 }

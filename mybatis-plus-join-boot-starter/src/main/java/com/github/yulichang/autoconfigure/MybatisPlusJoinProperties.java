@@ -1,5 +1,7 @@
 package com.github.yulichang.autoconfigure;
 
+import com.github.yulichang.config.enums.IfAbsentEnum;
+import com.github.yulichang.config.enums.LogicDelTypeEnum;
 import lombok.Data;
 import lombok.experimental.Accessors;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -43,7 +45,7 @@ public class MybatisPlusJoinProperties {
     /**
      * 逻辑删除类型 支持 where on
      */
-    private String logicDelType = "on";
+    private LogicDelTypeEnum logicDelType = LogicDelTypeEnum.ON;
 
     /**
      * 映射查询最大深度
@@ -54,4 +56,15 @@ public class MybatisPlusJoinProperties {
      * 子查询别名
      */
     private String subQueryAlias = "st";
+
+    /**
+     * Wrapper ifAbsent 判断策略
+     * <p>
+     * NOT_NULL 非null
+     * <p>
+     * NOT_EMPTY 非空字符串   例： "" -> false, " " -> true ...
+     * <p>
+     * NOT_BLANK 非空白字符串  例： "" -> false, " " -> false, "\r" -> false, "abc" -> true ...
+     */
+    private IfAbsentEnum ifAbsent = IfAbsentEnum.NOT_EMPTY;
 }

@@ -115,4 +115,35 @@ class QueryWrapperTest {
         System.out.println(joinMaps);
     }
 
+    @Test
+    void test5() {
+        ThreadLocalUtils.set("SELECT t.id, t.pid, t.`name`, t.`json`, t.sex, t.head_img, t.create_time, t.address_id, " +
+                "t.address_id2, t.del, t.create_by, t.update_by FROM `user` t LEFT JOIN address t2 ON t2.user_id = t.id " +
+                "WHERE t.del = false AND (t.id <= ?)");
+        List<UserDO> userDO = userMapper.selectJoinList(UserDO.class, new MPJQueryWrapper<UserDO>()
+                .selectAll(UserDO.class)
+                .leftJoin("address t2 on t2.user_id = t.id")
+                .le("t.id ", 10).lambda());
+        System.out.println(userDO);
+
+        ThreadLocalUtils.set("SELECT t.id, t.pid, t.`name`, t.`json`, t.sex, t.head_img, t.create_time, t.address_id, " +
+                "t.address_id2, t.del, t.create_by, t.update_by, t2.address AS userAddress FROM `user` t " +
+                "LEFT JOIN address t2 ON t2.user_id = t.id WHERE t.del = false AND (t.id <= ?)");
+        List<UserDTO> dto = userMapper.selectJoinList(UserDTO.class, new MPJQueryWrapper<UserDO>()
+                .selectAll(UserDO.class)
+                .select("t2.address AS userAddress")
+                .leftJoin("address t2 on t2.user_id = t.id")
+                .le("t.id ", 10).lambda());
+        System.out.println(dto);
+    }
+
+    @Test
+    void test6() {
+        ThreadLocalUtils.set("SELECT t.id AS idea, t.user_id AS uuid, t.tenant_id FROM user_tenant t WHERE (t.id <= ?) AND t.tenant_id = 1");
+        List<UserTenantDO> userDO = userTenantMapper.selectJoinList(UserTenantDO.class, new MPJQueryWrapper<UserTenantDO>()
+                .selectAll(UserTenantDO.class)
+                .le("t.id ", 10).lambda());
+        System.out.println(userDO);
+    }
+
 }

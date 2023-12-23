@@ -6,18 +6,22 @@ import com.baomidou.mybatisplus.core.conditions.query.Query;
 import com.baomidou.mybatisplus.core.conditions.segments.MergeSegments;
 import com.baomidou.mybatisplus.core.metadata.TableFieldInfo;
 import com.baomidou.mybatisplus.core.metadata.TableInfo;
-import com.baomidou.mybatisplus.core.toolkit.ArrayUtils;
-import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
-import com.baomidou.mybatisplus.core.toolkit.StringPool;
-import com.baomidou.mybatisplus.core.toolkit.StringUtils;
+import com.baomidou.mybatisplus.core.toolkit.*;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.github.yulichang.config.ConfigProperties;
+import com.github.yulichang.config.MybatisPlusJoinIfAbsent;
+import com.github.yulichang.query.interfaces.CompareIfAbsent;
 import com.github.yulichang.query.interfaces.StringJoin;
 import com.github.yulichang.toolkit.Asserts;
 import com.github.yulichang.toolkit.TableHelper;
+import com.github.yulichang.toolkit.ThrowOptional;
+import lombok.Getter;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -30,7 +34,8 @@ import java.util.stream.Collectors;
  */
 @SuppressWarnings("unused")
 public class MPJLambdaQueryWrapper<T> extends AbstractLambdaWrapper<T, MPJLambdaQueryWrapper<T>>
-        implements Query<MPJLambdaQueryWrapper<T>, T, SFunction<T, ?>>, StringJoin<MPJLambdaQueryWrapper<T>, T> {
+        implements Query<MPJLambdaQueryWrapper<T>, T, SFunction<T, ?>>, StringJoin<MPJLambdaQueryWrapper<T>, T>,
+        CompareIfAbsent<MPJLambdaQueryWrapper<T>, SFunction<T, ?>> {
 
     /**
      * 查询字段
@@ -45,7 +50,8 @@ public class MPJLambdaQueryWrapper<T> extends AbstractLambdaWrapper<T, MPJLambda
     /**
      * 主表别名
      */
-    private final String alias = ConfigProperties.tableAlias;
+    @Getter
+    private String alias = ConfigProperties.tableAlias;
 
     /**
      * 查询的列
@@ -61,6 +67,17 @@ public class MPJLambdaQueryWrapper<T> extends AbstractLambdaWrapper<T, MPJLambda
      * 是否 select distinct
      */
     private boolean selectDistinct = false;
+    /**
+     * 主表逻辑删除
+     */
+    private boolean logicSql = true;
+    /**
+     * 动态表名
+     */
+    private Function<String, String> tableNameFunc;
+
+    @Getter
+    private MybatisPlusJoinIfAbsent ifAbsent = ConfigProperties.ifAbsent;
 
     /**
      * 不建议直接 new 该实例，使用 Wrappers.lambdaQuery(entity)
@@ -75,9 +92,10 @@ public class MPJLambdaQueryWrapper<T> extends AbstractLambdaWrapper<T, MPJLambda
     MPJLambdaQueryWrapper(T entity, Class<T> entityClass, SharedString from, SharedString sqlSelect, AtomicInteger paramNameSeq,
                           Map<String, Object> paramNameValuePairs, MergeSegments mergeSegments,
                           SharedString lastSql, SharedString sqlComment, SharedString sqlFirst,
-                          List<String> selectColumns, List<String> ignoreColumns, boolean selectDistinct) {
+                          List<String> selectColumns, List<String> ignoreColumns, boolean selectDistinct,
+                          MybatisPlusJoinIfAbsent ifAbsent) {
         super.setEntity(entity);
-        super.setEntityClass(entityClass);
+        setEntityClass(entityClass);
         this.paramNameSeq = paramNameSeq;
         this.paramNameValuePairs = paramNameValuePairs;
         this.expression = mergeSegments;
@@ -85,10 +103,11 @@ public class MPJLambdaQueryWrapper<T> extends AbstractLambdaWrapper<T, MPJLambda
         this.from = from;
         this.lastSql = lastSql;
         this.sqlComment = sqlComment;
-        this.sqlFirst = sqlFirst;
+        ThrowOptional.tryDo(() -> this.sqlFirst = sqlFirst).catchDo();
         this.selectColumns = selectColumns;
         this.ignoreColumns = ignoreColumns;
         this.selectDistinct = selectDistinct;
+        this.ifAbsent = ifAbsent;
     }
 
     /**
@@ -214,7 +233,8 @@ public class MPJLambdaQueryWrapper<T> extends AbstractLambdaWrapper<T, MPJLambda
      */
     public MPJQueryWrapper<T> stringQuery() {
         return new MPJQueryWrapper<>(getEntity(), getEntityClass(), paramNameSeq, paramNameValuePairs,
-                expression, sqlSelect, from, lastSql, sqlComment, sqlFirst, selectColumns, ignoreColumns, selectDistinct);
+                expression, sqlSelect, from, lastSql, sqlComment, sqlFirst, selectColumns, ignoreColumns,
+                selectDistinct, ifAbsent);
     }
 
     @Override
@@ -241,13 +261,84 @@ public class MPJLambdaQueryWrapper<T> extends AbstractLambdaWrapper<T, MPJLambda
         return from.getStringValue();
     }
 
-
-    public String getAlias() {
-        return alias;
+    public MPJLambdaQueryWrapper<T> setAlias(String alias) {
+        Assert.isTrue(StringUtils.isNotBlank(alias), "别名不能为空");
+        this.alias = alias;
+        return typedThis;
     }
+
+    /**
+     * 逻辑删除
+     */
+    public String getSubLogicSql() {
+        return StringPool.EMPTY;
+    }
+
+    /**
+     * 关闭主表逻辑删除
+     */
+    public MPJLambdaQueryWrapper<T> disableLogicDel() {
+        this.logicSql = false;
+        return typedThis;
+    }
+
+    /**
+     * 启用主表逻辑删除
+     */
+    public MPJLambdaQueryWrapper<T> enableLogicDel() {
+        this.logicSql = true;
+        return typedThis;
+    }
+
+    /**
+     * 逻辑删除
+     */
+    public boolean getLogicSql() {
+        return logicSql;
+    }
+
 
     public boolean getSelectDistinct() {
         return selectDistinct;
+    }
+
+    /**
+     * 动态表名
+     * 如果主表需要动态表名,主表实体必须添加 @DynamicTableName 注解
+     * 关联表则不需要 加不加注解都会生效
+     * <p>
+     *
+     * @see com.github.yulichang.annotation.DynamicTableName
+     */
+    public MPJLambdaQueryWrapper<T> setTableName(Function<String, String> func) {
+        this.tableNameFunc = func;
+        return typedThis;
+    }
+
+    public String getTableName(String tableName) {
+        if (this.tableNameFunc == null) {
+            return tableName;
+        }
+        return this.tableNameFunc.apply(tableName);
+    }
+
+    @SuppressWarnings("DuplicatedCode")
+    public String getTableNameEnc(String tableName) {
+        String decode;
+        try {
+            decode = URLDecoder.decode(tableName, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            decode = tableName;
+        }
+        if (this.tableNameFunc == null) {
+            return decode;
+        }
+        return this.tableNameFunc.apply(decode);
+    }
+
+    public MPJLambdaQueryWrapper<T> setIfAbsent(MybatisPlusJoinIfAbsent ifAbsent) {
+        this.ifAbsent = ifAbsent;
+        return typedThis;
     }
 
     /**
@@ -257,7 +348,34 @@ public class MPJLambdaQueryWrapper<T> extends AbstractLambdaWrapper<T, MPJLambda
     @Override
     protected MPJLambdaQueryWrapper<T> instance() {
         return new MPJLambdaQueryWrapper<>(getEntity(), getEntityClass(), null, null, paramNameSeq, paramNameValuePairs,
-                new MergeSegments(), SharedString.emptyString(), SharedString.emptyString(), SharedString.emptyString(), null, null, selectDistinct);
+                new MergeSegments(), SharedString.emptyString(), SharedString.emptyString(), SharedString.emptyString(),
+                null, null, selectDistinct, ifAbsent);
+    }
+
+    @Override
+    public Class<T> getEntityClass() {
+        try {
+            return super.getEntityClass();
+        } catch (Throwable throwable) {
+            return null;
+        }
+    }
+
+    @Override
+    public MPJLambdaQueryWrapper<T> setEntityClass(Class<T> entityClass) {
+        try {
+            return super.setEntityClass(entityClass);
+        } catch (Throwable throwable) {
+            return this;
+        }
+    }
+
+    public SharedString getSqlFirstField() {
+        try {
+            return sqlSelect;
+        } catch (Throwable throwable) {
+            return SharedString.emptyString();
+        }
     }
 
     @Override
@@ -267,6 +385,7 @@ public class MPJLambdaQueryWrapper<T> extends AbstractLambdaWrapper<T, MPJLambda
         from.toNull();
         selectColumns.clear();
         ignoreColumns.clear();
+        ifAbsent = ConfigProperties.ifAbsent;
     }
 
     @Override

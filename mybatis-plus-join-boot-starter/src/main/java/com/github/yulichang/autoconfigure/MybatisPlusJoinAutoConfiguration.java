@@ -5,7 +5,7 @@ import com.baomidou.mybatisplus.core.injector.ISqlInjector;
 import com.github.yulichang.autoconfigure.conditional.MPJSqlInjectorCondition;
 import com.github.yulichang.config.ConfigProperties;
 import com.github.yulichang.config.MPJInterceptorConfig;
-import com.github.yulichang.config.enums.LogicDelTypeEnum;
+import com.github.yulichang.config.MybatisPlusJoinIfAbsent;
 import com.github.yulichang.extension.mapping.config.MappingConfig;
 import com.github.yulichang.injector.MPJSqlInjector;
 import com.github.yulichang.interceptor.MPJInterceptor;
@@ -56,20 +56,21 @@ public class MybatisPlusJoinAutoConfiguration {
 
     private static final Logger logger = LoggerFactory.getLogger(MybatisPlusJoinAutoConfiguration.class);
 
-    @SuppressWarnings("FieldCanBeLocal")
     private final MybatisPlusJoinProperties properties;
 
     public MybatisPlusJoinAutoConfiguration(MybatisPlusJoinProperties properties,
-                                            ObjectProvider<MybatisPlusJoinPropertiesConsumer> propertiesConsumers) {
+                                            ObjectProvider<MybatisPlusJoinPropertiesConsumer> propertiesConsumers,
+                                            ObjectProvider<MybatisPlusJoinIfAbsent> ifAbsentConsumers) {
         this.properties = Optional.ofNullable(propertiesConsumers.getIfAvailable()).map(c -> c.config(properties)).orElse(properties);
         ConfigProperties.banner = this.properties.getBanner();
         ConfigProperties.subTableLogic = this.properties.getSubTableLogic();
         ConfigProperties.msCache = this.properties.isMsCache();
         ConfigProperties.tableAlias = this.properties.getTableAlias();
         ConfigProperties.joinPrefix = this.properties.getJoinPrefix();
-        ConfigProperties.logicDelType = "where".equalsIgnoreCase(this.properties.getLogicDelType()) ?
-                LogicDelTypeEnum.WHERE : LogicDelTypeEnum.ON;
+        ConfigProperties.logicDelType = this.properties.getLogicDelType();
         ConfigProperties.mappingMaxCount = this.properties.getMappingMaxCount();
+        ConfigProperties.ifAbsent = Optional.ofNullable(ifAbsentConsumers.getIfAvailable()).orElse(this.properties.getIfAbsent());
+        info("mybatis plus join properties config complete");
     }
 
     /**
@@ -101,7 +102,7 @@ public class MybatisPlusJoinAutoConfiguration {
     @ConditionalOnBean(ISqlInjector.class)
     @ConditionalOnClass({SqlSessionFactory.class, SqlSessionFactoryBean.class})
     public MPJSqlInjector mpjSqlInjector(ISqlInjector sqlInjector) {
-        logger.info("MPJSqlInjector init");
+        info("mybatis plus join SqlInjector init");
         return new MPJSqlInjector(sqlInjector);
     }
 
@@ -113,7 +114,7 @@ public class MybatisPlusJoinAutoConfiguration {
     @ConditionalOnMissingBean(ISqlInjector.class)
     @ConditionalOnClass({SqlSessionFactory.class, SqlSessionFactoryBean.class})
     public MPJSqlInjector mpjSqlInjectorOnMiss() {
-        logger.info("MPJSqlInjector init");
+        info("mybatis plus join SqlInjector init");
         return new MPJSqlInjector();
     }
 
@@ -126,6 +127,12 @@ public class MybatisPlusJoinAutoConfiguration {
         @SuppressWarnings("NullableProblems")
         public void onApplicationEvent(ApplicationReadyEvent applicationReadyEvent) {
             MappingConfig.init();
+        }
+    }
+
+    private void info(String info) {
+        if (properties.getBanner()) {
+            logger.info(info);
         }
     }
 

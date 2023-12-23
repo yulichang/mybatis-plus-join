@@ -11,7 +11,9 @@ import com.baomidou.mybatisplus.core.exceptions.MybatisPlusException;
 import com.baomidou.mybatisplus.core.toolkit.*;
 import com.baomidou.mybatisplus.core.toolkit.sql.SqlUtils;
 import com.baomidou.mybatisplus.core.toolkit.sql.StringEscape;
-import com.github.yulichang.kt.interfaces.Compare;
+import com.github.yulichang.config.ConfigProperties;
+import com.github.yulichang.config.MybatisPlusJoinIfAbsent;
+import com.github.yulichang.kt.interfaces.CompareIfAbsent;
 import com.github.yulichang.kt.interfaces.Func;
 import com.github.yulichang.kt.interfaces.OnCompare;
 import com.github.yulichang.toolkit.KtUtils;
@@ -20,7 +22,7 @@ import com.github.yulichang.toolkit.Ref;
 import com.github.yulichang.toolkit.TableList;
 import com.github.yulichang.toolkit.sql.SqlScriptUtils;
 import com.github.yulichang.wrapper.enums.PrefixEnum;
-import com.github.yulichang.wrapper.interfaces.CompareStr;
+import com.github.yulichang.wrapper.interfaces.CompareStrIfAbsent;
 import com.github.yulichang.wrapper.interfaces.FuncStr;
 import com.github.yulichang.wrapper.interfaces.Join;
 import kotlin.reflect.KProperty;
@@ -44,8 +46,8 @@ import static java.util.stream.Collectors.joining;
  */
 @SuppressWarnings({"unused", "unchecked", "DuplicatedCode"})
 public abstract class KtAbstractWrapper<T, Children extends KtAbstractWrapper<T, Children>> extends Wrapper<T>
-        implements Compare<Children>, Nested<Children, Children>, Join<Children>, Func<Children>, OnCompare<Children>,
-        CompareStr<Children, String>, FuncStr<Children, String> {
+        implements CompareIfAbsent<Children>, Nested<Children, Children>, Join<Children>, Func<Children>, OnCompare<Children>,
+        CompareStrIfAbsent<Children, String>, FuncStr<Children, String> {
 
     /**
      * 占位符
@@ -121,6 +123,12 @@ public abstract class KtAbstractWrapper<T, Children extends KtAbstractWrapper<T,
      */
     protected boolean checkSqlInjection = false;
 
+    /**
+     * ifAbsent 策略
+     */
+    @Getter
+    protected MybatisPlusJoinIfAbsent ifAbsent = ConfigProperties.ifAbsent;
+
     @Override
     public T getEntity() {
         return entity;
@@ -169,6 +177,11 @@ public abstract class KtAbstractWrapper<T, Children extends KtAbstractWrapper<T,
      */
     public Children checkSqlInjection() {
         this.checkSqlInjection = true;
+        return typedThis;
+    }
+
+    public Children setIfAbsent(MybatisPlusJoinIfAbsent ifAbsent) {
+        this.ifAbsent = ifAbsent;
         return typedThis;
     }
 
@@ -630,6 +643,7 @@ public abstract class KtAbstractWrapper<T, Children extends KtAbstractWrapper<T,
         index = null;
         isMain = true;
         isNo = false;
+        ifAbsent = ConfigProperties.ifAbsent;
     }
 
     /**

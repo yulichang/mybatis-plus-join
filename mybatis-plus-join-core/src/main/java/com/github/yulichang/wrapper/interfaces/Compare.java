@@ -305,6 +305,28 @@ public interface Compare<Children> extends Serializable {
      */
     <R> Children likeLeft(boolean condition, String alias, SFunction<R, ?> column, Object val);
 
+    default <R> Children notLikeLeft(SFunction<R, ?> column, Object val) {
+        return notLikeLeft(true, null, column, val);
+    }
+
+    default <R> Children notLikeLeft(String alias, SFunction<R, ?> column, Object val) {
+        return notLikeLeft(true, alias, column, val);
+    }
+
+    default <R> Children notLikeLeft(boolean condition, SFunction<R, ?> column, Object val) {
+        return notLikeLeft(condition, null, column, val);
+    }
+
+    /**
+     * LIKE '%值'
+     *
+     * @param condition 执行条件
+     * @param column    字段
+     * @param val       值
+     * @return children
+     */
+    <R> Children notLikeLeft(boolean condition, String alias, SFunction<R, ?> column, Object val);
+
     default <R> Children likeRight(SFunction<R, ?> column, Object val) {
         return likeRight(true, null, column, val);
     }
@@ -326,4 +348,26 @@ public interface Compare<Children> extends Serializable {
      * @return children
      */
     <R> Children likeRight(boolean condition, String alias, SFunction<R, ?> column, Object val);
+
+    default <R> Children notLikeRight(SFunction<R, ?> column, Object val) {
+        return notLikeRight(true, null, column, val);
+    }
+
+    default <R> Children notLikeRight(String alias, SFunction<R, ?> column, Object val) {
+        return notLikeRight(true, alias, column, val);
+    }
+
+    default <R> Children notLikeRight(boolean condition, SFunction<R, ?> column, Object val) {
+        return notLikeRight(condition, null, column, val);
+    }
+
+    /**
+     * LIKE '值%'
+     *
+     * @param condition 执行条件
+     * @param column    字段
+     * @param val       值
+     * @return children
+     */
+    <R> Children notLikeRight(boolean condition, String alias, SFunction<R, ?> column, Object val);
 }

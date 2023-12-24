@@ -28,7 +28,7 @@ import java.util.stream.Collectors;
  * @since 1.4.5
  */
 @SuppressWarnings("unused")
-public class UpdateJoinWrapper<T> extends MPJAbstractLambdaWrapper<T, UpdateJoinWrapper<T>>
+public class UpdateJoinWrapper<T> extends JoinAbstractLambdaWrapper<T, UpdateJoinWrapper<T>>
         implements Update<UpdateJoinWrapper<T>> {
     /**
      * SQL 更新字段内容，例如：name='1', age=2

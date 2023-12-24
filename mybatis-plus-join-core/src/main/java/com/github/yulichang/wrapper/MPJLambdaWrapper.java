@@ -31,7 +31,7 @@ import java.util.stream.Collectors;
  * @author yulichang
  */
 @SuppressWarnings({"unused", "DuplicatedCode"})
-public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWrapper<T>> implements
+public class MPJLambdaWrapper<T> extends JoinAbstractLambdaWrapper<T, MPJLambdaWrapper<T>> implements
         Query<MPJLambdaWrapper<T>>, QueryLabel<MPJLambdaWrapper<T>>, Chain<T>, SelectWrapper<T, MPJLambdaWrapper<T>> {
 
     /**

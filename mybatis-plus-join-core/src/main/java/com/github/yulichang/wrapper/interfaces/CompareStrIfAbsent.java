@@ -54,4 +54,12 @@ public interface CompareStrIfAbsent<Children, R> extends CompareStr<Children, R>
     default Children likeRightIfAbsent(R column, Object val) {
         return likeRight(getIfAbsent().test(val, IfAbsentSqlKeyWordEnum.LIKE_RIGHT), column, val);
     }
+
+    default Children notLikeLeftIfAbsent(R column, Object val) {
+        return notLikeLeft(getIfAbsent().test(val, IfAbsentSqlKeyWordEnum.NOT_LIKE_LEFT), column, val);
+    }
+
+    default Children notLikeRightIfAbsent(R column, Object val) {
+        return notLikeRight(getIfAbsent().test(val, IfAbsentSqlKeyWordEnum.NOT_LIKE_RIGHT), column, val);
+    }
 }

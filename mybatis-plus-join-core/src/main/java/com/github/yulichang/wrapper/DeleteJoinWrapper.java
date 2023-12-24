@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
  * @author yulichang
  * @since 1.4.5
  */
-public class DeleteJoinWrapper<T> extends MPJAbstractLambdaWrapper<T, DeleteJoinWrapper<T>> {
+public class DeleteJoinWrapper<T> extends JoinAbstractLambdaWrapper<T, DeleteJoinWrapper<T>> {
 
     /**
      * 删除表
@@ -100,6 +100,7 @@ public class DeleteJoinWrapper<T> extends MPJAbstractLambdaWrapper<T, DeleteJoin
      * 获取删除的表
      */
     @Override
+    @SuppressWarnings("DuplicatedCode")
     public String getDeleteLogicSql() {
         if (StringUtils.isNotBlank(this.deleteSql.getStringValue())) {
             return this.deleteSql.getStringValue();
@@ -153,6 +154,7 @@ public class DeleteJoinWrapper<T> extends MPJAbstractLambdaWrapper<T, DeleteJoin
     /**
      * 删除表
      */
+    @SuppressWarnings("DuplicatedCode")
     public DeleteJoinWrapper<T> delete(Class<?>... deleteClass) {
         Class<T> entityClass = getEntityClass();
         Assert.notNull(entityClass, "缺少主表类型, 请使用 new MPJLambdaWrapper<>(主表.class) 或 JoinWrappers.lambda(主表.class) 构造方法");
@@ -164,6 +166,7 @@ public class DeleteJoinWrapper<T> extends MPJAbstractLambdaWrapper<T, DeleteJoin
         return typedThis;
     }
 
+    @SuppressWarnings({"DuplicatedCode", "DataFlowIssue"})
     private void check(List<Class<?>> classList) {
         Class<T> entityClass = getEntityClass();
         TableInfo tableInfo = TableHelper.get(entityClass);
@@ -185,7 +188,8 @@ public class DeleteJoinWrapper<T> extends MPJAbstractLambdaWrapper<T, DeleteJoin
         }
     }
 
-    private void check(){
+    @SuppressWarnings("DuplicatedCode")
+    private void check() {
         if (CollectionUtils.isNotEmpty(tableList.getAll())) {
             Class<T> entityClass = getEntityClass();
             Assert.notNull(entityClass, "缺少主表类型, 请使用 new MPJLambdaWrapper<>(主表.class) 或 JoinWrappers.lambda(主表.class) 构造方法");

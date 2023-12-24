@@ -89,11 +89,27 @@ public interface CompareIfAbsent<Children> extends Compare<Children> {
         return likeLeft(getIfAbsent().test(val, IfAbsentSqlKeyWordEnum.LIKE_LEFT), alias, column, val);
     }
 
+    default Children notLikeLeftIfAbsent(KProperty<?> column, Object val) {
+        return notLikeLeft(getIfAbsent().test(val, IfAbsentSqlKeyWordEnum.NOT_LIKE_LEFT), null, column, val);
+    }
+
+    default Children notLikeLeftIfAbsent(String alias, KProperty<?> column, Object val) {
+        return notLikeLeft(getIfAbsent().test(val, IfAbsentSqlKeyWordEnum.NOT_LIKE_LEFT), alias, column, val);
+    }
+
     default Children likeRightIfAbsent(KProperty<?> column, Object val) {
         return likeRight(getIfAbsent().test(val, IfAbsentSqlKeyWordEnum.LIKE_RIGHT), null, column, val);
     }
 
     default Children likeRightIfAbsent(String alias, KProperty<?> column, Object val) {
         return likeRight(getIfAbsent().test(val, IfAbsentSqlKeyWordEnum.LIKE_RIGHT), alias, column, val);
+    }
+
+    default Children notLikeRightIfAbsent(KProperty<?> column, Object val) {
+        return notLikeRight(getIfAbsent().test(val, IfAbsentSqlKeyWordEnum.NOT_LIKE_RIGHT), null, column, val);
+    }
+
+    default Children notLikeRightIfAbsent(String alias, KProperty<?> column, Object val) {
+        return notLikeRight(getIfAbsent().test(val, IfAbsentSqlKeyWordEnum.NOT_LIKE_RIGHT), alias, column, val);
     }
 }

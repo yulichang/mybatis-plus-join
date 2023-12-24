@@ -287,6 +287,28 @@ public interface Compare<Children> extends Serializable {
      */
     Children likeLeft(boolean condition, String alias, KProperty<?> column, Object val);
 
+    default Children notLikeLeft(KProperty<?> column, Object val) {
+        return notLikeLeft(true, null, column, val);
+    }
+
+    default Children notLikeLeft(String alias, KProperty<?> column, Object val) {
+        return notLikeLeft(true, alias, column, val);
+    }
+
+    default Children notLikeLeft(boolean condition, KProperty<?> column, Object val) {
+        return notLikeLeft(condition, null, column, val);
+    }
+
+    /**
+     * LIKE '%值'
+     *
+     * @param condition 执行条件
+     * @param column    字段
+     * @param val       值
+     * @return children
+     */
+    Children notLikeLeft(boolean condition, String alias, KProperty<?> column, Object val);
+
 
     default Children likeRight(KProperty<?> column, Object val) {
         return likeRight(true, null, column, val);
@@ -310,4 +332,29 @@ public interface Compare<Children> extends Serializable {
      * @return children
      */
     Children likeRight(boolean condition, String alias, KProperty<?> column, Object val);
+
+
+
+    default Children notLikeRight(KProperty<?> column, Object val) {
+        return notLikeRight(true, null, column, val);
+    }
+
+    default Children notLikeRight(String alias, KProperty<?> column, Object val) {
+        return notLikeRight(true, alias, column, val);
+    }
+
+    default Children notLikeRight(boolean condition, KProperty<?> column, Object val) {
+        return notLikeRight(condition, null, column, val);
+    }
+
+
+    /**
+     * LIKE '值%'
+     *
+     * @param condition 执行条件
+     * @param column    字段
+     * @param val       值
+     * @return children
+     */
+    Children notLikeRight(boolean condition, String alias, KProperty<?> column, Object val);
 }

@@ -41,7 +41,7 @@ import static java.util.stream.Collectors.joining;
  * @author yulichang
  */
 @SuppressWarnings({"unchecked", "unused", "DuplicatedCode"})
-public abstract class MPJAbstractWrapper<T, Children extends MPJAbstractWrapper<T, Children>> extends Wrapper<T>
+public abstract class JoinAbstractWrapper<T, Children extends JoinAbstractWrapper<T, Children>> extends Wrapper<T>
         implements CompareIfAbsent<Children>, Nested<Children, Children>, Join<Children>, Func<Children>, OnCompare<Children>,
         CompareStrIfAbsent<Children, String>, FuncStr<Children, String> {
 
@@ -273,8 +273,18 @@ public abstract class MPJAbstractWrapper<T, Children extends MPJAbstractWrapper<
     }
 
     @Override
+    public <R> Children notLikeLeft(boolean condition, String alias, SFunction<R, ?> column, Object val) {
+        return likeValue(condition, NOT_LIKE, alias, column, val, SqlLike.LEFT);
+    }
+
+    @Override
     public <X> Children likeRight(boolean condition, String alias, SFunction<X, ?> column, Object val) {
         return likeValue(condition, LIKE, alias, column, val, SqlLike.RIGHT);
+    }
+
+    @Override
+    public <R> Children notLikeRight(boolean condition, String alias, SFunction<R, ?> column, Object val) {
+        return likeValue(condition, NOT_LIKE, alias, column, val, SqlLike.RIGHT);
     }
 
     @Override
@@ -1003,8 +1013,18 @@ public abstract class MPJAbstractWrapper<T, Children extends MPJAbstractWrapper<
     }
 
     @Override
+    public Children notLikeLeft(boolean condition, String column, Object val) {
+        return likeValue(condition, NOT_LIKE, column, val, SqlLike.LEFT);
+    }
+
+    @Override
     public Children likeRight(boolean condition, String column, Object val) {
         return likeValue(condition, LIKE, column, val, SqlLike.RIGHT);
+    }
+
+    @Override
+    public Children notLikeRight(boolean condition, String column, Object val) {
+        return likeValue(condition, NOT_LIKE, column, val, SqlLike.RIGHT);
     }
 
     @Override

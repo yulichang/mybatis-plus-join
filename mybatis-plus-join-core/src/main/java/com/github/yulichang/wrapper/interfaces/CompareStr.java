@@ -268,6 +268,23 @@ public interface CompareStr<Children, R> extends Serializable {
     /**
      * ignore
      */
+    default Children notLikeLeft(R column, Object val) {
+        return notLikeLeft(true, column, val);
+    }
+
+    /**
+     * LIKE '%值'
+     *
+     * @param condition 执行条件
+     * @param column    字段
+     * @param val       值
+     * @return children
+     */
+    Children notLikeLeft(boolean condition, R column, Object val);
+
+    /**
+     * ignore
+     */
     default Children likeRight(R column, Object val) {
         return likeRight(true, column, val);
     }
@@ -281,4 +298,22 @@ public interface CompareStr<Children, R> extends Serializable {
      * @return children
      */
     Children likeRight(boolean condition, R column, Object val);
+
+
+    /**
+     * ignore
+     */
+    default Children notLikeRight(R column, Object val) {
+        return notLikeRight(true, column, val);
+    }
+
+    /**
+     * LIKE '值%'
+     *
+     * @param condition 执行条件
+     * @param column    字段
+     * @param val       值
+     * @return children
+     */
+    Children notLikeRight(boolean condition, R column, Object val);
 }

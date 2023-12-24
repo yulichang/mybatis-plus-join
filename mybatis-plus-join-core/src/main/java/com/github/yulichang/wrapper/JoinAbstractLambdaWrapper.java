@@ -38,8 +38,8 @@ import static java.util.stream.Collectors.joining;
  * @author yulichang
  */
 @SuppressWarnings({"DuplicatedCode", "unused"})
-public abstract class MPJAbstractLambdaWrapper<T, Children extends MPJAbstractLambdaWrapper<T, Children>>
-        extends MPJAbstractWrapper<T, Children> implements QueryJoin<Children, T> {
+public abstract class JoinAbstractLambdaWrapper<T, Children extends JoinAbstractLambdaWrapper<T, Children>>
+        extends JoinAbstractWrapper<T, Children> implements QueryJoin<Children, T> {
 
     /**
      * 主表别名
@@ -101,14 +101,14 @@ public abstract class MPJAbstractLambdaWrapper<T, Children extends MPJAbstractLa
     /**
      * 推荐使用 带 class 的构造方法
      */
-    public MPJAbstractLambdaWrapper() {
+    public JoinAbstractLambdaWrapper() {
         initNeed();
     }
 
     /**
      * 推荐使用此构造方法
      */
-    public MPJAbstractLambdaWrapper(Class<T> clazz) {
+    public JoinAbstractLambdaWrapper(Class<T> clazz) {
         initNeed();
         setEntityClass(clazz);
         tableList.setRootClass(clazz);
@@ -119,7 +119,7 @@ public abstract class MPJAbstractLambdaWrapper<T, Children extends MPJAbstractLa
      *
      * @param entity 主表实体
      */
-    public MPJAbstractLambdaWrapper(T entity) {
+    public JoinAbstractLambdaWrapper(T entity) {
         initNeed();
         setEntity(entity);
         if (entity != null) {
@@ -130,7 +130,7 @@ public abstract class MPJAbstractLambdaWrapper<T, Children extends MPJAbstractLa
     /**
      * 自定义主表别名
      */
-    public MPJAbstractLambdaWrapper(String alias) {
+    public JoinAbstractLambdaWrapper(String alias) {
         this.alias = alias;
         initNeed();
         tableList.setAlias(alias);
@@ -142,7 +142,7 @@ public abstract class MPJAbstractLambdaWrapper<T, Children extends MPJAbstractLa
      * @param clazz 主表class类
      * @param alias 主表别名
      */
-    public MPJAbstractLambdaWrapper(Class<T> clazz, String alias) {
+    public JoinAbstractLambdaWrapper(Class<T> clazz, String alias) {
         this.alias = alias;
         setEntityClass(clazz);
         initNeed();
@@ -156,7 +156,7 @@ public abstract class MPJAbstractLambdaWrapper<T, Children extends MPJAbstractLa
      * @param entity 主表实体类
      * @param alias  主表别名
      */
-    public MPJAbstractLambdaWrapper(T entity, String alias) {
+    public JoinAbstractLambdaWrapper(T entity, String alias) {
         this.alias = alias;
         setEntity(entity);
         initNeed();
@@ -372,7 +372,7 @@ public abstract class MPJAbstractLambdaWrapper<T, Children extends MPJAbstractLa
      * 内部调用, 不建议使用
      */
     @Override
-    public <R> Children join(String keyWord, Class<R> clazz, String tableAlias, BiConsumer<MPJAbstractLambdaWrapper<T, ?>, Children> consumer) {
+    public <R> Children join(String keyWord, Class<R> clazz, String tableAlias, BiConsumer<JoinAbstractLambdaWrapper<T, ?>, Children> consumer) {
         Integer oldIndex = this.getIndex();
         int newIndex = tableIndex;
         TableInfo info = TableHelper.get(clazz);

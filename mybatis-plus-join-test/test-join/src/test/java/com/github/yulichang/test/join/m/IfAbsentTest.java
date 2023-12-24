@@ -27,12 +27,18 @@ public class IfAbsentTest {
         assert IfAbsentEnum.NOT_EMPTY.test(" ");
         assert IfAbsentEnum.NOT_EMPTY.test("\r");
         assert IfAbsentEnum.NOT_EMPTY.test("a");
+        assert IfAbsentEnum.NOT_EMPTY.test(1);
+        assert IfAbsentEnum.NOT_EMPTY.test(true);
+        assert IfAbsentEnum.NOT_EMPTY.test('A');
 
         assert !IfAbsentEnum.NOT_BLANK.test("\t");
         assert !IfAbsentEnum.NOT_BLANK.test("");
         assert !IfAbsentEnum.NOT_BLANK.test(" ");
         assert !IfAbsentEnum.NOT_BLANK.test("\r");
         assert IfAbsentEnum.NOT_BLANK.test("a");
+        assert IfAbsentEnum.NOT_EMPTY.test(1);
+        assert IfAbsentEnum.NOT_EMPTY.test(true);
+        assert IfAbsentEnum.NOT_EMPTY.test('A');
 
         ThreadLocalUtils.set("SELECT t.id, t.pid, t.`name`, t.`json`, t.sex, t.head_img, t.create_time, t.address_id, " +
                 "t.address_id2, t.del, t.create_by, t.update_by FROM `user` t " +

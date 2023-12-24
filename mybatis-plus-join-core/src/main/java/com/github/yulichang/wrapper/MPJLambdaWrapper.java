@@ -6,10 +6,10 @@ import com.baomidou.mybatisplus.core.conditions.segments.MergeSegments;
 import com.baomidou.mybatisplus.core.toolkit.*;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.github.yulichang.config.ConfigProperties;
-import com.github.yulichang.config.MybatisPlusJoinIfAbsent;
 import com.github.yulichang.toolkit.LambdaUtils;
 import com.github.yulichang.toolkit.*;
 import com.github.yulichang.toolkit.support.ColumnCache;
+import com.github.yulichang.wrapper.enums.IfAbsentSqlKeyWordEnum;
 import com.github.yulichang.wrapper.interfaces.Chain;
 import com.github.yulichang.wrapper.interfaces.Query;
 import com.github.yulichang.wrapper.interfaces.QueryLabel;
@@ -20,6 +20,7 @@ import lombok.Getter;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.BiPredicate;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -125,7 +126,7 @@ public class MPJLambdaWrapper<T> extends MPJAbstractLambdaWrapper<T, MPJLambdaWr
                      Map<String, Object> paramNameValuePairs, MergeSegments mergeSegments, SharedString paramAlias,
                      SharedString lastSql, SharedString sqlComment, SharedString sqlFirst,
                      TableList tableList, Integer index, String keyWord, Class<?> joinClass, String tableName,
-                     MybatisPlusJoinIfAbsent ifAbsent) {
+                     BiPredicate<Object, IfAbsentSqlKeyWordEnum> ifAbsent) {
         super.setEntity(entity);
         super.setEntityClass(entityClass);
         this.paramNameSeq = paramNameSeq;

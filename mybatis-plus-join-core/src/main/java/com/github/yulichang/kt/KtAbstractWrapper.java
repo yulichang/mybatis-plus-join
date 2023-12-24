@@ -12,7 +12,6 @@ import com.baomidou.mybatisplus.core.toolkit.*;
 import com.baomidou.mybatisplus.core.toolkit.sql.SqlUtils;
 import com.baomidou.mybatisplus.core.toolkit.sql.StringEscape;
 import com.github.yulichang.config.ConfigProperties;
-import com.github.yulichang.config.MybatisPlusJoinIfAbsent;
 import com.github.yulichang.kt.interfaces.CompareIfAbsent;
 import com.github.yulichang.kt.interfaces.Func;
 import com.github.yulichang.kt.interfaces.OnCompare;
@@ -21,6 +20,7 @@ import com.github.yulichang.toolkit.MPJSqlInjectionUtils;
 import com.github.yulichang.toolkit.Ref;
 import com.github.yulichang.toolkit.TableList;
 import com.github.yulichang.toolkit.sql.SqlScriptUtils;
+import com.github.yulichang.wrapper.enums.IfAbsentSqlKeyWordEnum;
 import com.github.yulichang.wrapper.enums.PrefixEnum;
 import com.github.yulichang.wrapper.interfaces.CompareStrIfAbsent;
 import com.github.yulichang.wrapper.interfaces.FuncStr;
@@ -32,6 +32,7 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiPredicate;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 import static com.baomidou.mybatisplus.core.enums.SqlKeyword.*;
@@ -127,7 +128,7 @@ public abstract class KtAbstractWrapper<T, Children extends KtAbstractWrapper<T,
      * ifAbsent 策略
      */
     @Getter
-    protected MybatisPlusJoinIfAbsent ifAbsent = ConfigProperties.ifAbsent;
+    protected BiPredicate<Object, IfAbsentSqlKeyWordEnum> ifAbsent = ConfigProperties.ifAbsent;
 
     @Override
     public T getEntity() {
@@ -180,8 +181,13 @@ public abstract class KtAbstractWrapper<T, Children extends KtAbstractWrapper<T,
         return typedThis;
     }
 
-    public Children setIfAbsent(MybatisPlusJoinIfAbsent ifAbsent) {
+    public Children setIfAbsent(BiPredicate<Object, IfAbsentSqlKeyWordEnum> ifAbsent) {
         this.ifAbsent = ifAbsent;
+        return typedThis;
+    }
+
+    public Children setIfAbsent(Predicate<Object> ifAbsent) {
+        this.ifAbsent = (o, k) -> ifAbsent.test(o);
         return typedThis;
     }
 

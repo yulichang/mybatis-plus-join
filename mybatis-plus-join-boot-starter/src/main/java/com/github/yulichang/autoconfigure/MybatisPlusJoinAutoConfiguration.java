@@ -3,13 +3,15 @@ package com.github.yulichang.autoconfigure;
 import com.baomidou.mybatisplus.autoconfigure.MybatisPlusLanguageDriverAutoConfiguration;
 import com.baomidou.mybatisplus.core.injector.ISqlInjector;
 import com.github.yulichang.autoconfigure.conditional.MPJSqlInjectorCondition;
+import com.github.yulichang.autoconfigure.consumer.MybatisPlusJoinIfAbsentConsumer;
+import com.github.yulichang.autoconfigure.consumer.MybatisPlusJoinPropertiesConsumer;
 import com.github.yulichang.config.ConfigProperties;
 import com.github.yulichang.config.MPJInterceptorConfig;
-import com.github.yulichang.config.MybatisPlusJoinIfAbsent;
 import com.github.yulichang.extension.mapping.config.MappingConfig;
 import com.github.yulichang.injector.MPJSqlInjector;
 import com.github.yulichang.interceptor.MPJInterceptor;
 import com.github.yulichang.toolkit.SpringContentUtils;
+import com.github.yulichang.wrapper.enums.IfAbsentSqlKeyWordEnum;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.mybatis.spring.SqlSessionFactoryBean;
 import org.slf4j.Logger;
@@ -40,6 +42,7 @@ import javax.sql.DataSource;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.BiPredicate;
 
 /**
  * springboot 自动配置类
@@ -60,7 +63,7 @@ public class MybatisPlusJoinAutoConfiguration {
 
     public MybatisPlusJoinAutoConfiguration(MybatisPlusJoinProperties properties,
                                             ObjectProvider<MybatisPlusJoinPropertiesConsumer> propertiesConsumers,
-                                            ObjectProvider<MybatisPlusJoinIfAbsent> ifAbsentConsumers) {
+                                            ObjectProvider<MybatisPlusJoinIfAbsentConsumer> ifAbsentConsumers) {
         this.properties = Optional.ofNullable(propertiesConsumers.getIfAvailable()).map(c -> c.config(properties)).orElse(properties);
         ConfigProperties.banner = this.properties.getBanner();
         ConfigProperties.subTableLogic = this.properties.getSubTableLogic();
@@ -69,7 +72,8 @@ public class MybatisPlusJoinAutoConfiguration {
         ConfigProperties.joinPrefix = this.properties.getJoinPrefix();
         ConfigProperties.logicDelType = this.properties.getLogicDelType();
         ConfigProperties.mappingMaxCount = this.properties.getMappingMaxCount();
-        ConfigProperties.ifAbsent = Optional.ofNullable(ifAbsentConsumers.getIfAvailable()).orElse(this.properties.getIfAbsent());
+        ConfigProperties.ifAbsent = Optional.ofNullable(ifAbsentConsumers.getIfAvailable())
+                .map(m -> (BiPredicate<Object, IfAbsentSqlKeyWordEnum>) m).orElse(this.properties.getIfAbsent());
         info("mybatis plus join properties config complete");
     }
 

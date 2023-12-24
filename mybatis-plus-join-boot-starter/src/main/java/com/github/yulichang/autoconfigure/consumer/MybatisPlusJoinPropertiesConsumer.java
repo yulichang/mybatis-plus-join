@@ -1,4 +1,6 @@
-package com.github.yulichang.autoconfigure;
+package com.github.yulichang.autoconfigure.consumer;
+
+import com.github.yulichang.autoconfigure.MybatisPlusJoinProperties;
 
 /**
  * 自定义配置

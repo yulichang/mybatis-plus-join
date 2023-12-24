@@ -13,12 +13,12 @@ import com.baomidou.mybatisplus.core.toolkit.sql.SqlUtils;
 import com.baomidou.mybatisplus.core.toolkit.sql.StringEscape;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.github.yulichang.config.ConfigProperties;
-import com.github.yulichang.config.MybatisPlusJoinIfAbsent;
 import com.github.yulichang.toolkit.LambdaUtils;
 import com.github.yulichang.toolkit.MPJSqlInjectionUtils;
 import com.github.yulichang.toolkit.Ref;
 import com.github.yulichang.toolkit.TableList;
 import com.github.yulichang.toolkit.sql.SqlScriptUtils;
+import com.github.yulichang.wrapper.enums.IfAbsentSqlKeyWordEnum;
 import com.github.yulichang.wrapper.enums.PrefixEnum;
 import com.github.yulichang.wrapper.interfaces.*;
 import lombok.Getter;
@@ -27,6 +27,7 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiPredicate;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 import static com.baomidou.mybatisplus.core.enums.SqlKeyword.*;
@@ -122,7 +123,7 @@ public abstract class MPJAbstractWrapper<T, Children extends MPJAbstractWrapper<
      * ifAbsent 策略
      */
     @Getter
-    protected MybatisPlusJoinIfAbsent ifAbsent = ConfigProperties.ifAbsent;
+    protected BiPredicate<Object, IfAbsentSqlKeyWordEnum> ifAbsent = ConfigProperties.ifAbsent;
 
     @Override
     public T getEntity() {
@@ -175,6 +176,11 @@ public abstract class MPJAbstractWrapper<T, Children extends MPJAbstractWrapper<
         return typedThis;
     }
 
+    public Children setIfAbsent(BiPredicate<Object, IfAbsentSqlKeyWordEnum> ifAbsent) {
+        this.ifAbsent = ifAbsent;
+        return typedThis;
+    }
+
     /**
      * 设置 ifAbsent
      * .setIfAbsent(val -> val != null && StringUtils.isNotBlank(val))
@@ -182,8 +188,8 @@ public abstract class MPJAbstractWrapper<T, Children extends MPJAbstractWrapper<
      * @param ifAbsent 判断
      * @return Children
      */
-    public Children setIfAbsent(MybatisPlusJoinIfAbsent ifAbsent) {
-        this.ifAbsent = ifAbsent;
+    public Children setIfAbsent(Predicate<Object> ifAbsent) {
+        this.ifAbsent = (obj, key) -> ifAbsent.test(obj);
         return typedThis;
     }
 

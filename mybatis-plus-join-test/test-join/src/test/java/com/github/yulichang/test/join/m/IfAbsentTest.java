@@ -22,12 +22,24 @@ public class IfAbsentTest {
 
     @Test
     void ifAbsent() {
+        assert IfAbsentEnum.NOT_EMPTY.test("\t", null);
+        assert !IfAbsentEnum.NOT_EMPTY.test("", null);
+        assert IfAbsentEnum.NOT_EMPTY.test(" ", null);
+        assert IfAbsentEnum.NOT_EMPTY.test("\r", null);
+        assert IfAbsentEnum.NOT_EMPTY.test("a", null);
+
+        assert !IfAbsentEnum.NOT_BLANK.test("\t", null);
+        assert !IfAbsentEnum.NOT_BLANK.test("", null);
+        assert !IfAbsentEnum.NOT_BLANK.test(" ", null);
+        assert !IfAbsentEnum.NOT_BLANK.test("\r", null);
+        assert IfAbsentEnum.NOT_BLANK.test("a", null);
+
         ThreadLocalUtils.set("SELECT t.id, t.pid, t.`name`, t.`json`, t.sex, t.head_img, t.create_time, t.address_id, " +
                 "t.address_id2, t.del, t.create_by, t.update_by FROM `user` t " +
                 "WHERE t.del = false AND (t.id = ? AND t.head_img = ? AND t.`name` = ?)");
         MPJLambdaWrapper<UserDO> wrapper = JoinWrappers.lambda(UserDO.class)
                 .selectAll(UserDO.class)
-                .eq(UserDO::getId, 1)
+                .eqIfAbsent(UserDO::getId, 1)
                 .eqIfAbsent(UserDO::getPid, null)
                 .eqIfAbsent(UserDO::getAddressId, "")
                 .eqIfAbsent(UserDO::getImg, "\t")
@@ -41,7 +53,7 @@ public class IfAbsentTest {
         MPJLambdaWrapper<UserDO> wrapper1 = JoinWrappers.lambda(UserDO.class)
                 .selectAll(UserDO.class)
                 .setIfAbsent(IfAbsentEnum.NOT_BLANK)
-                .eq(UserDO::getId, 1)
+                .eqIfAbsent(UserDO::getId, 1)
                 .eqIfAbsent(UserDO::getPid, null)
                 .eqIfAbsent(UserDO::getAddressId, "")
                 .eqIfAbsent(UserDO::getImg, "\t")
@@ -55,7 +67,7 @@ public class IfAbsentTest {
         MPJLambdaWrapper<UserDO> wrapper2 = JoinWrappers.lambda(UserDO.class)
                 .selectAll(UserDO.class)
                 .setIfAbsent(o -> true)
-                .eq(UserDO::getId, 1)
+                .eqIfAbsent(UserDO::getId, 1)
                 .eqIfAbsent(UserDO::getPid, null)
                 .eqIfAbsent(UserDO::getName, "")
                 .eqIfAbsent(UserDO::getImg, "\t")

@@ -1,7 +1,9 @@
 package com.github.yulichang.kt.interfaces;
 
-import com.github.yulichang.config.MybatisPlusJoinIfAbsent;
+import com.github.yulichang.wrapper.enums.IfAbsentSqlKeyWordEnum;
 import kotlin.reflect.KProperty;
+
+import java.util.function.BiPredicate;
 
 /**
  * ifAbsent
@@ -12,86 +14,86 @@ import kotlin.reflect.KProperty;
 @SuppressWarnings("unused")
 public interface CompareIfAbsent<Children> extends Compare<Children> {
 
-    MybatisPlusJoinIfAbsent getIfAbsent();
+    BiPredicate<Object, IfAbsentSqlKeyWordEnum> getIfAbsent();
 
     default Children eqIfAbsent(KProperty<?> column, Object val) {
-        return eq(getIfAbsent().test(val), null, column, val);
+        return eq(getIfAbsent().test(val, IfAbsentSqlKeyWordEnum.EQ), null, column, val);
     }
 
     default Children eqIfAbsent(String alias, KProperty<?> column, Object val) {
-        return eq(getIfAbsent().test(val), alias, column, val);
+        return eq(getIfAbsent().test(val, IfAbsentSqlKeyWordEnum.EQ), alias, column, val);
     }
 
     default Children neIfAbsent(KProperty<?> column, Object val) {
-        return ne(getIfAbsent().test(val), null, column, val);
+        return ne(getIfAbsent().test(val, IfAbsentSqlKeyWordEnum.NE), null, column, val);
     }
 
     default Children neIfAbsent(String alias, KProperty<?> column, Object val) {
-        return ne(getIfAbsent().test(val), alias, column, val);
+        return ne(getIfAbsent().test(val, IfAbsentSqlKeyWordEnum.NE), alias, column, val);
     }
 
     default Children gtIfAbsent(KProperty<?> column, Object val) {
-        return gt(getIfAbsent().test(val), null, column, val);
+        return gt(getIfAbsent().test(val, IfAbsentSqlKeyWordEnum.GT), null, column, val);
     }
 
     default Children gtIfAbsent(String alias, KProperty<?> column, Object val) {
-        return gt(getIfAbsent().test(val), alias, column, val);
+        return gt(getIfAbsent().test(val, IfAbsentSqlKeyWordEnum.GT), alias, column, val);
     }
 
 
     default Children geIfAbsent(KProperty<?> column, Object val) {
-        return ge(getIfAbsent().test(val), null, column, val);
+        return ge(getIfAbsent().test(val, IfAbsentSqlKeyWordEnum.GE), null, column, val);
     }
 
     default Children geIfAbsent(String alias, KProperty<?> column, Object val) {
-        return ge(getIfAbsent().test(val), alias, column, val);
+        return ge(getIfAbsent().test(val, IfAbsentSqlKeyWordEnum.GE), alias, column, val);
     }
 
     default Children ltIfAbsent(KProperty<?> column, Object val) {
-        return lt(getIfAbsent().test(val), null, column, val);
+        return lt(getIfAbsent().test(val, IfAbsentSqlKeyWordEnum.LT), null, column, val);
     }
 
     default Children ltIfAbsent(String alias, KProperty<?> column, Object val) {
-        return lt(getIfAbsent().test(val), alias, column, val);
+        return lt(getIfAbsent().test(val, IfAbsentSqlKeyWordEnum.LT), alias, column, val);
     }
 
     default Children leIfAbsent(KProperty<?> column, Object val) {
-        return le(getIfAbsent().test(val), null, column, val);
+        return le(getIfAbsent().test(val, IfAbsentSqlKeyWordEnum.LE), null, column, val);
     }
 
     default Children leIfAbsent(String alias, KProperty<?> column, Object val) {
-        return le(getIfAbsent().test(val), alias, column, val);
+        return le(getIfAbsent().test(val, IfAbsentSqlKeyWordEnum.LE), alias, column, val);
     }
 
     default Children likeIfAbsent(KProperty<?> column, Object val) {
-        return like(getIfAbsent().test(val), null, column, val);
+        return like(getIfAbsent().test(val, IfAbsentSqlKeyWordEnum.LIKE), null, column, val);
     }
 
     default Children likeIfAbsent(String alisa, KProperty<?> column, Object val) {
-        return like(getIfAbsent().test(val), alisa, column, val);
+        return like(getIfAbsent().test(val, IfAbsentSqlKeyWordEnum.LIKE), alisa, column, val);
     }
 
     default Children notLikeIfAbsent(KProperty<?> column, Object val) {
-        return notLike(getIfAbsent().test(val), null, column, val);
+        return notLike(getIfAbsent().test(val, IfAbsentSqlKeyWordEnum.NOT_LIKE), null, column, val);
     }
 
     default Children notLikeIfAbsent(String alias, KProperty<?> column, Object val) {
-        return notLike(getIfAbsent().test(val), alias, column, val);
+        return notLike(getIfAbsent().test(val, IfAbsentSqlKeyWordEnum.NOT_LIKE), alias, column, val);
     }
 
     default Children likeLeftIfAbsent(KProperty<?> column, Object val) {
-        return likeLeft(getIfAbsent().test(val), null, column, val);
+        return likeLeft(getIfAbsent().test(val, IfAbsentSqlKeyWordEnum.LIKE_LEFT), null, column, val);
     }
 
     default Children likeLeftIfAbsent(String alias, KProperty<?> column, Object val) {
-        return likeLeft(getIfAbsent().test(val), alias, column, val);
+        return likeLeft(getIfAbsent().test(val, IfAbsentSqlKeyWordEnum.LIKE_LEFT), alias, column, val);
     }
 
     default Children likeRightIfAbsent(KProperty<?> column, Object val) {
-        return likeRight(getIfAbsent().test(val), null, column, val);
+        return likeRight(getIfAbsent().test(val, IfAbsentSqlKeyWordEnum.LIKE_RIGHT), null, column, val);
     }
 
     default Children likeRightIfAbsent(String alias, KProperty<?> column, Object val) {
-        return likeRight(getIfAbsent().test(val), alias, column, val);
+        return likeRight(getIfAbsent().test(val, IfAbsentSqlKeyWordEnum.LIKE_RIGHT), alias, column, val);
     }
 }

@@ -9,18 +9,19 @@ import com.baomidou.mybatisplus.core.metadata.TableInfo;
 import com.baomidou.mybatisplus.core.toolkit.*;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.github.yulichang.config.ConfigProperties;
-import com.github.yulichang.config.MybatisPlusJoinIfAbsent;
 import com.github.yulichang.query.interfaces.CompareIfAbsent;
 import com.github.yulichang.query.interfaces.StringJoin;
 import com.github.yulichang.toolkit.Asserts;
 import com.github.yulichang.toolkit.TableHelper;
 import com.github.yulichang.toolkit.ThrowOptional;
+import com.github.yulichang.wrapper.enums.IfAbsentSqlKeyWordEnum;
 import lombok.Getter;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.BiPredicate;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -77,7 +78,7 @@ public class MPJLambdaQueryWrapper<T> extends AbstractLambdaWrapper<T, MPJLambda
     private Function<String, String> tableNameFunc;
 
     @Getter
-    private MybatisPlusJoinIfAbsent ifAbsent = ConfigProperties.ifAbsent;
+    private BiPredicate<Object, IfAbsentSqlKeyWordEnum> ifAbsent = ConfigProperties.ifAbsent;
 
     /**
      * 不建议直接 new 该实例，使用 Wrappers.lambdaQuery(entity)
@@ -93,7 +94,7 @@ public class MPJLambdaQueryWrapper<T> extends AbstractLambdaWrapper<T, MPJLambda
                           Map<String, Object> paramNameValuePairs, MergeSegments mergeSegments,
                           SharedString lastSql, SharedString sqlComment, SharedString sqlFirst,
                           List<String> selectColumns, List<String> ignoreColumns, boolean selectDistinct,
-                          MybatisPlusJoinIfAbsent ifAbsent) {
+                          BiPredicate<Object, IfAbsentSqlKeyWordEnum> ifAbsent) {
         super.setEntity(entity);
         setEntityClass(entityClass);
         this.paramNameSeq = paramNameSeq;
@@ -336,8 +337,13 @@ public class MPJLambdaQueryWrapper<T> extends AbstractLambdaWrapper<T, MPJLambda
         return this.tableNameFunc.apply(decode);
     }
 
-    public MPJLambdaQueryWrapper<T> setIfAbsent(MybatisPlusJoinIfAbsent ifAbsent) {
+    public MPJLambdaQueryWrapper<T> setIfAbsent(BiPredicate<Object, IfAbsentSqlKeyWordEnum> ifAbsent) {
         this.ifAbsent = ifAbsent;
+        return typedThis;
+    }
+
+    public MPJLambdaQueryWrapper<T> setIfAbsent(Predicate<Object> ifAbsent) {
+        this.ifAbsent = (o, k) -> ifAbsent.test(o);
         return typedThis;
     }
 

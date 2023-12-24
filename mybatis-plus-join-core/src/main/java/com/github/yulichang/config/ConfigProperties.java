@@ -4,6 +4,9 @@ import com.github.yulichang.adapter.AdapterHelper;
 import com.github.yulichang.adapter.base.ITableInfoAdapter;
 import com.github.yulichang.config.enums.IfAbsentEnum;
 import com.github.yulichang.config.enums.LogicDelTypeEnum;
+import com.github.yulichang.wrapper.enums.IfAbsentSqlKeyWordEnum;
+
+import java.util.function.BiPredicate;
 
 /**
  * @author yulichang
@@ -56,5 +59,5 @@ public class ConfigProperties {
      * <p>
      * NOT_BLANK 非空白字符串  例： "" -> false, " " -> false, "\r" -> false, "abc" -> true ...
      */
-    public static MybatisPlusJoinIfAbsent ifAbsent = IfAbsentEnum.NOT_EMPTY;
+    public static BiPredicate<Object, IfAbsentSqlKeyWordEnum> ifAbsent = IfAbsentEnum.NOT_EMPTY;
 }

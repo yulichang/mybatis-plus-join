@@ -11,13 +11,13 @@ import com.baomidou.mybatisplus.core.metadata.TableInfo;
 import com.baomidou.mybatisplus.core.toolkit.*;
 import com.github.yulichang.adapter.base.tookit.VersionUtils;
 import com.github.yulichang.config.ConfigProperties;
-import com.github.yulichang.config.MybatisPlusJoinIfAbsent;
 import com.github.yulichang.query.interfaces.CompareIfAbsent;
 import com.github.yulichang.query.interfaces.StringJoin;
 import com.github.yulichang.toolkit.Asserts;
 import com.github.yulichang.toolkit.MPJSqlInjectionUtils;
 import com.github.yulichang.toolkit.TableHelper;
 import com.github.yulichang.toolkit.ThrowOptional;
+import com.github.yulichang.wrapper.enums.IfAbsentSqlKeyWordEnum;
 import com.github.yulichang.wrapper.interfaces.Chain;
 import lombok.Getter;
 
@@ -28,6 +28,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.BiPredicate;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -90,7 +91,7 @@ public class MPJQueryWrapper<T> extends AbstractWrapper<T, String, MPJQueryWrapp
     private boolean checkSqlInjection = false;
 
     @Getter
-    private MybatisPlusJoinIfAbsent ifAbsent = ConfigProperties.ifAbsent;
+    private BiPredicate<Object, IfAbsentSqlKeyWordEnum> ifAbsent = ConfigProperties.ifAbsent;
 
 
     public MPJQueryWrapper() {
@@ -123,7 +124,7 @@ public class MPJQueryWrapper<T> extends AbstractWrapper<T, String, MPJQueryWrapp
                            SharedString sqlSelect, SharedString from, SharedString lastSql,
                            SharedString sqlComment, SharedString sqlFirst,
                            List<String> selectColumns, List<String> ignoreColumns, boolean selectDistinct,
-                           MybatisPlusJoinIfAbsent ifAbsent) {
+                           BiPredicate<Object, IfAbsentSqlKeyWordEnum> ifAbsent) {
         super.setEntity(entity);
         setEntityClass(entityClass);
         this.paramNameSeq = paramNameSeq;
@@ -148,8 +149,13 @@ public class MPJQueryWrapper<T> extends AbstractWrapper<T, String, MPJQueryWrapp
         return this;
     }
 
-    public MPJQueryWrapper<T> setIfAbsent(MybatisPlusJoinIfAbsent ifAbsent) {
+    public MPJQueryWrapper<T> setIfAbsent(BiPredicate<Object, IfAbsentSqlKeyWordEnum> ifAbsent) {
         this.ifAbsent = ifAbsent;
+        return this;
+    }
+
+    public MPJQueryWrapper<T> setIfAbsent(Predicate<Object> ifAbsent) {
+        this.ifAbsent = (o, k) -> ifAbsent.test(o);
         return this;
     }
 

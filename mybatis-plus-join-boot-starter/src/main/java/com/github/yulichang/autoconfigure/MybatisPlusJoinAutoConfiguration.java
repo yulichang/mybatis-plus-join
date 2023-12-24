@@ -73,7 +73,8 @@ public class MybatisPlusJoinAutoConfiguration {
         ConfigProperties.logicDelType = this.properties.getLogicDelType();
         ConfigProperties.mappingMaxCount = this.properties.getMappingMaxCount();
         ConfigProperties.ifAbsent = Optional.ofNullable(ifAbsentConsumers.getIfAvailable())
-                .map(m -> (BiPredicate<Object, IfAbsentSqlKeyWordEnum>) m).orElse(this.properties.getIfAbsent());
+                .map(m -> (BiPredicate<Object, IfAbsentSqlKeyWordEnum>) m)
+                .orElse((val, key) -> this.properties.getIfAbsent().test(val));
         info("mybatis plus join properties config complete");
     }
 

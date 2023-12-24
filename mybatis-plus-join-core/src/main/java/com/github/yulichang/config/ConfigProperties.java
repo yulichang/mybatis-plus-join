@@ -59,5 +59,5 @@ public class ConfigProperties {
      * <p>
      * NOT_BLANK 非空白字符串  例： "" -> false, " " -> false, "\r" -> false, "abc" -> true ...
      */
-    public static BiPredicate<Object, IfAbsentSqlKeyWordEnum> ifAbsent = IfAbsentEnum.NOT_EMPTY;
+    public static BiPredicate<Object, IfAbsentSqlKeyWordEnum> ifAbsent = (val, key) -> IfAbsentEnum.NOT_EMPTY.test(val);
 }

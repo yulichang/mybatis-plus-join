@@ -22,17 +22,17 @@ public class IfAbsentTest {
 
     @Test
     void ifAbsent() {
-        assert IfAbsentEnum.NOT_EMPTY.test("\t", null);
-        assert !IfAbsentEnum.NOT_EMPTY.test("", null);
-        assert IfAbsentEnum.NOT_EMPTY.test(" ", null);
-        assert IfAbsentEnum.NOT_EMPTY.test("\r", null);
-        assert IfAbsentEnum.NOT_EMPTY.test("a", null);
+        assert IfAbsentEnum.NOT_EMPTY.test("\t");
+        assert !IfAbsentEnum.NOT_EMPTY.test("");
+        assert IfAbsentEnum.NOT_EMPTY.test(" ");
+        assert IfAbsentEnum.NOT_EMPTY.test("\r");
+        assert IfAbsentEnum.NOT_EMPTY.test("a");
 
-        assert !IfAbsentEnum.NOT_BLANK.test("\t", null);
-        assert !IfAbsentEnum.NOT_BLANK.test("", null);
-        assert !IfAbsentEnum.NOT_BLANK.test(" ", null);
-        assert !IfAbsentEnum.NOT_BLANK.test("\r", null);
-        assert IfAbsentEnum.NOT_BLANK.test("a", null);
+        assert !IfAbsentEnum.NOT_BLANK.test("\t");
+        assert !IfAbsentEnum.NOT_BLANK.test("");
+        assert !IfAbsentEnum.NOT_BLANK.test(" ");
+        assert !IfAbsentEnum.NOT_BLANK.test("\r");
+        assert IfAbsentEnum.NOT_BLANK.test("a");
 
         ThreadLocalUtils.set("SELECT t.id, t.pid, t.`name`, t.`json`, t.sex, t.head_img, t.create_time, t.address_id, " +
                 "t.address_id2, t.del, t.create_by, t.update_by FROM `user` t " +

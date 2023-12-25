@@ -899,8 +899,18 @@ public abstract class KtAbstractWrapper<T, Children extends KtAbstractWrapper<T,
     }
 
     @Override
+    public Children notLikeLeft(boolean condition, String column, Object val) {
+        return likeValue(condition, NOT_LIKE, column, val, SqlLike.LEFT);
+    }
+
+    @Override
     public Children likeRight(boolean condition, String column, Object val) {
         return likeValue(condition, LIKE, column, val, SqlLike.RIGHT);
+    }
+
+    @Override
+    public Children notLikeRight(boolean condition, String column, Object val) {
+        return likeValue(condition, NOT_LIKE, column, val, SqlLike.RIGHT);
     }
 
     @Override

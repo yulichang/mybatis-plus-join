@@ -6,7 +6,6 @@ import com.baomidou.mybatisplus.core.toolkit.*;
 import com.github.yulichang.adapter.base.tookit.VersionUtils;
 import com.github.yulichang.config.ConfigProperties;
 import com.github.yulichang.interfaces.MPJBaseJoin;
-import com.github.yulichang.method.MPJResultType;
 import com.github.yulichang.query.MPJQueryWrapper;
 import com.github.yulichang.toolkit.Constant;
 import com.github.yulichang.toolkit.MPJReflectionKit;
@@ -77,19 +76,14 @@ public class MPJInterceptor implements Interceptor {
                             if (CollectionUtils.isNotEmpty(ms.getResultMaps())) {
                                 Class<?> entity = MPJTableMapperHelper.getEntity(getMapper(ms.getId(), ms.getResource()));
                                 Class<?> type = ms.getResultMaps().get(0).getType();
-                                if (Objects.nonNull(entity) && Objects.nonNull(type) && entity == type) {
+                                if (Objects.nonNull(entity) && Objects.nonNull(type)
+                                        && !MPJReflectionKit.isPrimitiveOrWrapper(type) && entity == type) {
                                     rt = type;
                                 }
                             }
                         }
                         if (Objects.nonNull(rt)) {
-                            List<ResultMap> list = ms.getResultMaps();
-                            if (CollectionUtils.isNotEmpty(list)) {
-                                ResultMap resultMap = list.get(0);
-                                if (resultMap.getType() == MPJResultType.class) {
-                                    args[0] = getMappedStatement(ms, rt, ew);
-                                }
-                            }
+                            args[0] = getMappedStatement(ms, rt, ew);
                         }
                     }
                 }

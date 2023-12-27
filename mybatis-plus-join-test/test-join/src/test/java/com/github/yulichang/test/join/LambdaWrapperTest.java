@@ -260,7 +260,6 @@ class LambdaWrapperTest {
 
 
     @Test
-    @SuppressWarnings("unchecked")
     void testMSCache() {
         ThreadLocalUtils.set("SELECT t.id,\n" +
                 "       t.pid,\n" +
@@ -738,7 +737,9 @@ class LambdaWrapperTest {
                 .lt(UserDO::getId, 8));
         assert dos.size() == 4;
 
-        ThreadLocalUtils.set("SELECT id,pid,`name`,`json`,sex,head_img,create_time,address_id,address_id2,del,create_by,update_by FROM `user` t WHERE t.del=false AND (t.id > ? AND t.id < ?)",
+        ThreadLocalUtils.set(
+                "SELECT t.id, t.pid, t.`name`, t.`json`, t.sex, t.head_img, t.create_time, t.address_id, t.address_id2, t.del, t.create_by, t.update_by FROM `user` t WHERE t.del = false AND (t.id > ? AND t.id < ?)",
+                "SELECT id, pid, `name`, `json`, sex, head_img, create_time, address_id, address_id2, del, create_by, update_by FROM `user` t WHERE t.del = false AND (t.id > ? AND t.id < ?)",
                 "SELECT * FROM `user` t WHERE t.del=false AND (t.id > ? AND t.id < ?) ");
         List<UserDO> dos1 = userMapper.selectList(new MPJLambdaWrapper<UserDO>()
                 .gt(UserDO::getId, 3)
@@ -993,6 +994,7 @@ class LambdaWrapperTest {
     void joinOrder() {
         if (VersionUtils.compare(MybatisPlusVersion.getVersion(), "3.4.3") >= 0) {
             ThreadLocalUtils.set("SELECT id,user_id,name FROM order_t t ORDER BY t.name DESC",
+                    "SELECT t.id, t.user_id, t.name FROM order_t t ORDER BY t.name DESC",
                     "SELECT id,user_id,name FROM order_t t ORDER BY t.name desc");
         } else {
             ThreadLocalUtils.set("SELECT id,user_id,name FROM order_t t",

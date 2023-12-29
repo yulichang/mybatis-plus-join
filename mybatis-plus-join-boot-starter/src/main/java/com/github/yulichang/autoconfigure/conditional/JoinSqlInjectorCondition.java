@@ -13,5 +13,5 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.TYPE, ElementType.METHOD})
 @Conditional(OnSqlInjectorCondition.class)
-public @interface MPJSqlInjectorCondition {
+public @interface JoinSqlInjectorCondition {
 }

@@ -2,7 +2,7 @@ package com.github.yulichang.autoconfigure;
 
 import com.baomidou.mybatisplus.autoconfigure.MybatisPlusLanguageDriverAutoConfiguration;
 import com.baomidou.mybatisplus.core.injector.ISqlInjector;
-import com.github.yulichang.autoconfigure.conditional.MPJSqlInjectorCondition;
+import com.github.yulichang.autoconfigure.conditional.JoinSqlInjectorCondition;
 import com.github.yulichang.autoconfigure.consumer.MybatisPlusJoinIfAbsentConsumer;
 import com.github.yulichang.autoconfigure.consumer.MybatisPlusJoinPropertiesConsumer;
 import com.github.yulichang.config.ConfigProperties;
@@ -102,7 +102,7 @@ public class MybatisPlusJoinAutoConfiguration {
      */
     @Bean
     @Primary
-    @MPJSqlInjectorCondition
+    @JoinSqlInjectorCondition
     @Order(Ordered.HIGHEST_PRECEDENCE)
     @ConditionalOnBean(ISqlInjector.class)
     @ConditionalOnClass({SqlSessionFactory.class, SqlSessionFactoryBean.class})

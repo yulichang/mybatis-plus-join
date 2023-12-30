@@ -84,7 +84,7 @@ public class XPluginImpl implements Plugin {
         context.onEvent(AppLoadEndEvent.class, e -> {
             List<SqlSessionFactory> sqlSessionFactoryList = MybatisAdapterManager.getAll().values().stream()
                     .map(MybatisAdapter::getFactory).collect(Collectors.toList());
-            new MPJInterceptorConfig(sqlSessionFactoryList, false);
+            new MPJInterceptorConfig(sqlSessionFactoryList, ConfigProperties.banner);
             MappingConfig.init();
         });
     }

@@ -49,12 +49,12 @@ QQ群:1022221898  或者
   <dependency>
       <groupId>com.github.yulichang</groupId>
       <artifactId>mybatis-plus-join-boot-starter</artifactId>
-      <version>1.4.8.1</version>
+      <version>1.4.9</version>
   </dependency>
   ```
 - Gradle
   ```
-   implementation 'com.github.yulichang:mybatis-plus-join-boot-starter:1.4.8.1'
+   implementation 'com.github.yulichang:mybatis-plus-join-boot-starter:1.4.9'
   ```
   或者clone代码到本地执行 mvn install, 再引入以上依赖  
   <br>

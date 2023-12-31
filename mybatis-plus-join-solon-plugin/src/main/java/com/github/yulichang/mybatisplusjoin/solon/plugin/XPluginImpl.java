@@ -1,8 +1,6 @@
 package com.github.yulichang.mybatisplusjoin.solon.plugin;
 
-import com.baomidou.mybatisplus.core.config.GlobalConfig;
 import com.baomidou.mybatisplus.core.toolkit.ExceptionUtils;
-import com.baomidou.mybatisplus.core.toolkit.GlobalConfigUtils;
 import com.github.yulichang.config.ConfigProperties;
 import com.github.yulichang.config.MPJInterceptorConfig;
 import com.github.yulichang.config.enums.IfAbsentEnum;
@@ -15,43 +13,28 @@ import com.github.yulichang.wrapper.enums.IfAbsentSqlKeyWordEnum;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.solon.MybatisAdapter;
 import org.apache.ibatis.solon.integration.MybatisAdapterManager;
+import org.noear.solon.Utils;
 import org.noear.solon.core.AppContext;
 import org.noear.solon.core.Plugin;
 import org.noear.solon.core.Props;
 import org.noear.solon.core.event.AppLoadEndEvent;
 import org.noear.solon.core.util.GenericUtil;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
+import javax.sql.DataSource;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiPredicate;
 import java.util.stream.Collectors;
 
 public class XPluginImpl implements Plugin {
 
     @Override
-    public void start(AppContext context) throws Throwable {
-        /* 设置 MPJSqlInjector
-        反射修改GlobalConfigUtils.GLOBAL_CONFIG属性
-        修改final修饰的变量会出现警告
-        使用solon方式配置不生效采用的“曲线救国”方式
-        issue https://gitee.com/noear/solon/issues/I8SJ0Z */
-        Field field = GlobalConfigUtils.class.getDeclaredField("GLOBAL_CONFIG");
-        field.setAccessible(true);
-        Field modifier = Field.class.getDeclaredField("modifiers");
-        modifier.setAccessible(true);
-        modifier.setInt(field, field.getModifiers() & ~Modifier.FINAL);
-        field.set(null, new ConcurrentHashMap<String, GlobalConfig>() {
-            @Override
-            @SuppressWarnings("NullableProblems")
-            public GlobalConfig putIfAbsent(String key, GlobalConfig value) {
-                value.setSqlInjector(new MPJSqlInjector());
-                return super.putIfAbsent(key, value);
-            }
-        });
+    public void start(AppContext context) {
+        // MPJSqlInjector
+        context.subWrapsOfType(DataSource.class, bw -> context.cfg().putIfAbsent(Utils.isEmpty(bw.name()) ?
+                "mybatis.globalConfig.sqlInjector" : ("mybatis." + bw.name() + ".globalConfig.sqlInjector"), MPJSqlInjector.class.getName()));
+        // setGenericTypeResolver
         GenericTypeUtils.setGenericTypeResolver(GenericUtil::resolveTypeArguments);
         // SpringContext兼容
         SpringContentUtils.setSpringContext(new SpringContentUtils.SpringContext() {

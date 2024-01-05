@@ -21,10 +21,9 @@ import org.noear.solon.core.event.AppLoadEndEvent;
 import org.noear.solon.core.util.GenericUtil;
 
 import javax.sql.DataSource;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.BiPredicate;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class XPluginImpl implements Plugin {
@@ -33,7 +32,8 @@ public class XPluginImpl implements Plugin {
     public void start(AppContext context) {
         // MPJSqlInjector
         context.subWrapsOfType(DataSource.class, bw -> context.cfg().putIfAbsent(Utils.isEmpty(bw.name()) ?
-                "mybatis.globalConfig.sqlInjector" : ("mybatis." + bw.name() + ".globalConfig.sqlInjector"), MPJSqlInjector.class.getName()));
+                        "mybatis.globalConfig.sqlInjector" : ("mybatis." + bw.name() + ".globalConfig.sqlInjector"),
+                MPJSqlInjector.class.getName()));
         // setGenericTypeResolver
         GenericTypeUtils.setGenericTypeResolver(GenericUtil::resolveTypeArguments);
         // SpringContext兼容
@@ -49,19 +49,19 @@ public class XPluginImpl implements Plugin {
             }
         });
         // 读取配置
-        Props prop = context.cfg().getProp("mybatis-plus-join");
-        ConfigProperties.banner = prop.getBool("banner", ConfigProperties.banner);
-        ConfigProperties.subTableLogic = prop.getBool("subTableLogic", ConfigProperties.subTableLogic);
-        ConfigProperties.msCache = prop.getBool("msCache", ConfigProperties.msCache);
-        ConfigProperties.tableAlias = prop.get("tableAlias", ConfigProperties.tableAlias);
-        ConfigProperties.joinPrefix = prop.get("joinPrefix", ConfigProperties.joinPrefix);
-        ConfigProperties.logicDelType = prop.getOrDefault("logicDelType", ConfigProperties.logicDelType, val ->
+        Prop prop = new Prop(context.cfg().getProp("mybatis-plus-join"));
+        ConfigProperties.banner = prop.get("banner", Boolean::parseBoolean);
+        ConfigProperties.subTableLogic = prop.get("subTableLogic", Boolean::parseBoolean);
+        ConfigProperties.msCache = prop.get("msCache", Boolean::parseBoolean);
+        ConfigProperties.tableAlias = prop.get("tableAlias", Function.identity());
+        ConfigProperties.joinPrefix = prop.get("joinPrefix", Function.identity());
+        ConfigProperties.logicDelType = prop.get("logicDelType", val ->
                 Arrays.stream(LogicDelTypeEnum.values()).filter(e -> e.name().equalsIgnoreCase(val)).findFirst()
                         .orElseThrow(() -> ExceptionUtils.mpe("mybatis-plus-join.logicDelType 配置错误")));
-        ConfigProperties.mappingMaxCount = prop.getInt("mappingMaxCount", ConfigProperties.mappingMaxCount);
-        ConfigProperties.ifAbsent = prop.getOrDefault("ifAbsent", ConfigProperties.ifAbsent, val ->
+        ConfigProperties.mappingMaxCount = prop.get("mappingMaxCount", Integer::parseInt);
+        ConfigProperties.ifAbsent = prop.get("ifAbsent", val ->
                 Arrays.stream(IfAbsentEnum.values()).filter(e -> e.name().equalsIgnoreCase(val)).findFirst()
-                        .map(m -> (BiPredicate<Object, IfAbsentSqlKeyWordEnum>) (o, ifAbsentSqlKeyWordEnum) -> m.test(o))
+                        .map(m -> (BiPredicate<Object, IfAbsentSqlKeyWordEnum>) (o, enums) -> m.test(o))
                         .orElseThrow(() -> ExceptionUtils.mpe("mybatis-plus-join.ifAbsent 配置错误")));
         // 后续操作
         context.onEvent(AppLoadEndEvent.class, e -> {
@@ -70,5 +70,27 @@ public class XPluginImpl implements Plugin {
             new MPJInterceptorConfig(sqlSessionFactoryList, ConfigProperties.banner);
             MappingConfig.init();
         });
+    }
+
+    private static class Prop {
+
+        private final Properties props;
+
+        public Prop(Props props) {
+            this.props = new Properties();
+            props.forEach((k, v) -> this.props.put(k.toString()
+                    .replaceAll("[-_]", "").toUpperCase(Locale.ENGLISH), v));
+        }
+
+        @SuppressWarnings("unchecked")
+        public <T> T get(String key, Function<String, T> convert) {
+            try {
+                return Optional.ofNullable(this.props.get(key.toUpperCase(Locale.ENGLISH)))
+                        .map(v -> convert.apply(v.toString()))
+                        .orElse((T) ConfigProperties.class.getDeclaredField(key).get(null));
+            } catch (IllegalAccessException | NoSuchFieldException e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
 }

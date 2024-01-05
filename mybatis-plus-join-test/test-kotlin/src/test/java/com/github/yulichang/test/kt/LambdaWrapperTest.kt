@@ -734,7 +734,7 @@ class LambdaWrapperTest {
         assert(dos!!.size == 4)
 
         ThreadLocalUtils.set(
-                "SELECT id,pid,`name`,`json`,sex,head_img,create_time,address_id,address_id2,del,create_by,update_by FROM `user` t WHERE t.del=false AND (t.id > ? AND t.id < ?)",
+                "SELECT t.id, t.pid, t.`name`, t.`json`, t.sex, t.head_img, t.create_time, t.address_id, t.address_id2, t.del, t.create_by, t.update_by FROM `user` t WHERE t.del = false AND (t.id > ? AND t.id < ?)",
                 "SELECT * FROM `user` t WHERE t.del=false AND (t.id > ? AND t.id < ?) "
         )
         val dos1: MutableList<UserDO?>? = userMapper.selectList(
@@ -1009,7 +1009,7 @@ class LambdaWrapperTest {
     @Test
     fun joinOrder() {
         ThreadLocalUtils.set(
-                "SELECT id,user_id,name FROM order_t t ORDER BY t.name DESC",
+                "SELECT t.id, t.user_id, t.name FROM order_t t ORDER BY t.name DESC",
                 "SELECT id,user_id,name FROM order_t t ORDER BY t.name desc"
         )
         val wrapper: KtLambdaWrapper<OrderDO> = KtWrappers.query(OrderDO::class.java)

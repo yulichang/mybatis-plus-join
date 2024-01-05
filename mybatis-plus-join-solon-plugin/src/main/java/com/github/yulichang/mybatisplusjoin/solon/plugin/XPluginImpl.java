@@ -3,13 +3,13 @@ package com.github.yulichang.mybatisplusjoin.solon.plugin;
 import com.baomidou.mybatisplus.core.toolkit.ExceptionUtils;
 import com.github.yulichang.config.ConfigProperties;
 import com.github.yulichang.config.MPJInterceptorConfig;
-import com.github.yulichang.config.enums.IfAbsentEnum;
+import com.github.yulichang.config.enums.IfPresentEnum;
 import com.github.yulichang.config.enums.LogicDelTypeEnum;
 import com.github.yulichang.extension.mapping.config.MappingConfig;
 import com.github.yulichang.injector.MPJSqlInjector;
 import com.github.yulichang.toolkit.SpringContentUtils;
 import com.github.yulichang.toolkit.reflect.GenericTypeUtils;
-import com.github.yulichang.wrapper.enums.IfAbsentSqlKeyWordEnum;
+import com.github.yulichang.wrapper.enums.IfPresentSqlKeyWordEnum;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.solon.MybatisAdapter;
 import org.apache.ibatis.solon.integration.MybatisAdapterManager;
@@ -59,10 +59,10 @@ public class XPluginImpl implements Plugin {
                 Arrays.stream(LogicDelTypeEnum.values()).filter(e -> e.name().equalsIgnoreCase(val)).findFirst()
                         .orElseThrow(() -> ExceptionUtils.mpe("mybatis-plus-join.logicDelType 配置错误")));
         ConfigProperties.mappingMaxCount = prop.get("mappingMaxCount", Integer::parseInt);
-        ConfigProperties.ifAbsent = prop.get("ifAbsent", val ->
-                Arrays.stream(IfAbsentEnum.values()).filter(e -> e.name().equalsIgnoreCase(val)).findFirst()
-                        .map(m -> (BiPredicate<Object, IfAbsentSqlKeyWordEnum>) (o, enums) -> m.test(o))
-                        .orElseThrow(() -> ExceptionUtils.mpe("mybatis-plus-join.ifAbsent 配置错误")));
+        ConfigProperties.ifPresent = prop.get("ifPresent", val ->
+                Arrays.stream(IfPresentEnum.values()).filter(e -> e.name().equalsIgnoreCase(val)).findFirst()
+                        .map(m -> (BiPredicate<Object, IfPresentSqlKeyWordEnum>) (o, enums) -> m.test(o))
+                        .orElseThrow(() -> ExceptionUtils.mpe("mybatis-plus-join.ifPresent 配置错误")));
         // 后续操作
         context.onEvent(AppLoadEndEvent.class, e -> {
             List<SqlSessionFactory> sqlSessionFactoryList = MybatisAdapterManager.getAll().values().stream()

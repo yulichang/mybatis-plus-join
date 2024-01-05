@@ -9,12 +9,12 @@ import com.baomidou.mybatisplus.core.metadata.TableInfo;
 import com.baomidou.mybatisplus.core.toolkit.*;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.github.yulichang.config.ConfigProperties;
-import com.github.yulichang.query.interfaces.CompareIfAbsent;
+import com.github.yulichang.query.interfaces.CompareIfPresent;
 import com.github.yulichang.query.interfaces.StringJoin;
 import com.github.yulichang.toolkit.Asserts;
 import com.github.yulichang.toolkit.TableHelper;
 import com.github.yulichang.toolkit.ThrowOptional;
-import com.github.yulichang.wrapper.enums.IfAbsentSqlKeyWordEnum;
+import com.github.yulichang.wrapper.enums.IfPresentSqlKeyWordEnum;
 import lombok.Getter;
 
 import java.io.UnsupportedEncodingException;
@@ -36,7 +36,7 @@ import java.util.stream.Collectors;
 @SuppressWarnings("unused")
 public class MPJLambdaQueryWrapper<T> extends AbstractLambdaWrapper<T, MPJLambdaQueryWrapper<T>>
         implements Query<MPJLambdaQueryWrapper<T>, T, SFunction<T, ?>>, StringJoin<MPJLambdaQueryWrapper<T>, T>,
-        CompareIfAbsent<MPJLambdaQueryWrapper<T>, SFunction<T, ?>> {
+        CompareIfPresent<MPJLambdaQueryWrapper<T>, SFunction<T, ?>> {
 
     /**
      * 查询字段
@@ -78,7 +78,7 @@ public class MPJLambdaQueryWrapper<T> extends AbstractLambdaWrapper<T, MPJLambda
     private Function<String, String> tableNameFunc;
 
     @Getter
-    private BiPredicate<Object, IfAbsentSqlKeyWordEnum> ifAbsent = ConfigProperties.ifAbsent;
+    private BiPredicate<Object, IfPresentSqlKeyWordEnum> ifPresent = ConfigProperties.ifPresent;
 
     /**
      * 不建议直接 new 该实例，使用 Wrappers.lambdaQuery(entity)
@@ -94,7 +94,7 @@ public class MPJLambdaQueryWrapper<T> extends AbstractLambdaWrapper<T, MPJLambda
                           Map<String, Object> paramNameValuePairs, MergeSegments mergeSegments,
                           SharedString lastSql, SharedString sqlComment, SharedString sqlFirst,
                           List<String> selectColumns, List<String> ignoreColumns, boolean selectDistinct,
-                          BiPredicate<Object, IfAbsentSqlKeyWordEnum> ifAbsent) {
+                          BiPredicate<Object, IfPresentSqlKeyWordEnum> ifPresent) {
         super.setEntity(entity);
         setEntityClass(entityClass);
         this.paramNameSeq = paramNameSeq;
@@ -108,7 +108,7 @@ public class MPJLambdaQueryWrapper<T> extends AbstractLambdaWrapper<T, MPJLambda
         this.selectColumns = selectColumns;
         this.ignoreColumns = ignoreColumns;
         this.selectDistinct = selectDistinct;
-        this.ifAbsent = ifAbsent;
+        this.ifPresent = ifPresent;
     }
 
     /**
@@ -235,7 +235,7 @@ public class MPJLambdaQueryWrapper<T> extends AbstractLambdaWrapper<T, MPJLambda
     public MPJQueryWrapper<T> stringQuery() {
         return new MPJQueryWrapper<>(getEntity(), getEntityClass(), paramNameSeq, paramNameValuePairs,
                 expression, sqlSelect, from, lastSql, sqlComment, sqlFirst, selectColumns, ignoreColumns,
-                selectDistinct, ifAbsent);
+                selectDistinct, ifPresent);
     }
 
     @Override
@@ -337,13 +337,13 @@ public class MPJLambdaQueryWrapper<T> extends AbstractLambdaWrapper<T, MPJLambda
         return this.tableNameFunc.apply(decode);
     }
 
-    public MPJLambdaQueryWrapper<T> setIfAbsent(BiPredicate<Object, IfAbsentSqlKeyWordEnum> ifAbsent) {
-        this.ifAbsent = ifAbsent;
+    public MPJLambdaQueryWrapper<T> setIfPresent(BiPredicate<Object, IfPresentSqlKeyWordEnum> ifPresent) {
+        this.ifPresent = ifPresent;
         return typedThis;
     }
 
-    public MPJLambdaQueryWrapper<T> setIfAbsent(Predicate<Object> ifAbsent) {
-        this.ifAbsent = (o, k) -> ifAbsent.test(o);
+    public MPJLambdaQueryWrapper<T> setIfPresent(Predicate<Object> ifPresent) {
+        this.ifPresent = (o, k) -> ifPresent.test(o);
         return typedThis;
     }
 
@@ -355,7 +355,7 @@ public class MPJLambdaQueryWrapper<T> extends AbstractLambdaWrapper<T, MPJLambda
     protected MPJLambdaQueryWrapper<T> instance() {
         return new MPJLambdaQueryWrapper<>(getEntity(), getEntityClass(), null, null, paramNameSeq, paramNameValuePairs,
                 new MergeSegments(), SharedString.emptyString(), SharedString.emptyString(), SharedString.emptyString(),
-                null, null, selectDistinct, ifAbsent);
+                null, null, selectDistinct, ifPresent);
     }
 
     @Override
@@ -391,7 +391,7 @@ public class MPJLambdaQueryWrapper<T> extends AbstractLambdaWrapper<T, MPJLambda
         from.toNull();
         selectColumns.clear();
         ignoreColumns.clear();
-        ifAbsent = ConfigProperties.ifAbsent;
+        ifPresent = ConfigProperties.ifPresent;
     }
 
     @Override

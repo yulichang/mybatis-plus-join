@@ -57,10 +57,10 @@
       "description": "子查询表别名."
     },
     {
-      "name": "mybatis-plus-join.if-absent",
-      "defaultValue": "com.github.yulichang.config.enums.IfAbsentEnum.NOT_EMPTY",
-      "type": "com.github.yulichang.config.enums.IfAbsentEnum",
-      "description": "IfAbsent方法判断策略,如需自定义请用@Bean形式MybatisPlusJoinIfAbsent."
+      "name": "mybatis-plus-join.if-present",
+      "defaultValue": "com.github.yulichang.config.enums.IfPresentEnum.NOT_EMPTY",
+      "type": "com.github.yulichang.config.enums.IfPresentEnum",
+      "description": "IfPresent方法判断策略,如需自定义请用@Bean形式MybatisPlusJoinIfPresentConsumer."
     }
   ]
 }

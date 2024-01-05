@@ -12,7 +12,7 @@ import com.baomidou.mybatisplus.core.toolkit.*;
 import com.baomidou.mybatisplus.core.toolkit.sql.SqlUtils;
 import com.baomidou.mybatisplus.core.toolkit.sql.StringEscape;
 import com.github.yulichang.config.ConfigProperties;
-import com.github.yulichang.kt.interfaces.CompareIfAbsent;
+import com.github.yulichang.kt.interfaces.CompareIfPresent;
 import com.github.yulichang.kt.interfaces.Func;
 import com.github.yulichang.kt.interfaces.OnCompare;
 import com.github.yulichang.toolkit.KtUtils;
@@ -20,9 +20,9 @@ import com.github.yulichang.toolkit.MPJSqlInjectionUtils;
 import com.github.yulichang.toolkit.Ref;
 import com.github.yulichang.toolkit.TableList;
 import com.github.yulichang.toolkit.sql.SqlScriptUtils;
-import com.github.yulichang.wrapper.enums.IfAbsentSqlKeyWordEnum;
+import com.github.yulichang.wrapper.enums.IfPresentSqlKeyWordEnum;
 import com.github.yulichang.wrapper.enums.PrefixEnum;
-import com.github.yulichang.wrapper.interfaces.CompareStrIfAbsent;
+import com.github.yulichang.wrapper.interfaces.CompareStrIfPresent;
 import com.github.yulichang.wrapper.interfaces.FuncStr;
 import com.github.yulichang.wrapper.interfaces.Join;
 import kotlin.reflect.KProperty;
@@ -47,8 +47,8 @@ import static java.util.stream.Collectors.joining;
  */
 @SuppressWarnings({"unused", "unchecked", "DuplicatedCode"})
 public abstract class KtAbstractWrapper<T, Children extends KtAbstractWrapper<T, Children>> extends Wrapper<T>
-        implements CompareIfAbsent<Children>, Nested<Children, Children>, Join<Children>, Func<Children>, OnCompare<Children>,
-        CompareStrIfAbsent<Children, String>, FuncStr<Children, String> {
+        implements CompareIfPresent<Children>, Nested<Children, Children>, Join<Children>, Func<Children>, OnCompare<Children>,
+        CompareStrIfPresent<Children, String>, FuncStr<Children, String> {
 
     /**
      * 占位符
@@ -125,10 +125,10 @@ public abstract class KtAbstractWrapper<T, Children extends KtAbstractWrapper<T,
     protected boolean checkSqlInjection = false;
 
     /**
-     * ifAbsent 策略
+     * ifPresent 策略
      */
     @Getter
-    protected BiPredicate<Object, IfAbsentSqlKeyWordEnum> ifAbsent = ConfigProperties.ifAbsent;
+    protected BiPredicate<Object, IfPresentSqlKeyWordEnum> ifPresent = ConfigProperties.ifPresent;
 
     @Override
     public T getEntity() {
@@ -181,13 +181,13 @@ public abstract class KtAbstractWrapper<T, Children extends KtAbstractWrapper<T,
         return typedThis;
     }
 
-    public Children setIfAbsent(BiPredicate<Object, IfAbsentSqlKeyWordEnum> ifAbsent) {
-        this.ifAbsent = ifAbsent;
+    public Children setIfPresent(BiPredicate<Object, IfPresentSqlKeyWordEnum> ifPresent) {
+        this.ifPresent = ifPresent;
         return typedThis;
     }
 
-    public Children setIfAbsent(Predicate<Object> ifAbsent) {
-        this.ifAbsent = (o, k) -> ifAbsent.test(o);
+    public Children setIfPresent(Predicate<Object> ifPresent) {
+        this.ifPresent = (o, k) -> ifPresent.test(o);
         return typedThis;
     }
 
@@ -659,7 +659,7 @@ public abstract class KtAbstractWrapper<T, Children extends KtAbstractWrapper<T,
         index = null;
         isMain = true;
         isNo = false;
-        ifAbsent = ConfigProperties.ifAbsent;
+        ifPresent = ConfigProperties.ifPresent;
     }
 
     /**

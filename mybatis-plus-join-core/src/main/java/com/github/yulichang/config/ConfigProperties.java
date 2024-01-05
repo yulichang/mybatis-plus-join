@@ -2,9 +2,9 @@ package com.github.yulichang.config;
 
 import com.github.yulichang.adapter.AdapterHelper;
 import com.github.yulichang.adapter.base.ITableInfoAdapter;
-import com.github.yulichang.config.enums.IfAbsentEnum;
+import com.github.yulichang.config.enums.IfPresentEnum;
 import com.github.yulichang.config.enums.LogicDelTypeEnum;
-import com.github.yulichang.wrapper.enums.IfAbsentSqlKeyWordEnum;
+import com.github.yulichang.wrapper.enums.IfPresentSqlKeyWordEnum;
 
 import java.util.function.BiPredicate;
 
@@ -51,7 +51,7 @@ public class ConfigProperties {
      */
     public static String subQueryAlias = "st";
     /**
-     * Wrapper ifAbsent 判断策略
+     * Wrapper ifPresent 判断策略
      * <p>
      * NOT_NULL 非null
      * <p>
@@ -59,5 +59,5 @@ public class ConfigProperties {
      * <p>
      * NOT_BLANK 非空白字符串  例： "" -> false, " " -> false, "\r" -> false, "abc" -> true ...
      */
-    public static BiPredicate<Object, IfAbsentSqlKeyWordEnum> ifAbsent = (val, key) -> IfAbsentEnum.NOT_EMPTY.test(val);
+    public static BiPredicate<Object, IfPresentSqlKeyWordEnum> ifPresent = (val, key) -> IfPresentEnum.NOT_EMPTY.test(val);
 }

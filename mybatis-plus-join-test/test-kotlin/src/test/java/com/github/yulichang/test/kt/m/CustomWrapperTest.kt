@@ -26,7 +26,7 @@ class CustomWrapperTest {
     //自定义wrapper扩展
     class CWrapper<T> : KtLambdaWrapper<T>() {
 
-        fun eqIfAbsent(column: KProperty<*>, `val`: Any?): CWrapper<T> {
+        override fun eqIfPresent(column: KProperty<*>?, `val`: Any?): CWrapper<T> {
             eq(Objects.nonNull(`val`), column, `val`)
             return this
         }
@@ -42,16 +42,16 @@ class CustomWrapperTest {
     fun testWrapperCustomer() {
         ThreadLocalUtils.set("SELECT t.id, t.pid, t.`name`, t.`json`, t.sex, t.head_img, t.create_time, t.address_id, t.address_id2, t.del, t.create_by, t.update_by FROM `user` t WHERE t.del = false AND (t.id = ?)")
         val wrapper: CWrapper<UserDO> = CWrapper<UserDO>()
-                .selectAll(UserDO::class.java)
-                .toChildren<CWrapper<UserDO>> { CWrapper.toCWrapper() }
-                .eqIfAbsent(UserDO::id, 1)
+            .selectAll(UserDO::class.java)
+            .toChildren<CWrapper<UserDO>> { CWrapper.toCWrapper() }
+            .eqIfPresent(UserDO::id, 1)
         val dos = userMapper?.selectList(wrapper)
         dos?.forEach(System.out::println)
         ThreadLocalUtils.set("SELECT t.id, t.pid, t.`name`, t.`json`, t.sex, t.head_img, t.create_time, t.address_id, t.address_id2, t.del, t.create_by, t.update_by FROM `user` t WHERE t.del = false")
         val wrapper1: CWrapper<UserDO> = CWrapper<UserDO>()
-                .selectAll(UserDO::class.java)
-                .toChildren(Ref<CWrapper<UserDO>>())
-                .eqIfAbsent(UserDO::id, null)
+            .selectAll(UserDO::class.java)
+            .toChildren(Ref<CWrapper<UserDO>>())
+            .eqIfPresent(UserDO::id, null)
         val dos1 = userMapper?.selectList(wrapper1)
         dos1?.forEach(System.out::println)
     }

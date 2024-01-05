@@ -52,4 +52,7 @@ open class UserDO : ID<Int?>(), Serializable {
 
     @TableField(exist = false)
     var addressList2: List<AddressDO>? = null
+    override fun toString(): String {
+        return "UserDO(pid=$pid, name=$name, json=$json, sex=$sex, img=$img, createTime=$createTime, addressId=$addressId, addressId2=$addressId2, del=$del, createBy=$createBy, createName=$createName, updateBy=$updateBy, updateName=$updateName, alias=$alias, children=$children, addressList=$addressList, addressList2=$addressList2)"
+    }
 }

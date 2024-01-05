@@ -1,6 +1,6 @@
 package com.github.yulichang.test.join.m;
 
-import com.github.yulichang.config.enums.IfAbsentEnum;
+import com.github.yulichang.config.enums.IfPresentEnum;
 import com.github.yulichang.test.join.entity.UserDO;
 import com.github.yulichang.test.util.Reset;
 import com.github.yulichang.test.util.ThreadLocalUtils;
@@ -13,7 +13,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import java.util.List;
 
 @SpringBootTest
-public class IfAbsentTest {
+public class IfPresentTest {
 
     @BeforeEach
     void setUp() {
@@ -21,35 +21,35 @@ public class IfAbsentTest {
     }
 
     @Test
-    void ifAbsent() {
-        assert IfAbsentEnum.NOT_EMPTY.test("\t");
-        assert !IfAbsentEnum.NOT_EMPTY.test("");
-        assert IfAbsentEnum.NOT_EMPTY.test(" ");
-        assert IfAbsentEnum.NOT_EMPTY.test("\r");
-        assert IfAbsentEnum.NOT_EMPTY.test("a");
-        assert IfAbsentEnum.NOT_EMPTY.test(1);
-        assert IfAbsentEnum.NOT_EMPTY.test(true);
-        assert IfAbsentEnum.NOT_EMPTY.test('A');
+    void ifPresent() {
+        assert IfPresentEnum.NOT_EMPTY.test("\t");
+        assert !IfPresentEnum.NOT_EMPTY.test("");
+        assert IfPresentEnum.NOT_EMPTY.test(" ");
+        assert IfPresentEnum.NOT_EMPTY.test("\r");
+        assert IfPresentEnum.NOT_EMPTY.test("a");
+        assert IfPresentEnum.NOT_EMPTY.test(1);
+        assert IfPresentEnum.NOT_EMPTY.test(true);
+        assert IfPresentEnum.NOT_EMPTY.test('A');
 
-        assert !IfAbsentEnum.NOT_BLANK.test("\t");
-        assert !IfAbsentEnum.NOT_BLANK.test("");
-        assert !IfAbsentEnum.NOT_BLANK.test(" ");
-        assert !IfAbsentEnum.NOT_BLANK.test("\r");
-        assert IfAbsentEnum.NOT_BLANK.test("a");
-        assert IfAbsentEnum.NOT_EMPTY.test(1);
-        assert IfAbsentEnum.NOT_EMPTY.test(true);
-        assert IfAbsentEnum.NOT_EMPTY.test('A');
+        assert !IfPresentEnum.NOT_BLANK.test("\t");
+        assert !IfPresentEnum.NOT_BLANK.test("");
+        assert !IfPresentEnum.NOT_BLANK.test(" ");
+        assert !IfPresentEnum.NOT_BLANK.test("\r");
+        assert IfPresentEnum.NOT_BLANK.test("a");
+        assert IfPresentEnum.NOT_EMPTY.test(1);
+        assert IfPresentEnum.NOT_EMPTY.test(true);
+        assert IfPresentEnum.NOT_EMPTY.test('A');
 
         ThreadLocalUtils.set("SELECT t.id, t.pid, t.`name`, t.`json`, t.sex, t.head_img, t.create_time, t.address_id, " +
                 "t.address_id2, t.del, t.create_by, t.update_by FROM `user` t " +
                 "WHERE t.del = false AND (t.id = ? AND t.head_img = ? AND t.`name` = ?)");
         MPJLambdaWrapper<UserDO> wrapper = JoinWrappers.lambda(UserDO.class)
                 .selectAll(UserDO.class)
-                .eqIfAbsent(UserDO::getId, 1)
-                .eqIfAbsent(UserDO::getPid, null)
-                .eqIfAbsent(UserDO::getAddressId, "")
-                .eqIfAbsent(UserDO::getImg, "\t")
-                .eqIfAbsent(UserDO::getName, "张三 1");
+                .eqIfPresent(UserDO::getId, 1)
+                .eqIfPresent(UserDO::getPid, null)
+                .eqIfPresent(UserDO::getAddressId, "")
+                .eqIfPresent(UserDO::getImg, "\t")
+                .eqIfPresent(UserDO::getName, "张三 1");
         List<UserDO> list = wrapper.list();
         list.forEach(System.out::println);
 
@@ -58,12 +58,12 @@ public class IfAbsentTest {
                 "WHERE t.del = false AND (t.id = ? AND t.`name` = ?)");
         MPJLambdaWrapper<UserDO> wrapper1 = JoinWrappers.lambda(UserDO.class)
                 .selectAll(UserDO.class)
-                .setIfAbsent(IfAbsentEnum.NOT_BLANK)
-                .eqIfAbsent(UserDO::getId, 1)
-                .eqIfAbsent(UserDO::getPid, null)
-                .eqIfAbsent(UserDO::getAddressId, "")
-                .eqIfAbsent(UserDO::getImg, "\t")
-                .eqIfAbsent(UserDO::getName, "张三 1");
+                .setIfPresent(IfPresentEnum.NOT_BLANK)
+                .eqIfPresent(UserDO::getId, 1)
+                .eqIfPresent(UserDO::getPid, null)
+                .eqIfPresent(UserDO::getAddressId, "")
+                .eqIfPresent(UserDO::getImg, "\t")
+                .eqIfPresent(UserDO::getName, "张三 1");
         List<UserDO> list1 = wrapper1.list();
         list1.forEach(System.out::println);
 
@@ -72,12 +72,12 @@ public class IfAbsentTest {
                 "WHERE t.del = false AND (t.id = ? AND t.pid = ? AND t.`name` = ? AND t.head_img = ? AND t.`name` = ?)");
         MPJLambdaWrapper<UserDO> wrapper2 = JoinWrappers.lambda(UserDO.class)
                 .selectAll(UserDO.class)
-                .setIfAbsent(o -> true)
-                .eqIfAbsent(UserDO::getId, 1)
-                .eqIfAbsent(UserDO::getPid, null)
-                .eqIfAbsent(UserDO::getName, "")
-                .eqIfAbsent(UserDO::getImg, "\t")
-                .eqIfAbsent(UserDO::getName, "张三 1");
+                .setIfPresent(o -> true)
+                .eqIfPresent(UserDO::getId, 1)
+                .eqIfPresent(UserDO::getPid, null)
+                .eqIfPresent(UserDO::getName, "")
+                .eqIfPresent(UserDO::getImg, "\t")
+                .eqIfPresent(UserDO::getName, "张三 1");
         List<UserDO> list2 = wrapper2.list();
         list2.forEach(System.out::println);
     }

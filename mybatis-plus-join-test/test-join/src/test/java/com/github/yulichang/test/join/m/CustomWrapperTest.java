@@ -34,7 +34,8 @@ public class CustomWrapperTest {
             return null;
         }
 
-        public <X> CWrapper<T> eqIfAbsent(SFunction<X, ?> column, Object val) {
+        @Override
+        public <X> CWrapper<T> eqIfPresent(SFunction<X, ?> column, Object val) {
             super.eq(Objects.nonNull(val), column, val);
             return this;
         }
@@ -47,7 +48,7 @@ public class CustomWrapperTest {
                 .selectAll(UserDO.class)
 //                .toChildren(new Ref<CWrapper<UserDO>>())
                 .toChildren(CWrapper::toCWrapper)
-                .eqIfAbsent(UserDO::getId, 1);
+                .eqIfPresent(UserDO::getId, 1);
         List<UserDO> dos = userMapper.selectList(wrapper);
         dos.forEach(System.out::println);
 
@@ -56,7 +57,7 @@ public class CustomWrapperTest {
                 .selectAll(UserDO.class)
                 .toChildren(new Ref<CWrapper<UserDO>>())
 //                .toChildren(CWrapper::toCWrapper)
-                .eqIfAbsent(UserDO::getId, null);
+                .eqIfPresent(UserDO::getId, null);
         List<UserDO> dos1 = userMapper.selectList(wrapper1);
         dos1.forEach(System.out::println);
     }

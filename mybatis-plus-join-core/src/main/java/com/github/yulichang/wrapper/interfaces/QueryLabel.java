@@ -28,18 +28,18 @@ public interface QueryLabel<Children> {
     Children getChildren();
 
     /**
-     * 一对多查询 调用此方法发必需要调用对应的 left join / right join ... 连表方法，否则会报错
+     * 一对多查询 调用此方法必需要调用对应的 left join / right join ... 连表方法，否则会报错
      * <p>
      * 举例 UserDO AddressDO 为一对多关系  UserDTO 为结果类
      * <pre>
-     *     MPJLambdaQueryWrapper<UserDO> wrapper = new MPJLambdaQueryWrapper<UserDO>();
+     *     MPJLambdaWrapper&lt;UserDO&gt; wrapper = new MPJLambdaWrapper&lt;UserDO&gt;();
      *     wrapper.selectAll(UserDO.class)
      *            .selectCollection(AddressDO.class, UserDTO::getAddressListDTO)
      *            .leftJoin(AddressDO.class, ...... )
      *            .eq(...)
      *            ...
      * <pre/>
-     * 会自动将 AddressDO类中相同属性的字段 以mybatis<collection>的方式映射到UserDTO.addressListDTO属性中
+     * 会自动将 AddressDO类中相同属性的字段 以mybatis&lt;collection&gt;的方式映射到UserDTO.addressListDTO属性中
      *
      * @since 1.3.0
      *
@@ -50,11 +50,11 @@ public interface QueryLabel<Children> {
      * @param <Z>      包装类集合泛型
      * @param <F>      包装类集合字段泛型
      */
-    default <S, C, Z, F extends java.util.Collection<?>> Children selectCollection(Class<C> child, SFunction<S, F> dtoField) {
+    default <S, C, Z, F extends Collection<?>> Children selectCollection(Class<C> child, SFunction<S, F> dtoField) {
         return selectCollection(null, child, dtoField);
     }
 
-    default <S, C, Z, F extends java.util.Collection<?>> Children selectCollection(String prefix, Class<C> child, SFunction<S, F> dtoField) {
+    default <S, C, Z, F extends Collection<?>> Children selectCollection(String prefix, Class<C> child, SFunction<S, F> dtoField) {
         String dtoFieldName = LambdaUtils.getName(dtoField);
         Class<S> dtoClass = LambdaUtils.getEntityClass(dtoField);
         Map<String, FieldCache> fieldMap = MPJReflectionKit.getFieldMap(dtoClass);
@@ -73,22 +73,22 @@ public interface QueryLabel<Children> {
     }
 
     /**
-     * 一对多查询 调用此方法发必需要调用对应的 left join / right join ... 连表方法，否则会报错
+     * 一对多查询 调用此方法必需要调用对应的 left join / right join ... 连表方法，否则会报错
      * <p>
      * 举例 UserDO AddressDO 为一对多关系  UserDTO 为结果类
      * <pre>
-     *   MPJLambdaQueryWrapper<UserDO> wrapper = new MPJLambdaQueryWrapper();
-     *   wrapper.selectAll(UserDO.class)
+     *   MPJLambdaWrapper&lt;UserDO&gt; wrapper = new MPJLambdaWrapper&lt;UserDO&gt;()
+     *      .selectAll(UserDO.class)
      *      .selectCollection(AddressDO.class, UserDTO::getAddressListDTO, map -> map
      *           .id(AddressDO::getId, AddressDTO::getId)                 //如果属性名一致 可以传一个
      *           .result(AddressDO::getUserId)                            //如果属性名一致 可以传一个
-     *           .result(AddressDO::getAddress, AddressDTO::getAddress))) //如果属性名一致 可以传一个
+     *           .result(AddressDO::getAddress, AddressDTO::getAddress))  //如果属性名一致 可以传一个
      *      .leftJoin(AddressDO.class, ...... )
      *      .eq(...)
      *      ...
      * <pre/>
      *
-     * 会自动将 AddressDO类中指定的字段 以mybatis<collection>的方式映射到UserDTO.addressListDTO属性中
+     * 会自动将 AddressDO类中指定的字段 以mybatis&lt;collection&gt;的方式映射到UserDTO.addressListDTO属性中
      *
      * @since 1.3.0
      *
@@ -100,14 +100,14 @@ public interface QueryLabel<Children> {
      * @param <Z>        包装类集合泛型
      * @param <F>        包装类集合字段泛型
      */
-    default <S, C, Z, F extends java.util.Collection<Z>> Children selectCollection(Class<C> child,
-                                                                                   SFunction<S, F> dtoField,
-                                                                                   MFunc<MybatisLabel.Builder<C, Z>> collection) {
+    default <S, C, Z, F extends Collection<Z>> Children selectCollection(Class<C> child,
+                                                                         SFunction<S, F> dtoField,
+                                                                         MFunc<MybatisLabel.Builder<C, Z>> collection) {
         return selectCollection(null, child, dtoField, collection);
     }
 
-    default <S, Z, F extends java.util.Collection<Z>> Children selectCollection(SFunction<S, F> dtoField,
-                                                                                MFunc<MybatisLabelFree.Builder<Z>> collection) {
+    default <S, Z, F extends Collection<Z>> Children selectCollection(SFunction<S, F> dtoField,
+                                                                      MFunc<MybatisLabelFree.Builder<Z>> collection) {
         //自由映射必须存在泛型Z
         String dtoFieldName = LambdaUtils.getName(dtoField);
         Class<S> dtoClass = LambdaUtils.getEntityClass(dtoField);
@@ -121,10 +121,10 @@ public interface QueryLabel<Children> {
         return getChildren();
     }
 
-    default <S, C, Z, F extends java.util.Collection<Z>> Children selectCollection(String prefix,
-                                                                                   Class<C> child,
-                                                                                   SFunction<S, F> dtoField,
-                                                                                   MFunc<MybatisLabel.Builder<C, Z>> collection) {
+    default <S, C, Z, F extends Collection<Z>> Children selectCollection(String prefix,
+                                                                         Class<C> child,
+                                                                         SFunction<S, F> dtoField,
+                                                                         MFunc<MybatisLabel.Builder<C, Z>> collection) {
         String dtoFieldName = LambdaUtils.getName(dtoField);
         Class<S> dtoClass = LambdaUtils.getEntityClass(dtoField);
         FieldCache field = MPJReflectionKit.getFieldMap(dtoClass).get(dtoFieldName);

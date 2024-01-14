@@ -29,7 +29,7 @@ public interface Compare<Children> extends Serializable {
      *
      * @param condition   执行条件
      * @param params      map 类型的参数, key 是字段名, value 是字段值
-     * @param null2IsNull 是否参数为 null 自动执行 isNull 方法, false 则忽略这个字段\
+     * @param null2IsNull 是否参数为 null 自动执行 isNull 方法, false 则忽略这个字段
      * @return children
      */
     <R, V> Children allEq(boolean condition, Map<SFunction<R, ?>, V> params, boolean null2IsNull);

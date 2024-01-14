@@ -13,7 +13,7 @@ import com.github.yulichang.wrapper.MPJLambdaWrapper;
 public class MPJWrappers {
 
     /**
-     * MPJWrappers.<UserDO>queryJoin()
+     * MPJWrappers.&lt;UserDO&gt;query()
      */
     public static <T> MPJQueryWrapper<T> queryJoin() {
         return new MPJQueryWrapper<>();
@@ -28,7 +28,7 @@ public class MPJWrappers {
     }
 
     /**
-     * MPJWrappers.<UserDO>lambdaJoin()
+     * MPJWrappers.&lt;UserDO&gt;lambda()
      */
     public static <T> MPJLambdaWrapper<T> lambdaJoin() {
         return new MPJLambdaWrapper<>();

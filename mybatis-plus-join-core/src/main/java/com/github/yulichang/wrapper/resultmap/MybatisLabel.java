@@ -54,7 +54,6 @@ public class MybatisLabel<E, T> implements Label<T> {
         /**
          * 自动构建
          */
-        @SuppressWarnings("unchecked")
         public Builder(String index, String property, Class<E> entityClass, Class<?> javaType) {
             this.mybatisLabel = new MybatisLabel<>();
             mybatisLabel.property = property;

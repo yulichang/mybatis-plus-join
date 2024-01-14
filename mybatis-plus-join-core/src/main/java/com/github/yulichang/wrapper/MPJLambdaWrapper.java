@@ -227,7 +227,8 @@ public class MPJLambdaWrapper<T> extends JoinAbstractLambdaWrapper<T, MPJLambdaW
     /**
      * union
      * <p>
-     * 推荐使用 union(Class<U> clazz, Consumer<MPJLambdaWrapper<U>> consumer)
+     * 推荐使用 union(Class&lt;U&gt; clazz, ConsumerConsumer&lt;MPJLambdaWrapper&lt;U&gt;&gt; consumer)
+     * <p>
      * 例： wrapper.union(UserDO.class, union -> union.selectAll(UserDO.class))
      *
      * @see #union(Class, Consumer)
@@ -275,7 +276,8 @@ public class MPJLambdaWrapper<T> extends JoinAbstractLambdaWrapper<T, MPJLambdaW
     /**
      * union
      * <p>
-     * 推荐使用 unionAll(Class<U> clazz, Consumer<MPJLambdaWrapper<U>> consumer)
+     * 推荐使用 unionAll(Class&lt;U&gt; clazz, Consumer&lt;MPJLambdaWrapper&lt;U&gt;&gt; consumer)
+     * <p>
      * 例： wrapper.unionAll(UserDO.class, union -> union.selectAll(UserDO.class))
      *
      * @see #unionAll(Class, Consumer)

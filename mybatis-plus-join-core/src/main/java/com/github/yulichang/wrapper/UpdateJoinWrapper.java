@@ -129,6 +129,7 @@ public class UpdateJoinWrapper<T> extends JoinAbstractLambdaWrapper<T, UpdateJoi
         return typedThis;
     }
 
+    @SuppressWarnings("DuplicatedCode")
     @Override
     public String getSqlSet() {
         if (StringUtils.isNotBlank(sqlSetStr.getStringValue())) {

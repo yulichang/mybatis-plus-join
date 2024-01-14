@@ -224,14 +224,14 @@ public class KtLambdaWrapper<T> extends KtAbstractLambdaWrapper<T, KtLambdaWrapp
     /**
      * union
      * <p>
-     * 推荐使用 union(Class<U> clazz, Consumer<MPJLambdaWrapper<U>> consumer)
+     * 推荐使用 union(Class&lt;U&gt; clazz, Consumer&lt;MPJLambdaWrapper&lt;U&gt;&gt; consumer)
      * 例： wrapper.union(UserDO.class, union -> union.selectAll(UserDO.class))
      *
      * @see #union(Class, Consumer)
      * @deprecated union 不支持子查询
      */
     @Deprecated
-    @SuppressWarnings("DeprecatedIsStillUsed")
+    @SuppressWarnings("ALL")
     public final KtLambdaWrapper<T> union(KtLambdaWrapper<?>... wrappers) {
         StringBuilder sb = new StringBuilder();
         for (KtLambdaWrapper<?> wrapper : wrappers) {
@@ -272,14 +272,14 @@ public class KtLambdaWrapper<T> extends KtAbstractLambdaWrapper<T, KtLambdaWrapp
     /**
      * union
      * <p>
-     * 推荐使用 unionAll(Class<U> clazz, Consumer<MPJLambdaWrapper<U>> consumer)
+     * 推荐使用 unionAll(Class&lt;U&gt; clazz, Consumer&lt;MPJLambdaWrapper&lt;U&gt;&gt; consumer)
      * 例： wrapper.unionAll(UserDO.class, union -> union.selectAll(UserDO.class))
      *
      * @see #unionAll(Class, Consumer)
      * @deprecated union 不支持子查询
      */
     @Deprecated
-    @SuppressWarnings("DeprecatedIsStillUsed")
+    @SuppressWarnings("ALL")
     public final KtLambdaWrapper<T> unionAll(KtLambdaWrapper<?>... wrappers) {
         StringBuilder sb = new StringBuilder();
         for (KtLambdaWrapper<?> wrapper : wrappers) {

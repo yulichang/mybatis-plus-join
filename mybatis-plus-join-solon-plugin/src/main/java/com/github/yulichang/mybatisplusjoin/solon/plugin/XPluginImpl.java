@@ -49,7 +49,7 @@ public class XPluginImpl implements Plugin {
             }
         });
         // 读取配置
-        Prop prop = new Prop(context.cfg().getProp("mybatis-plus-join"));
+        Prop prop = new Prop(context.cfg());
         ConfigProperties.banner = prop.get("banner", Boolean::parseBoolean);
         ConfigProperties.subTableLogic = prop.get("subTableLogic", Boolean::parseBoolean);
         ConfigProperties.msCache = prop.get("msCache", Boolean::parseBoolean);
@@ -76,10 +76,12 @@ public class XPluginImpl implements Plugin {
 
         private final Properties props;
 
+        @SuppressWarnings("SpellCheckingInspection")
         public Prop(Props props) {
-            this.props = new Properties();
-            props.forEach((k, v) -> this.props.put(k.toString()
-                    .replaceAll("[-_]", "").toUpperCase(Locale.ENGLISH), v));
+            this.props = props.entrySet().stream().filter(e -> format(e.getKey().toString())
+                    .startsWith("MYBATISPLUSJOIN.")).collect(Collectors.toMap(e -> e.getKey().toString()
+                    .substring(e.getKey().toString().lastIndexOf(".") + 1)
+                    .toUpperCase(Locale.ENGLISH), Map.Entry::getValue, (o, n) -> n, Properties::new));
         }
 
         @SuppressWarnings("unchecked")
@@ -91,6 +93,10 @@ public class XPluginImpl implements Plugin {
             } catch (IllegalAccessException | NoSuchFieldException e) {
                 throw new RuntimeException(e);
             }
+        }
+
+        private String format(String key) {
+            return key.replaceAll("[-_]", "").toUpperCase(Locale.ENGLISH);
         }
     }
 }

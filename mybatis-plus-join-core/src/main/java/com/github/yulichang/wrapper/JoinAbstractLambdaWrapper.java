@@ -369,6 +369,35 @@ public abstract class JoinAbstractLambdaWrapper<T, Children extends JoinAbstract
     }
 
     /**
+     * 检验表是否已连接
+     */
+    public boolean checkJoinTable(Class clazz) {
+        TableInfo info = TableHelper.get(clazz);
+        Asserts.hasTable(info, clazz);
+        String tableName = info.getTableName();
+
+        for (Children wrapper : onWrappers) {
+            if (StringUtils.isBlank(wrapper.from.getStringValue())) {
+                if (this.subLogicSql && this.logicDelType == LogicDelTypeEnum.ON) {
+                    TableInfo tableInfo = TableHelper.get(wrapper.getJoinClass());
+                    if (tableInfo != null && tableName.equals(tableInfo.getTableName())) {
+                        return true;
+                    }
+                }
+                if (wrapper.getTableName().equals(tableName)) {
+                    return true;
+                }
+            } else {
+                if (wrapper.from.getStringValue().contains(Constant.JOIN + StringPool.SPACE + tableName)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * 内部调用, 不建议使用
      */
     @Override

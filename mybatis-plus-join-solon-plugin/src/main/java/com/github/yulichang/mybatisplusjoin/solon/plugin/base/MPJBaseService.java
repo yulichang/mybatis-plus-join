@@ -16,7 +16,7 @@ import java.util.Map;
  * @author yulichang
  */
 @SuppressWarnings({"unused"})
-public interface JoinService<T> extends IService<T> {
+public interface MPJBaseService<T> extends IService<T> {
 
 
     /**

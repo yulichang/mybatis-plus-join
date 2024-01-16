@@ -23,7 +23,7 @@ import java.util.function.Function;
  * @since 1.4.4
  */
 @SuppressWarnings({"unchecked", "unused"})
-public interface JoinRelationService<T> extends IService<T> {
+public interface MPJRelationService<T> extends IService<T> {
 
     /**
      * 通过注解实现单表多次查询

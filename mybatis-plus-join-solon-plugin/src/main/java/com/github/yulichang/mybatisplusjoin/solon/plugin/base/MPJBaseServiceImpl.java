@@ -8,6 +8,6 @@ import com.github.yulichang.base.MPJBaseMapper;
  * @see ServiceImpl
  */
 @SuppressWarnings("unused")
-public class JoinServiceImpl<M extends MPJBaseMapper<T>, T> extends ServiceImpl<M, T> implements JoinService<T> {
+public class MPJBaseServiceImpl<M extends MPJBaseMapper<T>, T> extends ServiceImpl<M, T> implements MPJBaseService<T> {
 
 }

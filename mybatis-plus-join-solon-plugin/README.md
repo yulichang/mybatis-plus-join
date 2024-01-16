@@ -22,9 +22,9 @@ public interface UserMapper extends MPJBaseMapper<UserDO> {
 ### (可选)service继承JoinService
 
 ```java
-import com.github.yulichang.mybatisplusjoin.solon.plugin.base.JoinService;
+import com.github.yulichang.mybatisplusjoin.solon.plugin.base.MPJBaseService;
 
-public interface UserService extends JoinService<UserDO> {
+public interface UserService extends MPJBaseService<UserDO> {
 
 }
 ```
@@ -32,11 +32,11 @@ public interface UserService extends JoinService<UserDO> {
 ### (可选)serviceImpl继承JoinServiceImpl
 
 ```java
-import com.github.yulichang.mybatisplusjoin.solon.plugin.base.JoinServiceImpl;
+import com.github.yulichang.mybatisplusjoin.solon.plugin.base.MPJBaseServiceImpl;
 import org.noear.solon.annotation.Component;
 
 @Component
-public class UserServiceImpl extends JoinServiceImpl<UserMapper, UserDO> implements UserService {
+public class UserServiceImpl extends MPJBaseServiceImpl<UserMapper, UserDO> implements UserService {
 
 }
 ```

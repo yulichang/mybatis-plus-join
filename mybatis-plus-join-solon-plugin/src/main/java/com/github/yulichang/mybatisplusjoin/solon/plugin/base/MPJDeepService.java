@@ -27,7 +27,7 @@ import java.util.function.Function;
  * @since 1.2.0
  */
 @SuppressWarnings({"unused"})
-public interface JoinDeepService<T> extends IService<T> {
+public interface MPJDeepService<T> extends IService<T> {
 
     /**
      * 根据 ID 查询 并关联全部映射

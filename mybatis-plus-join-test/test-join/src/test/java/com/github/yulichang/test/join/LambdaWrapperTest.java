@@ -64,15 +64,15 @@ class LambdaWrapperTest {
     @Test
     void testSelectSort() {
         ThreadLocalUtils.set("SELECT t.id, t.user_id, t.tenant_id FROM user_tenant t WHERE t.tenant_id = 1");
-        MPJLambdaWrapper<UserTenantDO> lambda = JoinWrappers.lambda(UserTenantDO.class);
-        lambda.selectAsClass(UserTenantDO.class, UserTenantDTO.class);
+        MPJLambdaWrapper<UserTenantDO> lambda = JoinWrappers.lambda(UserTenantDO.class)
+                .selectAsClass(UserTenantDO.class, UserTenantDTO.class);
         List<UserTenantDO> list = userTenantMapper.selectJoinList(UserTenantDO.class, lambda);
         assert list.size() == 5 && list.get(0).getIdea() != null;
 
 
         ThreadLocalUtils.set("SELECT t.tenant_id, t.user_id, t.id FROM user_tenant t WHERE t.tenant_id = 1");
-        MPJLambdaWrapper<UserTenantDO> lambda1 = JoinWrappers.lambda(UserTenantDO.class);
-        lambda1.selectAsClass(UserTenantDO.class, UserTenantDescDTO.class);
+        MPJLambdaWrapper<UserTenantDO> lambda1 = JoinWrappers.lambda(UserTenantDO.class)
+                .selectAsClass(UserTenantDO.class, UserTenantDescDTO.class);
         List<UserTenantDO> list1 = userTenantMapper.selectJoinList(UserTenantDO.class, lambda1);
         assert list1.size() == 5 && list1.get(0).getIdea() != null;
     }
@@ -525,7 +525,6 @@ class LambdaWrapperTest {
                         .eq(AddressDO::getDel, false)));
         assert l4.size() == 14 && l4.get(0).getAddressList().size() == 5;
     }
-
 
     /**
      * 别名测试

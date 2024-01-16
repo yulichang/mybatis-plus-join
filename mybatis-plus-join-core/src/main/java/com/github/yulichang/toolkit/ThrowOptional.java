@@ -33,7 +33,11 @@ public class ThrowOptional {
         try {
             this.doSomething.doSomething();
         } catch (Throwable ignored) {
-            doSomething.doSomething();
+            try {
+                doSomething.doSomething();
+            } catch (Throwable e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 
@@ -48,6 +52,6 @@ public class ThrowOptional {
 
     @FunctionalInterface
     public interface DoSomething {
-        void doSomething();
+        void doSomething() throws Throwable;
     }
 }

@@ -220,7 +220,8 @@ public class MPJLambdaWrapper<T> extends JoinAbstractLambdaWrapper<T, MPJLambdaW
         wrapper.subTableAlias = st;
         consumer.accept(wrapper);
         addCustomWrapper(wrapper);
-        this.selectColumns.add(new SelectSub(() -> WrapperUtils.buildSubSqlByWrapper(clazz, wrapper, LambdaUtils.getName(alias)), hasAlias, this.alias));
+        String name = LambdaUtils.getName(alias);
+        this.selectColumns.add(new SelectSub(() -> WrapperUtils.buildSubSqlByWrapper(clazz, wrapper, name), hasAlias, this.alias, name));
         return typedThis;
     }
 

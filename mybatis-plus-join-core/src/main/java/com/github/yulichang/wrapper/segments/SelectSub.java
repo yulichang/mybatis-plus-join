@@ -2,6 +2,7 @@ package com.github.yulichang.wrapper.segments;
 
 import com.baomidou.mybatisplus.core.metadata.TableFieldInfo;
 import com.baomidou.mybatisplus.core.toolkit.StringPool;
+import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.github.yulichang.wrapper.enums.BaseFuncEnum;
 import org.apache.ibatis.type.TypeHandler;
 
@@ -22,10 +23,13 @@ public class SelectSub implements Select {
 
     private final String tableAlias;
 
-    public SelectSub(Supplier<String> column, boolean hasTableAlias, String tableAlias) {
+    private final String tagProperty;
+
+    public SelectSub(Supplier<String> column, boolean hasTableAlias, String tableAlias,String tagProperty) {
         this.column = column;
         this.hasTableAlias = hasTableAlias;
         this.tableAlias = tableAlias;
+        this.tagProperty = null == tagProperty ? null : StringUtils.getTargetColumn(tagProperty);
     }
 
     @Override
@@ -65,12 +69,12 @@ public class SelectSub implements Select {
 
     @Override
     public String getTagColumn() {
-        return null;
+        return tagProperty;
     }
 
     @Override
     public String getColumProperty() {
-        return null;
+        return tagProperty;
     }
 
     @Override

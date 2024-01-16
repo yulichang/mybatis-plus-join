@@ -217,7 +217,7 @@ public class KtLambdaWrapper<T> extends KtAbstractLambdaWrapper<T, KtLambdaWrapp
         consumer.accept(wrapper);
         addCustomWrapper(wrapper);
         this.selectColumns.add(new SelectSub(() -> KtWrapperUtils.buildSubSqlByWrapper(
-                clazz, wrapper, alias.getName()), hasAlias, this.alias));
+                clazz, wrapper, alias.getName()), hasAlias, this.alias, alias.getName()));
         return typedThis;
     }
 

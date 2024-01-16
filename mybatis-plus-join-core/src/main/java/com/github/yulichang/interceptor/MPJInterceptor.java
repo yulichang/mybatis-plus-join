@@ -2,15 +2,13 @@ package com.github.yulichang.interceptor;
 
 import com.baomidou.mybatisplus.core.MybatisPlusVersion;
 import com.baomidou.mybatisplus.core.metadata.TableInfo;
+import com.baomidou.mybatisplus.core.toolkit.ReflectionKit;
 import com.baomidou.mybatisplus.core.toolkit.*;
 import com.github.yulichang.adapter.base.tookit.VersionUtils;
 import com.github.yulichang.config.ConfigProperties;
 import com.github.yulichang.interfaces.MPJBaseJoin;
 import com.github.yulichang.query.MPJQueryWrapper;
-import com.github.yulichang.toolkit.Constant;
-import com.github.yulichang.toolkit.MPJReflectionKit;
-import com.github.yulichang.toolkit.MPJTableMapperHelper;
-import com.github.yulichang.toolkit.TableHelper;
+import com.github.yulichang.toolkit.*;
 import com.github.yulichang.toolkit.support.FieldCache;
 import com.github.yulichang.wrapper.interfaces.SelectWrapper;
 import com.github.yulichang.wrapper.resultmap.IResult;
@@ -50,7 +48,7 @@ public class MPJInterceptor implements Interceptor {
     private static final List<ResultMapping> EMPTY_RESULT_MAPPING = new ArrayList<>(0);
 
     /**
-     * 缓存MappedStatement,不需要每次都去重新构建MappedStatement
+     * 缓存MappedStatement,不需要每次都去构建MappedStatement
      */
     private static final Map<String, Map<Configuration, MappedStatement>> MS_CACHE = new ConcurrentHashMap<>();
 
@@ -199,11 +197,23 @@ public class MPJInterceptor implements Interceptor {
                 }
             } else {
                 FieldCache field = fieldMap.get(i.getColumProperty());
-                columnSet.add(i.getTagColumn());
-                if (Objects.nonNull(field)) {
-                    ResultMapping.Builder builder = new ResultMapping.Builder(ms.getConfiguration(), i.getColumProperty(),
-                            i.getTagColumn(), field.getType());
-                    resultMappings.add(selectToResult(wrapper.getEntityClass(), i, field.getType(), builder));
+                if (StringUtils.isNotBlank(i.getTagColumn())) {
+                    columnSet.add(i.getTagColumn());
+                    if (Objects.nonNull(field)) {
+                        ResultMapping.Builder builder = new ResultMapping.Builder(ms.getConfiguration(), i.getColumProperty(),
+                                i.getTagColumn(), field.getType());
+                        resultMappings.add(selectToResult(wrapper.getEntityClass(), i, field.getType(), builder));
+                    }
+                } else if (wrapper.isResultMap()) {
+                    ThrowOptional.tryDo(() -> JSqlParserHelper.paresColum(wrapper, i.getColumn(), col -> {
+                        FieldCache strField = fieldMap.get(col);
+                        columnSet.add(col);
+                        if (Objects.nonNull(strField)) {
+                            ResultMapping.Builder builder = new ResultMapping.Builder(ms.getConfiguration(), col,
+                                    col, strField.getType());
+                            resultMappings.add(selectToResult(wrapper.getEntityClass(), i, strField.getType(), builder));
+                        }
+                    })).catchDo();
                 }
             }
         }
@@ -430,7 +440,7 @@ public class MPJInterceptor implements Interceptor {
     public void setProperties(Properties properties) {
         try {
             Interceptor.super.setProperties(properties);
-        } catch (Exception ignored) {
+        } catch (Throwable ignored) {
         }
     }
 

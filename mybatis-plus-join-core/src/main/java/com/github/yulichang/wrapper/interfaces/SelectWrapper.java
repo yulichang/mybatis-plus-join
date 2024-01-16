@@ -21,4 +21,8 @@ public interface SelectWrapper<Entity, Children> {
     boolean isResultMap();
 
     List<?> getResultMapMybatisLabel();
+
+    String getFrom();
+
+    String getAlias();
 }

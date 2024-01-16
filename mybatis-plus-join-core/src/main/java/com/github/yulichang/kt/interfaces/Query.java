@@ -90,7 +90,8 @@ public interface Query<Children> extends Serializable {
      * @param columns 列
      */
     default Children select(String... columns) {
-        getSelectColum().addAll(Arrays.stream(columns).map(i -> new SelectString(i, isHasAlias(), getAlias())).collect(Collectors.toList()));
+        getSelectColum().addAll(Arrays.stream(columns).map(i ->
+                new SelectString(i, null)).collect(Collectors.toList()));
         return getChildren();
     }
 
@@ -100,7 +101,7 @@ public interface Query<Children> extends Serializable {
      * @param column 列
      */
     default Children selectAs(String column, KProperty<?> alias) {
-        getSelectColum().add(new SelectString(column + Constants.AS + alias.getName(), isHasAlias(), getAlias()));
+        getSelectColum().add(new SelectString(column + Constants.AS + alias.getName(), alias.getName()));
         return getChildren();
     }
 
@@ -113,8 +114,7 @@ public interface Query<Children> extends Serializable {
         Map<String, SelectCache> cacheMap = ColumnCache.getMapField(KtUtils.ref(column));
         SelectCache cache = cacheMap.get(column.getName());
         getSelectColum().add(new SelectString(
-                index + Constants.DOT + cache.getColumn() + Constants.AS + alias.getName(),
-                isHasAlias(), getAlias()));
+                index + Constants.DOT + cache.getColumn() + Constants.AS + alias.getName(), alias.getName()));
         return getChildren();
     }
 

@@ -3,6 +3,7 @@ package com.github.yulichang.wrapper.interfaces;
 import com.baomidou.mybatisplus.core.metadata.TableFieldInfo;
 import com.baomidou.mybatisplus.core.metadata.TableInfo;
 import com.baomidou.mybatisplus.core.toolkit.Constants;
+import com.baomidou.mybatisplus.core.toolkit.StringPool;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.github.yulichang.toolkit.Asserts;
 import com.github.yulichang.toolkit.LambdaUtils;
@@ -15,7 +16,6 @@ import com.github.yulichang.wrapper.enums.DefaultFuncEnum;
 import com.github.yulichang.wrapper.segments.*;
 
 import java.io.Serializable;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -90,7 +90,7 @@ public interface Query<Children> extends Serializable {
      * @param columns 列
      */
     default Children select(String... columns) {
-        getSelectColum().addAll(Arrays.stream(columns).map(i -> new SelectString(i, isHasAlias(), getAlias())).collect(Collectors.toList()));
+        getSelectColum().add(new SelectString(String.join(StringPool.COMMA, columns), null));
         return getChildren();
     }
 
@@ -100,7 +100,7 @@ public interface Query<Children> extends Serializable {
      * @param column 列
      */
     default <E> Children selectAs(String column, SFunction<E, ?> alias) {
-        getSelectColum().add(new SelectString(column + Constants.AS + LambdaUtils.getName(alias), isHasAlias(), getAlias()));
+        getSelectColum().add(new SelectString(column + Constants.AS + LambdaUtils.getName(alias), LambdaUtils.getName(alias)));
         return getChildren();
     }
 
@@ -113,8 +113,7 @@ public interface Query<Children> extends Serializable {
         Map<String, SelectCache> cacheMap = ColumnCache.getMapField(LambdaUtils.getEntityClass(column));
         SelectCache cache = cacheMap.get(LambdaUtils.getName(column));
         getSelectColum().add(new SelectString(
-                index + Constants.DOT + cache.getColumn() + Constants.AS + LambdaUtils.getName(alias),
-                isHasAlias(), getAlias()));
+                index + Constants.DOT + cache.getColumn() + Constants.AS + LambdaUtils.getName(alias), LambdaUtils.getName(alias)));
         return getChildren();
     }
 

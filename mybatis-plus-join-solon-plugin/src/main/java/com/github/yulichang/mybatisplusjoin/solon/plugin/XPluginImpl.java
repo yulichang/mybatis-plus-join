@@ -76,10 +76,9 @@ public class XPluginImpl implements Plugin {
 
         private final Properties props;
 
-        @SuppressWarnings("SpellCheckingInspection")
         public Prop(Props props) {
-            this.props = props.entrySet().stream().filter(e -> format(e.getKey().toString())
-                    .startsWith("MYBATISPLUSJOIN.")).collect(Collectors.toMap(e -> e.getKey().toString()
+            this.props = props.entrySet().stream().filter(e -> format(e.getKey())
+                    .startsWith(format("mybatis-plus-join."))).collect(Collectors.toMap(e -> e.getKey().toString()
                     .substring(e.getKey().toString().lastIndexOf(".") + 1)
                     .toUpperCase(Locale.ENGLISH), Map.Entry::getValue, (o, n) -> n, Properties::new));
         }
@@ -95,8 +94,9 @@ public class XPluginImpl implements Plugin {
             }
         }
 
-        private String format(String key) {
-            return key.replaceAll("[-_]", "").toUpperCase(Locale.ENGLISH);
+        private String format(Object key) {
+            return Optional.ofNullable(key).map(k -> k.toString().replaceAll("[-_]", "")
+                    .toUpperCase(Locale.ENGLISH)).orElse("");
         }
     }
 }

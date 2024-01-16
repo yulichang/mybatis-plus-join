@@ -19,7 +19,7 @@ public interface UserMapper extends MPJBaseMapper<UserDO> {
 }
 ```
 
-### (可选)service继承JoinService
+### (可选)service继承MPJBaseService
 
 ```java
 import com.github.yulichang.mybatisplusjoin.solon.plugin.base.MPJBaseService;
@@ -29,7 +29,7 @@ public interface UserService extends MPJBaseService<UserDO> {
 }
 ```
 
-### (可选)serviceImpl继承JoinServiceImpl
+### (可选)serviceImpl继承MPJBaseServiceImpl
 
 ```java
 import com.github.yulichang.mybatisplusjoin.solon.plugin.base.MPJBaseServiceImpl;

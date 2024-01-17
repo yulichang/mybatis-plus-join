@@ -7,10 +7,10 @@ import com.baomidou.mybatisplus.core.metadata.TableInfo;
 import com.baomidou.mybatisplus.core.toolkit.*;
 import com.github.yulichang.adapter.AdapterHelper;
 import com.github.yulichang.kt.interfaces.Update;
-import com.github.yulichang.toolkit.Asserts;
 import com.github.yulichang.toolkit.KtUtils;
 import com.github.yulichang.toolkit.TableHelper;
 import com.github.yulichang.toolkit.TableList;
+import com.github.yulichang.wrapper.interfaces.UpdateChain;
 import kotlin.reflect.KProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -29,7 +29,7 @@ import java.util.stream.Collectors;
  */
 @SuppressWarnings({"unused", "DuplicatedCode"})
 public class KtUpdateJoinWrapper<T> extends KtAbstractLambdaWrapper<T, KtUpdateJoinWrapper<T>>
-        implements Update<KtUpdateJoinWrapper<T>> {
+        implements Update<KtUpdateJoinWrapper<T>>, UpdateChain<T> {
     /**
      * SQL 更新字段内容，例如：name='1', age=2
      */
@@ -199,8 +199,7 @@ public class KtUpdateJoinWrapper<T> extends KtAbstractLambdaWrapper<T, KtUpdateJ
     private void getSqlByEntity(StringBuilder sb, boolean filterNull, List<Object> entityList) {
         for (Object obj : entityList) {
             Assert.isTrue(tableList.contain(obj.getClass()), "更新的实体不是主表或关联表 <%>", obj.getClass().getSimpleName());
-            TableInfo tableInfo = TableHelper.get(obj.getClass());
-            Asserts.hasTable(tableInfo, obj.getClass());
+            TableInfo tableInfo = TableHelper.getAssert(obj.getClass());
             for (TableFieldInfo fieldInfo : tableInfo.getFieldList()) {
                 if (AdapterHelper.getTableInfoAdapter().mpjHasLogic(tableInfo) && fieldInfo.isLogicDelete()) {
                     continue;

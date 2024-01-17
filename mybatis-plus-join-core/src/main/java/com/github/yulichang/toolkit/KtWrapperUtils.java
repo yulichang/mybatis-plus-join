@@ -20,8 +20,7 @@ import java.util.Optional;
 public class KtWrapperUtils {
 
     public static String buildSubSqlByWrapper(Class<?> clazz, KtLambdaWrapper<?> wrapper, String alias) {
-        TableInfo tableInfo = TableHelper.get(clazz);
-        Asserts.hasTable(tableInfo, clazz);
+        TableInfo tableInfo = TableHelper.getAssert(clazz);
         String first = Optional.ofNullable(wrapper.getSqlFirst()).orElse(StringPool.EMPTY);
         boolean hasWhere = false;
         String entityWhere = getEntitySql(tableInfo, wrapper);
@@ -54,8 +53,7 @@ public class KtWrapperUtils {
     }
 
     public static String buildUnionSqlByWrapper(Class<?> clazz, KtLambdaWrapper<?> wrapper) {
-        TableInfo tableInfo = TableHelper.get(clazz);
-        Asserts.hasTable(tableInfo, clazz);
+        TableInfo tableInfo = TableHelper.getAssert(clazz);
         String first = Optional.ofNullable(wrapper.getSqlFirst()).orElse(StringPool.EMPTY);
         boolean hasWhere = false;
         String entityWhere = getEntitySql(tableInfo, wrapper);

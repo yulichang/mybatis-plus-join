@@ -7,7 +7,6 @@ import com.baomidou.mybatisplus.core.metadata.TableInfo;
 import com.baomidou.mybatisplus.core.toolkit.*;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.github.yulichang.adapter.AdapterHelper;
-import com.github.yulichang.toolkit.Asserts;
 import com.github.yulichang.toolkit.LambdaUtils;
 import com.github.yulichang.toolkit.TableHelper;
 import com.github.yulichang.toolkit.TableList;
@@ -198,11 +197,11 @@ public class UpdateJoinWrapper<T> extends JoinAbstractLambdaWrapper<T, UpdateJoi
         this.tableName = tableName;
     }
 
+    @SuppressWarnings("DuplicatedCode")
     private void getSqlByEntity(StringBuilder sb, boolean filterNull, List<Object> entityList) {
         for (Object obj : entityList) {
             Assert.isTrue(tableList.contain(obj.getClass()), "更新的实体不是主表或关联表 <%>", obj.getClass().getSimpleName());
-            TableInfo tableInfo = TableHelper.get(obj.getClass());
-            Asserts.hasTable(tableInfo, obj.getClass());
+            TableInfo tableInfo = TableHelper.getAssert(obj.getClass());
             for (TableFieldInfo fieldInfo : tableInfo.getFieldList()) {
                 if (AdapterHelper.getTableInfoAdapter().mpjHasLogic(tableInfo) && fieldInfo.isLogicDelete()) {
                     continue;

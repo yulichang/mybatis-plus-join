@@ -374,8 +374,7 @@ public abstract class JoinAbstractLambdaWrapper<T, Children extends JoinAbstract
             if (Objects.equals(wrapper.getJoinClass(), clazz)) {
                 return true;
             } else {
-                TableInfo info = TableHelper.get(clazz);
-                Asserts.hasTable(info, clazz);
+                TableInfo info = TableHelper.getAssert(clazz);
                 String tableName = info.getTableName();
                 return Optional.ofNullable(wrapper.from.getStringValue())
                         .map(w -> w.contains(Constant.JOIN + StringPool.SPACE + tableName + StringPool.SPACE))
@@ -391,8 +390,7 @@ public abstract class JoinAbstractLambdaWrapper<T, Children extends JoinAbstract
     public <R> Children join(String keyWord, Class<R> clazz, String tableAlias, BiConsumer<JoinAbstractLambdaWrapper<T, ?>, Children> consumer) {
         Integer oldIndex = this.getIndex();
         int newIndex = tableIndex;
-        TableInfo info = TableHelper.get(clazz);
-        Asserts.hasTable(info, clazz);
+        TableInfo info = TableHelper.getAssert(clazz);
         Children instance = instance(newIndex, keyWord, clazz, info.getTableName());
         instance.isOn = true;
         instance.isMain = false;

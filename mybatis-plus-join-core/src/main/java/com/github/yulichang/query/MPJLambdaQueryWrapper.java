@@ -11,7 +11,6 @@ import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.github.yulichang.config.ConfigProperties;
 import com.github.yulichang.query.interfaces.CompareIfExists;
 import com.github.yulichang.query.interfaces.StringJoin;
-import com.github.yulichang.toolkit.Asserts;
 import com.github.yulichang.toolkit.TableHelper;
 import com.github.yulichang.toolkit.ThrowOptional;
 import com.github.yulichang.wrapper.enums.IfExistsSqlKeyWordEnum;
@@ -194,8 +193,7 @@ public class MPJLambdaQueryWrapper<T> extends AbstractLambdaWrapper<T, MPJLambda
      */
     @Override
     public MPJLambdaQueryWrapper<T> select(Class<T> entityClass, Predicate<TableFieldInfo> predicate) {
-        TableInfo info = TableHelper.get(entityClass);
-        Asserts.hasTable(info, entityClass);
+        TableInfo info = TableHelper.getAssert(entityClass);
         selectColumns.addAll(info.getFieldList().stream().filter(predicate).map(c ->
                 alias + StringPool.DOT + c.getColumn()).collect(Collectors.toList()));
         return typedThis;
@@ -219,8 +217,7 @@ public class MPJLambdaQueryWrapper<T> extends AbstractLambdaWrapper<T, MPJLambda
      */
     @SuppressWarnings("DuplicatedCode")
     public final MPJLambdaQueryWrapper<T> selectAll(Class<?> clazz, String as) {
-        TableInfo info = TableHelper.get(clazz);
-        Asserts.hasTable(info, clazz);
+        TableInfo info = TableHelper.getAssert(clazz);
         if (info.havePK()) {
             selectColumns.add(as + StringPool.DOT + info.getKeyColumn());
         }

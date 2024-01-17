@@ -53,8 +53,7 @@ public class LogicInfoUtils implements Constants {
 
     private static String getLogicStr(String prefix, Class<?> clazz, boolean and, boolean invert) {
         String logicStr;
-        TableInfo tableInfo = TableHelper.get(clazz);
-        Asserts.hasTable(tableInfo, clazz);
+        TableInfo tableInfo = TableHelper.getAssert(clazz);
         TableFieldInfo logicField = ConfigProperties.tableInfoAdapter.mpjGetLogicField(tableInfo);
         if (ConfigProperties.tableInfoAdapter.mpjHasLogic(tableInfo) && Objects.nonNull(logicField)) {
             final String notDeleteValue = logicField.getLogicNotDeleteValue();

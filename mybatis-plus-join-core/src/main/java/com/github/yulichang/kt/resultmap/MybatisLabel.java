@@ -3,7 +3,6 @@ package com.github.yulichang.kt.resultmap;
 import com.baomidou.mybatisplus.core.metadata.TableInfo;
 import com.baomidou.mybatisplus.core.toolkit.Assert;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
-import com.github.yulichang.toolkit.Asserts;
 import com.github.yulichang.toolkit.KtUtils;
 import com.github.yulichang.toolkit.MPJReflectionKit;
 import com.github.yulichang.toolkit.TableHelper;
@@ -145,7 +144,7 @@ public class MybatisLabel<E, T> implements Label<T> {
         /**
          * 嵌套
          */
-        public  Builder<E, T> collection(String prefix, Class<?> entityClass, KProperty<?> func) {
+        public Builder<E, T> collection(String prefix, Class<?> entityClass, KProperty<?> func) {
             String dtoFieldName = func.getName();
             Map<String, FieldCache> fieldMap = MPJReflectionKit.getFieldMap(KtUtils.ref(func));
             FieldCache field = fieldMap.get(dtoFieldName);
@@ -254,8 +253,7 @@ public class MybatisLabel<E, T> implements Label<T> {
         }
 
         private void autoBuild(boolean auto, Class<E> entityClass, Class<T> tagClass) {
-            TableInfo tableInfo = TableHelper.get(entityClass);
-            Asserts.hasTable(tableInfo, entityClass);
+            TableInfo tableInfo = TableHelper.getAssert(entityClass);
             Map<String, FieldCache> tagMap = MPJReflectionKit.getFieldMap(tagClass);
             if (auto && !tagMap.isEmpty()) {
                 List<SelectCache> listField = ColumnCache.getListField(entityClass);

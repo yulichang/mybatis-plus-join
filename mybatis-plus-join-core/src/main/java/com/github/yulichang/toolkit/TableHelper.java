@@ -63,4 +63,11 @@ public class TableHelper {
             return null;
         }
     }
+
+    public static TableInfo getAssert(Class<?> clazz) {
+        Objects.requireNonNull(clazz);
+        TableInfo tableInfo = get(clazz);
+        Asserts.hasTable(tableInfo, clazz);
+        return tableInfo;
+    }
 }

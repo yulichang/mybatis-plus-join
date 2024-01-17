@@ -4,7 +4,6 @@ import com.baomidou.mybatisplus.core.metadata.TableFieldInfo;
 import com.baomidou.mybatisplus.core.metadata.TableInfo;
 import com.baomidou.mybatisplus.core.toolkit.Constants;
 import com.github.yulichang.kt.segments.FuncArgs;
-import com.github.yulichang.toolkit.Asserts;
 import com.github.yulichang.toolkit.KtUtils;
 import com.github.yulichang.toolkit.MPJReflectionKit;
 import com.github.yulichang.toolkit.TableHelper;
@@ -53,8 +52,7 @@ public interface Query<Children> extends Serializable {
      */
     @Deprecated
     default Children select(Class<?> entityClass, Predicate<TableFieldInfo> predicate) {
-        TableInfo info = TableHelper.get(entityClass);
-        Asserts.hasTable(info, entityClass);
+        TableInfo info = TableHelper.getAssert(entityClass);
         Map<String, SelectCache> cacheMap = ColumnCache.getMapField(entityClass);
         info.getFieldList().stream().filter(predicate).collect(Collectors.toList()).forEach(
                 i -> getSelectColum().add(new SelectNormal(cacheMap.get(i.getProperty()), getIndex(), isHasAlias(), getAlias())));
@@ -73,8 +71,7 @@ public interface Query<Children> extends Serializable {
      * @return children
      */
     default Children selectFilter(Class<?> entityClass, Predicate<SelectCache> predicate) {
-        TableInfo info = TableHelper.get(entityClass);
-        Asserts.hasTable(info, entityClass);
+        TableInfo info = TableHelper.getAssert(entityClass);
         List<SelectCache> cacheList = ColumnCache.getListField(entityClass);
         cacheList.stream().filter(predicate).collect(Collectors.toList()).forEach(
                 i -> getSelectColum().add(new SelectNormal(i, getIndex(), isHasAlias(), getAlias())));

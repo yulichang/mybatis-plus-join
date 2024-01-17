@@ -332,8 +332,7 @@ public abstract class KtAbstractLambdaWrapper<T, Children extends KtAbstractLamb
             for (Children wrapper : onWrappers) {
                 if (StringUtils.isBlank(wrapper.from.getStringValue())) {
                     if (this.subLogicSql && this.logicDelType == LogicDelTypeEnum.ON) {
-                        TableInfo tableInfo = TableHelper.get(wrapper.getJoinClass());
-                        Asserts.hasTable(tableInfo, wrapper.getJoinClass());
+                        TableInfo tableInfo = TableHelper.getAssert(wrapper.getJoinClass());
                         if (ConfigProperties.tableInfoAdapter.mpjHasLogic(tableInfo)) {
                             wrapper.appendSqlSegments(APPLY, () -> LogicInfoUtils.getLogicInfoNoAnd(
                                     wrapper.getIndex(), wrapper.getJoinClass(), wrapper.isHasAlias(), wrapper.getAlias()
@@ -368,8 +367,7 @@ public abstract class KtAbstractLambdaWrapper<T, Children extends KtAbstractLamb
     public Children join(String keyWord, Class<?> clazz, String tableAlias, BiConsumer<KtAbstractLambdaWrapper<?, ?>, Children> consumer) {
         Integer oldIndex = this.getIndex();
         int newIndex = tableIndex;
-        TableInfo info = TableHelper.get(clazz);
-        Asserts.hasTable(info, clazz);
+        TableInfo info = TableHelper.getAssert(clazz);
         Children instance = instance(newIndex, keyWord, clazz, info.getTableName());
         instance.isNo = true;
         instance.isMain = false;

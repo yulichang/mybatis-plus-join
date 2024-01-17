@@ -13,7 +13,6 @@ import com.github.yulichang.adapter.base.tookit.VersionUtils;
 import com.github.yulichang.config.ConfigProperties;
 import com.github.yulichang.query.interfaces.CompareIfExists;
 import com.github.yulichang.query.interfaces.StringJoin;
-import com.github.yulichang.toolkit.Asserts;
 import com.github.yulichang.toolkit.MPJSqlInjectionUtils;
 import com.github.yulichang.toolkit.TableHelper;
 import com.github.yulichang.toolkit.ThrowOptional;
@@ -215,8 +214,7 @@ public class MPJQueryWrapper<T> extends AbstractWrapper<T, String, MPJQueryWrapp
      */
     @Override
     public MPJQueryWrapper<T> select(Class<T> entityClass, Predicate<TableFieldInfo> predicate) {
-        TableInfo info = TableHelper.get(entityClass);
-        Asserts.hasTable(info, entityClass);
+        TableInfo info = TableHelper.getAssert(entityClass);
         selectColumns.addAll(info.getFieldList().stream().filter(predicate).map(c ->
                 alias + StringPool.DOT + c.getSqlSelect()).collect(Collectors.toList()));
         return typedThis;
@@ -240,8 +238,7 @@ public class MPJQueryWrapper<T> extends AbstractWrapper<T, String, MPJQueryWrapp
      */
     @SuppressWarnings({"DuplicatedCode", "UnusedReturnValue"})
     public final MPJQueryWrapper<T> selectAll(Class<?> clazz, String as) {
-        TableInfo info = TableHelper.get(clazz);
-        Asserts.hasTable(info, clazz);
+        TableInfo info = TableHelper.getAssert(clazz);
         if (ConfigProperties.tableInfoAdapter.mpjHasPK(info)) {
             selectColumns.add(as + StringPool.DOT + info.getKeySqlSelect());
         }

@@ -5,7 +5,6 @@ import com.baomidou.mybatisplus.core.conditions.segments.MergeSegments;
 import com.baomidou.mybatisplus.core.metadata.TableInfo;
 import com.baomidou.mybatisplus.core.toolkit.*;
 import com.github.yulichang.adapter.AdapterHelper;
-import com.github.yulichang.toolkit.Asserts;
 import com.github.yulichang.toolkit.LogicInfoUtils;
 import com.github.yulichang.toolkit.TableHelper;
 import com.github.yulichang.toolkit.TableList;
@@ -167,24 +166,22 @@ public class DeleteJoinWrapper<T> extends JoinAbstractLambdaWrapper<T, DeleteJoi
         return typedThis;
     }
 
-    @SuppressWarnings({"DuplicatedCode", "DataFlowIssue"})
+    @SuppressWarnings("DuplicatedCode")
     private void check(List<Class<?>> classList) {
         Class<T> entityClass = getEntityClass();
-        TableInfo tableInfo = TableHelper.get(entityClass);
-        Asserts.hasTable(tableInfo, entityClass);
+        TableInfo tableInfo = TableHelper.getAssert(entityClass);
         //检查
         boolean mainLogic = AdapterHelper.getTableInfoAdapter().mpjHasLogic(tableInfo);
         boolean check = classList.stream().allMatch(t -> {
-            TableInfo ti = TableHelper.get(t);
-            Asserts.hasTable(ti, t);
+            TableInfo ti = TableHelper.getAssert(t);
             return mainLogic == AdapterHelper.getTableInfoAdapter().mpjHasLogic(ti);
         });
         if (!check) {
             throw ExceptionUtils.mpe("连表删除只适用于全部表(主表和副表)都是物理删除或全部都是逻辑删除, " +
                             "不支持同时存在物理删除和逻辑删除 [物理删除->(%s)] [逻辑删除->(%s)]",
-                    classList.stream().filter(t -> !AdapterHelper.getTableInfoAdapter().mpjHasLogic(TableHelper.get(t)))
+                    classList.stream().filter(t -> !AdapterHelper.getTableInfoAdapter().mpjHasLogic(TableHelper.getAssert(t)))
                             .map(Class::getSimpleName).collect(Collectors.joining(StringPool.COMMA)),
-                    classList.stream().filter(t -> AdapterHelper.getTableInfoAdapter().mpjHasLogic(TableHelper.get(t)))
+                    classList.stream().filter(t -> AdapterHelper.getTableInfoAdapter().mpjHasLogic(TableHelper.getAssert(t)))
                             .map(Class::getSimpleName).collect(Collectors.joining(StringPool.COMMA)));
         }
     }

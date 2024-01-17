@@ -130,6 +130,11 @@ class LambdaWrapperTest {
                 .orderByDesc(UserDO::getId);
         List<UserDTO> list = userMapper.selectJoinList(UserDTO.class, wrapper);
 
+        assert wrapper.checkJoinTable(AddressDO.class);
+        assert wrapper.checkJoinTable(AreaDO.class);
+        assert !wrapper.checkJoinTable(UserDO.class);
+        assert !wrapper.checkJoinTable(UserDto.class);
+
         assert list.get(0).getAddressList() != null && list.get(0).getAddressList().get(0).getId() != null;
         list.forEach(System.out::println);
     }

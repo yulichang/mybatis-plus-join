@@ -36,15 +36,15 @@ public final class JSqlParserHelper {
                             SelectExpressionItem selectExpressionItem = (SelectExpressionItem) item;
                             if (null == selectExpressionItem.getAlias()) {
                                 if (selectExpressionItem.getExpression() instanceof Column) {
-                                    col = StringUtils.getTargetColumn(((Column) selectExpressionItem.getExpression()).getColumnName());
+                                    col = ((Column) selectExpressionItem.getExpression()).getColumnName();
                                 } else {
-                                    col = StringUtils.getTargetColumn(selectExpressionItem.getExpression().toString());
+                                    col = selectExpressionItem.getExpression().toString();
                                 }
                             } else {
-                                col = StringUtils.getTargetColumn(selectExpressionItem.getAlias().getName());
+                                col = selectExpressionItem.getAlias().getName();
                             }
                             if (StringUtils.isNotBlank(col)) {
-                                columConsumer.accept(col);
+                                columConsumer.accept(StringUtils.getTargetColumn(col));
                             }
                         }
                     }

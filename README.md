@@ -15,7 +15,6 @@
   <a href="https://gitee.com/best_handsome/mybatis-plus-join" target="_blank">
     <img src="https://gitee.com/best_handsome/mybatis-plus-join/badge/star.svg?theme=dark" alt=""/>
   </a>
-  <br/>
   <a href="https://central.sonatype.com/artifact/com.github.yulichang/mybatis-plus-join-boot-starter">
     <img alt="maven" src="https://img.shields.io/maven-central/v/com.github.yulichang/mybatis-plus-join-boot-starter.svg?style=flat-square">
   </a>
@@ -47,12 +46,12 @@ QQ群:1022221898  或者
   <dependency>
       <groupId>com.github.yulichang</groupId>
       <artifactId>mybatis-plus-join-boot-starter</artifactId>
-      <version>1.4.9</version>
+      <version>1.4.10</version>
   </dependency>
   ```
 - Gradle
   ```
-   implementation 'com.github.yulichang:mybatis-plus-join-boot-starter:1.4.9'
+   implementation 'com.github.yulichang:mybatis-plus-join-boot-starter:1.4.10'
   ```
   或者clone代码到本地执行 mvn install, 再引入以上依赖  
   <br>

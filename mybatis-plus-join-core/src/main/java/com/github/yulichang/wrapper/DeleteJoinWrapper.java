@@ -9,6 +9,7 @@ import com.github.yulichang.toolkit.Asserts;
 import com.github.yulichang.toolkit.LogicInfoUtils;
 import com.github.yulichang.toolkit.TableHelper;
 import com.github.yulichang.toolkit.TableList;
+import com.github.yulichang.wrapper.interfaces.DeleteChain;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -21,7 +22,7 @@ import java.util.stream.Collectors;
  * @author yulichang
  * @since 1.4.5
  */
-public class DeleteJoinWrapper<T> extends JoinAbstractLambdaWrapper<T, DeleteJoinWrapper<T>> {
+public class DeleteJoinWrapper<T> extends JoinAbstractLambdaWrapper<T, DeleteJoinWrapper<T>> implements DeleteChain<T> {
 
     /**
      * 删除表

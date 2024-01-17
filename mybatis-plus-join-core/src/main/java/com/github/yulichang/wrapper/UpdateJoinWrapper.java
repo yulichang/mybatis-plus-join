@@ -12,6 +12,7 @@ import com.github.yulichang.toolkit.LambdaUtils;
 import com.github.yulichang.toolkit.TableHelper;
 import com.github.yulichang.toolkit.TableList;
 import com.github.yulichang.wrapper.interfaces.Update;
+import com.github.yulichang.wrapper.interfaces.UpdateChain;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -29,7 +30,7 @@ import java.util.stream.Collectors;
  */
 @SuppressWarnings("unused")
 public class UpdateJoinWrapper<T> extends JoinAbstractLambdaWrapper<T, UpdateJoinWrapper<T>>
-        implements Update<UpdateJoinWrapper<T>> {
+        implements Update<UpdateJoinWrapper<T>>, UpdateChain<T> {
     /**
      * SQL 更新字段内容，例如：name='1', age=2
      */

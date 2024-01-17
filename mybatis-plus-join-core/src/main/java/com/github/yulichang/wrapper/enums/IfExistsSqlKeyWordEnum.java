@@ -6,7 +6,7 @@ package com.github.yulichang.wrapper.enums;
  * @author yulichang
  * @since 1.4.9
  */
-public enum IfPresentSqlKeyWordEnum {
+public enum IfExistsSqlKeyWordEnum {
     EQ,
     NE,
     GT,

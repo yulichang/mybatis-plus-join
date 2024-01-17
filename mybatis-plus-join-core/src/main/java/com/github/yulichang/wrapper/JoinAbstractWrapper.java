@@ -18,7 +18,7 @@ import com.github.yulichang.toolkit.MPJSqlInjectionUtils;
 import com.github.yulichang.toolkit.Ref;
 import com.github.yulichang.toolkit.TableList;
 import com.github.yulichang.toolkit.sql.SqlScriptUtils;
-import com.github.yulichang.wrapper.enums.IfPresentSqlKeyWordEnum;
+import com.github.yulichang.wrapper.enums.IfExistsSqlKeyWordEnum;
 import com.github.yulichang.wrapper.enums.PrefixEnum;
 import com.github.yulichang.wrapper.interfaces.*;
 import lombok.Getter;
@@ -42,8 +42,8 @@ import static java.util.stream.Collectors.joining;
  */
 @SuppressWarnings({"unchecked", "unused", "DuplicatedCode"})
 public abstract class JoinAbstractWrapper<T, Children extends JoinAbstractWrapper<T, Children>> extends Wrapper<T>
-        implements CompareIfPresent<Children>, Nested<Children, Children>, Join<Children>, Func<Children>, OnCompare<Children>,
-        CompareStrIfPresent<Children, String>, FuncStr<Children, String> {
+        implements CompareIfExists<Children>, Nested<Children, Children>, Join<Children>, Func<Children>, OnCompare<Children>,
+        CompareStrIfExists<Children, String>, FuncStr<Children, String> {
 
     /**
      * 占位符
@@ -120,10 +120,10 @@ public abstract class JoinAbstractWrapper<T, Children extends JoinAbstractWrappe
     protected boolean checkSqlInjection = false;
 
     /**
-     * ifPresent 策略
+     * IfExists 策略
      */
     @Getter
-    protected BiPredicate<Object, IfPresentSqlKeyWordEnum> ifPresent = ConfigProperties.ifPresent;
+    protected BiPredicate<Object, IfExistsSqlKeyWordEnum> ifExists = ConfigProperties.ifExists;
 
     @Override
     public T getEntity() {
@@ -176,20 +176,20 @@ public abstract class JoinAbstractWrapper<T, Children extends JoinAbstractWrappe
         return typedThis;
     }
 
-    public Children setIfPresent(BiPredicate<Object, IfPresentSqlKeyWordEnum> ifPresent) {
-        this.ifPresent = ifPresent;
+    public Children setIfExists(BiPredicate<Object, IfExistsSqlKeyWordEnum> IfExists) {
+        this.ifExists = IfExists;
         return typedThis;
     }
 
     /**
-     * 设置 ifPresent
-     * .ifPresent(val -> val != null && StringUtils.isNotBlank(val))
+     * 设置 IfExists
+     * .IfExists(val -> val != null && StringUtils.isNotBlank(val))
      *
-     * @param ifPresent 判断
+     * @param IfExists 判断
      * @return Children
      */
-    public Children setIfPresent(Predicate<Object> ifPresent) {
-        this.ifPresent = (obj, key) -> ifPresent.test(obj);
+    public Children setIfExists(Predicate<Object> IfExists) {
+        this.ifExists = (obj, key) -> IfExists.test(obj);
         return typedThis;
     }
 
@@ -773,7 +773,7 @@ public abstract class JoinAbstractWrapper<T, Children extends JoinAbstractWrappe
         index = null;
         isMain = true;
         isOn = false;
-        ifPresent = ConfigProperties.ifPresent;
+        ifExists = ConfigProperties.ifExists;
     }
 
     /**

@@ -3,7 +3,7 @@ package com.github.yulichang.autoconfigure;
 import com.baomidou.mybatisplus.autoconfigure.MybatisPlusLanguageDriverAutoConfiguration;
 import com.baomidou.mybatisplus.core.injector.ISqlInjector;
 import com.github.yulichang.autoconfigure.conditional.JoinSqlInjectorCondition;
-import com.github.yulichang.autoconfigure.consumer.MybatisPlusJoinIfPresentConsumer;
+import com.github.yulichang.autoconfigure.consumer.MybatisPlusJoinIfExistsConsumer;
 import com.github.yulichang.autoconfigure.consumer.MybatisPlusJoinPropertiesConsumer;
 import com.github.yulichang.config.ConfigProperties;
 import com.github.yulichang.config.MPJInterceptorConfig;
@@ -11,7 +11,7 @@ import com.github.yulichang.extension.mapping.config.MappingConfig;
 import com.github.yulichang.injector.MPJSqlInjector;
 import com.github.yulichang.interceptor.MPJInterceptor;
 import com.github.yulichang.toolkit.SpringContentUtils;
-import com.github.yulichang.wrapper.enums.IfPresentSqlKeyWordEnum;
+import com.github.yulichang.wrapper.enums.IfExistsSqlKeyWordEnum;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.mybatis.spring.SqlSessionFactoryBean;
 import org.slf4j.Logger;
@@ -63,7 +63,7 @@ public class MybatisPlusJoinAutoConfiguration {
 
     public MybatisPlusJoinAutoConfiguration(MybatisPlusJoinProperties properties,
                                             ObjectProvider<MybatisPlusJoinPropertiesConsumer> propertiesConsumers,
-                                            ObjectProvider<MybatisPlusJoinIfPresentConsumer> ifPresentConsumers) {
+                                            ObjectProvider<MybatisPlusJoinIfExistsConsumer> IfExistsConsumers) {
         this.properties = Optional.ofNullable(propertiesConsumers.getIfAvailable()).map(c -> c.config(properties)).orElse(properties);
         ConfigProperties.banner = this.properties.getBanner();
         ConfigProperties.subTableLogic = this.properties.getSubTableLogic();
@@ -72,9 +72,9 @@ public class MybatisPlusJoinAutoConfiguration {
         ConfigProperties.joinPrefix = this.properties.getJoinPrefix();
         ConfigProperties.logicDelType = this.properties.getLogicDelType();
         ConfigProperties.mappingMaxCount = this.properties.getMappingMaxCount();
-        ConfigProperties.ifPresent = Optional.ofNullable(ifPresentConsumers.getIfAvailable())
-                .map(m -> (BiPredicate<Object, IfPresentSqlKeyWordEnum>) m)
-                .orElse((val, key) -> this.properties.getIfPresent().test(val));
+        ConfigProperties.ifExists = Optional.ofNullable(IfExistsConsumers.getIfAvailable())
+                .map(m -> (BiPredicate<Object, IfExistsSqlKeyWordEnum>) m)
+                .orElse((val, key) -> this.properties.getIfExists().test(val));
         info("mybatis plus join properties config complete");
     }
 

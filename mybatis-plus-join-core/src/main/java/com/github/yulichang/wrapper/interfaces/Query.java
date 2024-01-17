@@ -30,7 +30,6 @@ import java.util.stream.Collectors;
 @SuppressWarnings({"unused", "DuplicatedCode"})
 public interface Query<Children> extends Serializable {
 
-
     List<Select> getSelectColum();
 
     Children getChildren();
@@ -100,7 +99,8 @@ public interface Query<Children> extends Serializable {
      * @param column 列
      */
     default <E> Children selectAs(String column, SFunction<E, ?> alias) {
-        getSelectColum().add(new SelectString(column + Constants.AS + LambdaUtils.getName(alias), LambdaUtils.getName(alias)));
+        String name = LambdaUtils.getName(alias);
+        getSelectColum().add(new SelectString(column + Constants.AS + name, name));
         return getChildren();
     }
 
@@ -112,8 +112,8 @@ public interface Query<Children> extends Serializable {
     default <E, X> Children selectAs(String index, SFunction<E, ?> column, SFunction<X, ?> alias) {
         Map<String, SelectCache> cacheMap = ColumnCache.getMapField(LambdaUtils.getEntityClass(column));
         SelectCache cache = cacheMap.get(LambdaUtils.getName(column));
-        getSelectColum().add(new SelectString(
-                index + Constants.DOT + cache.getColumn() + Constants.AS + LambdaUtils.getName(alias), LambdaUtils.getName(alias)));
+        String name = LambdaUtils.getName(alias);
+        getSelectColum().add(new SelectString(index + Constants.DOT + cache.getColumn() + Constants.AS + name, name));
         return getChildren();
     }
 

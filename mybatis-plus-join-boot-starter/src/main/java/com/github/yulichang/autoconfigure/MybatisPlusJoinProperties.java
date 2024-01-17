@@ -1,6 +1,6 @@
 package com.github.yulichang.autoconfigure;
 
-import com.github.yulichang.config.enums.IfPresentEnum;
+import com.github.yulichang.config.enums.IfExistsEnum;
 import com.github.yulichang.config.enums.LogicDelTypeEnum;
 import lombok.Data;
 import lombok.experimental.Accessors;
@@ -58,7 +58,7 @@ public class MybatisPlusJoinProperties {
     private String subQueryAlias = "st";
 
     /**
-     * Wrapper ifPresent 判断策略
+     * Wrapper IfExists 判断策略
      * <p>
      * NOT_NULL 非null
      * <p>
@@ -66,5 +66,5 @@ public class MybatisPlusJoinProperties {
      * <p>
      * NOT_BLANK 非空白字符串  例： "" -> false, " " -> false, "\r" -> false, "abc" -> true ...
      */
-    private IfPresentEnum ifPresent = IfPresentEnum.NOT_EMPTY;
+    private IfExistsEnum IfExists = IfExistsEnum.NOT_EMPTY;
 }

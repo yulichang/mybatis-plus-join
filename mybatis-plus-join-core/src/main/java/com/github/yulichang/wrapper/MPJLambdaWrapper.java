@@ -9,7 +9,7 @@ import com.github.yulichang.config.ConfigProperties;
 import com.github.yulichang.toolkit.LambdaUtils;
 import com.github.yulichang.toolkit.*;
 import com.github.yulichang.toolkit.support.ColumnCache;
-import com.github.yulichang.wrapper.enums.IfPresentSqlKeyWordEnum;
+import com.github.yulichang.wrapper.enums.IfExistsSqlKeyWordEnum;
 import com.github.yulichang.wrapper.interfaces.Chain;
 import com.github.yulichang.wrapper.interfaces.Query;
 import com.github.yulichang.wrapper.interfaces.QueryLabel;
@@ -126,7 +126,7 @@ public class MPJLambdaWrapper<T> extends JoinAbstractLambdaWrapper<T, MPJLambdaW
                      Map<String, Object> paramNameValuePairs, MergeSegments mergeSegments, SharedString paramAlias,
                      SharedString lastSql, SharedString sqlComment, SharedString sqlFirst,
                      TableList tableList, Integer index, String keyWord, Class<?> joinClass, String tableName,
-                     BiPredicate<Object, IfPresentSqlKeyWordEnum> ifPresent) {
+                     BiPredicate<Object, IfExistsSqlKeyWordEnum> IfExists) {
         super.setEntity(entity);
         super.setEntityClass(entityClass);
         this.paramNameSeq = paramNameSeq;
@@ -142,7 +142,7 @@ public class MPJLambdaWrapper<T> extends JoinAbstractLambdaWrapper<T, MPJLambdaW
         this.keyWord = keyWord;
         this.joinClass = joinClass;
         this.tableName = tableName;
-        this.ifPresent = ifPresent;
+        this.ifExists = IfExists;
     }
 
 
@@ -211,7 +211,7 @@ public class MPJLambdaWrapper<T> extends JoinAbstractLambdaWrapper<T, MPJLambdaW
         MPJLambdaWrapper<E> wrapper = new MPJLambdaWrapper<E>(null, clazz, SharedString.emptyString(),
                 paramNameSeq, paramNameValuePairs, new MergeSegments(), new SharedString(this.paramAlias
                 .getStringValue()), SharedString.emptyString(), SharedString.emptyString(), SharedString.emptyString(),
-                new TableList(), null, null, null, null, ifPresent) {
+                new TableList(), null, null, null, null, ifExists) {
         };
         wrapper.tableList.setAlias(st);
         wrapper.tableList.setRootClass(clazz);
@@ -409,7 +409,7 @@ public class MPJLambdaWrapper<T> extends JoinAbstractLambdaWrapper<T, MPJLambdaW
     protected MPJLambdaWrapper<T> instance(Integer index, String keyWord, Class<?> joinClass, String tableName) {
         return new MPJLambdaWrapper<>(getEntity(), getEntityClass(), null, paramNameSeq, paramNameValuePairs,
                 new MergeSegments(), this.paramAlias, SharedString.emptyString(), SharedString.emptyString(), SharedString.emptyString(),
-                this.tableList, index, keyWord, joinClass, tableName, ifPresent);
+                this.tableList, index, keyWord, joinClass, tableName, ifExists);
     }
 
     @Override
@@ -422,6 +422,6 @@ public class MPJLambdaWrapper<T> extends JoinAbstractLambdaWrapper<T, MPJLambdaW
         if (Objects.nonNull(wrapperMap)) wrapperMap.clear();
         if (Objects.nonNull(unionSql)) unionSql.toEmpty();
         resultMapMybatisLabel.clear();
-        ifPresent = ConfigProperties.ifPresent;
+        ifExists = ConfigProperties.ifExists;
     }
 }

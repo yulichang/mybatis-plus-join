@@ -11,7 +11,7 @@ import java.util.function.Predicate;
  * @author yulichang
  * @since 1.4.9
  */
-public enum IfPresentEnum implements Predicate<Object> {
+public enum IfExistsEnum implements Predicate<Object> {
 
     /**
      * 非null
@@ -28,7 +28,7 @@ public enum IfPresentEnum implements Predicate<Object> {
 
     private final Predicate<Object> predicate;
 
-    IfPresentEnum(Predicate<Object> predicate) {
+    IfExistsEnum(Predicate<Object> predicate) {
         this.predicate = predicate;
     }
 

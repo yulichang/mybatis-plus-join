@@ -56,8 +56,8 @@ public class XPluginImpl implements Plugin {
         ConfigProperties.tableAlias = prop.get("tableAlias", Function.identity());
         ConfigProperties.joinPrefix = prop.get("joinPrefix", Function.identity());
         ConfigProperties.logicDelType = prop.get("logicDelType", val ->
-                Arrays.stream(LogicDelTypeEnum.values()).filter(e -> e.name().equalsIgnoreCase(val)).findFirst()
-                        .orElseThrow(() -> ExceptionUtils.mpe("mybatis-plus-join.logicDelType 配置错误")));
+                // fix on/off yes/no 会转为Boolean
+                LogicDelTypeEnum.WHERE.name().equalsIgnoreCase(val) ? LogicDelTypeEnum.WHERE : LogicDelTypeEnum.ON);
         ConfigProperties.mappingMaxCount = prop.get("mappingMaxCount", Integer::parseInt);
         ConfigProperties.ifExists = prop.get("ifExists", val ->
                 Arrays.stream(IfExistsEnum.values()).filter(e -> e.name().equalsIgnoreCase(val)).findFirst()
@@ -78,8 +78,8 @@ public class XPluginImpl implements Plugin {
 
         public Prop(Props props) {
             this.props = props.entrySet().stream().filter(e -> format(e.getKey())
-                    .startsWith(format("mybatis-plus-join."))).collect(Collectors.toMap(e -> e.getKey().toString()
-                    .substring(e.getKey().toString().lastIndexOf(".") + 1)
+                    .startsWith(format("mybatis-plus-join."))).collect(Collectors.toMap(e -> format(e.getKey())
+                    .substring(e.getKey().toString().indexOf(".") + 1)
                     .toUpperCase(Locale.ENGLISH), Map.Entry::getValue, (o, n) -> n, Properties::new));
         }
 

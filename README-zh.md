@@ -9,17 +9,17 @@
   为简化开发工作、提高生产率而生
 </p>
 <p align="center">
-  <a href="https://github.com/yulichang/mybatis-plus-join" target="_blank">
-    <img src="https://img.shields.io/github/stars/yulichang/mybatis-plus-join.svg?style=social&label=Stars" alt=""/>
-  </a>
-  <a href="https://gitee.com/best_handsome/mybatis-plus-join" target="_blank">
-    <img src="https://gitee.com/best_handsome/mybatis-plus-join/badge/star.svg?theme=dark" alt=""/>
-  </a>
   <a href="https://central.sonatype.com/artifact/com.github.yulichang/mybatis-plus-join-boot-starter">
     <img alt="maven" src="https://img.shields.io/maven-central/v/com.github.yulichang/mybatis-plus-join-boot-starter.svg?style=flat-square">
   </a>
   <a href="https://www.apache.org/licenses/LICENSE-2.0">
     <img alt="code style" src="https://img.shields.io/badge/license-Apache%202-4EB1BA.svg?style=flat-square">
+  </a>
+  <a href="https://github.com/yulichang/mybatis-plus-join" target="_blank">
+    <img src="https://img.shields.io/github/stars/yulichang/mybatis-plus-join.svg?style=social&label=Stars" alt=""/>
+  </a>
+  <a href="https://gitee.com/best_handsome/mybatis-plus-join" target="_blank">
+    <img src="https://gitee.com/best_handsome/mybatis-plus-join/badge/star.svg?theme=dark" alt=""/>
   </a>
 </p>
 <p align="center">

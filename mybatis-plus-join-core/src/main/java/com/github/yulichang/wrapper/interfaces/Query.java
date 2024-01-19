@@ -201,12 +201,27 @@ public interface Query<Children> extends Serializable {
         return getChildren();
     }
 
+    default <S> Children selectFunc(BaseFuncEnum funcEnum, String index, SFunction<S, ?> column, String alias) {
+        Class<?> aClass = LambdaUtils.getEntityClass(column);
+        Map<String, SelectCache> cacheMap = ColumnCache.getMapField(aClass);
+        getSelectColum().add(new SelectFunc(cacheMap.get(LambdaUtils.getName(column)), getIndex(), alias, funcEnum, true, index));
+        return getChildren();
+    }
+
     default <S, X> Children selectFunc(BaseFuncEnum funcEnum, SFunction<S, ?> column, SFunction<X, ?> alias) {
         return selectFunc(funcEnum, column, LambdaUtils.getName(alias));
     }
 
+    default <S, X> Children selectFunc(BaseFuncEnum funcEnum, String index, SFunction<S, ?> column, SFunction<X, ?> alias) {
+        return selectFunc(funcEnum, index, column, LambdaUtils.getName(alias));
+    }
+
     default <S> Children selectFunc(BaseFuncEnum funcEnum, SFunction<S, ?> column) {
         return selectFunc(funcEnum, column, column);
+    }
+
+    default <S> Children selectFunc(BaseFuncEnum funcEnum, String index, SFunction<S, ?> column) {
+        return selectFunc(funcEnum, index, column, column);
     }
 
     default <X> Children selectFunc(BaseFuncEnum funcEnum, Object column, SFunction<X, ?> alias) {
@@ -215,14 +230,14 @@ public interface Query<Children> extends Serializable {
 
 
     default <X> Children selectFunc(String sql, Function<SelectFunc.Func, SFunction<?, ?>[]> column, String alias) {
-        getSelectColum().add(new SelectFunc(alias, getIndex(), () -> sql, column.apply(new SelectFunc.Func()),
+        getSelectColum().add(new SelectFunc(alias, getIndex(), () -> sql, column.apply(SelectFunc.Func.func),
                 isHasAlias(), getAlias()));
         return getChildren();
     }
 
     default <X, S> Children selectFunc(String sql, Function<SelectFunc.Func, SFunction<?, ?>[]> column, SFunction<S, ?> alias) {
         getSelectColum().add(new SelectFunc(LambdaUtils.getName(alias), getIndex(), () -> sql,
-                column.apply(new SelectFunc.Func()), isHasAlias(), getAlias()));
+                column.apply(SelectFunc.Func.func), isHasAlias(), getAlias()));
         return getChildren();
     }
 

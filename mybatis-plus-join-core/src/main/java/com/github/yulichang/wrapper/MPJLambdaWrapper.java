@@ -367,10 +367,10 @@ public class MPJLambdaWrapper<T> extends JoinAbstractLambdaWrapper<T, MPJLambdaW
                         return String.format(i.getFunc().getSql(), str) + Constant.AS + i.getAlias();
                     } else {
                         return String.format(i.getFunc().getSql(), Arrays.stream(args).map(arg -> {
-                            String prefixByClass = tableList.getPrefixByClass(arg.getClazz());
+                            String pf = arg.isHasTableAlias() ? arg.getTableAlias() : tableList.getPrefixByClass(arg.getClazz());
                             Map<String, SelectCache> mapField = ColumnCache.getMapField(arg.getClazz());
                             SelectCache cache = mapField.get(arg.getProp());
-                            return prefixByClass + StringPool.DOT + cache.getColumn();
+                            return pf + StringPool.DOT + cache.getColumn();
                         }).toArray()) + Constant.AS + i.getAlias();
                     }
                 } else {

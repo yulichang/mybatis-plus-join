@@ -1,8 +1,10 @@
 package com.github.yulichang.test.mapping;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.github.yulichang.test.mapping.entity.AddressDO;
 import com.github.yulichang.test.mapping.entity.UserDO;
+import com.github.yulichang.test.mapping.service.AddressService;
 import com.github.yulichang.test.mapping.service.UserService;
 import com.github.yulichang.wrapper.MPJLambdaWrapper;
 import org.junit.jupiter.api.Test;
@@ -20,6 +22,8 @@ class MappingTest {
 
     @Autowired
     private UserService userService;
+    @Autowired
+    private AddressService addressService;
 
     @Test
     public void test() {
@@ -49,5 +53,12 @@ class MappingTest {
                 .leftJoin(AddressDO.class, AddressDO::getId, UserDO::getAddressId);
         List<UserDO> dos = userService.listDeep(wrapper, conf -> conf.loop(false));
         System.out.println(1);
+    }
+
+    @Test
+    public void testJoin1() {
+        List<AddressDO> dos = addressService.listDeep(Wrappers.emptyWrapper());
+        assert dos.get(0).getArea() != null;
+        dos.forEach(System.out::println);
     }
 }

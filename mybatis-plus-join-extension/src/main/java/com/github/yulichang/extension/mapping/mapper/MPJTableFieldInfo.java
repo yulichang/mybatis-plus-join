@@ -123,7 +123,7 @@ public class MPJTableFieldInfo {
                 (!Arrays.asList(mapping.select()).contains(this.joinProperty.trim()) &&
                         !Arrays.asList(mapping.select()).contains(this.joinColumn.trim()));
         this.wrapper = new MPJMappingWrapper(mapping.first(), checkArr(mapping.select()) ?
-                (this.isRemoveBindField ? propToColumn(this.joinClass, mapping.select(), this.joinColumn) :
+                (this.isRemoveBindField ? propToColumn(this.joinClass, mapping.select(), this.joinProperty) :
                         propToColumn(this.joinClass, mapping.select(), null)) : null,
                 mapping.apply(), mapping.condition(), mapping.last(), mapping.orderByAsc(), mapping.orderByDesc());
     }
@@ -146,7 +146,7 @@ public class MPJTableFieldInfo {
         this.isRemoveBindField = !mappingField.select().equals(this.joinColumn.trim()) &&
                 !mappingField.select().equals(this.joinProperty.trim());
         this.wrapper = new MPJMappingWrapper(mappingField.first(), this.isRemoveBindField ?
-                propToColumn(this.joinClass, new String[]{mappingField.select()}, this.joinColumn) :
+                propToColumn(this.joinClass, new String[]{mappingField.select()}, this.joinProperty) :
                 propToColumn(this.joinClass, new String[]{mappingField.select()}, null), mappingField.apply(),
                 mappingField.condition(), mappingField.last(), mappingField.orderByAsc(), mappingField.orderByDesc());
         initBindField(mappingField.select());
@@ -201,9 +201,9 @@ public class MPJTableFieldInfo {
             this.joinColumn = joinFieldInfo.getColumn();
             this.joinField = getField(this.joinClass, joinFieldInfo);
         }
-        Assert.notNull(this.joinField, "注解属性thisField不存在 %s , %s", this.joinClass.getName(),
+        Assert.notNull(this.joinField, "注解属性joinField不存在 %s , %s", this.joinClass.getName(),
                 StringUtils.isBlank(this.joinProperty) ? "主键" : this.joinProperty);
-        Assert.notNull(this.joinColumn, "注解属性thisField不存在 %s , %s", this.joinClass.getName(),
+        Assert.notNull(this.joinColumn, "注解属性joinField不存在 %s , %s", this.joinClass.getName(),
                 StringUtils.isBlank(this.joinProperty) ? "主键" : this.joinProperty);
         this.joinField.setAccessible(true);
     }
@@ -268,7 +268,7 @@ public class MPJTableFieldInfo {
     }
 
     private boolean checkArr(String[] arr) {
-        if (Objects.isNull(arr) || arr.length <= 0) {
+        if (Objects.isNull(arr) || arr.length == 0) {
             return false;
         }
         return Arrays.stream(arr).anyMatch(StringUtils::isNotBlank);

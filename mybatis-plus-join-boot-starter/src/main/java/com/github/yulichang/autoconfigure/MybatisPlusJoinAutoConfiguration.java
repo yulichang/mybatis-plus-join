@@ -40,7 +40,6 @@ import org.springframework.core.annotation.Order;
 
 import javax.sql.DataSource;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.function.BiPredicate;
 
@@ -155,8 +154,8 @@ public class MybatisPlusJoinAutoConfiguration {
         }
 
         @Override
-        public <T> Map<String, T> getBeansOfType(Class<T> clazz) {
-            return getBeanFactory().getBeansOfType(clazz);
+        public <T> void getBeansOfType(Class<T> clazz) {
+            getBeanFactory().getBeansOfType(clazz);
         }
 
         private ListableBeanFactory getBeanFactory() {

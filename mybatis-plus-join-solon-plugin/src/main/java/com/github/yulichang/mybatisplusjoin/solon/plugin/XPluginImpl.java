@@ -44,8 +44,8 @@ public class XPluginImpl implements Plugin {
             }
 
             @Override
-            public <T> Map<String, T> getBeansOfType(Class<T> clazz) {
-                return context.getBeansMapOfType(clazz);
+            public <T> void getBeansOfType(Class<T> clazz) {
+                context.getBeansMapOfType(clazz);
             }
         });
         // 读取配置

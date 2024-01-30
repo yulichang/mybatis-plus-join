@@ -8,8 +8,8 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.apache.ibatis.session.SqlSession;
 
-import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 
 /**
  * spring容器工具类
@@ -29,15 +29,14 @@ public class SpringContentUtils {
     }
 
     public static <T> T getBean(Class<T> clazz) {
-        return SpringContentUtils.springContext.getBean(clazz);
+        return Optional.ofNullable(springContext).map(c -> c.getBean(clazz)).orElse(null);
     }
 
-    @SuppressWarnings("UnusedReturnValue")
-    public static <T> Map<String, T> getBeansOfType(Class<T> clazz) {
-        return SpringContentUtils.springContext.getBeansOfType(clazz);
+    public static <T> void getBeansOfType(Class<T> clazz) {
+        Optional.ofNullable(springContext).ifPresent(c -> c.getBeansOfType(clazz));
     }
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({"unchecked", "deprecation"})
     public static <T> T getMapper(Class<?> clazz) {
         if (Objects.isNull(springContext)) {
             SqlSession session = SqlHelper.sqlSession(clazz);
@@ -57,6 +56,6 @@ public class SpringContentUtils {
 
         <T> T getBean(Class<T> clazz);
 
-        <T> Map<String, T> getBeansOfType(Class<T> clazz);
+        <T> void getBeansOfType(Class<T> clazz);
     }
 }

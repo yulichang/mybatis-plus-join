@@ -198,6 +198,18 @@ public class MPJLambdaWrapper<T> extends JoinAbstractLambdaWrapper<T, MPJLambdaW
     }
 
     /**
+     * 查询主表全部字段
+     * <p>
+     * 需要使用 使用 JoinWrappers.lambda(clazz) 或者 new MPJLambdaQueryWrapper&lt;&lt;(clazz) 构造
+     *
+     * @return children
+     */
+    public MPJLambdaWrapper<T> selectAll() {
+        Assert.notNull(getEntityClass(), "使用 JoinWrappers.lambda(clazz) 或者 new MPJLambdaQueryWrapper<>(clazz)");
+        return selectAll(getEntityClass());
+    }
+
+    /**
      * 子查询
      */
     public <E, F> MPJLambdaWrapper<T> selectSub(Class<E> clazz, Consumer<MPJLambdaWrapper<E>> consumer, SFunction<F, ?> alias) {

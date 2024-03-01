@@ -333,7 +333,7 @@ public abstract class JoinAbstractWrapper<T, Children extends JoinAbstractWrappe
     @Override
     public Children last(boolean condition, String lastSql) {
         if (condition) {
-            this.lastSql.setStringValue(StringPool.SPACE + lastSql);
+            this.lastSql.setStringValue(this.lastSql.getStringValue() + StringPool.SPACE + lastSql);
         }
         return typedThis;
     }
@@ -349,8 +349,15 @@ public abstract class JoinAbstractWrapper<T, Children extends JoinAbstractWrappe
     @Override
     public Children first(boolean condition, String firstSql) {
         if (condition) {
-            this.sqlFirst.setStringValue(firstSql);
+            this.sqlFirst.setStringValue(firstSql + StringPool.SPACE + this.sqlFirst.getStringValue());
         }
+        return typedThis;
+    }
+
+    @Override
+    public Children around(boolean condition, String firstSql, String lastSql) {
+        this.first(condition, firstSql);
+        this.last(condition, lastSql);
         return typedThis;
     }
 

@@ -100,6 +100,24 @@ public interface Join<Children> extends Serializable {
     /**
      * ignore
      */
+    default Children around(String firstSql, String lastSql) {
+        return around(true, firstSql, lastSql);
+    }
+
+    /**
+     * sql 起始句 和介绍语句（会拼接在SQL语句的起始处和结束处）
+     *
+     * @param condition 执行条件
+     * @param firstSql  起始语句
+     * @param lastSql   结束语句
+     * @return children
+     * @since 1.4.11
+     */
+    Children around(boolean condition, String firstSql, String lastSql);
+
+    /**
+     * ignore
+     */
     default Children exists(String existsSql, Object... values) {
         return exists(true, existsSql, values);
     }

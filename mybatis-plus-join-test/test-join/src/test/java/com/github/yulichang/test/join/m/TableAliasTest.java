@@ -84,4 +84,14 @@ public class TableAliasTest {
         List<UserDO> dos = userMapper.selectJoinList(UserDO.class, wrapper);
         dos.forEach(System.out::println);
     }
+
+    @Test
+    void tableAlias3() {
+        ThreadLocalUtils.set("SELECT aaa.id, aaa.pid, aaa.`name`, aaa.`json`, aaa.sex, aaa.head_img, aaa.create_time, " +
+                "aaa.address_id, aaa.address_id2, aaa.del, aaa.create_by, aaa.update_by FROM `user` aaa WHERE aaa.`name` = ? AND aaa.del = false");
+        UserDO userDO = new UserDO();
+        userDO.setName("aaa");
+        MPJLambdaWrapper<UserDO> wrapper = JoinWrappers.lambda("aaa", userDO);
+        wrapper.list();
+    }
 }

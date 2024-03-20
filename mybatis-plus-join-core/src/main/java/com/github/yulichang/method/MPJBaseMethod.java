@@ -107,7 +107,7 @@ public interface MPJBaseMethod extends Constants {
             return filedSqlScript;
         }
         String newKeyProperty = newPrefix + tableInfo.getKeyProperty();
-        String keySqlScript = ConfigProperties.tableAlias + DOT + tableInfo.getKeyColumn() + EQUALS +
+        String keySqlScript = "${ew.alias}" + DOT + tableInfo.getKeyColumn() + EQUALS +
                 SqlScriptUtils.safeParam(newKeyProperty);
         return SqlScriptUtils.convertIf(keySqlScript, String.format("%s != null", newKeyProperty), false)
                 + NEWLINE + filedSqlScript;
@@ -116,7 +116,7 @@ public interface MPJBaseMethod extends Constants {
     default String getSqlWhere(TableFieldInfo tableFieldInfo, final String prefix) {
         final String newPrefix = prefix == null ? EMPTY : prefix;
         // 默认:  AND column=#{prefix + el}
-        String sqlScript = " AND " + String.format(tableFieldInfo.getCondition(), ConfigProperties.tableAlias + DOT +
+        String sqlScript = " AND " + String.format(tableFieldInfo.getCondition(), "${ew.alias}" + DOT +
                 tableFieldInfo.getColumn(), newPrefix + tableFieldInfo.getEl());
         // 查询的时候只判非空
         return convertIf(tableFieldInfo, sqlScript, convertIfProperty(newPrefix, tableFieldInfo.getProperty()),

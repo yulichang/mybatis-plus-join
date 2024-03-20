@@ -1,10 +1,6 @@
 package com.github.yulichang.wrapper.interfaces;
 
-import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.core.toolkit.Assert;
-import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
-import com.github.yulichang.base.MPJBaseMapper;
 import com.github.yulichang.interfaces.MPJBaseJoin;
 import com.github.yulichang.toolkit.SqlHelper;
 
@@ -33,10 +29,7 @@ public interface Chain<T> {
      * JoinWrappers.lambda(User.class)<br />
      */
     default Long count() {
-        return SqlHelper.exec(getEntityClass(), mapper -> {
-            Assert.isTrue(mapper instanceof MPJBaseMapper, "mapper <%s> is not extends MPJBaseMapper", mapper.getClass().getSimpleName());
-            return ((MPJBaseMapper<T>) mapper).selectJoinCount((MPJBaseJoin<T>) this);
-        });
+        return SqlHelper.exec(getEntityClass(), mapper -> mapper.selectJoinCount((MPJBaseJoin<T>) this));
     }
 
     /**
@@ -47,7 +40,7 @@ public interface Chain<T> {
      * JoinWrappers.lambda(User.class)<br />
      */
     default T one() {
-        return SqlHelper.exec(getEntityClass(), mapper -> mapper.selectOne((Wrapper<T>) this));
+        return SqlHelper.exec(getEntityClass(), mapper -> mapper.selectJoinOne(getEntityClass(), (MPJBaseJoin<T>) this));
     }
 
     /**
@@ -58,7 +51,7 @@ public interface Chain<T> {
      * JoinWrappers.lambda(User.class)<br />
      */
     default <R> R one(Class<R> resultType) {
-        return SqlHelper.execJoin(getEntityClass(), mapper -> mapper.selectJoinOne(resultType, (MPJBaseJoin<T>) this));
+        return SqlHelper.exec(getEntityClass(), mapper -> mapper.selectJoinOne(resultType, (MPJBaseJoin<T>) this));
     }
 
     /**
@@ -69,8 +62,7 @@ public interface Chain<T> {
      * JoinWrappers.lambda(User.class)<br />
      */
     default T first() {
-        List<T> list = list();
-        return CollectionUtils.isEmpty(list) ? null : list.get(0);
+        return list().stream().findFirst().orElse(null);
     }
 
     /**
@@ -81,8 +73,7 @@ public interface Chain<T> {
      * JoinWrappers.lambda(User.class)<br />
      */
     default <R> R first(Class<R> resultType) {
-        List<R> list = list(resultType);
-        return CollectionUtils.isEmpty(list) ? null : list.get(0);
+        return list(resultType).stream().findFirst().orElse(null);
     }
 
     /**
@@ -92,7 +83,7 @@ public interface Chain<T> {
      * JoinWrappers.lambda(User.class)<br />
      */
     default List<T> list() {
-        return SqlHelper.exec(getEntityClass(), mapper -> mapper.selectList((Wrapper<T>) this));
+        return SqlHelper.exec(getEntityClass(), mapper -> mapper.selectJoinList(getEntityClass(), (MPJBaseJoin<T>) this));
     }
 
     /**
@@ -102,7 +93,7 @@ public interface Chain<T> {
      * JoinWrappers.lambda(User.class)<br />
      */
     default <R> List<R> list(Class<R> resultType) {
-        return SqlHelper.execJoin(getEntityClass(), mapper -> mapper.selectJoinList(resultType, (MPJBaseJoin<T>) this));
+        return SqlHelper.exec(getEntityClass(), mapper -> mapper.selectJoinList(resultType, (MPJBaseJoin<T>) this));
     }
 
     /**
@@ -112,7 +103,7 @@ public interface Chain<T> {
      * JoinWrappers.lambda(User.class)<br />
      */
     default <P extends IPage<T>> P page(P page) {
-        return SqlHelper.exec(getEntityClass(), mapper -> mapper.selectPage(page, (Wrapper<T>) this));
+        return SqlHelper.exec(getEntityClass(), mapper -> mapper.selectJoinPage(page, getEntityClass(), (MPJBaseJoin<T>) this));
     }
 
     /**
@@ -122,6 +113,6 @@ public interface Chain<T> {
      * JoinWrappers.lambda(User.class)<br />
      */
     default <R, P extends IPage<R>> P page(P page, Class<R> resultType) {
-        return SqlHelper.execJoin(getEntityClass(), mapper -> mapper.selectJoinPage(page, resultType, (MPJBaseJoin<T>) this));
+        return SqlHelper.exec(getEntityClass(), mapper -> mapper.selectJoinPage(page, resultType, (MPJBaseJoin<T>) this));
     }
 }

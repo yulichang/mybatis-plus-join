@@ -61,4 +61,14 @@ class MappingTest {
         assert dos.get(0).getArea() != null;
         dos.forEach(System.out::println);
     }
+
+    @Test
+    public void testReuseWrapper() {
+        MPJLambdaWrapper<UserDO> wrapper = new MPJLambdaWrapper<UserDO>()
+                .select(UserDO::getName);
+        List<UserDO> dos = userService.list(wrapper);
+        System.out.println(1);
+        wrapper.select(UserDO::getAddressId);
+        dos = userService.list(wrapper);
+    }
 }

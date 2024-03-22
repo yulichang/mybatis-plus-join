@@ -188,12 +188,14 @@ public class MPJLambdaWrapper<T> extends JoinAbstractLambdaWrapper<T, MPJLambdaW
                 SelectCache cache = cacheMap.get(LambdaUtils.getName(s));
                 getSelectColum().add(new SelectNormal(cache, index, hasAlias, alias));
             }
+            sqlSelect.toNull();
         }
         return typedThis;
     }
 
     @Override
     public MPJLambdaWrapper<T> selectAll(Class<?> clazz) {
+        sqlSelect.toNull();
         return Query.super.selectAll(clazz);
     }
 
@@ -234,6 +236,7 @@ public class MPJLambdaWrapper<T> extends JoinAbstractLambdaWrapper<T, MPJLambdaW
         addCustomWrapper(wrapper);
         String name = LambdaUtils.getName(alias);
         this.selectColumns.add(new SelectSub(() -> WrapperUtils.buildSubSqlByWrapper(clazz, wrapper, name), hasAlias, this.alias, name));
+        sqlSelect.toNull();
         return typedThis;
     }
 

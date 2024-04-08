@@ -48,4 +48,17 @@ public class SelectSubTest {
                 .le(UserDO::getId, 100);
         wrapper1.list();
     }
+
+    @Test
+    void sub1() {
+        ThreadLocalUtils.set("SELECT (SELECT st.id FROM `area` st WHERE st.del = false AND (st.id = t1.id) LIMIT 1) AS id FROM `user` t LEFT JOIN address t1 ON (t1.user_id = t.id) WHERE t.del = false AND t1.del = false AND (t.id <= ?)");
+        MPJLambdaWrapper<UserDO> wrapper1 = JoinWrappers.lambda(UserDO.class)
+                .selectSub(AreaDO.class, w -> w.select(AreaDO::getId)
+                        .eq(AreaDO::getId, AddressDO::getId)
+                        .setTableName(t -> "`" + t + "`")
+                        .last("limit 1"), UserDO::getId)
+                .leftJoin(AddressDO.class, AddressDO::getUserId, UserDO::getId)
+                .le(UserDO::getId, 100);
+        wrapper1.list();
+    }
 }

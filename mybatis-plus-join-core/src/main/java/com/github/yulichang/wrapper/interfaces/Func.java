@@ -311,6 +311,30 @@ public interface Func<Children> extends Serializable {
      */
     <R> Children leSql(boolean condition, String alias, SFunction<R, ?> column, String inValue);
 
+    default <R> Children eqSql(SFunction<R, ?> column, String inValue) {
+        return eqSql(true, null, column, inValue);
+    }
+
+    default <R> Children eqSql(String alias, SFunction<R, ?> column, String inValue) {
+        return eqSql(true, alias, column, inValue);
+    }
+
+    default <R> Children eqSql(boolean condition, SFunction<R, ?> column, String inValue) {
+        return eqSql(condition, null, column, inValue);
+    }
+
+    /**
+     * 字段 <= ( sql语句 )
+     * <p>例1: leSql("id", "1, 2, 3, 4, 5, 6")</p>
+     * <p>例1: leSql("id", "select id from table where name = 'JunJun'")</p>
+     *
+     * @param condition 执行条件
+     * @param column    字段
+     * @param inValue   sql语句 ---&gt; 1,2,3,4,5,6 或者 select id from table where id &lt; 3
+     * @return children
+     */
+    <R> Children eqSql(boolean condition, String alias, SFunction<R, ?> column, String inValue);
+
     default <R> Children groupBy(SFunction<R, ?> column) {
         return groupBy(true, (String) null, column);
     }

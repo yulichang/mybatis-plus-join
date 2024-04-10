@@ -997,6 +997,12 @@ public abstract class KtAbstractWrapper<T, Children extends KtAbstractWrapper<T,
     }
 
     @Override
+    public Children eqSql(boolean condition, String column, String inValue) {
+        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(column), EQ,
+                () -> String.format("(%s)", inValue)));
+    }
+
+    @Override
     public Children notInSql(boolean condition, String column, String inValue) {
         return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(column), NOT_IN,
                 () -> String.format("(%s)", inValue)));

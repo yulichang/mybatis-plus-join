@@ -440,6 +440,12 @@ public abstract class JoinAbstractWrapper<T, Children extends JoinAbstractWrappe
     }
 
     @Override
+    public <R> Children eqSql(boolean condition, String alias, SFunction<R, ?> column, String inValue) {
+        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(index, alias, column), EQ,
+                () -> String.format("(%s)", inValue)));
+    }
+
+    @Override
     public <R> Children groupBy(boolean condition, String alias, List<SFunction<R, ?>> columns) {
         return maybeDo(condition, () -> {
             if (CollectionUtils.isNotEmpty(columns)) {
@@ -1107,6 +1113,12 @@ public abstract class JoinAbstractWrapper<T, Children extends JoinAbstractWrappe
     @Override
     public Children leSql(boolean condition, String column, String inValue) {
         return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(column), LE,
+                () -> String.format("(%s)", inValue)));
+    }
+
+    @Override
+    public Children eqSql(boolean condition, String column, String inValue) {
+        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(column), EQ,
                 () -> String.format("(%s)", inValue)));
     }
 

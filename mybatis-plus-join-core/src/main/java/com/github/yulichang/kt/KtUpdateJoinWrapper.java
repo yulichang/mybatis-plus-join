@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.core.metadata.TableInfo;
 import com.baomidou.mybatisplus.core.toolkit.*;
 import com.github.yulichang.adapter.AdapterHelper;
 import com.github.yulichang.kt.interfaces.Update;
+import com.github.yulichang.toolkit.Constant;
 import com.github.yulichang.toolkit.KtUtils;
 import com.github.yulichang.toolkit.TableHelper;
 import com.github.yulichang.toolkit.TableList;
@@ -114,7 +115,27 @@ public class KtUpdateJoinWrapper<T> extends KtAbstractLambdaWrapper<T, KtUpdateJ
             if (Objects.isNull(updateSet)) {
                 updateSet = new ArrayList<>();
             }
-            updateSet.add(new UpdateSet(column, val, mapping));
+            updateSet.add(new UpdateSet(column, val, mapping, false, null));
+        });
+    }
+
+    @Override
+    public KtUpdateJoinWrapper<T> setIncrBy(boolean condition, KProperty<?> column, Number val) {
+        return maybeDo(condition, () -> {
+            if (Objects.isNull(updateSet)) {
+                updateSet = new ArrayList<>();
+            }
+            updateSet.add(new UpdateSet(column, val, null, true, Constant.PLUS));
+        });
+    }
+
+    @Override
+    public KtUpdateJoinWrapper<T> setDecrBy(boolean condition, KProperty<?> column, Number val) {
+        return maybeDo(condition, () -> {
+            if (Objects.isNull(updateSet)) {
+                updateSet = new ArrayList<>();
+            }
+            updateSet.add(new UpdateSet(column, val, null, true, Constant.DASH));
         });
     }
 
@@ -136,8 +157,15 @@ public class KtUpdateJoinWrapper<T> extends KtAbstractLambdaWrapper<T, KtUpdateJ
         }
         StringBuilder set = new StringBuilder(StringPool.EMPTY);
         if (CollectionUtils.isNotEmpty(updateSet)) {
-            set = new StringBuilder(updateSet.stream().map(i -> tableList.getPrefixByClass(KtUtils.ref(i.getColumn())) +
-                            Constants.DOT + getCache(i.getColumn()).getColumn() + Constants.EQUALS + formatParam(i.mapping, i.value))
+            set = new StringBuilder(updateSet.stream().map(i -> {
+                        String col = tableList.getPrefixByClass(KtUtils.ref(i.getColumn())) +
+                                Constants.DOT + getCache(i.getColumn()).getColumn();
+                        if (i.incOrDnc) {
+                            return col + Constants.EQUALS + col + i.cal + i.value;
+                        } else {
+                            return col + Constants.EQUALS + formatParam(i.mapping, i.value);
+                        }
+                    })
                     .collect(Collectors.joining(StringPool.COMMA)) + StringPool.COMMA);
         }
         if (CollectionUtils.isNotEmpty(sqlSet)) {
@@ -253,5 +281,9 @@ public class KtUpdateJoinWrapper<T> extends KtAbstractLambdaWrapper<T, KtUpdateJ
         private Object value;
 
         private String mapping;
+
+        private boolean incOrDnc;
+
+        private String cal;
     }
 }

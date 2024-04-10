@@ -7,6 +7,10 @@ import com.baomidou.mybatisplus.core.toolkit.StringPool;
  */
 public interface Constant {
 
+    String PLUS = " + ";
+
+    String DASH = " - ";
+
     String AS = " AS ";
 
     String ON = " ON ";

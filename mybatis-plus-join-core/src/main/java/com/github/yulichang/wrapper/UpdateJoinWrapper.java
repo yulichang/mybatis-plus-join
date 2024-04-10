@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.core.metadata.TableInfo;
 import com.baomidou.mybatisplus.core.toolkit.*;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.github.yulichang.adapter.AdapterHelper;
+import com.github.yulichang.toolkit.Constant;
 import com.github.yulichang.toolkit.LambdaUtils;
 import com.github.yulichang.toolkit.TableHelper;
 import com.github.yulichang.toolkit.TableList;
@@ -114,7 +115,27 @@ public class UpdateJoinWrapper<T> extends JoinAbstractLambdaWrapper<T, UpdateJoi
             if (Objects.isNull(updateSet)) {
                 updateSet = new ArrayList<>();
             }
-            updateSet.add(new UpdateSet(column, val, mapping));
+            updateSet.add(new UpdateSet(column, val, mapping, false, null));
+        });
+    }
+
+    @Override
+    public <R> UpdateJoinWrapper<T> setIncrBy(boolean condition, SFunction<R, ?> column, Number val) {
+        return maybeDo(condition, () -> {
+            if (Objects.isNull(updateSet)) {
+                updateSet = new ArrayList<>();
+            }
+            updateSet.add(new UpdateSet(column, val, null, true, Constant.PLUS));
+        });
+    }
+
+    @Override
+    public <R> UpdateJoinWrapper<T> setDecrBy(boolean condition, SFunction<R, ?> column, Number val) {
+        return maybeDo(condition, () -> {
+            if (Objects.isNull(updateSet)) {
+                updateSet = new ArrayList<>();
+            }
+            updateSet.add(new UpdateSet(column, val, null, true, Constant.DASH));
         });
     }
 
@@ -137,8 +158,15 @@ public class UpdateJoinWrapper<T> extends JoinAbstractLambdaWrapper<T, UpdateJoi
         }
         StringBuilder set = new StringBuilder(StringPool.EMPTY);
         if (CollectionUtils.isNotEmpty(updateSet)) {
-            set = new StringBuilder(updateSet.stream().map(i -> tableList.getPrefixByClass(LambdaUtils.getEntityClass(i.getColumn())) +
-                            Constants.DOT + getCache(i.getColumn()).getColumn() + Constants.EQUALS + formatParam(i.mapping, i.value))
+            set = new StringBuilder(updateSet.stream().map(i -> {
+                        String col = tableList.getPrefixByClass(LambdaUtils.getEntityClass(i.getColumn())) +
+                                Constants.DOT + getCache(i.getColumn()).getColumn();
+                        if (i.incOrDnc) {
+                            return col + Constants.EQUALS + col + i.cal + i.value;
+                        } else {
+                            return col + Constants.EQUALS + formatParam(i.mapping, i.value);
+                        }
+                    })
                     .collect(Collectors.joining(StringPool.COMMA)) + StringPool.COMMA);
         }
         if (CollectionUtils.isNotEmpty(sqlSet)) {
@@ -255,5 +283,9 @@ public class UpdateJoinWrapper<T> extends JoinAbstractLambdaWrapper<T, UpdateJoi
         private Object value;
 
         private String mapping;
+
+        private boolean incOrDnc;
+
+        private String cal;
     }
 }

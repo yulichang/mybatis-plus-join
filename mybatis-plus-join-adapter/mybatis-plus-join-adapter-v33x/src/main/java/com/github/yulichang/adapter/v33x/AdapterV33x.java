@@ -4,21 +4,23 @@ import com.baomidou.mybatisplus.core.MybatisPlusVersion;
 import com.baomidou.mybatisplus.core.metadata.TableFieldInfo;
 import com.baomidou.mybatisplus.core.metadata.TableInfo;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
-import com.github.yulichang.adapter.base.ITableInfoAdapter;
+import com.github.yulichang.adapter.base.IAdapter;
 import com.github.yulichang.adapter.base.metadata.OrderFieldInfo;
 import com.github.yulichang.adapter.base.tookit.VersionUtils;
+import com.github.yulichang.adapter.jsqlparser.v46.JSqlParserHelperV46;
 import org.apache.ibatis.session.Configuration;
 
 import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 /**
  * @author yulichang
  * @since 1.4.3
  */
-public class TableInfoAdapterV33x implements ITableInfoAdapter {
+public class AdapterV33x implements IAdapter {
 
     private static final boolean is330 = VersionUtils.compare(MybatisPlusVersion.getVersion(), "3.3.0") == 0;
 
@@ -51,11 +53,16 @@ public class TableInfoAdapterV33x implements ITableInfoAdapter {
 
     @Override
     public Field mpjGetField(TableFieldInfo fieldInfo, Supplier<Field> supplier) {
-        return is330 ? supplier.get() : ITableInfoAdapter.super.mpjGetField(fieldInfo, null);
+        return is330 ? supplier.get() : IAdapter.super.mpjGetField(fieldInfo, null);
     }
 
     @Override
     public List<OrderFieldInfo> mpjGetOrderField(TableInfo tableInfo) {
         throw new UnsupportedOperationException("不支持排序");
+    }
+
+    @Override
+    public void parserColum(String alias, String from, String selectSql, Consumer<String> columConsumer) {
+        JSqlParserHelperV46.parserColum(alias, from, selectSql, columConsumer);
     }
 }

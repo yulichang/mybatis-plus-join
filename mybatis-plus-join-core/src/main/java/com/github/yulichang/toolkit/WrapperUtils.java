@@ -98,7 +98,7 @@ public class WrapperUtils {
         }
         StringBuilder sb = new StringBuilder(StringPool.EMPTY);
         for (TableFieldInfo fieldInfo : tableInfo.getFieldList()) {
-            if (AdapterHelper.getTableInfoAdapter().mpjHasLogic(tableInfo) && fieldInfo.isLogicDelete()) {
+            if (AdapterHelper.getAdapter().mpjHasLogic(tableInfo) && fieldInfo.isLogicDelete()) {
                 continue;
             }
             Object val;

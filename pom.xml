@@ -41,7 +41,7 @@
 
     <properties>
         <revision>1.4.11</revision>
-        <mpj.mybatis.plus.version>3.5.5</mpj.mybatis.plus.version>
+        <mpj.mybatis.plus.version>3.5.6</mpj.mybatis.plus.version>
 
         <jdkVersion>1.8</jdkVersion>
         <jdkVersion.test>1.8</jdkVersion.test>

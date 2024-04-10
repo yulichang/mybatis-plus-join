@@ -73,7 +73,7 @@ public interface MPJBaseMethod extends Constants {
         /* 不存在排序字段，直接返回空 */
         List<OrderFieldInfo> orderByFields;
         try {
-            orderByFields = AdapterHelper.getTableInfoAdapter().mpjGetOrderField(tableInfo);
+            orderByFields = AdapterHelper.getAdapter().mpjGetOrderField(tableInfo);
         } catch (Exception e) {
             return StringPool.EMPTY;
         }
@@ -226,7 +226,7 @@ public interface MPJBaseMethod extends Constants {
         return tableInfo.getFieldList().stream()
                 .filter(i -> {
                     if (ignoreLogicDelFiled) {
-                        return !(AdapterHelper.getTableInfoAdapter().mpjHasLogic(tableInfo) && i.isLogicDelete());
+                        return !(AdapterHelper.getAdapter().mpjHasLogic(tableInfo) && i.isLogicDelete());
                     }
                     return true;
                 }).map(i -> mpjGetSqlSet(i, newPrefix)).filter(Objects::nonNull).collect(joining(NEWLINE));

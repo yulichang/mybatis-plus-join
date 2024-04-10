@@ -7,6 +7,7 @@ import org.apache.ibatis.session.Configuration;
 
 import java.lang.reflect.Field;
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
@@ -14,7 +15,7 @@ import java.util.stream.Collectors;
  * @author yulichang
  * @since 1.4.3
  */
-public interface ITableInfoAdapter {
+public interface IAdapter {
 
     default boolean mpjHasLogic(TableInfo tableInfo) {
         return tableInfo.isWithLogicDelete();
@@ -44,4 +45,6 @@ public interface ITableInfoAdapter {
         return tableInfo.getOrderByFields().stream().map(f ->
                 new OrderFieldInfo(f.getColumn(), f.getType(), f.getSort())).collect(Collectors.toList());
     }
+
+    void parserColum(String alias, String from, String selectSql, Consumer<String> columConsumer);
 }

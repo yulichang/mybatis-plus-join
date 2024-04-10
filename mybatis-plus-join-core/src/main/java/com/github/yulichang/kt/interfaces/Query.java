@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.metadata.TableFieldInfo;
 import com.baomidou.mybatisplus.core.metadata.TableInfo;
 import com.baomidou.mybatisplus.core.toolkit.Constants;
 import com.github.yulichang.kt.segments.FuncArgs;
+import com.github.yulichang.toolkit.Constant;
 import com.github.yulichang.toolkit.KtUtils;
 import com.github.yulichang.toolkit.MPJReflectionKit;
 import com.github.yulichang.toolkit.TableHelper;
@@ -98,7 +99,7 @@ public interface Query<Children> extends Serializable {
      * @param column 列
      */
     default Children selectAs(String column, KProperty<?> alias) {
-        getSelectColum().add(new SelectString(column + Constants.AS + alias.getName(), alias.getName()));
+        getSelectColum().add(new SelectString(column + Constant.AS + alias.getName(), alias.getName()));
         return getChildren();
     }
 
@@ -111,7 +112,7 @@ public interface Query<Children> extends Serializable {
         Map<String, SelectCache> cacheMap = ColumnCache.getMapField(KtUtils.ref(column));
         SelectCache cache = cacheMap.get(column.getName());
         getSelectColum().add(new SelectString(
-                index + Constants.DOT + cache.getColumn() + Constants.AS + alias.getName(), alias.getName()));
+                index + Constants.DOT + cache.getColumn() + Constant.AS + alias.getName(), alias.getName()));
         return getChildren();
     }
 

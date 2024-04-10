@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.metadata.TableInfo;
 import com.baomidou.mybatisplus.core.toolkit.Constants;
 import com.baomidou.mybatisplus.core.toolkit.StringPool;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
+import com.github.yulichang.toolkit.Constant;
 import com.github.yulichang.toolkit.LambdaUtils;
 import com.github.yulichang.toolkit.MPJReflectionKit;
 import com.github.yulichang.toolkit.TableHelper;
@@ -97,7 +98,7 @@ public interface Query<Children> extends Serializable {
      */
     default <E> Children selectAs(String column, SFunction<E, ?> alias) {
         String name = LambdaUtils.getName(alias);
-        getSelectColum().add(new SelectString(column + Constants.AS + name, name));
+        getSelectColum().add(new SelectString(column + Constant.AS + name, name));
         return getChildren();
     }
 
@@ -110,7 +111,7 @@ public interface Query<Children> extends Serializable {
         Map<String, SelectCache> cacheMap = ColumnCache.getMapField(LambdaUtils.getEntityClass(column));
         SelectCache cache = cacheMap.get(LambdaUtils.getName(column));
         String name = LambdaUtils.getName(alias);
-        getSelectColum().add(new SelectString(index + Constants.DOT + cache.getColumn() + Constants.AS + name, name));
+        getSelectColum().add(new SelectString(index + Constants.DOT + cache.getColumn() + Constant.AS + name, name));
         return getChildren();
     }
 

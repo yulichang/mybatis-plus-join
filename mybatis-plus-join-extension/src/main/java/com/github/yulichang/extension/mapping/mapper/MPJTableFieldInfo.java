@@ -192,7 +192,7 @@ public class MPJTableFieldInfo {
         TableFieldInfo joinFieldInfo = joinTableInfo.getFieldList().stream().filter(f ->
                 f.getProperty().equals(this.joinProperty)).findFirst().orElse(null);
         if (joinFieldInfo == null) {
-            if (AdapterHelper.getTableInfoAdapter().mpjHasPK(joinTableInfo) && this.joinProperty.equals(joinTableInfo.getKeyProperty())) {
+            if (AdapterHelper.getAdapter().mpjHasPK(joinTableInfo) && this.joinProperty.equals(joinTableInfo.getKeyProperty())) {
                 this.joinColumn = joinTableInfo.getKeyColumn();
                 this.joinField = ReflectionKit.getFieldList(this.joinClass).stream().filter(i ->
                         i.getName().equals(joinTableInfo.getKeyProperty())).findFirst().orElse(null);
@@ -218,7 +218,7 @@ public class MPJTableFieldInfo {
         }
 
         TableInfo tableInfo = getTableInfo(this.entityType);
-        if (AdapterHelper.getTableInfoAdapter().mpjHasPK(tableInfo) && this.thisProperty.equals(tableInfo.getKeyProperty())) {
+        if (AdapterHelper.getAdapter().mpjHasPK(tableInfo) && this.thisProperty.equals(tableInfo.getKeyProperty())) {
             this.thisField = ReflectionKit.getFieldList(ClassUtils.getUserClass(entityType)).stream().filter(f ->
                     f.getName().equals(tableInfo.getKeyProperty())).findFirst().orElse(null);
             Assert.notNull(this.thisField, "注解属性thisField不存在 %s , %s", entityType.getName(),
@@ -313,7 +313,7 @@ public class MPJTableFieldInfo {
     }
 
     private Field getField(Class<?> table, TableFieldInfo tableFieldInfo) {
-        return AdapterHelper.getTableInfoAdapter().mpjGetField(tableFieldInfo, () ->
+        return AdapterHelper.getAdapter().mpjGetField(tableFieldInfo, () ->
                 ReflectionKit.getFieldMap(table).get(tableFieldInfo.getProperty()));
     }
 

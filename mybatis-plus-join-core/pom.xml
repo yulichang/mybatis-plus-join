@@ -55,6 +55,11 @@
             <version>${revision}</version>
         </dependency>
         <dependency>
+            <groupId>com.github.yulichang</groupId>
+            <artifactId>mybatis-plus-join-adapter-v355</artifactId>
+            <version>${revision}</version>
+        </dependency>
+        <dependency>
             <groupId>com.baomidou</groupId>
             <artifactId>mybatis-plus-extension</artifactId>
             <version>${mpj.mybatis.plus.version}</version>

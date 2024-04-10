@@ -201,12 +201,12 @@ public class KtUpdateJoinWrapper<T> extends KtAbstractLambdaWrapper<T, KtUpdateJ
             Assert.isTrue(tableList.contain(obj.getClass()), "更新的实体不是主表或关联表 <%>", obj.getClass().getSimpleName());
             TableInfo tableInfo = TableHelper.getAssert(obj.getClass());
             for (TableFieldInfo fieldInfo : tableInfo.getFieldList()) {
-                if (AdapterHelper.getTableInfoAdapter().mpjHasLogic(tableInfo) && fieldInfo.isLogicDelete()) {
+                if (AdapterHelper.getAdapter().mpjHasLogic(tableInfo) && fieldInfo.isLogicDelete()) {
                     continue;
                 }
                 Object val;
                 try {
-                    Field field = AdapterHelper.getTableInfoAdapter().mpjGetField(fieldInfo, () -> {
+                    Field field = AdapterHelper.getAdapter().mpjGetField(fieldInfo, () -> {
                         Field field1 = ReflectionKit.getFieldMap(obj.getClass()).get(fieldInfo.getProperty());
                         field1.setAccessible(true);
                         return field1;

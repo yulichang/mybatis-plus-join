@@ -2,13 +2,16 @@ package com.github.yulichang.interceptor;
 
 import com.baomidou.mybatisplus.core.MybatisPlusVersion;
 import com.baomidou.mybatisplus.core.metadata.TableInfo;
-import com.baomidou.mybatisplus.core.toolkit.ReflectionKit;
 import com.baomidou.mybatisplus.core.toolkit.*;
+import com.github.yulichang.adapter.AdapterHelper;
 import com.github.yulichang.adapter.base.tookit.VersionUtils;
 import com.github.yulichang.config.ConfigProperties;
 import com.github.yulichang.interfaces.MPJBaseJoin;
 import com.github.yulichang.query.MPJQueryWrapper;
-import com.github.yulichang.toolkit.*;
+import com.github.yulichang.toolkit.Constant;
+import com.github.yulichang.toolkit.MPJReflectionKit;
+import com.github.yulichang.toolkit.MPJTableMapperHelper;
+import com.github.yulichang.toolkit.TableHelper;
 import com.github.yulichang.toolkit.support.FieldCache;
 import com.github.yulichang.wrapper.interfaces.SelectWrapper;
 import com.github.yulichang.wrapper.resultmap.IResult;
@@ -205,7 +208,7 @@ public class MPJInterceptor implements Interceptor {
                         resultMappings.add(selectToResult(wrapper.getEntityClass(), i, field.getType(), builder));
                     }
                 } else if (wrapper.isResultMap()) {
-                    ThrowOptional.tryDo(() -> JSqlParserHelper.paresColum(wrapper, i.getColumn(), col -> {
+                    AdapterHelper.getAdapter().parserColum(wrapper.getAlias(), wrapper.getFrom(), i.getColumn(), col -> {
                         FieldCache strField = fieldMap.get(col);
                         columnSet.add(col);
                         if (Objects.nonNull(strField)) {
@@ -213,7 +216,7 @@ public class MPJInterceptor implements Interceptor {
                                     col, strField.getType());
                             resultMappings.add(selectToResult(wrapper.getEntityClass(), i, strField.getType(), builder));
                         }
-                    })).catchDo();
+                    });
                 }
             }
         }

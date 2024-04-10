@@ -24,7 +24,7 @@
         <module>test-mapping</module>
 
         <!-- 以下两个模块需要jdk17+, 使用jdk8会出现编译错误, 如果有安装jdk17+可以打开这两个模块 -->
-<!--        <module>test-kotlin</module>-->
+        <!--        <module>test-kotlin</module>-->
         <!--        <module>test-springboot3-jdk17</module>-->
     </modules>
 
@@ -51,7 +51,7 @@
 
     <properties>
         <revision>1.4.11</revision>
-        <mpj.mybatis.plus.version>3.5.5</mpj.mybatis.plus.version>
+        <mpj.mybatis.plus.version>3.5.6</mpj.mybatis.plus.version>
 
         <jdkVersion>1.8</jdkVersion>
         <jdkVersion.test>1.8</jdkVersion.test>

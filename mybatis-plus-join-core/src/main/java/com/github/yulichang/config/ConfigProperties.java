@@ -1,7 +1,7 @@
 package com.github.yulichang.config;
 
 import com.github.yulichang.adapter.AdapterHelper;
-import com.github.yulichang.adapter.base.ITableInfoAdapter;
+import com.github.yulichang.adapter.base.IAdapter;
 import com.github.yulichang.config.enums.IfExistsEnum;
 import com.github.yulichang.config.enums.LogicDelTypeEnum;
 import com.github.yulichang.wrapper.enums.IfExistsSqlKeyWordEnum;
@@ -45,7 +45,7 @@ public class ConfigProperties {
     /**
      * TableInfo适配器
      */
-    public static ITableInfoAdapter tableInfoAdapter = AdapterHelper.getTableInfoAdapter();
+    public static IAdapter tableInfoAdapter = AdapterHelper.getAdapter();
     /**
      * 子查询别名
      */

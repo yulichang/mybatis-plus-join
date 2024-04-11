@@ -1,6 +1,7 @@
 package com.github.yulichang.wrapper.segments;
 
 import com.baomidou.mybatisplus.core.metadata.TableFieldInfo;
+import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.github.yulichang.wrapper.enums.BaseFuncEnum;
 import org.apache.ibatis.type.TypeHandler;
 
@@ -13,14 +14,11 @@ import org.apache.ibatis.type.TypeHandler;
 public class SelectString implements Select {
     private final String column;
 
-    private final boolean hasTableAlias;
+    private final String tagProperty;
 
-    private final String tableAlias;
-
-    public SelectString(String column, boolean hasTableAlias, String tableAlias) {
+    public SelectString(String column, String tagProperty) {
         this.column = column;
-        this.hasTableAlias = hasTableAlias;
-        this.tableAlias = tableAlias;
+        this.tagProperty = null == tagProperty ? null : StringUtils.getTargetColumn(tagProperty);
     }
 
     @Override
@@ -35,12 +33,12 @@ public class SelectString implements Select {
 
     @Override
     public boolean isHasTableAlias() {
-        return this.hasTableAlias;
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public String getTableAlias() {
-        return this.tableAlias;
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -60,12 +58,12 @@ public class SelectString implements Select {
 
     @Override
     public String getTagColumn() {
-        return null;
+        return tagProperty;
     }
 
     @Override
     public String getColumProperty() {
-        return null;
+        return tagProperty;
     }
 
     @Override

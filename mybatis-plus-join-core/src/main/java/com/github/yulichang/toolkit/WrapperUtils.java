@@ -20,8 +20,7 @@ import java.util.Optional;
 public class WrapperUtils {
 
     public static <T> String buildSubSqlByWrapper(Class<T> clazz, MPJLambdaWrapper<T> wrapper, String alias) {
-        TableInfo tableInfo = TableHelper.get(clazz);
-        Asserts.hasTable(tableInfo, clazz);
+        TableInfo tableInfo = TableHelper.getAssert(clazz);
         String first = Optional.ofNullable(wrapper.getSqlFirst()).orElse(StringPool.EMPTY);
         boolean hasWhere = false;
         String entityWhere = getEntitySql(tableInfo, wrapper);
@@ -43,7 +42,7 @@ public class WrapperUtils {
         return String.format(" (%s SELECT %s FROM %s %s %s %s %s %s %s) AS %s ",
                 first,
                 wrapper.getSqlSelect(),
-                tableInfo.getTableName(),
+                wrapper.getTableName(tableInfo.getTableName()),
                 wrapper.getAlias(),
                 wrapper.getFrom(),
                 mainLogic,
@@ -54,8 +53,7 @@ public class WrapperUtils {
     }
 
     public static String buildUnionSqlByWrapper(Class<?> clazz, MPJLambdaWrapper<?> wrapper) {
-        TableInfo tableInfo = TableHelper.get(clazz);
-        Asserts.hasTable(tableInfo, clazz);
+        TableInfo tableInfo = TableHelper.getAssert(clazz);
         String first = Optional.ofNullable(wrapper.getSqlFirst()).orElse(StringPool.EMPTY);
         boolean hasWhere = false;
         String entityWhere = getEntitySql(tableInfo, wrapper);
@@ -77,7 +75,7 @@ public class WrapperUtils {
         return String.format(" %s SELECT %s FROM %s %s %s %s %s %s %s ",
                 first,
                 wrapper.getSqlSelect(),
-                tableInfo.getTableName(),
+                wrapper.getTableName(tableInfo.getTableName()),
                 wrapper.getAlias(),
                 wrapper.getFrom(),
                 mainLogic,
@@ -100,7 +98,7 @@ public class WrapperUtils {
         }
         StringBuilder sb = new StringBuilder(StringPool.EMPTY);
         for (TableFieldInfo fieldInfo : tableInfo.getFieldList()) {
-            if (AdapterHelper.getTableInfoAdapter().mpjHasLogic(tableInfo) && fieldInfo.isLogicDelete()) {
+            if (AdapterHelper.getAdapter().mpjHasLogic(tableInfo) && fieldInfo.isLogicDelete()) {
                 continue;
             }
             Object val;
@@ -124,6 +122,9 @@ public class WrapperUtils {
     }
 
     private static String mainLogic(boolean hasWhere, Class<?> clazz, MPJLambdaWrapper<?> wrapper) {
+        if (!wrapper.getLogicSql()) {
+            return StringPool.EMPTY;
+        }
         String info = LogicInfoUtils.getLogicInfo(null, clazz, true, wrapper.getAlias());
         if (StringUtils.isNotBlank(info)) {
             if (hasWhere) {

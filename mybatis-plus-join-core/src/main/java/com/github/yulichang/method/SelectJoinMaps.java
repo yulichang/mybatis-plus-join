@@ -33,7 +33,7 @@ public class SelectJoinMaps extends MPJAbstractMethod {
         SqlMethod sqlMethod = SqlMethod.SELECT_JOIN_MAPS;
         String sql = String.format(sqlMethod.getSql(), sqlFirst(), sqlDistinct(), sqlSelectColumns(tableInfo, true),
                 mpjTableName(tableInfo), sqlAlias(), sqlFrom(), sqlWhereEntityWrapper(true, tableInfo), mpjSqlOrderBy(tableInfo), sqlComment());
-        SqlSource sqlSource = languageDriver.createSqlSource(configuration, sql, modelClass);
+        SqlSource sqlSource = languageDriver.createSqlSource(configuration, removeExtraWhitespaces(sql), modelClass);
         return this.addSelectMappedStatementForOther(mapperClass, sqlMethod.getMethod(), sqlSource, Map.class);
     }
 

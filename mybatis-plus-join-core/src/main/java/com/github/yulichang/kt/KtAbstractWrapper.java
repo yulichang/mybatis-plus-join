@@ -11,15 +11,18 @@ import com.baomidou.mybatisplus.core.exceptions.MybatisPlusException;
 import com.baomidou.mybatisplus.core.toolkit.*;
 import com.baomidou.mybatisplus.core.toolkit.sql.SqlUtils;
 import com.baomidou.mybatisplus.core.toolkit.sql.StringEscape;
-import com.github.yulichang.kt.interfaces.Compare;
+import com.github.yulichang.config.ConfigProperties;
+import com.github.yulichang.kt.interfaces.CompareIfExists;
 import com.github.yulichang.kt.interfaces.Func;
 import com.github.yulichang.kt.interfaces.OnCompare;
 import com.github.yulichang.toolkit.KtUtils;
 import com.github.yulichang.toolkit.MPJSqlInjectionUtils;
+import com.github.yulichang.toolkit.Ref;
 import com.github.yulichang.toolkit.TableList;
 import com.github.yulichang.toolkit.sql.SqlScriptUtils;
+import com.github.yulichang.wrapper.enums.IfExistsSqlKeyWordEnum;
 import com.github.yulichang.wrapper.enums.PrefixEnum;
-import com.github.yulichang.wrapper.interfaces.CompareStr;
+import com.github.yulichang.wrapper.interfaces.CompareStrIfExists;
 import com.github.yulichang.wrapper.interfaces.FuncStr;
 import com.github.yulichang.wrapper.interfaces.Join;
 import kotlin.reflect.KProperty;
@@ -29,6 +32,8 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiPredicate;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
+import java.util.function.Supplier;
 
 import static com.baomidou.mybatisplus.core.enums.SqlKeyword.*;
 import static com.baomidou.mybatisplus.core.enums.WrapperKeyword.APPLY;
@@ -40,10 +45,10 @@ import static java.util.stream.Collectors.joining;
  *
  * @author yulichang
  */
-@SuppressWarnings("ALL")
+@SuppressWarnings({"unused", "unchecked", "DuplicatedCode"})
 public abstract class KtAbstractWrapper<T, Children extends KtAbstractWrapper<T, Children>> extends Wrapper<T>
-        implements Compare<Children>, Nested<Children, Children>, Join<Children>, Func<Children>, OnCompare<Children>,
-        CompareStr<Children, String>, FuncStr<Children, String> {
+        implements CompareIfExists<Children>, Nested<Children, Children>, Join<Children>, Func<Children>, OnCompare<Children>,
+        CompareStrIfExists<Children, String>, FuncStr<Children, String> {
 
     /**
      * 占位符
@@ -59,12 +64,13 @@ public abstract class KtAbstractWrapper<T, Children extends KtAbstractWrapper<T,
      */
     @Getter
     protected AtomicInteger paramNameSeq;
+    @Getter
     protected Map<String, Object> paramNameValuePairs;
     /**
      * 其他
      */
     /* mybatis plus 3.4.3新增 这个时wrapper的别名 不是MPJ的别名 */
-    protected SharedString paramAlias;
+    protected SharedString paramAlias = new SharedString(null);
     protected SharedString lastSql;
     /**
      * SQL注释
@@ -118,6 +124,12 @@ public abstract class KtAbstractWrapper<T, Children extends KtAbstractWrapper<T,
      */
     protected boolean checkSqlInjection = false;
 
+    /**
+     * IfExists 策略
+     */
+    @Getter
+    protected BiPredicate<Object, IfExistsSqlKeyWordEnum> ifExists = ConfigProperties.ifExists;
+
     @Override
     public T getEntity() {
         return entity;
@@ -147,10 +159,35 @@ public abstract class KtAbstractWrapper<T, Children extends KtAbstractWrapper<T,
     }
 
     /**
+     * 转为子类，方便自定义继承扩展
+     */
+    public <C extends Children> C toChildren(Ref<C> children) {
+        return (C) this;
+    }
+
+    /**
+     * 转为子类，方便自定义继承扩展
+     * 需要子类自定义字段
+     */
+    public <C extends Children> C toChildren(Supplier<C> s) {
+        return (C) this;
+    }
+
+    /**
      * 开启检查 SQL 注入
      */
     public Children checkSqlInjection() {
         this.checkSqlInjection = true;
+        return typedThis;
+    }
+
+    public Children setIfExists(BiPredicate<Object, IfExistsSqlKeyWordEnum> IfExists) {
+        this.ifExists = IfExists;
+        return typedThis;
+    }
+
+    public Children setIfExists(Predicate<Object> IfExists) {
+        this.ifExists = (o, k) -> IfExists.test(o);
         return typedThis;
     }
 
@@ -171,64 +208,74 @@ public abstract class KtAbstractWrapper<T, Children extends KtAbstractWrapper<T,
     }
 
     @Override
-    public Children eq(boolean condition, KProperty<?> column, Object val) {
-        return addCondition(condition, column, EQ, val);
+    public Children eq(boolean condition, String alias, KProperty<?> column, Object val) {
+        return addCondition(condition, alias, column, EQ, val);
     }
 
     @Override
-    public Children ne(boolean condition, KProperty<?> column, Object val) {
-        return addCondition(condition, column, NE, val);
+    public Children ne(boolean condition, String alias, KProperty<?> column, Object val) {
+        return addCondition(condition, alias, column, NE, val);
     }
 
     @Override
-    public Children gt(boolean condition, KProperty<?> column, Object val) {
-        return addCondition(condition, column, GT, val);
+    public Children gt(boolean condition, String alias, KProperty<?> column, Object val) {
+        return addCondition(condition, alias, column, GT, val);
     }
 
     @Override
-    public Children ge(boolean condition, KProperty<?> column, Object val) {
-        return addCondition(condition, column, GE, val);
+    public Children ge(boolean condition, String alias, KProperty<?> column, Object val) {
+        return addCondition(condition, alias, column, GE, val);
     }
 
     @Override
-    public Children lt(boolean condition, KProperty<?> column, Object val) {
-        return addCondition(condition, column, LT, val);
+    public Children lt(boolean condition, String alias, KProperty<?> column, Object val) {
+        return addCondition(condition, alias, column, LT, val);
     }
 
     @Override
-    public Children le(boolean condition, KProperty<?> column, Object val) {
-        return addCondition(condition, column, LE, val);
+    public Children le(boolean condition, String alias, KProperty<?> column, Object val) {
+        return addCondition(condition, alias, column, LE, val);
     }
 
     @Override
-    public Children like(boolean condition, KProperty<?> column, Object val) {
-        return likeValue(condition, LIKE, column, val, SqlLike.DEFAULT);
+    public Children like(boolean condition, String alias, KProperty<?> column, Object val) {
+        return likeValue(condition, LIKE, alias, column, val, SqlLike.DEFAULT);
     }
 
     @Override
-    public Children notLike(boolean condition, KProperty<?> column, Object val) {
-        return likeValue(condition, NOT_LIKE, column, val, SqlLike.DEFAULT);
+    public Children notLike(boolean condition, String alias, KProperty<?> column, Object val) {
+        return likeValue(condition, NOT_LIKE, alias, column, val, SqlLike.DEFAULT);
     }
 
     @Override
-    public Children likeLeft(boolean condition, KProperty<?> column, Object val) {
-        return likeValue(condition, LIKE, column, val, SqlLike.LEFT);
+    public Children likeLeft(boolean condition, String alias, KProperty<?> column, Object val) {
+        return likeValue(condition, LIKE, alias, column, val, SqlLike.LEFT);
     }
 
     @Override
-    public Children likeRight(boolean condition, KProperty<?> column, Object val) {
-        return likeValue(condition, LIKE, column, val, SqlLike.RIGHT);
+    public Children notLikeLeft(boolean condition, String alias, KProperty<?> column, Object val) {
+        return likeValue(condition, NOT_LIKE, alias, column, val, SqlLike.LEFT);
     }
 
     @Override
-    public Children between(boolean condition, KProperty<?> column, Object val1, Object val2) {
-        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(index, column, false), BETWEEN,
+    public Children likeRight(boolean condition, String alias, KProperty<?> column, Object val) {
+        return likeValue(condition, LIKE, alias, column, val, SqlLike.RIGHT);
+    }
+
+    @Override
+    public Children notLikeRight(boolean condition, String alias, KProperty<?> column, Object val) {
+        return likeValue(condition, NOT_LIKE, alias, column, val, SqlLike.RIGHT);
+    }
+
+    @Override
+    public Children between(boolean condition, String alias, KProperty<?> column, Object val1, Object val2) {
+        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(index, alias, column), BETWEEN,
                 () -> formatParam(null, val1), AND, () -> formatParam(null, val2)));
     }
 
     @Override
-    public Children notBetween(boolean condition, KProperty<?> column, Object val1, Object val2) {
-        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(index, column, false), NOT_BETWEEN,
+    public Children notBetween(boolean condition, String alias, KProperty<?> column, Object val1, Object val2) {
+        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(index, alias, column), NOT_BETWEEN,
                 () -> formatParam(null, val1), AND, () -> formatParam(null, val2)));
     }
 
@@ -266,7 +313,7 @@ public abstract class KtAbstractWrapper<T, Children extends KtAbstractWrapper<T,
     @Override
     public Children last(boolean condition, String lastSql) {
         if (condition) {
-            this.lastSql.setStringValue(StringPool.SPACE + lastSql);
+            this.lastSql.setStringValue(this.lastSql.getStringValue() + StringPool.SPACE + lastSql);
         }
         return typedThis;
     }
@@ -282,8 +329,15 @@ public abstract class KtAbstractWrapper<T, Children extends KtAbstractWrapper<T,
     @Override
     public Children first(boolean condition, String firstSql) {
         if (condition) {
-            this.sqlFirst.setStringValue(firstSql);
+            this.sqlFirst.setStringValue(firstSql + StringPool.SPACE + this.sqlFirst.getStringValue());
         }
+        return typedThis;
+    }
+
+    @Override
+    public Children around(boolean condition, String firstSql, String lastSql) {
+        this.first(condition, firstSql);
+        this.last(condition, lastSql);
         return typedThis;
     }
 
@@ -299,125 +353,119 @@ public abstract class KtAbstractWrapper<T, Children extends KtAbstractWrapper<T,
     }
 
     @Override
-    public Children isNull(boolean condition, KProperty<?> column) {
-        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(index, column, false), IS_NULL));
+    public Children isNull(boolean condition, String alias, KProperty<?> column) {
+        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(index, alias, column), IS_NULL));
     }
 
     @Override
-    public Children isNotNull(boolean condition, KProperty<?> column) {
-        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(index, column, false), IS_NOT_NULL));
+    public Children isNotNull(boolean condition, String alias, KProperty<?> column) {
+        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(index, alias, column), IS_NOT_NULL));
     }
 
     @Override
-    public Children in(boolean condition, KProperty<?> column, Collection<?> coll) {
-        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(index, column, false), IN, inExpression(coll)));
+    public Children in(boolean condition, String alias, KProperty<?> column, Collection<?> coll) {
+        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(index, alias, column), IN, inExpression(coll)));
     }
 
     @Override
-    public Children in(boolean condition, KProperty<?> column, Object... values) {
-        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(index, column, false), IN, inExpression(values)));
+    public Children in(boolean condition, String alias, KProperty<?> column, Object... values) {
+        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(index, alias, column), IN, inExpression(values)));
     }
 
     @Override
-    public Children notIn(boolean condition, KProperty<?> column, Collection<?> coll) {
-        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(index, column, false), NOT_IN, inExpression(coll)));
+    public Children notIn(boolean condition, String alias, KProperty<?> column, Collection<?> coll) {
+        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(index, alias, column), NOT_IN, inExpression(coll)));
     }
 
     @Override
-    public Children notIn(boolean condition, KProperty<?> column, Object... values) {
-        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(index, column, false), NOT_IN, inExpression(values)));
+    public Children notIn(boolean condition, String alias, KProperty<?> column, Object... values) {
+        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(index, alias, column), NOT_IN, inExpression(values)));
     }
 
     @Override
-    public Children inSql(boolean condition, KProperty<?> column, String inValue) {
-        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(index, column, false), IN,
+    public Children inSql(boolean condition, String alias, KProperty<?> column, String inValue) {
+        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(index, alias, column), IN,
                 () -> String.format("(%s)", inValue)));
     }
 
     @Override
-    public Children notInSql(boolean condition, KProperty<?> column, String inValue) {
-        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(index, column, false), NOT_IN,
+    public Children notInSql(boolean condition, String alias, KProperty<?> column, String inValue) {
+        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(index, alias, column), NOT_IN,
                 () -> String.format("(%s)", inValue)));
     }
 
 
     @Override
-    public Children gtSql(boolean condition, KProperty<?> column, String inValue) {
-        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(index, column, false), GT,
+    public Children gtSql(boolean condition, String alias, KProperty<?> column, String inValue) {
+        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(index, alias, column), GT,
                 () -> String.format("(%s)", inValue)));
     }
 
     @Override
-    public Children geSql(boolean condition, KProperty<?> column, String inValue) {
-        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(index, column, false), GE,
+    public Children geSql(boolean condition, String alias, KProperty<?> column, String inValue) {
+        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(index, alias, column), GE,
                 () -> String.format("(%s)", inValue)));
     }
 
     @Override
-    public Children ltSql(boolean condition, KProperty<?> column, String inValue) {
-        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(index, column, false), LT,
+    public Children ltSql(boolean condition, String alias, KProperty<?> column, String inValue) {
+        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(index, alias, column), LT,
                 () -> String.format("(%s)", inValue)));
     }
 
     @Override
-    public Children leSql(boolean condition, KProperty<?> column, String inValue) {
-        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(index, column, false), LE,
+    public Children leSql(boolean condition, String alias, KProperty<?> column, String inValue) {
+        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(index, alias, column), LE,
                 () -> String.format("(%s)", inValue)));
     }
 
     @Override
-    public Children groupBy(boolean condition, List<KProperty<?>> columns) {
+    public Children groupBy(boolean condition, String alias, List<KProperty<?>> columns) {
         return maybeDo(condition, () -> {
             if (CollectionUtils.isNotEmpty(columns)) {
-                String one = (StringPool.COMMA + columnsToString(index, false, isNo ? PrefixEnum.ON_FIRST : PrefixEnum.CD_FIRST, columns));
-                final String finalOne = one;
+                final String finalOne = columnsToString(index, isNo ? PrefixEnum.ON_FIRST : PrefixEnum.CD_FIRST, alias, columns);
                 appendSqlSegments(GROUP_BY, () -> finalOne);
             }
         });
     }
 
     @Override
-    public Children groupBy(boolean condition, KProperty<?> column, KProperty<?>... columns) {
+    public Children groupBy(boolean condition, String alias, KProperty<?>... columns) {
         return maybeDo(condition, () -> {
-            String one = columnToString(index, column, false, isNo ? PrefixEnum.ON_FIRST : PrefixEnum.CD_FIRST);
             if (ArrayUtils.isNotEmpty(columns)) {
-                one += (StringPool.COMMA + columnsToString(index, false, isNo ? PrefixEnum.ON_FIRST : PrefixEnum.CD_FIRST, columns));
+                final String finalOne = columnsToString(index, isNo ? PrefixEnum.ON_FIRST : PrefixEnum.CD_FIRST, alias, columns);
+                appendSqlSegments(GROUP_BY, () -> finalOne);
             }
-            final String finalOne = one;
-            appendSqlSegments(GROUP_BY, () -> finalOne);
         });
     }
 
     @Override
-    public Children orderByAsc(boolean condition, List<KProperty<?>> columns) {
+    public Children orderByAsc(boolean condition, String alias, List<KProperty<?>> columns) {
         return maybeDo(condition, () -> {
-            final SqlKeyword mode = ASC;
             if (CollectionUtils.isNotEmpty(columns)) {
                 columns.forEach(c -> appendSqlSegments(ORDER_BY,
-                        columnToSqlSegment(index, columnSqlInjectFilter(c), false), mode));
+                        columnToSqlSegment(index, alias, columnSqlInjectFilter(c)), ASC));
             }
         });
     }
 
     @Override
-    public Children orderByDesc(boolean condition, List<KProperty<?>> columns) {
+    public Children orderByDesc(boolean condition, String alias, List<KProperty<?>> columns) {
         return maybeDo(condition, () -> {
-            final SqlKeyword mode = DESC;
             if (CollectionUtils.isNotEmpty(columns)) {
                 columns.forEach(c -> appendSqlSegments(ORDER_BY,
-                        columnToSqlSegment(index, columnSqlInjectFilter(c), false), mode));
+                        columnToSqlSegment(index, alias, columnSqlInjectFilter(c)), DESC));
             }
         });
     }
 
     @Override
-    public Children orderBy(boolean condition, boolean isAsc, KProperty<?> column, KProperty<?>... columns) {
+    public Children orderBy(boolean condition, boolean isAsc, String alias, KProperty<?>... columns) {
         return maybeDo(condition, () -> {
             final SqlKeyword mode = isAsc ? ASC : DESC;
-            appendSqlSegments(ORDER_BY, columnToSqlSegment(index, column, false), mode);
             if (ArrayUtils.isNotEmpty(columns)) {
                 Arrays.stream(columns).forEach(c -> appendSqlSegments(ORDER_BY,
-                        columnToSqlSegment(index, columnSqlInjectFilter(c), false), mode));
+                        columnToSqlSegment(index, alias, columnSqlInjectFilter(c)), mode));
             }
         });
     }
@@ -426,7 +474,7 @@ public abstract class KtAbstractWrapper<T, Children extends KtAbstractWrapper<T,
      * 字段 SQL 注入过滤处理，子类重写实现过滤逻辑
      *
      * @param column 字段内容
-     * @return
+     * @return Children
      */
     protected KProperty<?> columnSqlInjectFilter(KProperty<?> column) {
         return column;
@@ -463,8 +511,8 @@ public abstract class KtAbstractWrapper<T, Children extends KtAbstractWrapper<T,
      * 内部自用
      * <p>拼接 LIKE 以及 值</p>
      */
-    protected Children likeValue(boolean condition, SqlKeyword keyword, KProperty<?> column, Object val, SqlLike sqlLike) {
-        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(index, column, false), keyword,
+    protected Children likeValue(boolean condition, SqlKeyword keyword, String alias, KProperty<?> column, Object val, SqlLike sqlLike) {
+        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(index, alias, column), keyword,
                 () -> formatParam(null, SqlUtils.concatLike(val, sqlLike))));
     }
 
@@ -481,18 +529,18 @@ public abstract class KtAbstractWrapper<T, Children extends KtAbstractWrapper<T,
      * @param sqlKeyword SQL 关键词
      * @param val        条件值
      */
-    protected Children addCondition(boolean condition, KProperty<?> column, SqlKeyword sqlKeyword, Object val) {
-        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(index, column, false), sqlKeyword,
+    protected Children addCondition(boolean condition, String alias, KProperty<?> column, SqlKeyword sqlKeyword, Object val) {
+        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(index, alias, column), sqlKeyword,
                 () -> formatParam(null, val)));
     }
 
-    protected <X, S> Children addCondition(boolean condition, KProperty<?> column, SqlKeyword sqlKeyword, KProperty<?> val) {
+    protected <X, S> Children addCondition(boolean condition, String alias, KProperty<?> column, SqlKeyword sqlKeyword, String rightAlias, KProperty<?> val) {
         Class<X> c = (Class<X>) KtUtils.ref(column);
         Class<S> v = (Class<S>) KtUtils.ref(val);
-        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(index, column, false), sqlKeyword,
+        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(index, alias, column), sqlKeyword,
                 isNo ?
-                        columnToSqlSegmentS(index, val, v == c && v == joinClass) :
-                        columnToSqlSegmentS(index, val, v == c)
+                        columnToSqlSegmentS(index, rightAlias, val, v == c && v == joinClass) :
+                        columnToSqlSegmentS(index, rightAlias, val, v == c)
         ));
     }
 
@@ -533,6 +581,7 @@ public abstract class KtAbstractWrapper<T, Children extends KtAbstractWrapper<T,
      * @param params  参数
      * @return sql片段
      */
+    @SuppressWarnings("SameParameterValue")
     protected final String formatSqlMaybeWithParam(String sqlStr, String mapping, Object... params) {
         if (StringUtils.isBlank(sqlStr)) {
             // todo 何时会这样?
@@ -607,15 +656,17 @@ public abstract class KtAbstractWrapper<T, Children extends KtAbstractWrapper<T,
         paramNameSeq.set(0);
         paramNameValuePairs.clear();
         expression.clear();
-        lastSql.toEmpty();
-        sqlComment.toEmpty();
-        sqlFirst.toEmpty();
+        paramAlias.toNull();
+        if (Objects.nonNull(lastSql)) lastSql.toEmpty();
+        if (Objects.nonNull(sqlComment)) sqlComment.toEmpty();
+        if (Objects.nonNull(sqlFirst)) sqlFirst.toEmpty();
         tableList.clear();
         entityClass = null;
         onWrappers.clear();
         index = null;
         isMain = true;
         isNo = false;
+        ifExists = ConfigProperties.ifExists;
     }
 
     /**
@@ -653,12 +704,8 @@ public abstract class KtAbstractWrapper<T, Children extends KtAbstractWrapper<T,
         return expression;
     }
 
-    public Map<String, Object> getParamNameValuePairs() {
-        return paramNameValuePairs;
-    }
-
     public String getParamAlias() {
-        return paramAlias == null ? Constants.WRAPPER : paramAlias.getStringValue();
+        return paramAlias.getStringValue() == null ? Constants.WRAPPER : paramAlias.getStringValue();
     }
 
     /**
@@ -667,29 +714,28 @@ public abstract class KtAbstractWrapper<T, Children extends KtAbstractWrapper<T,
      * @param paramAlias 参数别名
      * @return Children
      */
+    @SuppressWarnings("UnusedReturnValue")
     public Children setParamAlias(String paramAlias) {
         Assert.notEmpty(paramAlias, "paramAlias can not be empty!");
-        Assert.isTrue(CollectionUtils.isEmpty(paramNameValuePairs), "Please call this method before working!");
-        Assert.isNull(this.paramAlias, "Please do not call the method repeatedly!");
-        this.paramAlias = new SharedString(paramAlias);
+        this.paramAlias.setStringValue(paramAlias);
         return typedThis;
     }
 
     /**
      * 获取 columnName
      */
-    protected final ISqlSegment columnToSqlSegment(Integer index, KProperty<?> column, boolean isJoin) {
-        return () -> columnToString(index, column, isJoin, isNo ? PrefixEnum.ON_FIRST : PrefixEnum.CD_FIRST);
+    protected final ISqlSegment columnToSqlSegment(Integer index, String alias, KProperty<?> column) {
+        return () -> columnToString(index, alias, column, false, isNo ? PrefixEnum.ON_FIRST : PrefixEnum.CD_FIRST);
     }
 
-    protected final ISqlSegment columnToSqlSegmentS(Integer index, KProperty<?> column, boolean isJoin) {
+    protected final ISqlSegment columnToSqlSegmentS(Integer index, String alias, KProperty<?> column, boolean isJoin) {
         PrefixEnum prefixEnum;
         if (isMain) {
             prefixEnum = isNo ? PrefixEnum.ON_SECOND /* 理论上不可能有这种情况 */ : PrefixEnum.CD_SECOND;
         } else {
             prefixEnum = isNo ? PrefixEnum.ON_SECOND : PrefixEnum.CD_ON_SECOND;
         }
-        return () -> columnToString(index, column, isJoin, prefixEnum);
+        return () -> columnToString(index, alias, column, isJoin, prefixEnum);
     }
 
     protected final ISqlSegment columnToSqlSegment(String column) {
@@ -699,9 +745,7 @@ public abstract class KtAbstractWrapper<T, Children extends KtAbstractWrapper<T,
     /**
      * 获取 columnName
      */
-    protected String columnToString(Integer index, Object column, boolean isJoin, PrefixEnum prefixEnum) {
-        return (String) column;
-    }
+    abstract String columnToString(Integer index, String alias, KProperty<?> column, boolean isJoin, PrefixEnum prefixEnum);
 
     protected String columnToString(String column) {
         if (checkSqlInjection && MPJSqlInjectionUtils.check(column)) {
@@ -724,12 +768,16 @@ public abstract class KtAbstractWrapper<T, Children extends KtAbstractWrapper<T,
      *
      * @param columns 多字段
      */
-    protected String columnsToString(Integer index, boolean isJoin, PrefixEnum prefixEnum, Object... columns) {
-        return Arrays.stream(columns).map(i -> this.columnToString(index, i, isJoin, prefixEnum)).collect(joining(StringPool.COMMA));
+    protected String columnsToString(Integer index, PrefixEnum prefixEnum, String alias, KProperty<?>... columns) {
+        return Arrays.stream(columns).map(i -> this.columnToString(index, alias, i, false, prefixEnum)).collect(joining(StringPool.COMMA));
     }
 
+    protected String columnsToString(Integer index, PrefixEnum prefixEnum, String alias, List<KProperty<?>> columns) {
+        return columns.stream().map(i -> this.columnToString(index, alias, i, false, prefixEnum)).collect(joining(StringPool.COMMA));
+    }
+
+    @SuppressWarnings("MethodDoesntCallSuperMethod")
     @Override
-    @SuppressWarnings("all")
     public Children clone() {
         return SerializationUtils.clone(typedThis);
     }
@@ -746,33 +794,33 @@ public abstract class KtAbstractWrapper<T, Children extends KtAbstractWrapper<T,
     /* ************************* on语句重载 *************************** */
 
     @Override
-    public Children eq(boolean condition, KProperty<?> column, KProperty<?> val) {
-        return addCondition(condition, column, EQ, val);
+    public Children eq(boolean condition, String alias, KProperty<?> column, String rightAlias, KProperty<?> val) {
+        return addCondition(condition, alias, column, EQ, rightAlias, val);
     }
 
     @Override
-    public Children ne(boolean condition, KProperty<?> column, KProperty<?> val) {
-        return addCondition(condition, column, NE, val);
+    public Children ne(boolean condition, String alias, KProperty<?> column, String rightAlias, KProperty<?> val) {
+        return addCondition(condition, alias, column, NE, rightAlias, val);
     }
 
     @Override
-    public Children gt(boolean condition, KProperty<?> column, KProperty<?> val) {
-        return addCondition(condition, column, GT, val);
+    public Children gt(boolean condition, String alias, KProperty<?> column, String rightAlias, KProperty<?> val) {
+        return addCondition(condition, alias, column, GT, rightAlias, val);
     }
 
     @Override
-    public Children ge(boolean condition, KProperty<?> column, KProperty<?> val) {
-        return addCondition(condition, column, GE, val);
+    public Children ge(boolean condition, String alias, KProperty<?> column, String rightAlias, KProperty<?> val) {
+        return addCondition(condition, alias, column, GE, rightAlias, val);
     }
 
     @Override
-    public Children lt(boolean condition, KProperty<?> column, KProperty<?> val) {
-        return addCondition(condition, column, LT, val);
+    public Children lt(boolean condition, String alias, KProperty<?> column, String rightAlias, KProperty<?> val) {
+        return addCondition(condition, alias, column, LT, rightAlias, val);
     }
 
     @Override
-    public Children le(boolean condition, KProperty<?> column, KProperty<?> val) {
-        return addCondition(condition, column, LE, val);
+    public Children le(boolean condition, String alias, KProperty<?> column, String rightAlias, KProperty<?> val) {
+        return addCondition(condition, alias, column, LE, rightAlias, val);
     }
 
     /* ****************************************** **/
@@ -858,8 +906,18 @@ public abstract class KtAbstractWrapper<T, Children extends KtAbstractWrapper<T,
     }
 
     @Override
+    public Children notLikeLeft(boolean condition, String column, Object val) {
+        return likeValue(condition, NOT_LIKE, column, val, SqlLike.LEFT);
+    }
+
+    @Override
     public Children likeRight(boolean condition, String column, Object val) {
         return likeValue(condition, LIKE, column, val, SqlLike.RIGHT);
+    }
+
+    @Override
+    public Children notLikeRight(boolean condition, String column, Object val) {
+        return likeValue(condition, NOT_LIKE, column, val, SqlLike.RIGHT);
     }
 
     @Override
@@ -935,6 +993,12 @@ public abstract class KtAbstractWrapper<T, Children extends KtAbstractWrapper<T,
     @Override
     public Children leSql(boolean condition, String column, String inValue) {
         return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(column), LE,
+                () -> String.format("(%s)", inValue)));
+    }
+
+    @Override
+    public Children eqSql(boolean condition, String column, String inValue) {
+        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(column), EQ,
                 () -> String.format("(%s)", inValue)));
     }
 

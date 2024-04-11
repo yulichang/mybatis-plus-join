@@ -6,10 +6,10 @@ DROP TABLE IF EXISTS area;
 
 create table area
 (
-    id       int auto_increment
+    area_id       int auto_increment
         primary key,
     province varchar(255) null,
-    city     varchar(255) null,
+    city_id     varchar(255) null,
     area     varchar(255) null,
     postcode varchar(255) null,
     del      bit
@@ -37,6 +37,7 @@ create table address
         primary key,
     user_id int null,
     area_id int null,
+    city    varchar(255) null,
     tel     varchar(255) null,
     address varchar(255) null,
     del     bit

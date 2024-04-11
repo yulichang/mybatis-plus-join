@@ -1,5 +1,6 @@
 package com.github.yulichang.query;
 
+import com.baomidou.mybatisplus.core.MybatisPlusVersion;
 import com.baomidou.mybatisplus.core.conditions.AbstractWrapper;
 import com.baomidou.mybatisplus.core.conditions.SharedString;
 import com.baomidou.mybatisplus.core.conditions.query.Query;
@@ -8,11 +9,14 @@ import com.baomidou.mybatisplus.core.exceptions.MybatisPlusException;
 import com.baomidou.mybatisplus.core.metadata.TableFieldInfo;
 import com.baomidou.mybatisplus.core.metadata.TableInfo;
 import com.baomidou.mybatisplus.core.toolkit.*;
+import com.github.yulichang.adapter.base.tookit.VersionUtils;
 import com.github.yulichang.config.ConfigProperties;
+import com.github.yulichang.query.interfaces.CompareIfExists;
 import com.github.yulichang.query.interfaces.StringJoin;
-import com.github.yulichang.toolkit.Asserts;
 import com.github.yulichang.toolkit.MPJSqlInjectionUtils;
 import com.github.yulichang.toolkit.TableHelper;
+import com.github.yulichang.toolkit.ThrowOptional;
+import com.github.yulichang.wrapper.enums.IfExistsSqlKeyWordEnum;
 import com.github.yulichang.wrapper.interfaces.Chain;
 import lombok.Getter;
 
@@ -23,20 +27,22 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.BiPredicate;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 /**
  * copy {@link com.baomidou.mybatisplus.core.conditions.query.QueryWrapper}
- * 推荐使用 JoinWrappers.<UserDO>queryJoin();构造
+ * 推荐使用 JoinWrappers.&lt;UserDO&gt;query();构造
  *
  * @author yulichang
  * @see com.github.yulichang.toolkit.JoinWrappers
  */
 @SuppressWarnings("unused")
 public class MPJQueryWrapper<T> extends AbstractWrapper<T, String, MPJQueryWrapper<T>> implements
-        Query<MPJQueryWrapper<T>, T, String>, StringJoin<MPJQueryWrapper<T>, T>, Chain<T> {
+        Query<MPJQueryWrapper<T>, T, String>, StringJoin<MPJQueryWrapper<T>, T>, Chain<T>,
+        CompareIfExists<MPJQueryWrapper<T>, String> {
 
     /**
      * 查询字段
@@ -83,13 +89,22 @@ public class MPJQueryWrapper<T> extends AbstractWrapper<T, String, MPJQueryWrapp
      */
     private boolean checkSqlInjection = false;
 
+    @Getter
+    private BiPredicate<Object, IfExistsSqlKeyWordEnum> ifExists = ConfigProperties.ifExists;
+
 
     public MPJQueryWrapper() {
         super.initNeed();
     }
 
     public MPJQueryWrapper(Class<T> clazz) {
-        super.setEntityClass(clazz);
+        try {
+            super.setEntityClass(clazz);
+        } catch (NoSuchMethodError error) {
+            if (VersionUtils.compare(MybatisPlusVersion.getVersion(), "3.3.0") > 0) {
+                throw error;
+            }
+        }
         super.initNeed();
     }
 
@@ -107,9 +122,10 @@ public class MPJQueryWrapper<T> extends AbstractWrapper<T, String, MPJQueryWrapp
                            Map<String, Object> paramNameValuePairs, MergeSegments mergeSegments,
                            SharedString sqlSelect, SharedString from, SharedString lastSql,
                            SharedString sqlComment, SharedString sqlFirst,
-                           List<String> selectColumns, List<String> ignoreColumns, boolean selectDistinct) {
+                           List<String> selectColumns, List<String> ignoreColumns, boolean selectDistinct,
+                           BiPredicate<Object, IfExistsSqlKeyWordEnum> IfExists) {
         super.setEntity(entity);
-        super.setEntityClass(entityClass);
+        setEntityClass(entityClass);
         this.paramNameSeq = paramNameSeq;
         this.paramNameValuePairs = paramNameValuePairs;
         this.expression = mergeSegments;
@@ -117,10 +133,11 @@ public class MPJQueryWrapper<T> extends AbstractWrapper<T, String, MPJQueryWrapp
         this.lastSql = lastSql;
         this.from = from;
         this.sqlComment = sqlComment;
-        this.sqlFirst = sqlFirst;
+        ThrowOptional.tryDo(() -> this.sqlFirst = sqlFirst).catchDo();
         this.selectColumns = selectColumns;
         this.ignoreColumns = ignoreColumns;
         this.selectDistinct = selectDistinct;
+        this.ifExists = IfExists;
     }
 
     /**
@@ -128,6 +145,16 @@ public class MPJQueryWrapper<T> extends AbstractWrapper<T, String, MPJQueryWrapp
      */
     public MPJQueryWrapper<T> checkSqlInjection() {
         this.checkSqlInjection = true;
+        return this;
+    }
+
+    public MPJQueryWrapper<T> setIfExists(BiPredicate<Object, IfExistsSqlKeyWordEnum> IfExists) {
+        this.ifExists = IfExists;
+        return this;
+    }
+
+    public MPJQueryWrapper<T> setIfExists(Predicate<Object> IfExists) {
+        this.ifExists = (o, k) -> IfExists.test(o);
         return this;
     }
 
@@ -187,8 +214,7 @@ public class MPJQueryWrapper<T> extends AbstractWrapper<T, String, MPJQueryWrapp
      */
     @Override
     public MPJQueryWrapper<T> select(Class<T> entityClass, Predicate<TableFieldInfo> predicate) {
-        TableInfo info = TableHelper.get(entityClass);
-        Asserts.hasTable(info, entityClass);
+        TableInfo info = TableHelper.getAssert(entityClass);
         selectColumns.addAll(info.getFieldList().stream().filter(predicate).map(c ->
                 alias + StringPool.DOT + c.getSqlSelect()).collect(Collectors.toList()));
         return typedThis;
@@ -212,8 +238,7 @@ public class MPJQueryWrapper<T> extends AbstractWrapper<T, String, MPJQueryWrapp
      */
     @SuppressWarnings({"DuplicatedCode", "UnusedReturnValue"})
     public final MPJQueryWrapper<T> selectAll(Class<?> clazz, String as) {
-        TableInfo info = TableHelper.get(clazz);
-        Asserts.hasTable(info, clazz);
+        TableInfo info = TableHelper.getAssert(clazz);
         if (ConfigProperties.tableInfoAdapter.mpjHasPK(info)) {
             selectColumns.add(as + StringPool.DOT + info.getKeySqlSelect());
         }
@@ -307,6 +332,7 @@ public class MPJQueryWrapper<T> extends AbstractWrapper<T, String, MPJQueryWrapp
         return this.tableNameFunc.apply(tableName);
     }
 
+    @SuppressWarnings("DuplicatedCode")
     public String getTableNameEnc(String tableName) {
         String decode;
         try {
@@ -325,7 +351,33 @@ public class MPJQueryWrapper<T> extends AbstractWrapper<T, String, MPJQueryWrapp
      */
     public MPJLambdaQueryWrapper<T> lambda() {
         return new MPJLambdaQueryWrapper<>(getEntity(), getEntityClass(), from, sqlSelect, paramNameSeq, paramNameValuePairs,
-                expression, lastSql, sqlComment, sqlFirst, selectColumns, ignoreColumns, selectDistinct);
+                expression, lastSql, sqlComment, getSqlFirstField(), selectColumns, ignoreColumns, selectDistinct, ifExists);
+    }
+
+    @Override
+    public Class<T> getEntityClass() {
+        try {
+            return super.getEntityClass();
+        } catch (Throwable throwable) {
+            return null;
+        }
+    }
+
+    @Override
+    public MPJQueryWrapper<T> setEntityClass(Class<T> entityClass) {
+        try {
+            return super.setEntityClass(entityClass);
+        } catch (Throwable throwable) {
+            return this;
+        }
+    }
+
+    public SharedString getSqlFirstField() {
+        try {
+            return sqlSelect;
+        } catch (Throwable throwable) {
+            return SharedString.emptyString();
+        }
     }
 
     /**
@@ -335,7 +387,8 @@ public class MPJQueryWrapper<T> extends AbstractWrapper<T, String, MPJQueryWrapp
     @Override
     protected MPJQueryWrapper<T> instance() {
         return new MPJQueryWrapper<>(getEntity(), getEntityClass(), paramNameSeq, paramNameValuePairs, new MergeSegments(),
-                null, null, SharedString.emptyString(), SharedString.emptyString(), SharedString.emptyString(), null, null, selectDistinct);
+                null, null, SharedString.emptyString(), SharedString.emptyString(), SharedString.emptyString(),
+                null, null, selectDistinct, ifExists);
     }
 
 
@@ -346,6 +399,7 @@ public class MPJQueryWrapper<T> extends AbstractWrapper<T, String, MPJQueryWrapp
         from.toNull();
         selectColumns.clear();
         ignoreColumns.clear();
+        ifExists = ConfigProperties.ifExists;
     }
 
     @Override

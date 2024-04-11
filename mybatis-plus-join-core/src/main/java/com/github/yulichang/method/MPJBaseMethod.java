@@ -1,7 +1,6 @@
 package com.github.yulichang.method;
 
 import com.baomidou.mybatisplus.annotation.FieldStrategy;
-import com.baomidou.mybatisplus.core.MybatisPlusVersion;
 import com.baomidou.mybatisplus.core.metadata.TableFieldInfo;
 import com.baomidou.mybatisplus.core.metadata.TableInfo;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
@@ -10,9 +9,9 @@ import com.baomidou.mybatisplus.core.toolkit.StringPool;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.core.toolkit.sql.SqlScriptUtils;
 import com.github.yulichang.adapter.AdapterHelper;
+import com.github.yulichang.adapter.base.metadata.OrderFieldInfo;
 import com.github.yulichang.annotation.DynamicTableName;
 import com.github.yulichang.config.ConfigProperties;
-import com.github.yulichang.toolkit.VersionUtils;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -72,23 +71,19 @@ public interface MPJBaseMethod extends Constants {
      */
     default String mpjSqlOrderBy(TableInfo tableInfo) {
         /* 不存在排序字段，直接返回空 */
-        List<TableFieldInfo> orderByFields;
+        List<OrderFieldInfo> orderByFields;
         try {
-            if (VersionUtils.compare(MybatisPlusVersion.getVersion(), "3.4.3") >= 0) {
-                orderByFields = tableInfo.getOrderByFields();
-            } else {
-                return StringPool.EMPTY;
-            }
+            orderByFields = AdapterHelper.getAdapter().mpjGetOrderField(tableInfo);
         } catch (Exception e) {
             return StringPool.EMPTY;
         }
         if (CollectionUtils.isEmpty(orderByFields)) {
             return StringPool.EMPTY;
         }
-        orderByFields.sort(Comparator.comparingInt(TableFieldInfo::getOrderBySort));
+        orderByFields.sort(Comparator.comparingInt(OrderFieldInfo::getSort));
         String sql = NEWLINE + " ORDER BY " +
                 orderByFields.stream().map(tfi -> String.format("${ew.alias}.%s %s", tfi.getColumn(),
-                        tfi.getOrderByType())).collect(joining(","));
+                        tfi.getType())).collect(joining(","));
         /* 当wrapper中传递了orderBy属性，@orderBy注解失效 */
         return SqlScriptUtils.convertIf(sql, String.format("%s == null or %s", WRAPPER,
                 WRAPPER_EXPRESSION_ORDER), true);
@@ -112,7 +107,7 @@ public interface MPJBaseMethod extends Constants {
             return filedSqlScript;
         }
         String newKeyProperty = newPrefix + tableInfo.getKeyProperty();
-        String keySqlScript = ConfigProperties.tableAlias + DOT + tableInfo.getKeyColumn() + EQUALS +
+        String keySqlScript = "${ew.alias}" + DOT + tableInfo.getKeyColumn() + EQUALS +
                 SqlScriptUtils.safeParam(newKeyProperty);
         return SqlScriptUtils.convertIf(keySqlScript, String.format("%s != null", newKeyProperty), false)
                 + NEWLINE + filedSqlScript;
@@ -121,7 +116,7 @@ public interface MPJBaseMethod extends Constants {
     default String getSqlWhere(TableFieldInfo tableFieldInfo, final String prefix) {
         final String newPrefix = prefix == null ? EMPTY : prefix;
         // 默认:  AND column=#{prefix + el}
-        String sqlScript = " AND " + String.format(tableFieldInfo.getCondition(), ConfigProperties.tableAlias + DOT +
+        String sqlScript = " AND " + String.format(tableFieldInfo.getCondition(), "${ew.alias}" + DOT +
                 tableFieldInfo.getColumn(), newPrefix + tableFieldInfo.getEl());
         // 查询的时候只判非空
         return convertIf(tableFieldInfo, sqlScript, convertIfProperty(newPrefix, tableFieldInfo.getProperty()),
@@ -231,7 +226,7 @@ public interface MPJBaseMethod extends Constants {
         return tableInfo.getFieldList().stream()
                 .filter(i -> {
                     if (ignoreLogicDelFiled) {
-                        return !(AdapterHelper.getTableInfoAdapter().mpjHasLogic(tableInfo) && i.isLogicDelete());
+                        return !(AdapterHelper.getAdapter().mpjHasLogic(tableInfo) && i.isLogicDelete());
                     }
                     return true;
                 }).map(i -> mpjGetSqlSet(i, newPrefix)).filter(Objects::nonNull).collect(joining(NEWLINE));

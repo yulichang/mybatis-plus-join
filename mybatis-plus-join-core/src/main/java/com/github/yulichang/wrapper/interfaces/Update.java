@@ -50,6 +50,18 @@ public interface Update<Children> extends Serializable {
      */
     <R> Children set(boolean condition, SFunction<R, ?> column, Object val, String mapping);
 
+    default <R> Children setIncrBy(SFunction<R, ?> column, Number val) {
+        return setIncrBy(true, column, val);
+    }
+
+    <R> Children setIncrBy(boolean condition, SFunction<R, ?> column, Number val);
+
+    default <R> Children setDecrBy(SFunction<R, ?> column, Number val) {
+        return setDecrBy(true, column, val);
+    }
+
+    <R> Children setDecrBy(boolean condition, SFunction<R, ?> column, Number val);
+
     /**
      * ignore
      */

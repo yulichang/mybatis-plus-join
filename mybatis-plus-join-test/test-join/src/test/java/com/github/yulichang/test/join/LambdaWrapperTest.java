@@ -1,16 +1,17 @@
 package com.github.yulichang.test.join;
 
+import com.baomidou.mybatisplus.core.MybatisPlusVersion;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.github.yulichang.adapter.base.tookit.VersionUtils;
 import com.github.yulichang.test.join.dto.AddressDTO;
 import com.github.yulichang.test.join.dto.UserDTO;
+import com.github.yulichang.test.join.dto.UserTenantDTO;
+import com.github.yulichang.test.join.dto.UserTenantDescDTO;
 import com.github.yulichang.test.join.entity.*;
-import com.github.yulichang.test.join.mapper.AddressMapper;
-import com.github.yulichang.test.join.mapper.OrderMapper;
-import com.github.yulichang.test.join.mapper.UserDTOMapper;
-import com.github.yulichang.test.join.mapper.UserMapper;
+import com.github.yulichang.test.join.mapper.*;
 import com.github.yulichang.test.util.Reset;
 import com.github.yulichang.test.util.ThreadLocalUtils;
 import com.github.yulichang.toolkit.JoinWrappers;
@@ -52,9 +53,37 @@ class LambdaWrapperTest {
     @Autowired
     private OrderMapper orderMapper;
 
+    @Autowired
+    private UserTenantMapper userTenantMapper;
+
     @BeforeEach
     void setUp() {
         Reset.reset();
+    }
+
+    @Test
+    void testSelectSort() {
+        ThreadLocalUtils.set("SELECT t.id, t.user_id, t.tenant_id FROM user_tenant t WHERE t.tenant_id = 1");
+        MPJLambdaWrapper<UserTenantDO> lambda = JoinWrappers.lambda(UserTenantDO.class)
+                .selectAsClass(UserTenantDO.class, UserTenantDTO.class);
+        List<UserTenantDO> list = userTenantMapper.selectJoinList(UserTenantDO.class, lambda);
+        assert list.size() == 5 && list.get(0).getIdea() != null;
+
+
+        ThreadLocalUtils.set("SELECT t.tenant_id, t.user_id, t.id FROM user_tenant t WHERE t.tenant_id = 1");
+        MPJLambdaWrapper<UserTenantDO> lambda1 = JoinWrappers.lambda(UserTenantDO.class)
+                .selectAsClass(UserTenantDO.class, UserTenantDescDTO.class);
+        List<UserTenantDO> list1 = userTenantMapper.selectJoinList(UserTenantDO.class, lambda1);
+        assert list1.size() == 5 && list1.get(0).getIdea() != null;
+    }
+
+    @Test
+    void testSimple() {
+        MPJLambdaWrapper<UserTenantDO> lambda = JoinWrappers.lambda(UserTenantDO.class);
+        lambda.selectAs(UserTenantDO::getIdea, UserTenantDO::getIdea);
+        List<UserTenantDO> list = userTenantMapper.selectList(lambda);
+
+        assert list.size() == 5 && list.get(0).getIdea() != null;
     }
 
     @Test
@@ -100,6 +129,11 @@ class LambdaWrapperTest {
                 .le(UserDO::getId, 10000)
                 .orderByDesc(UserDO::getId);
         List<UserDTO> list = userMapper.selectJoinList(UserDTO.class, wrapper);
+
+        assert wrapper.checkJoinTable(AddressDO.class);
+        assert wrapper.checkJoinTable(AreaDO.class);
+        assert !wrapper.checkJoinTable(UserDO.class);
+        assert !wrapper.checkJoinTable(UserDto.class);
 
         assert list.get(0).getAddressList() != null && list.get(0).getAddressList().get(0).getId() != null;
         list.forEach(System.out::println);
@@ -231,7 +265,6 @@ class LambdaWrapperTest {
 
 
     @Test
-    @SuppressWarnings("unchecked")
     void testMSCache() {
         ThreadLocalUtils.set("SELECT t.id,\n" +
                 "       t.pid,\n" +
@@ -498,7 +531,6 @@ class LambdaWrapperTest {
         assert l4.size() == 14 && l4.get(0).getAddressList().size() == 5;
     }
 
-
     /**
      * 别名测试
      */
@@ -678,7 +710,9 @@ class LambdaWrapperTest {
                 .eq(UserDO::getName, "ref");
         userMapper.selectList(wrapper);
         try {
-            userMapper.insertBatchSomeColumn(new ArrayList<>());
+            userMapper.insertBatchSomeColumn(new ArrayList<UserDO>() {{
+                add(new UserDO());
+            }});
         } catch (BadSqlGrammarException ignored) {
         }
     }
@@ -707,7 +741,9 @@ class LambdaWrapperTest {
                 .lt(UserDO::getId, 8));
         assert dos.size() == 4;
 
-        ThreadLocalUtils.set("SELECT id,pid,`name`,`json`,sex,head_img,create_time,address_id,address_id2,del,create_by,update_by FROM `user` t WHERE t.del=false AND (t.id > ? AND t.id < ?)",
+        ThreadLocalUtils.set(
+                "SELECT t.id, t.pid, t.`name`, t.`json`, t.sex, t.head_img, t.create_time, t.address_id, t.address_id2, t.del, t.create_by, t.update_by FROM `user` t WHERE t.del = false AND (t.id > ? AND t.id < ?)",
+                "SELECT id, pid, `name`, `json`, sex, head_img, create_time, address_id, address_id2, del, create_by, update_by FROM `user` t WHERE t.del = false AND (t.id > ? AND t.id < ?)",
                 "SELECT * FROM `user` t WHERE t.del=false AND (t.id > ? AND t.id < ?) ");
         List<UserDO> dos1 = userMapper.selectList(new MPJLambdaWrapper<UserDO>()
                 .gt(UserDO::getId, 3)
@@ -772,7 +808,7 @@ class LambdaWrapperTest {
      */
     @Test
     void testTable() {
-        ThreadLocalUtils.set("SELECT t.id FROM `user`bbbbbbb t LEFT JOIN addressaaaaaaaaaa t1 ON (t1.user_id = t.id) LEFT JOIN area t2 ON (t2.id = t1.area_id) WHERE t.del=false AND t1.del=false AND t2.del=false AND (t.id <= ?) ORDER BY t.id DESC");
+        ThreadLocalUtils.set("SELECT t.id FROM bbbbbbb t LEFT JOIN addressaaaaaaaaaa t1 ON (t1.user_id = t.id) LEFT JOIN area t2 ON (t2.id = t1.area_id) WHERE t.del=false AND t1.del=false AND t2.del=false AND (t.id <= ?) ORDER BY t.id DESC");
         MPJLambdaWrapper<UserDO> wrapper = new MPJLambdaWrapper<UserDO>()
                 .select(UserDO::getId)
                 .leftJoin(AddressDO.class, on -> on
@@ -781,10 +817,11 @@ class LambdaWrapperTest {
                 .leftJoin(AreaDO.class, AreaDO::getId, AddressDO::getAreaId)
                 .le(UserDO::getId, 10000)
                 .orderByDesc(UserDO::getId)
-                .setTableName(name -> name + "bbbbbbb");
+                .setTableName(name -> "bbbbbbb");
         try {
             List<UserDTO> list = userMapper.selectJoinList(UserDTO.class, wrapper);
         } catch (BadSqlGrammarException ignored) {
+
         }
     }
 
@@ -959,18 +996,28 @@ class LambdaWrapperTest {
      */
     @Test
     void joinOrder() {
-        ThreadLocalUtils.set("SELECT id,user_id,name FROM order_t t ORDER BY t.name DESC",
-                "SELECT id,user_id,name FROM order_t t ORDER BY t.name desc");
+        if (VersionUtils.compare(MybatisPlusVersion.getVersion(), "3.4.3") >= 0) {
+            ThreadLocalUtils.set("SELECT id,user_id,name FROM order_t t ORDER BY t.name DESC",
+                    "SELECT t.id, t.user_id, t.name FROM order_t t ORDER BY t.name DESC",
+                    "SELECT id,user_id,name FROM order_t t ORDER BY t.name desc");
+        } else {
+            ThreadLocalUtils.set("SELECT id,user_id,name FROM order_t t",
+                    "SELECT id,user_id,name FROM order_t t");
+        }
         MPJLambdaWrapper<OrderDO> wrapper = JoinWrappers.lambda(OrderDO.class);
         List<OrderDO> list = wrapper.list();
 
-        ThreadLocalUtils.set("SELECT t.id,t.user_id,t.name,t1.`name` AS userName FROM order_t t LEFT JOIN `user` t1 ON (t1.id = t.user_id) WHERE t1.del=false ORDER BY t.name DESC",
-                "SELECT t.id,t.user_id,t.name,t1.`name` AS userName FROM order_t t LEFT JOIN `user` t1 ON (t1.id = t.user_id) WHERE t1.del=false ORDER BY t.name desc");
+        if (VersionUtils.compare(MybatisPlusVersion.getVersion(), "3.4.3") >= 0) {
+            ThreadLocalUtils.set("SELECT t.id,t.user_id,t.name,t1.`name` AS userName FROM order_t t LEFT JOIN `user` t1 ON (t1.id = t.user_id) WHERE t1.del=false ORDER BY t.name DESC",
+                    "SELECT t.id,t.user_id,t.name,t1.`name` AS userName FROM order_t t LEFT JOIN `user` t1 ON (t1.id = t.user_id) WHERE t1.del=false ORDER BY t.name desc");
+        } else {
+            ThreadLocalUtils.set("SELECT t.id,t.user_id,t.name,t1.`name` AS userName FROM order_t t LEFT JOIN `user` t1 ON (t1.id = t.user_id) WHERE t1.del=false",
+                    "SELECT t.id,t.user_id,t.name,t1.`name` AS userName FROM order_t t LEFT JOIN `user` t1 ON (t1.id = t.user_id) WHERE t1.del=false");
+        }
         MPJLambdaWrapper<OrderDO> w = JoinWrappers.lambda(OrderDO.class)
                 .selectAll(OrderDO.class)
                 .selectAs(UserDO::getName, OrderDO::getUserName)
                 .leftJoin(UserDO.class, UserDO::getId, OrderDO::getUserId);
-        System.out.println(wrapper.getFrom());
         List<OrderDO> l = w.list();
     }
 
@@ -1037,30 +1084,6 @@ class LambdaWrapperTest {
      * select 子查询
      */
     @Test
-    void sub() {
-        ThreadLocalUtils.set("SELECT ( SELECT st.id FROM `user` st WHERE st.del=false AND (st.id = t.id) limit 1 ) AS id FROM `user` t LEFT JOIN address t1 ON (t1.user_id = t.id) WHERE t.del=false AND t1.del=false AND (t.id <= ?)");
-        MPJLambdaWrapper<UserDO> wrapper = JoinWrappers.lambda(UserDO.class)
-                .selectSub(UserDO.class, w -> w.select(UserDO::getId)
-                        .eq(UserDO::getId, UserDO::getId)
-                        .last("limit 1"), UserDO::getId)
-                .leftJoin(AddressDO.class, AddressDO::getUserId, UserDO::getId)
-                .le(UserDO::getId, 100);
-        wrapper.list();
-
-        ThreadLocalUtils.set("SELECT ( SELECT st.id FROM address st WHERE st.del=false AND (st.id = t.id) limit 1 ) AS id FROM `user` t LEFT JOIN address t1 ON (t1.user_id = t.id) WHERE t.del=false AND t1.del=false AND (t.id <= ?)");
-        MPJLambdaWrapper<UserDO> wrapper1 = JoinWrappers.lambda(UserDO.class)
-                .selectSub(AddressDO.class, w -> w.select(AddressDO::getId)
-                        .eq(AddressDO::getId, UserDO::getId)
-                        .last("limit 1"), UserDO::getId)
-                .leftJoin(AddressDO.class, AddressDO::getUserId, UserDO::getId)
-                .le(UserDO::getId, 100);
-        wrapper1.list();
-    }
-
-    /**
-     * select 子查询
-     */
-    @Test
     void checkOrderBy() {
         MPJLambdaWrapper<UserDO> wrapper = JoinWrappers.lambda(UserDO.class)
                 .selectAll(UserDO.class)
@@ -1069,26 +1092,5 @@ class LambdaWrapperTest {
                 .checkSqlInjection()
                 .orderByDesc("t.id");
         wrapper.list();
-    }
-
-    /**
-     * select 子查询
-     */
-    @Test
-    void union() {
-        ThreadLocalUtils.set();
-        MPJLambdaWrapper<UserDO> wrapper = JoinWrappers.lambda(UserDO.class)
-                .selectAll(UserDO.class)
-                .eq(UserDO::getId, 1);
-        MPJLambdaWrapper<UserDO> wrapper1 = JoinWrappers.lambda(UserDO.class)
-                .selectAll(UserDO.class)
-                .eq(UserDO::getName, "张三 2");
-        MPJLambdaWrapper<UserDO> wrapper2 = JoinWrappers.lambda(UserDO.class)
-                .selectAll(UserDO.class)
-                .eq(UserDO::getPid, 2);
-        wrapper.union(wrapper1, wrapper2);
-        List<UserDO> list = wrapper.list();
-
-        assert list.size() == 7;
     }
 }

@@ -7,10 +7,11 @@ import com.baomidou.mybatisplus.core.metadata.TableInfo;
 import com.baomidou.mybatisplus.core.toolkit.*;
 import com.github.yulichang.adapter.AdapterHelper;
 import com.github.yulichang.kt.interfaces.Update;
-import com.github.yulichang.toolkit.Asserts;
+import com.github.yulichang.toolkit.Constant;
 import com.github.yulichang.toolkit.KtUtils;
 import com.github.yulichang.toolkit.TableHelper;
 import com.github.yulichang.toolkit.TableList;
+import com.github.yulichang.wrapper.interfaces.UpdateChain;
 import kotlin.reflect.KProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -29,7 +30,7 @@ import java.util.stream.Collectors;
  */
 @SuppressWarnings({"unused", "DuplicatedCode"})
 public class KtUpdateJoinWrapper<T> extends KtAbstractLambdaWrapper<T, KtUpdateJoinWrapper<T>>
-        implements Update<KtUpdateJoinWrapper<T>> {
+        implements Update<KtUpdateJoinWrapper<T>>, UpdateChain<T> {
     /**
      * SQL 更新字段内容，例如：name='1', age=2
      */
@@ -114,7 +115,27 @@ public class KtUpdateJoinWrapper<T> extends KtAbstractLambdaWrapper<T, KtUpdateJ
             if (Objects.isNull(updateSet)) {
                 updateSet = new ArrayList<>();
             }
-            updateSet.add(new UpdateSet(column, val, mapping));
+            updateSet.add(new UpdateSet(column, val, mapping, false, null));
+        });
+    }
+
+    @Override
+    public KtUpdateJoinWrapper<T> setIncrBy(boolean condition, KProperty<?> column, Number val) {
+        return maybeDo(condition, () -> {
+            if (Objects.isNull(updateSet)) {
+                updateSet = new ArrayList<>();
+            }
+            updateSet.add(new UpdateSet(column, val, null, true, Constant.PLUS));
+        });
+    }
+
+    @Override
+    public KtUpdateJoinWrapper<T> setDecrBy(boolean condition, KProperty<?> column, Number val) {
+        return maybeDo(condition, () -> {
+            if (Objects.isNull(updateSet)) {
+                updateSet = new ArrayList<>();
+            }
+            updateSet.add(new UpdateSet(column, val, null, true, Constant.DASH));
         });
     }
 
@@ -136,8 +157,15 @@ public class KtUpdateJoinWrapper<T> extends KtAbstractLambdaWrapper<T, KtUpdateJ
         }
         StringBuilder set = new StringBuilder(StringPool.EMPTY);
         if (CollectionUtils.isNotEmpty(updateSet)) {
-            set = new StringBuilder(updateSet.stream().map(i -> tableList.getPrefixByClass(KtUtils.ref(i.getColumn())) +
-                            Constants.DOT + getCache(i.getColumn()).getColumn() + Constants.EQUALS + formatParam(i.mapping, i.value))
+            set = new StringBuilder(updateSet.stream().map(i -> {
+                        String col = tableList.getPrefixByClass(KtUtils.ref(i.getColumn())) +
+                                Constants.DOT + getCache(i.getColumn()).getColumn();
+                        if (i.incOrDnc) {
+                            return col + Constants.EQUALS + col + i.cal + i.value;
+                        } else {
+                            return col + Constants.EQUALS + formatParam(i.mapping, i.value);
+                        }
+                    })
                     .collect(Collectors.joining(StringPool.COMMA)) + StringPool.COMMA);
         }
         if (CollectionUtils.isNotEmpty(sqlSet)) {
@@ -199,15 +227,14 @@ public class KtUpdateJoinWrapper<T> extends KtAbstractLambdaWrapper<T, KtUpdateJ
     private void getSqlByEntity(StringBuilder sb, boolean filterNull, List<Object> entityList) {
         for (Object obj : entityList) {
             Assert.isTrue(tableList.contain(obj.getClass()), "更新的实体不是主表或关联表 <%>", obj.getClass().getSimpleName());
-            TableInfo tableInfo = TableHelper.get(obj.getClass());
-            Asserts.hasTable(tableInfo, obj.getClass());
+            TableInfo tableInfo = TableHelper.getAssert(obj.getClass());
             for (TableFieldInfo fieldInfo : tableInfo.getFieldList()) {
-                if (AdapterHelper.getTableInfoAdapter().mpjHasLogic(tableInfo) && fieldInfo.isLogicDelete()) {
+                if (AdapterHelper.getAdapter().mpjHasLogic(tableInfo) && fieldInfo.isLogicDelete()) {
                     continue;
                 }
                 Object val;
                 try {
-                    Field field = AdapterHelper.getTableInfoAdapter().mpjGetField(fieldInfo, () -> {
+                    Field field = AdapterHelper.getAdapter().mpjGetField(fieldInfo, () -> {
                         Field field1 = ReflectionKit.getFieldMap(obj.getClass()).get(fieldInfo.getProperty());
                         field1.setAccessible(true);
                         return field1;
@@ -254,5 +281,9 @@ public class KtUpdateJoinWrapper<T> extends KtAbstractLambdaWrapper<T, KtUpdateJ
         private Object value;
 
         private String mapping;
+
+        private boolean incOrDnc;
+
+        private String cal;
     }
 }

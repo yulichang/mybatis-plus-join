@@ -10,9 +10,9 @@ import java.lang.annotation.*;
  * @since 1.2.0
  */
 @Documented
-@SuppressWarnings({"unused"})
+@SuppressWarnings("unused")
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.FIELD, ElementType.ANNOTATION_TYPE})
+@Target(ElementType.FIELD)
 public @interface EntityMapping {
 
     /**

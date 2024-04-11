@@ -6,10 +6,10 @@
     <parent>
         <groupId>com.github.yulichang</groupId>
         <artifactId>mybatis-plus-join-adapter</artifactId>
-        <version>1.4.6</version>
+        <version>${revision}</version>
     </parent>
     <artifactId>mybatis-plus-join-adapter-v352</artifactId>
-    <version>1.4.6</version>
+    <version>${revision}</version>
     <name>mybatis-plus-join-adapter-v352</name>
 
     <description>An enhanced toolkit of Mybatis-Plus to simplify development.</description>

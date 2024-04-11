@@ -8,11 +8,15 @@ import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.extension.injector.methods.InsertBatchSomeColumn;
 import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
+import com.baomidou.mybatisplus.extension.plugins.handler.TenantLineHandler;
 import com.baomidou.mybatisplus.extension.plugins.inner.InnerInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.PaginationInnerInterceptor;
+import com.baomidou.mybatisplus.extension.plugins.inner.TenantLineInnerInterceptor;
 import com.github.yulichang.injector.MPJSqlInjector;
 import com.github.yulichang.test.util.ThreadLocalUtils;
 import lombok.SneakyThrows;
+import net.sf.jsqlparser.expression.Expression;
+import net.sf.jsqlparser.expression.LongValue;
 import org.apache.ibatis.builder.SqlSourceBuilder;
 import org.apache.ibatis.executor.Executor;
 import org.apache.ibatis.executor.statement.StatementHandler;
@@ -44,6 +48,17 @@ public class MybatisPlusConfig {
         MybatisPlusInterceptor interceptor = new MybatisPlusInterceptor();
         PaginationInnerInterceptor page = new PaginationInnerInterceptor(DbType.H2);
         page.setOptimizeJoin(false);
+        interceptor.addInnerInterceptor(new TenantLineInnerInterceptor(new TenantLineHandler() {
+            @Override
+            public Expression getTenantId() {
+                return new LongValue(1);
+            }
+
+            @Override
+            public boolean ignoreTable(String tableName) {
+                return !"user_tenant".equals(tableName);
+            }
+        }));
         interceptor.addInnerInterceptor(page);
         interceptor.addInnerInterceptor(new SqlInterceptor());
         return interceptor;
@@ -82,6 +97,10 @@ public class MybatisPlusConfig {
         @SneakyThrows
         public void beforeQuery(Executor executor, MappedStatement ms, Object parameter, RowBounds rowBounds, ResultHandler resultHandler, BoundSql boundSql) {
             String sql = boundSql.getSql();
+            check(sql);
+        }
+
+        private void check(String sql) {
             List<String> sqlList = ThreadLocalUtils.get();
             if (CollectionUtils.isNotEmpty(sqlList)) {
                 if (sqlList.stream().anyMatch(e -> Objects.equals(formatSql(sql), formatSql(e)))) {
@@ -107,20 +126,7 @@ public class MybatisPlusConfig {
                 if (sql.toUpperCase().startsWith("SELECT")) {
                     return;
                 }
-                List<String> sqlList = ThreadLocalUtils.get();
-                if (CollectionUtils.isNotEmpty(sqlList)) {
-                    if (sqlList.stream().anyMatch(e -> Objects.equals(formatSql(sql), formatSql(e)))) {
-                        System.out.println("===============================================");
-                        System.out.println();
-                        System.out.println("pass");
-                        System.out.println();
-                        System.out.println("===============================================");
-                    } else {
-                        System.err.println("执行sql: " + SqlSourceBuilder.removeExtraWhitespaces(sql));
-                        sqlList.forEach(i -> System.err.println("预期sql: " + SqlSourceBuilder.removeExtraWhitespaces(i)));
-                        throw new RuntimeException("sql error");
-                    }
-                }
+                check(sql);
             }
         }
 

@@ -6,10 +6,10 @@
     <parent>
         <groupId>com.github.yulichang</groupId>
         <artifactId>mybatis-plus-join-adapter</artifactId>
-        <version>1.4.6</version>
+        <version>${revision}</version>
     </parent>
     <artifactId>mybatis-plus-join-adapter-base</artifactId>
-    <version>1.4.6</version>
+    <version>${revision}</version>
     <name>mybatis-plus-join-adapter-base</name>
 
     <description>An enhanced toolkit of Mybatis-Plus to simplify development.</description>
@@ -33,21 +33,22 @@
         <url>https://github.com/yulichang/mybatis-plus-join</url>
     </scm>
 
-    <properties>
-        <jdkVersion>1.8</jdkVersion>
-        <jdkVersion.test>1.8</jdkVersion.test>
-        <maven.compiler.source>1.8</maven.compiler.source>
-        <maven.compiler.target>1.8</maven.compiler.target>
-        <github.global.server>github</github.global.server>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    </properties>
-
     <dependencies>
         <dependency>
             <groupId>com.baomidou</groupId>
             <artifactId>mybatis-plus-extension</artifactId>
-            <version>3.5.3.2</version>
+            <version>${mpj.mybatis.plus.version}</version>
             <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.github.yulichang</groupId>
+            <artifactId>mybatis-plus-join-adapter-jsqlparser</artifactId>
+            <version>${revision}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.yulichang</groupId>
+            <artifactId>mybatis-plus-join-adapter-jsqlparser-v46</artifactId>
+            <version>${revision}</version>
         </dependency>
     </dependencies>
 </project>

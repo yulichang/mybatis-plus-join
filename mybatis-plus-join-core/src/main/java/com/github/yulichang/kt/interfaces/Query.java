@@ -4,7 +4,7 @@ import com.baomidou.mybatisplus.core.metadata.TableFieldInfo;
 import com.baomidou.mybatisplus.core.metadata.TableInfo;
 import com.baomidou.mybatisplus.core.toolkit.Constants;
 import com.github.yulichang.kt.segments.FuncArgs;
-import com.github.yulichang.toolkit.Asserts;
+import com.github.yulichang.toolkit.Constant;
 import com.github.yulichang.toolkit.KtUtils;
 import com.github.yulichang.toolkit.MPJReflectionKit;
 import com.github.yulichang.toolkit.TableHelper;
@@ -28,7 +28,7 @@ import java.util.stream.Collectors;
  *
  * @author yulichang
  */
-@SuppressWarnings("unused")
+@SuppressWarnings({"unused", "DuplicatedCode"})
 public interface Query<Children> extends Serializable {
 
 
@@ -53,8 +53,7 @@ public interface Query<Children> extends Serializable {
      */
     @Deprecated
     default Children select(Class<?> entityClass, Predicate<TableFieldInfo> predicate) {
-        TableInfo info = TableHelper.get(entityClass);
-        Asserts.hasTable(info, entityClass);
+        TableInfo info = TableHelper.getAssert(entityClass);
         Map<String, SelectCache> cacheMap = ColumnCache.getMapField(entityClass);
         info.getFieldList().stream().filter(predicate).collect(Collectors.toList()).forEach(
                 i -> getSelectColum().add(new SelectNormal(cacheMap.get(i.getProperty()), getIndex(), isHasAlias(), getAlias())));
@@ -73,8 +72,7 @@ public interface Query<Children> extends Serializable {
      * @return children
      */
     default Children selectFilter(Class<?> entityClass, Predicate<SelectCache> predicate) {
-        TableInfo info = TableHelper.get(entityClass);
-        Asserts.hasTable(info, entityClass);
+        TableInfo info = TableHelper.getAssert(entityClass);
         List<SelectCache> cacheList = ColumnCache.getListField(entityClass);
         cacheList.stream().filter(predicate).collect(Collectors.toList()).forEach(
                 i -> getSelectColum().add(new SelectNormal(i, getIndex(), isHasAlias(), getAlias())));
@@ -90,7 +88,8 @@ public interface Query<Children> extends Serializable {
      * @param columns 列
      */
     default Children select(String... columns) {
-        getSelectColum().addAll(Arrays.stream(columns).map(i -> new SelectString(i, isHasAlias(), getAlias())).collect(Collectors.toList()));
+        getSelectColum().addAll(Arrays.stream(columns).map(i ->
+                new SelectString(i, null)).collect(Collectors.toList()));
         return getChildren();
     }
 
@@ -100,7 +99,7 @@ public interface Query<Children> extends Serializable {
      * @param column 列
      */
     default Children selectAs(String column, KProperty<?> alias) {
-        getSelectColum().add(new SelectString(column + Constants.AS + alias.getName(), isHasAlias(), getAlias()));
+        getSelectColum().add(new SelectString(column + Constant.AS + alias.getName(), alias.getName()));
         return getChildren();
     }
 
@@ -113,8 +112,7 @@ public interface Query<Children> extends Serializable {
         Map<String, SelectCache> cacheMap = ColumnCache.getMapField(KtUtils.ref(column));
         SelectCache cache = cacheMap.get(column.getName());
         getSelectColum().add(new SelectString(
-                index + Constants.DOT + cache.getColumn() + Constants.AS + alias.getName(),
-                isHasAlias(), getAlias()));
+                index + Constants.DOT + cache.getColumn() + Constant.AS + alias.getName(), alias.getName()));
         return getChildren();
     }
 
@@ -129,11 +127,12 @@ public interface Query<Children> extends Serializable {
      * @return children
      */
     default Children selectAsClass(Class<?> source, Class<?> tag) {
-        List<SelectCache> normalList = ColumnCache.getListField(source);
-        Map<String, FieldCache> fieldMap = MPJReflectionKit.getFieldMap(tag);
-        for (SelectCache cache : normalList) {
-            if (fieldMap.containsKey(cache.getColumProperty())) {
-                getSelectColum().add(new SelectNormal(cache, getIndex(), isHasAlias(), getAlias()));
+        Map<String, SelectCache> normalMap = ColumnCache.getMapField(source);
+        List<FieldCache> fieldList = MPJReflectionKit.getFieldList(tag);
+        for (FieldCache cache : fieldList) {
+            if (normalMap.containsKey(cache.getField().getName())) {
+                SelectCache selectCache = normalMap.get(cache.getField().getName());
+                getSelectColum().add(new SelectNormal(selectCache, getIndex(), isHasAlias(), getAlias()));
             }
         }
         return getChildren();

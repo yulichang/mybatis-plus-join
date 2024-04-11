@@ -16,7 +16,7 @@ import java.util.Arrays;
 public class FuncArgs {
 
     public SelectFunc.Arg[] accept(KProperty<?>... kProperty) {
-        return Arrays.stream(kProperty).map(i -> new SelectFunc.Arg(KtUtils.ref(i), i.getName())).toArray(SelectFunc.Arg[]::new);
+        return Arrays.stream(kProperty).map(i -> new SelectFunc.Arg(KtUtils.ref(i), i.getName(), false, null)).toArray(SelectFunc.Arg[]::new);
     }
 
 }

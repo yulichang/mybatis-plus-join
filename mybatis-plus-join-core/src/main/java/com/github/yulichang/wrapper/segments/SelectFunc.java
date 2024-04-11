@@ -5,7 +5,7 @@ import com.baomidou.mybatisplus.core.metadata.TableFieldInfo;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.github.yulichang.toolkit.LambdaUtils;
 import com.github.yulichang.wrapper.enums.BaseFuncEnum;
-import lombok.Data;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.apache.ibatis.type.TypeHandler;
 
@@ -71,7 +71,15 @@ public class SelectFunc implements Select {
     public SelectFunc(String alias, Integer index, BaseFuncEnum func, SFunction<?, ?>[] args, boolean hasTableAlias, String tableAlias) {
         this.index = index;
         this.column = null;
-        this.args = Arrays.stream(args).map(i -> new Arg(LambdaUtils.getEntityClass(i), LambdaUtils.getName(i))).toArray(Arg[]::new);
+        this.args = Arrays.stream(args).map(i -> {
+            boolean ins = i instanceof Fun;
+            if (ins) {
+                Fun<?, ?> f = (Fun<?, ?>) i;
+                return new Arg(LambdaUtils.getEntityClass(f.getFunc()), LambdaUtils.getName(f.getFunc()), true, f.getAlias());
+            } else {
+                return new Arg(LambdaUtils.getEntityClass(i), LambdaUtils.getName(i), false, null);
+            }
+        }).toArray(Arg[]::new);
         this.cache = null;
         this.hasAlias = true;
         this.alias = alias;
@@ -149,16 +157,13 @@ public class SelectFunc implements Select {
         return false;
     }
 
-    @Data
+    @Getter
+    @AllArgsConstructor
     public static class Arg {
-        public Class<?> clazz;
-
-        public String prop;
-
-        public Arg(Class<?> clazz, String prop) {
-            this.clazz = clazz;
-            this.prop = prop;
-        }
+        private final Class<?> clazz;
+        private final String prop;
+        private final boolean hasTableAlias;
+        private final String tableAlias;
     }
 
     /**
@@ -167,6 +172,8 @@ public class SelectFunc implements Select {
      */
     @SuppressWarnings("unused")
     public static class Func {
+
+        public static final Func func = new Func();
 
         public final <A> SFunction<?, ?>[] accept(SFunction<A, ?> a) {
             return new SFunction[]{a};

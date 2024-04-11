@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.TableFieldInfo;
 import com.baomidou.mybatisplus.core.metadata.TableInfo;
 import com.baomidou.mybatisplus.core.toolkit.*;
+import com.github.yulichang.adapter.AdapterHelper;
 import com.github.yulichang.annotation.EntityMapping;
 import com.github.yulichang.annotation.FieldMapping;
 import com.github.yulichang.toolkit.SpringContentUtils;
@@ -122,7 +123,7 @@ public class MPJTableFieldInfo {
                 (!Arrays.asList(mapping.select()).contains(this.joinProperty.trim()) &&
                         !Arrays.asList(mapping.select()).contains(this.joinColumn.trim()));
         this.wrapper = new MPJMappingWrapper(mapping.first(), checkArr(mapping.select()) ?
-                (this.isRemoveBindField ? propToColumn(this.joinClass, mapping.select(), this.joinColumn) :
+                (this.isRemoveBindField ? propToColumn(this.joinClass, mapping.select(), this.joinProperty) :
                         propToColumn(this.joinClass, mapping.select(), null)) : null,
                 mapping.apply(), mapping.condition(), mapping.last(), mapping.orderByAsc(), mapping.orderByDesc());
     }
@@ -145,7 +146,7 @@ public class MPJTableFieldInfo {
         this.isRemoveBindField = !mappingField.select().equals(this.joinColumn.trim()) &&
                 !mappingField.select().equals(this.joinProperty.trim());
         this.wrapper = new MPJMappingWrapper(mappingField.first(), this.isRemoveBindField ?
-                propToColumn(this.joinClass, new String[]{mappingField.select()}, this.joinColumn) :
+                propToColumn(this.joinClass, new String[]{mappingField.select()}, this.joinProperty) :
                 propToColumn(this.joinClass, new String[]{mappingField.select()}, null), mappingField.apply(),
                 mappingField.condition(), mappingField.last(), mappingField.orderByAsc(), mappingField.orderByDesc());
         initBindField(mappingField.select());
@@ -156,7 +157,7 @@ public class MPJTableFieldInfo {
         Assert.notNull(info, "未注册的实体类 <%s>", this.joinClass.getSimpleName());
         //根据属性名查询
         Field field = info.getFieldList().stream().filter(i -> i.getProperty().equals(bindName))
-                .findFirst().map(TableFieldInfo::getField).orElse(null);
+                .findFirst().map(f -> getField(this.joinClass, f)).orElse(null);
         if (field == null && bindName.equals(info.getKeyProperty())) {
             field = ReflectionKit.getFieldList(joinClass).stream().filter(f ->
                     f.getName().equals(info.getKeyProperty())).findFirst().orElse(null);
@@ -165,7 +166,7 @@ public class MPJTableFieldInfo {
             //根据字段查询
             field = info.getFieldList().stream()
                     .filter(i -> i.getColumn().equals(bindName))
-                    .map(TableFieldInfo::getField).findFirst().orElse(null);
+                    .map(f -> getField(this.joinClass, f)).findFirst().orElse(null);
             if (field == null && bindName.equals(info.getKeyColumn())) {
                 field = ReflectionKit.getFieldList(joinClass).stream().filter(f ->
                         f.getName().equals(info.getKeyProperty())).findFirst().orElse(null);
@@ -175,6 +176,7 @@ public class MPJTableFieldInfo {
             }
         }
         this.bindField = field;
+        this.bindField.setAccessible(true);
     }
 
     private void initJoinField(String joinField) {
@@ -188,20 +190,20 @@ public class MPJTableFieldInfo {
 
         TableInfo joinTableInfo = getTableInfo(this.joinClass);
         TableFieldInfo joinFieldInfo = joinTableInfo.getFieldList().stream().filter(f ->
-                f.getField().getName().equals(this.joinProperty)).findFirst().orElse(null);
+                f.getProperty().equals(this.joinProperty)).findFirst().orElse(null);
         if (joinFieldInfo == null) {
-            if (joinTableInfo.havePK() && this.joinProperty.equals(joinTableInfo.getKeyProperty())) {
+            if (AdapterHelper.getAdapter().mpjHasPK(joinTableInfo) && this.joinProperty.equals(joinTableInfo.getKeyProperty())) {
                 this.joinColumn = joinTableInfo.getKeyColumn();
                 this.joinField = ReflectionKit.getFieldList(this.joinClass).stream().filter(i ->
                         i.getName().equals(joinTableInfo.getKeyProperty())).findFirst().orElse(null);
             }
         } else {
             this.joinColumn = joinFieldInfo.getColumn();
-            this.joinField = joinFieldInfo.getField();
+            this.joinField = getField(this.joinClass, joinFieldInfo);
         }
-        Assert.notNull(this.joinField, "注解属性thisField不存在 %s , %s", this.joinClass.getName(),
+        Assert.notNull(this.joinField, "注解属性joinField不存在 %s , %s", this.joinClass.getName(),
                 StringUtils.isBlank(this.joinProperty) ? "主键" : this.joinProperty);
-        Assert.notNull(this.joinColumn, "注解属性thisField不存在 %s , %s", this.joinClass.getName(),
+        Assert.notNull(this.joinColumn, "注解属性joinField不存在 %s , %s", this.joinClass.getName(),
                 StringUtils.isBlank(this.joinProperty) ? "主键" : this.joinProperty);
         this.joinField.setAccessible(true);
     }
@@ -216,7 +218,7 @@ public class MPJTableFieldInfo {
         }
 
         TableInfo tableInfo = getTableInfo(this.entityType);
-        if (tableInfo.havePK() && this.thisProperty.equals(tableInfo.getKeyProperty())) {
+        if (AdapterHelper.getAdapter().mpjHasPK(tableInfo) && this.thisProperty.equals(tableInfo.getKeyProperty())) {
             this.thisField = ReflectionKit.getFieldList(ClassUtils.getUserClass(entityType)).stream().filter(f ->
                     f.getName().equals(tableInfo.getKeyProperty())).findFirst().orElse(null);
             Assert.notNull(this.thisField, "注解属性thisField不存在 %s , %s", entityType.getName(),
@@ -224,10 +226,10 @@ public class MPJTableFieldInfo {
             this.thisColumn = tableInfo.getKeyColumn();
         } else {
             TableFieldInfo fieldInfo = tableInfo.getFieldList().stream().filter(f ->
-                    f.getField().getName().equals(this.thisProperty)).findFirst().orElse(null);
+                    f.getProperty().equals(this.thisProperty)).findFirst().orElse(null);
             Assert.notNull(fieldInfo, "注解属性thisField不存在 %s , %s", entityType.getName(),
                     StringUtils.isBlank(this.thisProperty) ? "主键" : this.thisProperty);
-            this.thisField = fieldInfo.getField();
+            this.thisField = getField(this.entityType, fieldInfo);
             this.thisColumn = fieldInfo.getColumn();
         }
         this.thisField.setAccessible(true);
@@ -266,7 +268,7 @@ public class MPJTableFieldInfo {
     }
 
     private boolean checkArr(String[] arr) {
-        if (Objects.isNull(arr) || arr.length <= 0) {
+        if (Objects.isNull(arr) || arr.length == 0) {
             return false;
         }
         return Arrays.stream(arr).anyMatch(StringUtils::isNotBlank);
@@ -293,8 +295,7 @@ public class MPJTableFieldInfo {
 
     public BaseMapper<?> getJoinMapper() {
         if (this.joinMapper == null) {
-            MPJTableInfo joinTableInfo = MPJTableInfoHelper.getTableInfos().stream().filter(table ->
-                    table.getTableInfo().getEntityType() == this.joinClass).findFirst().orElse(null);
+            MPJTableInfo joinTableInfo = MPJTableInfoHelper.getTableInfo(this.joinClass);
             if (joinTableInfo == null) {
                 throw ExceptionUtils.mpe("未注册 mapper " + this.joinClass.getName());
             }
@@ -309,6 +310,11 @@ public class MPJTableFieldInfo {
             throw ExceptionUtils.mpe("未注册 mapper " + clazz.getName());
         }
         return tableInfo;
+    }
+
+    private Field getField(Class<?> table, TableFieldInfo tableFieldInfo) {
+        return AdapterHelper.getAdapter().mpjGetField(tableFieldInfo, () ->
+                ReflectionKit.getFieldMap(table).get(tableFieldInfo.getProperty()));
     }
 
     public void fieldSet(Object o, Object val) {
@@ -368,7 +374,7 @@ public class MPJTableFieldInfo {
         } else {
             if (data.size() > 1 && fieldInfo.isThrowExp()) {
                 throw ExceptionUtils.mpe("Expected one result (or null) to be returned by select, but found: " +
-                        data.size() + " , " + fieldInfo.getField().getName());
+                        data.size() + " , " + fieldInfo.getProperty());
             } else {
                 fieldInfo.fieldSet(i, data.stream().findFirst().orElse(null));
             }

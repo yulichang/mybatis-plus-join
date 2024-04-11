@@ -11,10 +11,7 @@ import com.github.yulichang.extension.mapping.mapper.MPJTableInfoHelper;
 import com.github.yulichang.extension.mapping.wrapper.MappingQuery;
 import com.github.yulichang.toolkit.LambdaUtils;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @SuppressWarnings("unchecked")
@@ -80,10 +77,10 @@ public class Relation {
         MPJTableInfo tableInfo = MPJTableInfoHelper.getTableInfo(entityClass);
         if (tableInfo.isHasMappingOrField()) {
             boolean hasProperty = CollectionUtils.isNotEmpty(config.getProperty());
-            List<String> listProperty = hasProperty ? config.getProperty().stream().map(LambdaUtils::getName).collect(
-                    Collectors.toList()) : null;
+            List<String> listProperty = hasProperty ? config.getProperty().stream().map(i ->
+                    LambdaUtils.getName(i).toUpperCase(Locale.ENGLISH)).collect(Collectors.toList()) : null;
             for (MPJTableFieldInfo fieldInfo : tableInfo.getFieldList()) {
-                if (!hasProperty || listProperty.contains(fieldInfo.getProperty())) {
+                if (!hasProperty || listProperty.contains(fieldInfo.getProperty().toUpperCase(Locale.ENGLISH))) {
                     List<Object> itemList = data.stream().map(fieldInfo::thisFieldGet).collect(Collectors.toList());
                     if (CollectionUtils.isNotEmpty(itemList)) {
                         List<?> joinList = MappingQuery.mpjQueryList(fieldInfo.getJoinMapper(), SqlKeyword.IN,

@@ -13,7 +13,7 @@ import com.github.yulichang.wrapper.UpdateJoinWrapper;
 public class JoinWrappers {
 
     /**
-     * JoinWrappers.<UserDO>query()
+     * JoinWrappers.&lt;UserDO&gt;query()
      */
     public static <T> MPJQueryWrapper<T> query() {
         return new MPJQueryWrapper<>();
@@ -34,14 +34,14 @@ public class JoinWrappers {
     }
 
     /**
-     * JoinWrappers.<UserDO>lambda()
+     * JoinWrappers.&lt;UserDO&gt;lambda()
      */
     public static <T> MPJLambdaWrapper<T> lambda() {
         return new MPJLambdaWrapper<>();
     }
 
     /**
-     * JoinWrappers.<UserDO>lambda("t")
+     * JoinWrappers.&lt;UserDO&gt;lambda("t")
      */
     public static <T> MPJLambdaWrapper<T> lambda(String alias) {
         return new MPJLambdaWrapper<>(alias);

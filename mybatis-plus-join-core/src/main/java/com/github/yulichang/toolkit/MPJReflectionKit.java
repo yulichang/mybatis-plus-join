@@ -8,11 +8,10 @@ import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.WildcardType;
-import java.util.HashMap;
-import java.util.IdentityHashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * 反射工具类
@@ -23,7 +22,8 @@ import java.util.concurrent.ConcurrentHashMap;
 @SuppressWarnings("unused")
 public final class MPJReflectionKit {
 
-    private static final Map<Class<?>, Map<String, FieldCache>> CLASS_FIELD_CACHE = new ConcurrentHashMap<>();
+    private static final Map<Class<?>, FieldStringMap<FieldCache>> CLASS_FIELD_CACHE = new ConcurrentHashMap<>();
+    private static final Map<Class<?>, List<FieldCache>> CLASS_FIELD_LIST_CACHE = new ConcurrentHashMap<>();
 
     private static final Map<String, FieldCache> EMPTY_MAP = new HashMap<>();
 
@@ -77,28 +77,32 @@ public final class MPJReflectionKit {
      * @param clazz 反射类
      */
     public static Map<String, FieldCache> getFieldMap(Class<?> clazz) {
+        return CLASS_FIELD_CACHE.computeIfAbsent(clazz, key -> getFieldList(key).stream().collect(Collectors.toMap(f ->
+                f.getField().getName().toUpperCase(Locale.ENGLISH), Function.identity(), (o, n) -> n, FieldStringMap::new)));
+    }
+
+    public static List<FieldCache> getFieldList(Class<?> clazz) {
         if (clazz == null) {
-            return EMPTY_MAP;
+            return Collections.emptyList();
         }
-        Map<String, FieldCache> fieldMap = CLASS_FIELD_CACHE.get(clazz);
-        if (fieldMap != null) {
-            return fieldMap;
+        List<FieldCache> fieldList = CLASS_FIELD_LIST_CACHE.get(clazz);
+        if (fieldList != null) {
+            return fieldList;
         }
-        Map<String, Field> map = ReflectionKit.getFieldMap(clazz);
-        Map<String, FieldCache> cache = new HashMap<>();
-        map.forEach((key, value) -> {
+        List<Field> list = ReflectionKit.getFieldList(clazz);
+        List<FieldCache> cache = list.stream().map(f -> {
             FieldCache fieldCache = new FieldCache();
-            fieldCache.setField(value);
+            fieldCache.setField(f);
             try {
                 Reflector reflector = new Reflector(clazz);
-                Class<?> getterType = reflector.getGetterType(key);
-                fieldCache.setType(Objects.isNull(getterType) ? value.getType() : getterType);
+                Class<?> getterType = reflector.getGetterType(f.getName());
+                fieldCache.setType(Objects.isNull(getterType) ? f.getType() : getterType);
             } catch (Throwable throwable) {
-                fieldCache.setType(value.getType());
+                fieldCache.setType(f.getType());
             }
-            cache.put(key, fieldCache);
-        });
-        CLASS_FIELD_CACHE.put(clazz, cache);
+            return fieldCache;
+        }).collect(Collectors.toList());
+        CLASS_FIELD_LIST_CACHE.put(clazz, cache);
         return cache;
     }
 

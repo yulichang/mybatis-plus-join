@@ -32,7 +32,7 @@ public interface QueryLabel<Children> {
      * <p>
      * 举例 UserDO AddressDO 为一对多关系  UserDTO 为结果类
      * <pre>
-     *     MPJLambdaQueryWrapper<UserDO> wrapper = new MPJLambdaQueryWrapper<UserDO>();
+     *     MPJLambdaWrapper&lt;UserDO&gt; wrapper = new MPJLambdaWrapper&lt;UserDO&gt;();
      *     wrapper.selectAll(UserDO.class)
      *            .selectCollection(AddressDO.class, UserDTO::getAddressListDTO)
      *            .leftJoin(AddressDO.class, ...... )
@@ -71,7 +71,7 @@ public interface QueryLabel<Children> {
      * <p>
      * 举例 UserDO AddressDO 为一对多关系  UserDTO 为结果类
      * <pre>
-     *   MPJLambdaQueryWrapper<UserDO> wrapper = new MPJLambdaQueryWrapper();
+     *   MPJLambdaWrapper&lt;UserDO&gt; wrapper = new MPJLambdaWrapper();
      *   wrapper.selectAll(UserDO.class)
      *      .selectCollection(AddressDO.class, UserDTO::getAddressListDTO, map -> map
      *           .id(AddressDO::getId, AddressDTO::getId)                 //如果属性名一致 可以传一个

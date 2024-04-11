@@ -1,9 +1,12 @@
 package com.github.yulichang.interceptor;
 
+import com.baomidou.mybatisplus.core.MybatisPlusVersion;
 import com.baomidou.mybatisplus.core.metadata.TableInfo;
 import com.baomidou.mybatisplus.core.toolkit.*;
+import com.github.yulichang.adapter.AdapterHelper;
+import com.github.yulichang.adapter.base.tookit.VersionUtils;
 import com.github.yulichang.config.ConfigProperties;
-import com.github.yulichang.method.MPJResultType;
+import com.github.yulichang.interfaces.MPJBaseJoin;
 import com.github.yulichang.query.MPJQueryWrapper;
 import com.github.yulichang.toolkit.Constant;
 import com.github.yulichang.toolkit.MPJReflectionKit;
@@ -15,6 +18,8 @@ import com.github.yulichang.wrapper.resultmap.IResult;
 import com.github.yulichang.wrapper.resultmap.Label;
 import com.github.yulichang.wrapper.segments.Select;
 import com.github.yulichang.wrapper.segments.SelectLabel;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 import org.apache.ibatis.executor.Executor;
 import org.apache.ibatis.mapping.MappedStatement;
 import org.apache.ibatis.mapping.ResultFlag;
@@ -41,14 +46,18 @@ import java.util.concurrent.ConcurrentHashMap;
 @Intercepts(@Signature(type = Executor.class, method = "query", args = {MappedStatement.class, Object.class, RowBounds.class, ResultHandler.class}))
 public class MPJInterceptor implements Interceptor {
 
+    private static final boolean v = VersionUtils.compare(MybatisPlusVersion.getVersion(), "3.4.3.1") > 0;
 
     private static final List<ResultMapping> EMPTY_RESULT_MAPPING = new ArrayList<>(0);
 
     /**
-     * 缓存MappedStatement,不需要每次都去重新构建MappedStatement
+     * 缓存MappedStatement,不需要每次都去构建MappedStatement
      */
     private static final Map<String, Map<Configuration, MappedStatement>> MS_CACHE = new ConcurrentHashMap<>();
 
+    private static final Map<String, Val> MS_MAPPER_CACHE = new ConcurrentHashMap<>();
+
+    private static final Map<String, Val> RES_MAPPER_CACHE = new ConcurrentHashMap<>();
 
     @Override
     @SuppressWarnings("Java8MapApi")
@@ -59,15 +68,23 @@ public class MPJInterceptor implements Interceptor {
             if (args[1] instanceof Map) {
                 Map<String, Object> map = (Map<String, Object>) args[1];
                 Object ew = map.containsKey(Constants.WRAPPER) ? map.get(Constants.WRAPPER) : null;
-                if (CollectionUtils.isNotEmpty(map) && map.containsKey(Constant.CLAZZ)) {
-                    Class<?> clazz = (Class<?>) map.get(Constant.CLAZZ);
-                    if (Objects.nonNull(clazz)) {
-                        List<ResultMap> list = ms.getResultMaps();
-                        if (CollectionUtils.isNotEmpty(list)) {
-                            ResultMap resultMap = list.get(0);
-                            if (resultMap.getType() == MPJResultType.class) {
-                                args[0] = getMappedStatement(ms, clazz, ew);
+                if (Objects.nonNull(ew) && ew instanceof MPJBaseJoin) {
+                    if (CollectionUtils.isNotEmpty(map)) {
+                        Class<?> rt = null;
+                        if (map.containsKey(Constant.CLAZZ)) {
+                            rt = (Class<?>) map.get(Constant.CLAZZ);
+                        } else {
+                            if (CollectionUtils.isNotEmpty(ms.getResultMaps())) {
+                                Class<?> entity = MPJTableMapperHelper.getEntity(getMapper(ms.getId(), ms.getResource()));
+                                Class<?> type = ms.getResultMaps().get(0).getType();
+                                if (Objects.nonNull(entity) && Objects.nonNull(type)
+                                        && !MPJReflectionKit.isPrimitiveOrWrapper(type) && entity == type) {
+                                    rt = type;
+                                }
                             }
+                        }
+                        if (Objects.nonNull(rt)) {
+                            args[0] = getMappedStatement(ms, rt, ew);
                         }
                     }
                 }
@@ -86,7 +103,7 @@ public class MPJInterceptor implements Interceptor {
         if (ew instanceof SelectWrapper) {
             SelectWrapper wrapper = (SelectWrapper) ew;
             if (wrapper.getEntityClass() == null) {
-                wrapper.setEntityClass(MPJTableMapperHelper.getEntity(getEntity(ms.getId(), ms.getResource())));
+                wrapper.setEntityClass(MPJTableMapperHelper.getEntity(getMapper(ms.getId(), ms.getResource())));
             }
             if (wrapper.getSelectColumns().isEmpty() && wrapper.getEntityClass() != null) {
                 wrapper.selectAll(wrapper.getEntityClass());
@@ -183,11 +200,23 @@ public class MPJInterceptor implements Interceptor {
                 }
             } else {
                 FieldCache field = fieldMap.get(i.getColumProperty());
-                columnSet.add(i.getTagColumn());
-                if (Objects.nonNull(field)) {
-                    ResultMapping.Builder builder = new ResultMapping.Builder(ms.getConfiguration(), i.getColumProperty(),
-                            i.getTagColumn(), field.getType());
-                    resultMappings.add(selectToResult(wrapper.getEntityClass(), i, field.getType(), builder));
+                if (StringUtils.isNotBlank(i.getTagColumn())) {
+                    columnSet.add(i.getTagColumn());
+                    if (Objects.nonNull(field)) {
+                        ResultMapping.Builder builder = new ResultMapping.Builder(ms.getConfiguration(), i.getColumProperty(),
+                                i.getTagColumn(), field.getType());
+                        resultMappings.add(selectToResult(wrapper.getEntityClass(), i, field.getType(), builder));
+                    }
+                } else if (wrapper.isResultMap()) {
+                    AdapterHelper.getAdapter().parserColum(wrapper.getAlias(), wrapper.getFrom(), i.getColumn(), col -> {
+                        FieldCache strField = fieldMap.get(col);
+                        columnSet.add(col);
+                        if (Objects.nonNull(strField)) {
+                            ResultMapping.Builder builder = new ResultMapping.Builder(ms.getConfiguration(), col,
+                                    col, strField.getType());
+                            resultMappings.add(selectToResult(wrapper.getEntityClass(), i, strField.getType(), builder));
+                        }
+                    });
                 }
             }
         }
@@ -286,7 +315,7 @@ public class MPJInterceptor implements Interceptor {
             childId.append("]");
         }
         //双检
-        String id = childId.toString();
+        String id = v ? childId.toString() : childId.toString().replaceAll("\\.", "~");
         if (!ms.getConfiguration().hasResultMap(id)) {
             ResultMap build = new ResultMap.Builder(ms.getConfiguration(), id, mybatisLabel.getOfType(), childMapping).build();
             MPJInterceptor.addResultMap(ms, id, build);
@@ -359,29 +388,37 @@ public class MPJInterceptor implements Interceptor {
         }
     }
 
-    private Class<?> getEntity(String id, String resource) {
-        Class<?> clazz = null;
-        try {
-            String className = id.substring(0, id.lastIndexOf(StringPool.DOT));
+    private Class<?> getMapper(String id, String resource) {
+        Class<?> clazz = MS_MAPPER_CACHE.computeIfAbsent(id, key -> {
             try {
-                clazz = Class.forName(className);
-            } catch (ClassNotFoundException e) {
-                clazz = MPJTableMapperHelper.getMapperForName(className);
+                String className = key.substring(0, key.lastIndexOf(StringPool.DOT));
+                try {
+                    return new Val(Class.forName(className));
+                } catch (ClassNotFoundException e) {
+                    return new Val(MPJTableMapperHelper.getMapperForName(className));
+                }
+            } catch (Exception ignored) {
+                return new Val(null);
             }
-        } catch (Exception ignored) {
-        }
+        }).getVal();
+
         if (Objects.nonNull(clazz)) {
             return clazz;
         }
-        try {
-            String className = resource.substring(0, id.lastIndexOf(StringPool.DOT)).replaceAll("/", StringPool.DOT);
+
+        clazz = RES_MAPPER_CACHE.computeIfAbsent(resource, key -> {
             try {
-                clazz = Class.forName(className);
-            } catch (ClassNotFoundException e) {
-                clazz = MPJTableMapperHelper.getMapperForName(className);
+                String className = key.substring(0, key.lastIndexOf(StringPool.DOT)).replaceAll("/", StringPool.DOT);
+                try {
+                    return new Val(Class.forName(className));
+                } catch (ClassNotFoundException e) {
+                    return new Val(MPJTableMapperHelper.getMapperForName(className));
+                }
+            } catch (Exception ignored) {
+                return new Val(null);
             }
-        } catch (Exception ignored) {
-        }
+        }).getVal();
+
         return clazz;
     }
 
@@ -397,7 +434,7 @@ public class MPJInterceptor implements Interceptor {
     public Object plugin(Object target) {
         try {
             return Interceptor.super.plugin(target);
-        } catch (Exception e) {
+        } catch (Throwable e) {
             return Plugin.wrap(target, this);
         }
     }
@@ -406,7 +443,13 @@ public class MPJInterceptor implements Interceptor {
     public void setProperties(Properties properties) {
         try {
             Interceptor.super.setProperties(properties);
-        } catch (Exception ignored) {
+        } catch (Throwable ignored) {
         }
+    }
+
+    @Data
+    @AllArgsConstructor
+    public static class Val {
+        private Class<?> val;
     }
 }

@@ -30,7 +30,7 @@ public class UpdateJoinAndNull extends MPJAbstractMethod {
         SqlMethod sqlMethod = SqlMethod.UPDATE_JOIN_AND_NULL;
         String sql = String.format(sqlMethod.getSql(), sqlFirst(), mpjTableName(tableInfo), sqlAlias(), sqlFrom(),
                 mpjSqlSet(true, true, tableInfo, true, ENTITY, ENTITY_DOT), sqlWhereEntityWrapper(true, tableInfo), sqlComment());
-        SqlSource sqlSource = languageDriver.createSqlSource(configuration, sql, modelClass);
+        SqlSource sqlSource = languageDriver.createSqlSource(configuration, removeExtraWhitespaces(sql), modelClass);
         return this.addUpdateMappedStatement(mapperClass, modelClass, sqlMethod.getMethod(), sqlSource);
     }
 

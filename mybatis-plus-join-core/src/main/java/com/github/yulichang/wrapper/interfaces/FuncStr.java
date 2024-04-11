@@ -231,6 +231,25 @@ public interface FuncStr<Children, R> extends Serializable {
     /**
      * ignore
      */
+    default Children eqSql(R column, String inValue) {
+        return eqSql(true, column, inValue);
+    }
+
+    /**
+     * 字段 = ( sql语句 )
+     * <p>例1: eqSql("id", "1, 2, 3, 4, 5, 6")</p>
+     * <p>例1: eqSql("id", "select id from table where name = 'JunJun'")</p>
+     *
+     * @param condition
+     * @param column
+     * @param inValue
+     * @return
+     */
+    Children eqSql(boolean condition, R column, String inValue);
+
+    /**
+     * ignore
+     */
     default Children leSql(R column, String inValue) {
         return leSql(true, column, inValue);
     }

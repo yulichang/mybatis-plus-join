@@ -50,6 +50,18 @@ public interface Update<Children> extends Serializable {
      */
     Children set(boolean condition, KProperty<?> column, Object val, String mapping);
 
+    default Children setIncrBy(KProperty<?> column, Number val) {
+        return setIncrBy(true, column, val);
+    }
+
+    Children setIncrBy(boolean condition, KProperty<?> column, Number val);
+
+    default Children setDecrBy(KProperty<?> column, Number val) {
+        return setDecrBy(true, column, val);
+    }
+
+    Children setDecrBy(boolean condition, KProperty<?> column, Number val);
+
     /**
      * ignore
      */

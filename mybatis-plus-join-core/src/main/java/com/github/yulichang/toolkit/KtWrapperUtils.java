@@ -16,12 +16,11 @@ import java.util.Optional;
  * @author yulichang
  * @since 1.4.6
  */
+@SuppressWarnings("DuplicatedCode")
 public class KtWrapperUtils {
 
-    @SuppressWarnings("DuplicatedCode")
     public static String buildSubSqlByWrapper(Class<?> clazz, KtLambdaWrapper<?> wrapper, String alias) {
-        TableInfo tableInfo = TableHelper.get(clazz);
-        Asserts.hasTable(tableInfo, clazz);
+        TableInfo tableInfo = TableHelper.getAssert(clazz);
         String first = Optional.ofNullable(wrapper.getSqlFirst()).orElse(StringPool.EMPTY);
         boolean hasWhere = false;
         String entityWhere = getEntitySql(tableInfo, wrapper);
@@ -43,7 +42,7 @@ public class KtWrapperUtils {
         return String.format(" (%s SELECT %s FROM %s %s %s %s %s %s %s) AS %s ",
                 first,
                 wrapper.getSqlSelect(),
-                tableInfo.getTableName(),
+                wrapper.getTableName(tableInfo.getTableName()),
                 wrapper.getAlias(),
                 wrapper.getFrom(),
                 mainLogic,
@@ -53,10 +52,8 @@ public class KtWrapperUtils {
                 alias);
     }
 
-    @SuppressWarnings("DuplicatedCode")
     public static String buildUnionSqlByWrapper(Class<?> clazz, KtLambdaWrapper<?> wrapper) {
-        TableInfo tableInfo = TableHelper.get(clazz);
-        Asserts.hasTable(tableInfo, clazz);
+        TableInfo tableInfo = TableHelper.getAssert(clazz);
         String first = Optional.ofNullable(wrapper.getSqlFirst()).orElse(StringPool.EMPTY);
         boolean hasWhere = false;
         String entityWhere = getEntitySql(tableInfo, wrapper);
@@ -78,7 +75,7 @@ public class KtWrapperUtils {
         return String.format(" %s SELECT %s FROM %s %s %s %s %s %s %s ",
                 first,
                 wrapper.getSqlSelect(),
-                tableInfo.getTableName(),
+                wrapper.getTableName(tableInfo.getTableName()),
                 wrapper.getAlias(),
                 wrapper.getFrom(),
                 mainLogic,
@@ -94,7 +91,6 @@ public class KtWrapperUtils {
         return SqlScriptUtils.safeParam(paramStr, null);
     }
 
-    @SuppressWarnings("DuplicatedCode")
     private static String getEntitySql(TableInfo tableInfo, KtLambdaWrapper<?> wrapper) {
         Object obj = wrapper.getEntity();
         if (Objects.isNull(obj)) {
@@ -102,7 +98,7 @@ public class KtWrapperUtils {
         }
         StringBuilder sb = new StringBuilder(StringPool.EMPTY);
         for (TableFieldInfo fieldInfo : tableInfo.getFieldList()) {
-            if (AdapterHelper.getTableInfoAdapter().mpjHasLogic(tableInfo) && fieldInfo.isLogicDelete()) {
+            if (AdapterHelper.getAdapter().mpjHasLogic(tableInfo) && fieldInfo.isLogicDelete()) {
                 continue;
             }
             Object val;
@@ -126,6 +122,9 @@ public class KtWrapperUtils {
     }
 
     private static String mainLogic(boolean hasWhere, Class<?> clazz, KtLambdaWrapper<?> wrapper) {
+        if (!wrapper.getLogicSql()) {
+            return StringPool.EMPTY;
+        }
         String info = LogicInfoUtils.getLogicInfo(null, clazz, true, wrapper.getAlias());
         if (StringUtils.isNotBlank(info)) {
             if (hasWhere) {

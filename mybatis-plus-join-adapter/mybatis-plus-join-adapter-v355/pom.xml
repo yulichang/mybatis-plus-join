@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>com.github.yulichang</groupId>
+        <artifactId>mybatis-plus-join-adapter</artifactId>
+        <version>${revision}</version>
+    </parent>
+    <artifactId>mybatis-plus-join-adapter-v355</artifactId>
+    <version>${revision}</version>
+    <name>mybatis-plus-join-adapter-v355</name>
+
+    <description>An enhanced toolkit of Mybatis-Plus to simplify development.</description>
+    <url>https://github.com/yulichang/mybatis-plus-join</url>
+    <licenses>
+        <license>
+            <name>The Apache License, Version 2.0</name>
+            <url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
+        </license>
+    </licenses>
+    <developers>
+        <developer>
+            <id>mybatis-plus-join</id>
+            <name>yulichang</name>
+            <email>yu_lichang@qq.com</email>
+        </developer>
+    </developers>
+    <scm>
+        <connection>scm:git:https://github.com/yulichang/mybatis-plus-join.git</connection>
+        <developerConnection>scm:git:https://github.com/yulichang/mybatis-plus-join.git</developerConnection>
+        <url>https://github.com/yulichang/mybatis-plus-join</url>
+    </scm>
+
+    <properties>
+        <jdkVersion>1.8</jdkVersion>
+        <jdkVersion.test>1.8</jdkVersion.test>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
+        <github.global.server>github</github.global.server>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.github.yulichang</groupId>
+            <artifactId>mybatis-plus-join-adapter-base</artifactId>
+            <version>${revision}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.baomidou</groupId>
+            <artifactId>mybatis-plus-core</artifactId>
+            <version>3.5.5</version>
+            <scope>provided</scope>
+        </dependency>
+    </dependencies>
+
+</project>

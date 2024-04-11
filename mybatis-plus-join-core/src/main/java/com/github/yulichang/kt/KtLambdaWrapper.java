@@ -7,12 +7,8 @@ import com.baomidou.mybatisplus.core.toolkit.*;
 import com.github.yulichang.config.ConfigProperties;
 import com.github.yulichang.kt.interfaces.Query;
 import com.github.yulichang.kt.interfaces.QueryLabel;
-import com.github.yulichang.toolkit.Constant;
-import com.github.yulichang.toolkit.KtUtils;
-import com.github.yulichang.toolkit.KtWrapperUtils;
-import com.github.yulichang.toolkit.TableList;
+import com.github.yulichang.toolkit.*;
 import com.github.yulichang.toolkit.support.ColumnCache;
-import com.github.yulichang.wrapper.MPJLambdaWrapper;
 import com.github.yulichang.wrapper.interfaces.Chain;
 import com.github.yulichang.wrapper.interfaces.SelectWrapper;
 import com.github.yulichang.wrapper.resultmap.Label;
@@ -32,7 +28,7 @@ import java.util.stream.Collectors;
  * @author yulichang
  * @since 1.4.6
  */
-@SuppressWarnings({"unused", "unchecked", "rawtypes"})
+@SuppressWarnings({"unused", "unchecked", "rawtypes", "DuplicatedCode"})
 public class KtLambdaWrapper<T> extends KtAbstractLambdaWrapper<T, KtLambdaWrapper<T>> implements
         Query<KtLambdaWrapper<T>>, QueryLabel<KtLambdaWrapper<T>>, Chain<T>, SelectWrapper<T, KtLambdaWrapper<T>> {
 
@@ -126,7 +122,7 @@ public class KtLambdaWrapper<T> extends KtAbstractLambdaWrapper<T, KtLambdaWrapp
      * 不建议直接 new 该实例，使用 JoinWrappers.lambda(UserDO.class)
      */
     KtLambdaWrapper(T entity, Class<T> entityClass, SharedString sqlSelect, AtomicInteger paramNameSeq,
-                    Map<String, Object> paramNameValuePairs, MergeSegments mergeSegments,
+                    Map<String, Object> paramNameValuePairs, MergeSegments mergeSegments, SharedString paramAlias,
                     SharedString lastSql, SharedString sqlComment, SharedString sqlFirst,
                     TableList tableList, Integer index, String keyWord, Class<?> joinClass, String tableName) {
         super.setEntity(entity);
@@ -135,6 +131,7 @@ public class KtLambdaWrapper<T> extends KtAbstractLambdaWrapper<T, KtLambdaWrapp
         this.paramNameValuePairs = paramNameValuePairs;
         this.expression = mergeSegments;
         this.sqlSelect = sqlSelect;
+        this.paramAlias = paramAlias;
         this.lastSql = lastSql;
         this.sqlComment = sqlComment;
         this.sqlFirst = sqlFirst;
@@ -205,11 +202,12 @@ public class KtLambdaWrapper<T> extends KtAbstractLambdaWrapper<T, KtLambdaWrapp
     /**
      * 子查询
      */
-    @SuppressWarnings("DuplicatedCode")
-    public KtLambdaWrapper<T> selectSub(Class<?> clazz, String st, Consumer<KtLambdaWrapper<?>> consumer, KProperty<?> alias) {
-        KtLambdaWrapper<?> wrapper = new KtLambdaWrapper(null, clazz, SharedString.emptyString(), paramNameSeq, paramNameValuePairs,
-                new MergeSegments(), SharedString.emptyString(), SharedString.emptyString(), SharedString.emptyString(),
-                new TableList(), null, null, null, null) {
+    public KtLambdaWrapper<T> selectSub(Class<?> clazz, String st,
+                                        Consumer<KtLambdaWrapper<?>> consumer, KProperty<?> alias) {
+        KtLambdaWrapper<?> wrapper = new KtLambdaWrapper(null, clazz, SharedString.emptyString(), paramNameSeq,
+                paramNameValuePairs, new MergeSegments(), new SharedString(this.paramAlias.getStringValue()),
+                SharedString.emptyString(), SharedString.emptyString(), SharedString.emptyString(), new TableList(),
+                null, null, null, null) {
         };
         wrapper.tableList.setAlias(st);
         wrapper.tableList.setRootClass(clazz);
@@ -218,23 +216,29 @@ public class KtLambdaWrapper<T> extends KtAbstractLambdaWrapper<T, KtLambdaWrapp
         wrapper.subTableAlias = st;
         consumer.accept(wrapper);
         addCustomWrapper(wrapper);
-        String sql = KtWrapperUtils.buildSubSqlByWrapper(clazz, wrapper, alias.getName());
-        this.selectColumns.add(new SelectString(sql, hasAlias, this.alias));
+        this.selectColumns.add(new SelectSub(() -> KtWrapperUtils.buildSubSqlByWrapper(
+                clazz, wrapper, alias.getName()), hasAlias, this.alias, alias.getName()));
         return typedThis;
     }
 
     /**
      * union
+     * <p>
+     * 推荐使用 union(Class&lt;U&gt; clazz, Consumer&lt;MPJLambdaWrapper&lt;U&gt;&gt; consumer)
+     * 例： wrapper.union(UserDO.class, union -> union.selectAll(UserDO.class))
+     *
+     * @see #union(Class, Consumer)
+     * @deprecated union 不支持子查询
      */
-    @SuppressWarnings("UnusedReturnValue")
+    @Deprecated
+    @SuppressWarnings("ALL")
     public final KtLambdaWrapper<T> union(KtLambdaWrapper<?>... wrappers) {
         StringBuilder sb = new StringBuilder();
         for (KtLambdaWrapper<?> wrapper : wrappers) {
             addCustomWrapper(wrapper);
             Class<?> entityClass = wrapper.getEntityClass();
             Assert.notNull(entityClass, "请使用 new MPJLambdaWrapper(主表.class) 或 JoinWrappers.lambda(主表.class) 构造方法");
-            sb.append(" UNION ")
-                    .append(KtWrapperUtils.buildUnionSqlByWrapper(entityClass, wrapper));
+            sb.append(" UNION ").append(KtWrapperUtils.buildUnionSqlByWrapper(entityClass, wrapper));
         }
         if (Objects.isNull(unionSql)) {
             unionSql = SharedString.emptyString();
@@ -244,17 +248,45 @@ public class KtLambdaWrapper<T> extends KtAbstractLambdaWrapper<T, KtLambdaWrapp
     }
 
     /**
-     * union all
+     * union
+     * <p>
+     * 例： wrapper.union(UserDO.class, union -> union.selectAll(UserDO.class))
+     *
+     * @param clazz union语句的主表类型
+     * @since 1.4.8
      */
-    @SafeVarargs
-    public final <E, F> KtLambdaWrapper<T> unionAll(KtLambdaWrapper<T>... wrappers) {
+    public <U> KtLambdaWrapper<T> union(Class<U> clazz, Consumer<KtLambdaWrapper<U>> consumer) {
+        KtLambdaWrapper<U> unionWrapper = KtWrappers.query(clazz);
+        addCustomWrapper(unionWrapper);
+        consumer.accept(unionWrapper);
+
+        String sb = " UNION " + KtWrapperUtils.buildUnionSqlByWrapper(clazz, unionWrapper);
+
+        if (Objects.isNull(unionSql)) {
+            unionSql = SharedString.emptyString();
+        }
+        unionSql.setStringValue(unionSql.getStringValue() + sb);
+        return typedThis;
+    }
+
+    /**
+     * union
+     * <p>
+     * 推荐使用 unionAll(Class&lt;U&gt; clazz, Consumer&lt;MPJLambdaWrapper&lt;U&gt;&gt; consumer)
+     * 例： wrapper.unionAll(UserDO.class, union -> union.selectAll(UserDO.class))
+     *
+     * @see #unionAll(Class, Consumer)
+     * @deprecated union 不支持子查询
+     */
+    @Deprecated
+    @SuppressWarnings("ALL")
+    public final KtLambdaWrapper<T> unionAll(KtLambdaWrapper<?>... wrappers) {
         StringBuilder sb = new StringBuilder();
         for (KtLambdaWrapper<?> wrapper : wrappers) {
             addCustomWrapper(wrapper);
             Class<?> entityClass = wrapper.getEntityClass();
             Assert.notNull(entityClass, "请使用 new MPJLambdaWrapper(主表.class) 或 JoinWrappers.lambda(主表.class) 构造方法");
-            sb.append(" UNION ALL ")
-                    .append(KtWrapperUtils.buildUnionSqlByWrapper(entityClass, wrapper));
+            sb.append(" UNION ALL ").append(KtWrapperUtils.buildUnionSqlByWrapper(entityClass, wrapper));
         }
         if (Objects.isNull(unionSql)) {
             unionSql = SharedString.emptyString();
@@ -263,7 +295,28 @@ public class KtLambdaWrapper<T> extends KtAbstractLambdaWrapper<T, KtLambdaWrapp
         return typedThis;
     }
 
-    @SuppressWarnings("DuplicatedCode")
+    /**
+     * union
+     * <p>
+     * 例： wrapper.unionAll(UserDO.class, union -> union.selectAll(UserDO.class))
+     *
+     * @param clazz union语句的主表类型
+     * @since 1.4.8
+     */
+    public <U> KtLambdaWrapper<T> unionAll(Class<U> clazz, Consumer<KtLambdaWrapper<U>> consumer) {
+        KtLambdaWrapper<U> unionWrapper = KtWrappers.query(clazz);
+        addCustomWrapper(unionWrapper);
+        consumer.accept(unionWrapper);
+
+        String sb = " UNION ALL " + KtWrapperUtils.buildUnionSqlByWrapper(clazz, unionWrapper);
+
+        if (Objects.isNull(unionSql)) {
+            unionSql = SharedString.emptyString();
+        }
+        unionSql.setStringValue(unionSql.getStringValue() + sb);
+        return typedThis;
+    }
+
     private void addCustomWrapper(KtLambdaWrapper<?> wrapper) {
         if (Objects.isNull(wrapperIndex)) {
             wrapperIndex = new AtomicInteger(0);
@@ -281,7 +334,6 @@ public class KtLambdaWrapper<T> extends KtAbstractLambdaWrapper<T, KtLambdaWrapp
      * 查询条件 SQL 片段
      */
     @Override
-    @SuppressWarnings("DuplicatedCode")
     public String getSqlSelect() {
         if (StringUtils.isBlank(sqlSelect.getStringValue()) && CollectionUtils.isNotEmpty(selectColumns)) {
             String s = selectColumns.stream().map(i -> {
@@ -350,7 +402,7 @@ public class KtLambdaWrapper<T> extends KtAbstractLambdaWrapper<T, KtLambdaWrapp
     @Override
     protected KtLambdaWrapper<T> instance(Integer index, String keyWord, Class<?> joinClass, String tableName) {
         return new KtLambdaWrapper<>(getEntity(), getEntityClass(), null, paramNameSeq, paramNameValuePairs,
-                new MergeSegments(), SharedString.emptyString(), SharedString.emptyString(), SharedString.emptyString(),
+                new MergeSegments(), this.paramAlias, SharedString.emptyString(), SharedString.emptyString(), SharedString.emptyString(),
                 this.tableList, index, keyWord, joinClass, tableName);
     }
 
@@ -358,7 +410,8 @@ public class KtLambdaWrapper<T> extends KtAbstractLambdaWrapper<T, KtLambdaWrapp
     public void clear() {
         super.clear();
         selectDistinct = false;
-        sqlSelect.toNull();
+        sqlSelect.toEmpty();
+        if (Objects.nonNull(unionSql)) unionSql.toEmpty();
         selectColumns.clear();
         wrapperIndex = new AtomicInteger(0);
         wrapperMap.clear();

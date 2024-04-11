@@ -43,6 +43,7 @@ public abstract class KtAbstractLambdaWrapper<T, Children extends KtAbstractLamb
     /**
      * 主表别名
      */
+    @Getter
     protected String alias = ConfigProperties.tableAlias;
     /**
      * 副表别名
@@ -217,18 +218,13 @@ public abstract class KtAbstractLambdaWrapper<T, Children extends KtAbstractLamb
     }
 
     @Override
-    protected String columnToString(Integer index, Object column, boolean isJoin, PrefixEnum prefixEnum) {
-        return columnToString(index, (KProperty<?>) column, isJoin, prefixEnum);
+    protected final String columnsToString(Integer index, PrefixEnum prefixEnum, String alias, KProperty<?>... columns) {
+        return Arrays.stream(columns).map(i -> columnToString(index, alias, i, false, prefixEnum)).collect(joining(StringPool.COMMA));
     }
 
-    @Override
-    protected final String columnsToString(Integer index, boolean isJoin, PrefixEnum prefixEnum, Object... columns) {
-        return Arrays.stream(columns).map(i -> columnToString(index, (KProperty<?>) i, isJoin, prefixEnum)).collect(joining(StringPool.COMMA));
-    }
-
-    protected String columnToString(Integer index, KProperty<?> column, boolean isJoin, PrefixEnum prefixEnum) {
+    protected String columnToString(Integer index, String alias, KProperty<?> column, boolean isJoin, PrefixEnum prefixEnum) {
         Class<?> entityClass = KtUtils.ref(column);
-        return getDefault(index, entityClass, isJoin, prefixEnum) + StringPool.DOT + getCache(column).getColumn();
+        return (alias == null ? getDefault(index, entityClass, isJoin, prefixEnum) : alias) + StringPool.DOT + getCache(column).getColumn();
     }
 
     protected SelectCache getCache(KProperty<?> fn) {
@@ -336,7 +332,7 @@ public abstract class KtAbstractLambdaWrapper<T, Children extends KtAbstractLamb
             for (Children wrapper : onWrappers) {
                 if (StringUtils.isBlank(wrapper.from.getStringValue())) {
                     if (this.subLogicSql && this.logicDelType == LogicDelTypeEnum.ON) {
-                        TableInfo tableInfo = TableHelper.get(wrapper.getJoinClass());
+                        TableInfo tableInfo = TableHelper.getAssert(wrapper.getJoinClass());
                         if (ConfigProperties.tableInfoAdapter.mpjHasLogic(tableInfo)) {
                             wrapper.appendSqlSegments(APPLY, () -> LogicInfoUtils.getLogicInfoNoAnd(
                                     wrapper.getIndex(), wrapper.getJoinClass(), wrapper.isHasAlias(), wrapper.getAlias()
@@ -364,10 +360,6 @@ public abstract class KtAbstractLambdaWrapper<T, Children extends KtAbstractLamb
         return from.getStringValue();
     }
 
-    public String getAlias() {
-        return alias;
-    }
-
     /**
      * 内部调用, 不建议使用
      */
@@ -375,8 +367,7 @@ public abstract class KtAbstractLambdaWrapper<T, Children extends KtAbstractLamb
     public Children join(String keyWord, Class<?> clazz, String tableAlias, BiConsumer<KtAbstractLambdaWrapper<?, ?>, Children> consumer) {
         Integer oldIndex = this.getIndex();
         int newIndex = tableIndex;
-        TableInfo info = TableHelper.get(clazz);
-        Asserts.hasTable(info, clazz);
+        TableInfo info = TableHelper.getAssert(clazz);
         Children instance = instance(newIndex, keyWord, clazz, info.getTableName());
         instance.isNo = true;
         instance.isMain = false;

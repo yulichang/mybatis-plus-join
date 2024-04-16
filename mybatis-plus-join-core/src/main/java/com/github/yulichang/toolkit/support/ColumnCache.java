@@ -1,5 +1,6 @@
 package com.github.yulichang.toolkit.support;
 
+import com.baomidou.mybatisplus.core.metadata.TableFieldInfo;
 import com.baomidou.mybatisplus.core.metadata.TableInfo;
 import com.github.yulichang.config.ConfigProperties;
 import com.github.yulichang.toolkit.FieldStringMap;
@@ -34,7 +35,9 @@ public class ColumnCache {
                 list.add(new SelectCache(clazz, true, tableInfo.getKeyColumn(), tableInfo.getKeyType(),
                         tableInfo.getKeyProperty(), null));
             }
-            list.addAll(tableInfo.getFieldList().stream().filter(TableFieldInfo::isSelect).map(f -> new SelectCache(clazz, false, f.getColumn(), f.getPropertyType(), f.getProperty(), f)).collect(Collectors.toList()));
+            list.addAll(tableInfo.getFieldList().stream().filter(TableFieldInfo::isSelect).map(f ->
+                            new SelectCache(clazz, false, f.getColumn(), f.getPropertyType(), f.getProperty(), f))
+                    .collect(Collectors.toList()));
             return list;
         });
     }

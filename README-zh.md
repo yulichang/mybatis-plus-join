@@ -1,7 +1,7 @@
 <!--suppress HtmlDeprecatedAttribute -->
 <p align="center">
   <a href="https://github.com/yulichang/mybatis-plus-join" target="_blank">
-   <img alt="Mybatis-Plus-Join-Logo" src="https://mybatisplusjoin.com/lg.png">
+   <img alt="Mybatis-Plus-Join-Logo" src="https://foruda.gitee.com/images/1714756037858567246/8b0258f5_2020985.png">
   </a>
 </p>
 <h1 align="center">MyBatis-Plus-Join</h1>
@@ -33,7 +33,7 @@
 QQ群:680016987  或者 
 <a href="https://gitee.com/best_handsome/mybatis-plus-join/issues/I65N2M" target="_blank">添加作者微信，备注MPJ，加入微信群</a>  
 <br/>
-<img width="200px" height="200px" src="https://mybatisplusjoin.com/qr.png"  alt="添加作者微信，备注MPJ，加入微信群"/>
+<img width="200px" height="200px" src="https://foruda.gitee.com/images/1714756135330585984/bcc86eb0_2020985.png"  alt="添加作者微信，备注MPJ，加入微信群"/>
 </p>
 
 ### <a href="https://www.baidu.com/link?url=6NtKqbGKUIIdwoBUaqNkQnLiG3d5y03L6Pfg6ODId0VKfPifpB1xqdQzsBprm-0h&wd=&eqid=d26e7f1600004777000000056440ade6" target="_blank">使用文档WIKI</a>

@@ -25,7 +25,7 @@
 <p align="center">
 对 <a href="https://gitee.com/baomidou/mybatis-plus" target="_blank">MyBatis-Plus</a> 多表查询的扩展 |
 <a href="https://gitee.com/best_handsome/mybatis-plus-join-demo" target="_blank">演示工程</a> |
-<a href="https://www.baidu.com/link?url=wdmhssysW-Mj19Gkcc2CBOzNVoimHat57mlnH78SEU_6y0awYgDKTBy7es9BXnAH&wd=&eqid=908484020001866e000000056440b5e3" target="_blank">使用文档</a> |
+<a href="https://yulichang.github.io/mybatis-plus-join-doc/" target="_blank">使用文档</a> |
 点个Star支持一下吧 (☆▽☆)
 </p>
 
@@ -157,6 +157,6 @@ MPJLambdaWrapper其他功能
   一对一，一对多使用</a>
 * <a href="https://yulichang.github.io/mybatis-plus-join-doc/pages/core/lambda/select/selectFunc.html" target="_blank">简单的SQL函数使用</a>
 * <a href="https://yulichang.github.io/mybatis-plus-join-doc/pages/core/lambda/join/leftJoin.html" target="_blank">ON语句多条件支持</a>
-* <a href="https://yulichang.github.io/mybatis-plus-join-doc" target="_blank">其他全部功能请参考使用文档</a>
+* <a href="https://yulichang.github.io/mybatis-plus-join-doc/" target="_blank">其他全部功能请参考使用文档</a>
 
 # <a href="https://yulichang.github.io/mybatis-plus-join-doc" target="_blank">使用文档 wiki</a>

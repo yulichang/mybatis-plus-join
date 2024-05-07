@@ -25,7 +25,7 @@
 <p align="center">
 对 <a href="https://gitee.com/baomidou/mybatis-plus" target="_blank">MyBatis-Plus</a> 多表查询的扩展 |
 <a href="https://gitee.com/best_handsome/mybatis-plus-join-demo" target="_blank">演示工程</a> |
-<a href="https://www.baidu.com/link?url=wdmhssysW-Mj19Gkcc2CBOzNVoimHat57mlnH78SEU_6y0awYgDKTBy7es9BXnAH&wd=&eqid=908484020001866e000000056440b5e3" target="_blank">使用文档</a> |
+<a href="https://yulichang.github.io/mybatis-plus-join-doc/" target="_blank">使用文档</a> |
 点个Star支持一下吧 (☆▽☆)
 </p>
 
@@ -36,7 +36,7 @@ QQ群:680016987  或者
 <img width="200px" height="200px" src="https://foruda.gitee.com/images/1714756135330585984/bcc86eb0_2020985.png"  alt="添加作者微信，备注MPJ，加入微信群"/>
 </p>
 
-### <a href="https://www.baidu.com/link?url=6NtKqbGKUIIdwoBUaqNkQnLiG3d5y03L6Pfg6ODId0VKfPifpB1xqdQzsBprm-0h&wd=&eqid=d26e7f1600004777000000056440ade6" target="_blank">使用文档WIKI</a>
+### <a href="https://yulichang.github.io/mybatis-plus-join-doc/" target="_blank">使用文档WIKI</a>
 
 ## 使用方法
 

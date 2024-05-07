@@ -153,10 +153,10 @@ class test {
 
 MPJLambdaWrapper其他功能
 
-* <a href="https://mybatisplusjoin.com/pages/core/lambda/select/selectCollection.html" target="_blank">
+* <a href="https://yulichang.github.io/mybatis-plus-join-doc/pages/core/lambda/select/selectCollection.html" target="_blank">
   一对一，一对多使用</a>
-* <a href="https://mybatisplusjoin.com/pages/core/lambda/select/selectFunc.html" target="_blank">简单的SQL函数使用</a>
-* <a href="https://mybatisplusjoin.com/pages/core/lambda/join/leftJoin.html" target="_blank">ON语句多条件支持</a>
-* <a href="https://www.baidu.com/link?url=wdmhssysW-Mj19Gkcc2CBOzNVoimHat57mlnH78SEU_6y0awYgDKTBy7es9BXnAH&wd=&eqid=908484020001866e000000056440b5e3" target="_blank">其他全部功能请参考使用文档</a>
+* <a href="https://yulichang.github.io/mybatis-plus-join-doc/pages/core/lambda/select/selectFunc.html" target="_blank">简单的SQL函数使用</a>
+* <a href="https://yulichang.github.io/mybatis-plus-join-doc/pages/core/lambda/join/leftJoin.html" target="_blank">ON语句多条件支持</a>
+* <a href="https://yulichang.github.io/mybatis-plus-join-doc/" target="_blank">其他全部功能请参考使用文档</a>
 
-# <a href="https://www.baidu.com/link?url=wdmhssysW-Mj19Gkcc2CBOzNVoimHat57mlnH78SEU_6y0awYgDKTBy7es9BXnAH&wd=&eqid=908484020001866e000000056440b5e3" target="_blank">使用文档 wiki</a>
+# <a href="https://yulichang.github.io/mybatis-plus-join-doc" target="_blank">使用文档 wiki</a>

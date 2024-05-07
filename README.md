@@ -1,7 +1,7 @@
 <!--suppress HtmlDeprecatedAttribute -->
 <p align="center">
   <a href="https://github.com/yulichang/mybatis-plus-join" target="_blank">
-   <img alt="Mybatis-Plus-Join-Logo" src="https://mybatisplusjoin.com/lg.png">
+   <img alt="Mybatis-Plus-Join-Logo" src="https://github.com/yulichang/mybatis-plus-join/assets/33247410/f61a92d0-dc6e-463d-b431-61f469bd35f8">
   </a>
 </p>
 <h1 align="center">MyBatis-Plus-Join</h1>
@@ -33,10 +33,10 @@
 QQ群:680016987  或者 
 <a href="https://gitee.com/best_handsome/mybatis-plus-join/issues/I65N2M" target="_blank">添加作者微信，备注MPJ，加入微信群</a>
 <br/>
-<img width="200px" height="200px" src="https://mybatisplusjoin.com/qr.png"  alt="添加作者微信，备注MPJ，加入微信群"/>
+<img width="200px" height="200px" src="https://github.com/yulichang/mybatis-plus-join/assets/33247410/6a2aedfa-c67d-4691-9441-204f28b6c73d"  alt="添加作者微信，备注MPJ，加入微信群"/>
 </p>
 
-### <a href="https://www.baidu.com/link?url=6NtKqbGKUIIdwoBUaqNkQnLiG3d5y03L6Pfg6ODId0VKfPifpB1xqdQzsBprm-0h&wd=&eqid=d26e7f1600004777000000056440ade6" target="_blank">使用文档WIKI</a>
+### <a href="https://yulichang.github.io/mybatis-plus-join-doc" target="_blank">使用文档WIKI</a>
 
 ## 使用方法
 
@@ -153,10 +153,10 @@ class test {
 
 MPJLambdaWrapper其他功能
 
-* <a href="https://mybatisplusjoin.com/pages/core/lambda/select/selectCollection.html" target="_blank">
+* <a href="https://yulichang.github.io/mybatis-plus-join-doc/pages/core/lambda/select/selectCollection.html" target="_blank">
   一对一，一对多使用</a>
-* <a href="https://mybatisplusjoin.com/pages/core/lambda/select/selectFunc.html" target="_blank">简单的SQL函数使用</a>
-* <a href="https://mybatisplusjoin.com/pages/core/lambda/join/leftJoin.html" target="_blank">ON语句多条件支持</a>
-* <a href="https://www.baidu.com/link?url=wdmhssysW-Mj19Gkcc2CBOzNVoimHat57mlnH78SEU_6y0awYgDKTBy7es9BXnAH&wd=&eqid=908484020001866e000000056440b5e3" target="_blank">其他全部功能请参考使用文档</a>
+* <a href="https://yulichang.github.io/mybatis-plus-join-doc/pages/core/lambda/select/selectFunc.html" target="_blank">简单的SQL函数使用</a>
+* <a href="https://yulichang.github.io/mybatis-plus-join-doc/pages/core/lambda/join/leftJoin.html" target="_blank">ON语句多条件支持</a>
+* <a href="https://yulichang.github.io/mybatis-plus-join-doc" target="_blank">其他全部功能请参考使用文档</a>
 
-# <a href="https://www.baidu.com/link?url=wdmhssysW-Mj19Gkcc2CBOzNVoimHat57mlnH78SEU_6y0awYgDKTBy7es9BXnAH&wd=&eqid=908484020001866e000000056440b5e3" target="_blank">使用文档 wiki</a>
+# <a href="https://yulichang.github.io/mybatis-plus-join-doc" target="_blank">使用文档 wiki</a>

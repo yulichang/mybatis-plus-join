@@ -253,6 +253,13 @@ public interface QueryJoin<Children, Entity> extends MPJBaseJoin<Entity>, String
     }
 
     /**
+     * innerjoin两个表支持别名 参考 left join
+     */
+    default <T, X> Children innerJoin(Class<T> clazz, String alias, SFunction<T, ?> left, String rightAlias, SFunction<X, ?> right) {
+        return join(Constant.INNER_JOIN, clazz, alias, left, rightAlias, right);
+    }
+
+    /**
      * ignore 参考 left join
      */
     default <T> Children innerJoin(Class<T> clazz, String alias, BiConsumer<JoinAbstractLambdaWrapper<Entity, ?>, Children> consumer) {

@@ -11,9 +11,8 @@ import com.github.yulichang.toolkit.SpringContentUtils;
 import com.github.yulichang.toolkit.TableHelper;
 import com.github.yulichang.toolkit.support.ColumnCache;
 import com.github.yulichang.wrapper.segments.SelectCache;
+import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.ToString;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
@@ -27,8 +26,7 @@ import java.util.stream.Collectors;
  * @author yulichang
  * @since 1.2.0
  */
-@Getter
-@ToString
+@Data
 @EqualsAndHashCode
 public class MPJTableFieldInfo {
 
@@ -122,7 +120,7 @@ public class MPJTableFieldInfo {
         this.isRemoveBindField = checkArr(mapping.select()) &&
                 (!Arrays.asList(mapping.select()).contains(this.joinProperty.trim()) &&
                         !Arrays.asList(mapping.select()).contains(this.joinColumn.trim()));
-        this.wrapper = new MPJMappingWrapper(mapping.first(), checkArr(mapping.select()) ?
+        this.wrapper = new MPJMappingWrapper(this.joinClass, mapping.first(), checkArr(mapping.select()) ?
                 (this.isRemoveBindField ? propToColumn(this.joinClass, mapping.select(), this.joinProperty) :
                         propToColumn(this.joinClass, mapping.select(), null)) : null,
                 mapping.apply(), mapping.condition(), mapping.last(), mapping.orderByAsc(), mapping.orderByDesc());
@@ -145,7 +143,7 @@ public class MPJTableFieldInfo {
         initJoinField(mappingField.joinField());
         this.isRemoveBindField = !mappingField.select().equals(this.joinColumn.trim()) &&
                 !mappingField.select().equals(this.joinProperty.trim());
-        this.wrapper = new MPJMappingWrapper(mappingField.first(), this.isRemoveBindField ?
+        this.wrapper = new MPJMappingWrapper(this.joinClass, mappingField.first(), this.isRemoveBindField ?
                 propToColumn(this.joinClass, new String[]{mappingField.select()}, this.joinProperty) :
                 propToColumn(this.joinClass, new String[]{mappingField.select()}, null), mappingField.apply(),
                 mappingField.condition(), mappingField.last(), mappingField.orderByAsc(), mappingField.orderByDesc());

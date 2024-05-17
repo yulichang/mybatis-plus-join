@@ -3,8 +3,7 @@ package com.github.yulichang.extension.mapping.config;
 import com.baomidou.mybatisplus.core.toolkit.Assert;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.github.yulichang.config.ConfigProperties;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 import lombok.experimental.Accessors;
 
 import java.util.ArrayList;
@@ -18,22 +17,18 @@ import java.util.Objects;
  * @author yulichang
  * @since 1.4.5
  */
-@Getter
+@Data
 @Accessors(chain = true)
 public class DeepConfig<T> {
 
     private static final DeepConfig<?> defaultConfig = new DeepConfig<>();
 
-    @Setter
     private List<SFunction<T, ?>> property;
 
-    @Setter
     private boolean loop = false;
 
-    @Setter
     private int deep = ConfigProperties.mappingMaxCount;
 
-    @Setter
     private int maxDeep = ConfigProperties.mappingMaxCount;
 
     public static <T> Builder<T> builder() {

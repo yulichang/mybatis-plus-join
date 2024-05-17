@@ -5,8 +5,10 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
+import com.github.yulichang.annotation.Condition;
 import com.github.yulichang.annotation.EntityMapping;
 import com.github.yulichang.annotation.FieldMapping;
+import com.github.yulichang.annotation.enums.SqlKeyword;
 import com.github.yulichang.test.mapping.enums.Sex;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -53,6 +55,8 @@ public class UserDO {
     private List<String> pName;
 
     @TableField(exist = false)
-    @EntityMapping(thisField = "id", joinField = "userId")
+    @EntityMapping(thisField = "id", joinField = "userId", condition = {
+            @Condition(column = "userId", keyWord = SqlKeyword.GE, value = "0")
+    }, orderByAsc = "userId", orderByDesc = "areaId")
     private List<AddressDO> addressList;
 }

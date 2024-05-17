@@ -66,13 +66,13 @@ public @interface FieldMapping {
      * 映射表查询条件之 orderBy<br/>
      * 等效于 Wrappers.<T>query().orderByAsc(xxx);
      */
-    String orderByAsc() default "";
+    String[] orderByAsc() default "";
 
     /**
      * 映射表查询条件之 orderByDesc<br/>
      * 等效于 Wrappers.<T>query().orderByDesc(xxx);
      */
-    String orderByDesc() default "";
+    String[] orderByDesc() default "";
 
     /**
      * 映射表查询条件之 last<br/>

@@ -61,4 +61,10 @@ class MappingTest {
         assert dos.get(0).getArea() != null;
         dos.forEach(System.out::println);
     }
+
+    @Test
+    public void testJoin2() {
+        List<UserDO> dos = userService.listDeep(Wrappers.emptyWrapper());
+        assert dos.get(0).getAddressList().get(0).getId() != null;
+    }
 }

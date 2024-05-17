@@ -4,13 +4,13 @@ package com.github.yulichang.extension.mapping.mapper;
 import com.baomidou.mybatisplus.core.enums.SqlKeyword;
 import com.baomidou.mybatisplus.core.toolkit.StringPool;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
+import com.github.yulichang.toolkit.support.ColumnCache;
+import com.github.yulichang.wrapper.segments.SelectCache;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * 关联查询条件
@@ -42,8 +42,8 @@ public class MPJMappingWrapper {
     private final boolean hasOrderByDesc;
     private List<String> orderByDesc;
 
-    public MPJMappingWrapper(String first, String select, com.github.yulichang.annotation.Apply[] applys,
-                             com.github.yulichang.annotation.Condition[] conditions, String last, String orderByAsc, String orderByDesc) {
+    public MPJMappingWrapper(Class<?> joinClass, String first, String select, com.github.yulichang.annotation.Apply[] applyArr,
+                             com.github.yulichang.annotation.Condition[] conditions, String last, String[] orderByAsc, String[] orderByDesc) {
         this.hasFirst = StringUtils.isNotBlank(first);
         if (this.hasFirst) {
             this.first = first;
@@ -54,10 +54,10 @@ public class MPJMappingWrapper {
             this.select = select;
         }
 
-        this.hasApply = applys.length > 0;
+        this.hasApply = applyArr.length > 0;
         if (this.hasApply) {
             this.applyList = new ArrayList<>();
-            for (com.github.yulichang.annotation.Apply apply : applys) {
+            for (com.github.yulichang.annotation.Apply apply : applyArr) {
                 this.applyList.add(new Apply(apply.value(), apply.args()));
             }
         }
@@ -66,7 +66,15 @@ public class MPJMappingWrapper {
         if (this.hasCondition) {
             this.conditionList = new ArrayList<>();
             for (com.github.yulichang.annotation.Condition condition : conditions) {
-                conditionList.add(new Condition(convert(condition.keyWord()), condition.column(), condition.value()));
+                List<SelectCache> listField = ColumnCache.getListField(joinClass);
+                if (listField.stream().anyMatch(f -> f.getColumn().equals(condition.column().trim()))) {
+                    conditionList.add(new Condition(convert(condition.keyWord()), condition.column(), condition.value()));
+                } else {
+                    //通过属性获取
+                    String col = listField.stream().filter(f -> f.getColumProperty().equals(condition.column())).findFirst()
+                            .map(SelectCache::getColumn).orElse(condition.column());
+                    conditionList.add(new Condition(convert(condition.keyWord()), col, condition.value()));
+                }
             }
         }
 
@@ -75,55 +83,38 @@ public class MPJMappingWrapper {
             this.last = last;
         }
 
-        this.hasOrderByAsc = StringUtils.isNotBlank(orderByAsc);
+        this.hasOrderByAsc = orderByAsc.length > 0;
         if (this.hasOrderByAsc) {
-            this.orderByAsc = Arrays.asList(orderByAsc.split(StringPool.COMMA));
+            List<SelectCache> listField = ColumnCache.getListField(joinClass);
+            Set<String> colSet = listField.stream().map(SelectCache::getColumn).collect(Collectors.toSet());
+            List<String> allColumns = new ArrayList<>();
+            for (String orderBy : orderByAsc) {
+                allColumns.addAll(Arrays.asList(orderBy.split(StringPool.COMMA)));
+            }
+            this.orderByAsc = allColumns.stream().filter(StringUtils::isNotBlank).map(String::trim).map(f ->
+                    colSet.contains(f) ? f : listField.stream().filter(s -> s.getColumProperty().equals(f))
+                            .findFirst().map(SelectCache::getColumn).orElse(f)).collect(Collectors.toList());
         }
 
-        this.hasOrderByDesc = StringUtils.isNotBlank(orderByDesc);
+        this.hasOrderByDesc = orderByDesc.length > 0;
         if (this.hasOrderByDesc) {
-            this.orderByDesc = Arrays.asList(orderByDesc.split(StringPool.COMMA));
+            List<SelectCache> listField = ColumnCache.getListField(joinClass);
+            Set<String> colSet = listField.stream().map(SelectCache::getColumn).collect(Collectors.toSet());
+            List<String> allColumns = new ArrayList<>();
+            for (String orderBy : orderByDesc) {
+                allColumns.addAll(Arrays.asList(orderBy.split(StringPool.COMMA)));
+            }
+            this.orderByDesc = allColumns.stream().filter(StringUtils::isNotBlank).map(String::trim).map(f ->
+                    colSet.contains(f) ? f : listField.stream().filter(s -> s.getColumProperty().equals(f))
+                            .findFirst().map(SelectCache::getColumn).orElse(f)).collect(Collectors.toList());
         }
     }
 
-    private SqlKeyword convert(com.github.yulichang.annotation.enums.SqlKeyword sqlKeyword) {
+    public static SqlKeyword convert(com.github.yulichang.annotation.enums.SqlKeyword sqlKeyword) {
         if (Objects.isNull(sqlKeyword)) {
             return null;
         }
-        switch (sqlKeyword) {
-            case NOT:
-                return SqlKeyword.NOT;
-            case IN:
-                return SqlKeyword.IN;
-            case NOT_IN:
-                return SqlKeyword.NOT_IN;
-            case LIKE:
-                return SqlKeyword.LIKE;
-            case NOT_LIKE:
-                return SqlKeyword.NOT_LIKE;
-            case EQ:
-                return SqlKeyword.EQ;
-            case NE:
-                return SqlKeyword.NE;
-            case GT:
-                return SqlKeyword.GT;
-            case GE:
-                return SqlKeyword.GE;
-            case LT:
-                return SqlKeyword.LT;
-            case LE:
-                return SqlKeyword.LE;
-            case IS_NULL:
-                return SqlKeyword.IS_NULL;
-            case IS_NOT_NULL:
-                return SqlKeyword.IS_NOT_NULL;
-            case BETWEEN:
-                return SqlKeyword.BETWEEN;
-            case NOT_BETWEEN:
-                return SqlKeyword.NOT_BETWEEN;
-            default:
-                return SqlKeyword.EQ;
-        }
+        return SqlKeyword.valueOf(sqlKeyword.name());
     }
 
     @Getter

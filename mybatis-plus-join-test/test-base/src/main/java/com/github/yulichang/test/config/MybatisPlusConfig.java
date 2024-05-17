@@ -56,7 +56,7 @@ public class MybatisPlusConfig {
 
             @Override
             public boolean ignoreTable(String tableName) {
-                return !"user_tenant".equals(tableName);
+                return !tableName.startsWith("user_tenant");
             }
         }));
         interceptor.addInnerInterceptor(page);

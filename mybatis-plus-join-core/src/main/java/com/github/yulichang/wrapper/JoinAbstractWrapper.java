@@ -289,13 +289,13 @@ public abstract class JoinAbstractWrapper<T, Children extends JoinAbstractWrappe
 
     @Override
     public <X> Children between(boolean condition, String alias, SFunction<X, ?> column, Object val1, Object val2) {
-        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(index, alias, column), BETWEEN,
+        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(index, alias, column, false), BETWEEN,
                 () -> formatParam(null, val1), AND, () -> formatParam(null, val2)));
     }
 
     @Override
     public <X> Children notBetween(boolean condition, String alias, SFunction<X, ?> column, Object val1, Object val2) {
-        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(index, alias, column), NOT_BETWEEN,
+        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(index, alias, column, false), NOT_BETWEEN,
                 () -> formatParam(null, val1), AND, () -> formatParam(null, val2)));
     }
 
@@ -374,74 +374,74 @@ public abstract class JoinAbstractWrapper<T, Children extends JoinAbstractWrappe
 
     @Override
     public <X> Children isNull(boolean condition, String alias, SFunction<X, ?> column) {
-        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(index, alias, column), IS_NULL));
+        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(index, alias, column, false), IS_NULL));
     }
 
     @Override
     public <X> Children isNotNull(boolean condition, String alias, SFunction<X, ?> column) {
-        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(index, alias, column), IS_NOT_NULL));
+        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(index, alias, column, false), IS_NOT_NULL));
     }
 
     @Override
     public <X> Children in(boolean condition, String alias, SFunction<X, ?> column, Collection<?> coll) {
-        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(index, alias, column), IN, inExpression(coll)));
+        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(index, alias, column, false), IN, inExpression(coll)));
     }
 
     @Override
     public <X> Children in(boolean condition, String alias, SFunction<X, ?> column, Object... values) {
-        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(index, alias, column), IN, inExpression(values)));
+        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(index, alias, column, false), IN, inExpression(values)));
     }
 
     @Override
     public <X> Children notIn(boolean condition, String alias, SFunction<X, ?> column, Collection<?> coll) {
-        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(index, alias, column), NOT_IN, inExpression(coll)));
+        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(index, alias, column, false), NOT_IN, inExpression(coll)));
     }
 
     @Override
     public <X> Children notIn(boolean condition, String alias, SFunction<X, ?> column, Object... values) {
-        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(index, alias, column), NOT_IN, inExpression(values)));
+        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(index, alias, column, false), NOT_IN, inExpression(values)));
     }
 
     @Override
     public <X> Children inSql(boolean condition, String alias, SFunction<X, ?> column, String inValue) {
-        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(index, alias, column), IN,
+        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(index, alias, column, false), IN,
                 () -> String.format("(%s)", inValue)));
     }
 
     @Override
     public <X> Children notInSql(boolean condition, String alias, SFunction<X, ?> column, String inValue) {
-        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(index, alias, column), NOT_IN,
+        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(index, alias, column, false), NOT_IN,
                 () -> String.format("(%s)", inValue)));
     }
 
 
     @Override
     public <X> Children gtSql(boolean condition, String alias, SFunction<X, ?> column, String inValue) {
-        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(index, alias, column), GT,
+        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(index, alias, column, false), GT,
                 () -> String.format("(%s)", inValue)));
     }
 
     @Override
     public <X> Children geSql(boolean condition, String alias, SFunction<X, ?> column, String inValue) {
-        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(index, alias, column), GE,
+        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(index, alias, column, false), GE,
                 () -> String.format("(%s)", inValue)));
     }
 
     @Override
     public <X> Children ltSql(boolean condition, String alias, SFunction<X, ?> column, String inValue) {
-        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(index, alias, column), LT,
+        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(index, alias, column, false), LT,
                 () -> String.format("(%s)", inValue)));
     }
 
     @Override
     public <X> Children leSql(boolean condition, String alias, SFunction<X, ?> column, String inValue) {
-        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(index, alias, column), LE,
+        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(index, alias, column, false), LE,
                 () -> String.format("(%s)", inValue)));
     }
 
     @Override
     public <R> Children eqSql(boolean condition, String alias, SFunction<R, ?> column, String inValue) {
-        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(index, alias, column), EQ,
+        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(index, alias, column, false), EQ,
                 () -> String.format("(%s)", inValue)));
     }
 
@@ -449,7 +449,7 @@ public abstract class JoinAbstractWrapper<T, Children extends JoinAbstractWrappe
     public <R> Children groupBy(boolean condition, String alias, List<SFunction<R, ?>> columns) {
         return maybeDo(condition, () -> {
             if (CollectionUtils.isNotEmpty(columns)) {
-                final String finalOne = columnsToString(index, isOn ? PrefixEnum.ON_FIRST : PrefixEnum.CD_FIRST, alias, columns);
+                final String finalOne = columnsToString(index, isOn ? PrefixEnum.ON_FIRST : PrefixEnum.CD_FIRST, alias, false, columns);
                 appendSqlSegments(GROUP_BY, () -> finalOne);
             }
         });
@@ -477,9 +477,9 @@ public abstract class JoinAbstractWrapper<T, Children extends JoinAbstractWrappe
     @SafeVarargs
     public final <X> Children groupBy(boolean condition, String alias, SFunction<X, ?> column, SFunction<X, ?>... columns) {
         return maybeDo(condition, () -> {
-            String one = columnToString(index, alias, column, false, isOn ? PrefixEnum.ON_FIRST : PrefixEnum.CD_FIRST);
+            String one = columnToString(index, alias, column, false, isOn ? PrefixEnum.ON_FIRST : PrefixEnum.CD_FIRST, false);
             if (ArrayUtils.isNotEmpty(columns)) {
-                one += (StringPool.COMMA + columnsToString(index, isOn ? PrefixEnum.ON_FIRST : PrefixEnum.CD_FIRST, alias, columns));
+                one += (StringPool.COMMA + columnsToString(index, isOn ? PrefixEnum.ON_FIRST : PrefixEnum.CD_FIRST, alias, false, columns));
             }
             final String finalOne = one;
             appendSqlSegments(GROUP_BY, () -> finalOne);
@@ -491,7 +491,7 @@ public abstract class JoinAbstractWrapper<T, Children extends JoinAbstractWrappe
         return maybeDo(condition, () -> {
             if (CollectionUtils.isNotEmpty(columns)) {
                 columns.forEach(c -> appendSqlSegments(ORDER_BY,
-                        columnToSqlSegment(index, alias, columnSqlInjectFilter(c)), ASC));
+                        columnToSqlSegment(index, alias, columnSqlInjectFilter(c), true), ASC));
             }
         });
     }
@@ -534,7 +534,7 @@ public abstract class JoinAbstractWrapper<T, Children extends JoinAbstractWrappe
         return maybeDo(condition, () -> {
             if (CollectionUtils.isNotEmpty(columns)) {
                 columns.forEach(c -> appendSqlSegments(ORDER_BY,
-                        columnToSqlSegment(index, alias, columnSqlInjectFilter(c)), DESC));
+                        columnToSqlSegment(index, alias, columnSqlInjectFilter(c), true), DESC));
             }
         });
     }
@@ -577,10 +577,10 @@ public abstract class JoinAbstractWrapper<T, Children extends JoinAbstractWrappe
     public final <X> Children orderBy(boolean condition, boolean isAsc, String alias, SFunction<X, ?> column, SFunction<X, ?>... columns) {
         return maybeDo(condition, () -> {
             final SqlKeyword mode = isAsc ? ASC : DESC;
-            appendSqlSegments(ORDER_BY, columnToSqlSegment(index, alias, column), mode);
+            appendSqlSegments(ORDER_BY, columnToSqlSegment(index, alias, column, true), mode);
             if (ArrayUtils.isNotEmpty(columns)) {
                 Arrays.stream(columns).forEach(c -> appendSqlSegments(ORDER_BY,
-                        columnToSqlSegment(index, alias, columnSqlInjectFilter(c)), mode));
+                        columnToSqlSegment(index, alias, columnSqlInjectFilter(c), true), mode));
             }
         });
     }
@@ -632,7 +632,7 @@ public abstract class JoinAbstractWrapper<T, Children extends JoinAbstractWrappe
      * <p>拼接 LIKE 以及 值</p>
      */
     protected <X> Children likeValue(boolean condition, SqlKeyword keyword, String alias, SFunction<X, ?> column, Object val, SqlLike sqlLike) {
-        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(index, alias, column), keyword,
+        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(index, alias, column, false), keyword,
                 () -> formatParam(null, SqlUtils.concatLike(val, sqlLike))));
     }
 
@@ -650,7 +650,7 @@ public abstract class JoinAbstractWrapper<T, Children extends JoinAbstractWrappe
      * @param val        条件值
      */
     protected <X> Children addCondition(boolean condition, String alias, SFunction<X, ?> column, SqlKeyword sqlKeyword, Object val) {
-        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(index, alias, column), sqlKeyword,
+        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(index, alias, column, false), sqlKeyword,
                 () -> formatParam(null, val)));
     }
 
@@ -658,7 +658,7 @@ public abstract class JoinAbstractWrapper<T, Children extends JoinAbstractWrappe
                                            SqlKeyword sqlKeyword, String rightAlias, SFunction<S, ?> val) {
         Class<X> c = LambdaUtils.getEntityClass(column);
         Class<S> v = LambdaUtils.getEntityClass(val);
-        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(index, alias, column), sqlKeyword,
+        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(index, alias, column, false), sqlKeyword,
                 isOn ? columnToSqlSegmentS(index, rightAlias, val, v == c && v == joinClass) :
                         columnToSqlSegmentS(index, rightAlias, val, v == c)
         ));
@@ -844,8 +844,8 @@ public abstract class JoinAbstractWrapper<T, Children extends JoinAbstractWrappe
     /**
      * 获取 columnName
      */
-    protected final <X> ISqlSegment columnToSqlSegment(Integer index, String alias, SFunction<X, ?> column) {
-        return () -> columnToString(index, alias, column, false, isOn ? PrefixEnum.ON_FIRST : PrefixEnum.CD_FIRST);
+    protected final <X> ISqlSegment columnToSqlSegment(Integer index, String alias, SFunction<X, ?> column, boolean orderBy) {
+        return () -> columnToString(index, alias, column, false, isOn ? PrefixEnum.ON_FIRST : PrefixEnum.CD_FIRST, orderBy);
     }
 
     protected final <X> ISqlSegment columnToSqlSegmentS(Integer index, String alias, SFunction<X, ?> column, boolean isJoin) {
@@ -855,7 +855,7 @@ public abstract class JoinAbstractWrapper<T, Children extends JoinAbstractWrappe
         } else {
             prefixEnum = isOn ? PrefixEnum.ON_SECOND : PrefixEnum.CD_ON_SECOND;
         }
-        return () -> columnToString(index, alias, column, isJoin, prefixEnum);
+        return () -> columnToString(index, alias, column, isJoin, prefixEnum, false);
     }
 
     protected final ISqlSegment columnToSqlSegment(String column) {
@@ -865,7 +865,7 @@ public abstract class JoinAbstractWrapper<T, Children extends JoinAbstractWrappe
     /**
      * 获取 columnName
      */
-    protected <X> String columnToString(Integer index, String alias, X column, boolean isJoin, PrefixEnum prefixEnum) {
+    protected <X> String columnToString(Integer index, String alias, X column, boolean isJoin, PrefixEnum prefixEnum, boolean orderBy) {
         return (String) column;
     }
 
@@ -890,10 +890,12 @@ public abstract class JoinAbstractWrapper<T, Children extends JoinAbstractWrappe
      *
      * @param columns 多字段
      */
-    abstract <X> String columnsToString(Integer index, PrefixEnum prefixEnum, String alias, X... columns);
+    abstract <X> String columnsToString(Integer index, PrefixEnum prefixEnum, String alias, boolean orderBy, X... columns);
 
-    public <X> String columnsToString(Integer index, PrefixEnum prefixEnum, String alias, List<X> columns) {
-        return columns.stream().map(i -> columnToString(index, alias, (SFunction<?, ?>) i, false, prefixEnum)).collect(joining(StringPool.COMMA));
+    public <X> String columnsToString(Integer index, PrefixEnum prefixEnum, String alias, boolean orderBy, List<X> columns) {
+        return columns.stream().map(i ->
+                        columnToString(index, alias, (SFunction<?, ?>) i, false, prefixEnum, orderBy))
+                .collect(joining(StringPool.COMMA));
     }
 
     @Override

@@ -217,18 +217,26 @@ public abstract class JoinAbstractLambdaWrapper<T, Children extends JoinAbstract
     }
 
     @Override
-    protected <X> String columnToString(Integer index, String alias, X column, boolean isJoin, PrefixEnum prefixEnum) {
-        return columnToString(index, alias, (SFunction<?, ?>) column, isJoin, prefixEnum);
+    protected <X> String columnToString(Integer index, String alias, X column, boolean isJoin, PrefixEnum prefixEnum, boolean orderBy) {
+        return columnToString(index, alias, (SFunction<?, ?>) column, isJoin, prefixEnum, orderBy);
     }
 
     @Override
     @SafeVarargs
-    protected final <X> String columnsToString(Integer index, PrefixEnum prefixEnum, String alias, X... columns) {
-        return Arrays.stream(columns).map(i -> columnToString(index, alias, (SFunction<?, ?>) i, false, prefixEnum)).collect(joining(StringPool.COMMA));
+    protected final <X> String columnsToString(Integer index, PrefixEnum prefixEnum,  String alias,boolean orderBy, X... columns) {
+        return Arrays.stream(columns).map(i ->
+                        columnToString(index, alias, (SFunction<?, ?>) i, false, prefixEnum, orderBy))
+                .collect(joining(StringPool.COMMA));
     }
 
-    protected String columnToString(Integer index, String alias, SFunction<?, ?> column, boolean isJoin, PrefixEnum prefixEnum) {
+    protected String columnToString(Integer index, String alias, SFunction<?, ?> column, boolean isJoin, PrefixEnum prefixEnum, boolean orderBy) {
         Class<?> entityClass = LambdaUtils.getEntityClass(column);
+        if (orderBy) {
+            TableInfo info = TableHelper.get(entityClass);
+            if (Objects.isNull(info)) {
+                return LambdaUtils.getName(column);
+            }
+        }
         return (alias == null ? getDefault(index, entityClass, isJoin, prefixEnum) : alias) + StringPool.DOT + getCache(column).getColumn();
     }
 

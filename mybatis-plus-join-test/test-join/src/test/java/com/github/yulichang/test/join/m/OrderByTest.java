@@ -1,6 +1,8 @@
 package com.github.yulichang.test.join.m;
 
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
+import com.github.yulichang.test.join.dto.UserDTO;
+import com.github.yulichang.test.join.entity.AddressDO;
 import com.github.yulichang.test.join.entity.UserDO;
 import com.github.yulichang.test.util.Reset;
 import com.github.yulichang.test.util.ThreadLocalUtils;
@@ -49,6 +51,20 @@ public class OrderByTest {
                 .groupBy(columList);
 //                .groupBy(UserDO::getId, UserDO::getName, UserDO::getPid);
 //                .orderByAsc(columList);
+
+
+        List<UserDO> list = wrapper.list();
+        list.forEach(System.out::println);
+    }
+
+
+    @Test
+    void orderBy2() {
+        MPJLambdaWrapper<UserDO> wrapper = JoinWrappers.lambda(UserDO.class)
+                .selectAll(UserDO.class)
+                .selectAs(AddressDO::getId, UserDTO::getAddress)
+                .leftJoin(AddressDO.class, AddressDO::getUserId, UserDO::getId)
+                .orderByAsc(UserDTO::getAddress);
 
 
         List<UserDO> list = wrapper.list();

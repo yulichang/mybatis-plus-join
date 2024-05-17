@@ -223,9 +223,9 @@ public abstract class JoinAbstractLambdaWrapper<T, Children extends JoinAbstract
 
     @Override
     @SafeVarargs
-    protected final <X> String columnsToString(Integer index, PrefixEnum prefixEnum,  String alias,boolean orderBy, X... columns) {
+    protected final <X> String columnsToString(Integer index, PrefixEnum prefixEnum, String alias, X... columns) {
         return Arrays.stream(columns).map(i ->
-                        columnToString(index, alias, (SFunction<?, ?>) i, false, prefixEnum, orderBy))
+                        columnToString(index, alias, (SFunction<?, ?>) i, false, prefixEnum, false))
                 .collect(joining(StringPool.COMMA));
     }
 

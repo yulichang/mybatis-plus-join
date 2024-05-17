@@ -479,7 +479,7 @@ public abstract class JoinAbstractWrapper<T, Children extends JoinAbstractWrappe
         return maybeDo(condition, () -> {
             String one = columnToString(index, alias, column, false, isOn ? PrefixEnum.ON_FIRST : PrefixEnum.CD_FIRST, false);
             if (ArrayUtils.isNotEmpty(columns)) {
-                one += (StringPool.COMMA + columnsToString(index, isOn ? PrefixEnum.ON_FIRST : PrefixEnum.CD_FIRST, alias, false, columns));
+                one += (StringPool.COMMA + columnsToString(index, isOn ? PrefixEnum.ON_FIRST : PrefixEnum.CD_FIRST, alias, columns));
             }
             final String finalOne = one;
             appendSqlSegments(GROUP_BY, () -> finalOne);
@@ -890,7 +890,7 @@ public abstract class JoinAbstractWrapper<T, Children extends JoinAbstractWrappe
      *
      * @param columns 多字段
      */
-    abstract <X> String columnsToString(Integer index, PrefixEnum prefixEnum, String alias, boolean orderBy, X... columns);
+    abstract <X> String columnsToString(Integer index, PrefixEnum prefixEnum, String alias, X... columns);
 
     public <X> String columnsToString(Integer index, PrefixEnum prefixEnum, String alias, boolean orderBy, List<X> columns) {
         return columns.stream().map(i ->

@@ -160,3 +160,5 @@ MPJLambdaWrapper其他功能
 * <a href="https://yulichang.github.io/mybatis-plus-join-doc/" target="_blank">其他全部功能请参考使用文档</a>
 
 # <a href="https://yulichang.github.io/mybatis-plus-join-doc" target="_blank">使用文档 wiki</a>
+# 捐赠
+![捐赠 mybatis-plus-join](https://foruda.gitee.com/images/1715967492739259773/c8f375b5_2020985.png "支持一下mybatis-plus-join")

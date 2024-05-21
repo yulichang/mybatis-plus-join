@@ -42,7 +42,7 @@ public class JSqlParserHelperV46 {
                                     col = selectExpressionItem.getAlias().getName();
                                 }
                                 if (StringUtils.isNotBlank(col)) {
-                                    columConsumer.accept(StringUtils.getTargetColumn(col));
+                                    columConsumer.accept(col);
                                 }
                             }
                         }

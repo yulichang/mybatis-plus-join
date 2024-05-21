@@ -39,7 +39,7 @@ public class JSqlParserHelper {
                             col = item.getAlias().getName();
                         }
                         if (StringUtils.isNotBlank(col)) {
-                            columConsumer.accept(StringUtils.getTargetColumn(col));
+                            columConsumer.accept(col);
                         }
                     }
                     parser = true;

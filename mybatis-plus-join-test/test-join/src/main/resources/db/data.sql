@@ -111,3 +111,14 @@ INSERT INTO user_tenant (id,user_id, tenant_id) VALUES
 (6, 6, 2),
 (7, 7, 2),
 (8, 8, 2);
+
+DELETE FROM user_tenanta;
+INSERT INTO user_tenanta (id,user_id, tenant_id, 中文字段) VALUES
+(1, 1, 1, '中文字段1'),
+(2, 2, 1, '中文字段2'),
+(3, 3, 1, '中文字段3'),
+(4, 4, 1, '中文字段4'),
+(5, 5, 1, '中文字段5'),
+(6, 6, 2, '中文字段6'),
+(7, 7, 2, '中文字段7'),
+(8, 8, 2, '中文字段8');

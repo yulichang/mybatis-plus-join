@@ -3,15 +3,13 @@ package com.github.yulichang.interceptor;
 import com.baomidou.mybatisplus.core.MybatisPlusVersion;
 import com.baomidou.mybatisplus.core.metadata.TableInfo;
 import com.baomidou.mybatisplus.core.toolkit.*;
+import com.baomidou.mybatisplus.core.toolkit.ReflectionKit;
 import com.github.yulichang.adapter.AdapterHelper;
 import com.github.yulichang.adapter.base.tookit.VersionUtils;
 import com.github.yulichang.config.ConfigProperties;
 import com.github.yulichang.interfaces.MPJBaseJoin;
 import com.github.yulichang.query.MPJQueryWrapper;
-import com.github.yulichang.toolkit.Constant;
-import com.github.yulichang.toolkit.MPJReflectionKit;
-import com.github.yulichang.toolkit.MPJTableMapperHelper;
-import com.github.yulichang.toolkit.TableHelper;
+import com.github.yulichang.toolkit.*;
 import com.github.yulichang.toolkit.support.FieldCache;
 import com.github.yulichang.wrapper.interfaces.SelectWrapper;
 import com.github.yulichang.wrapper.resultmap.IResult;
@@ -209,11 +207,12 @@ public class MPJInterceptor implements Interceptor {
                     }
                 } else if (wrapper.isResultMap()) {
                     AdapterHelper.getAdapter().parserColum(wrapper.getAlias(), wrapper.getFrom(), i.getColumn(), col -> {
-                        FieldCache strField = fieldMap.get(col);
-                        columnSet.add(col);
+                        String tagCol = MPJStringUtils.getTargetColumn(col);
+                        FieldCache strField = fieldMap.get(tagCol);
+                        columnSet.add(tagCol);
                         if (Objects.nonNull(strField)) {
-                            ResultMapping.Builder builder = new ResultMapping.Builder(ms.getConfiguration(), col,
-                                    col, strField.getType());
+                            ResultMapping.Builder builder = new ResultMapping.Builder(ms.getConfiguration(), tagCol,
+                                    tagCol, strField.getType());
                             resultMappings.add(selectToResult(wrapper.getEntityClass(), i, strField.getType(), builder));
                         }
                     });
@@ -262,7 +261,7 @@ public class MPJInterceptor implements Interceptor {
             childId.append("(");
             Map<String, FieldCache> ofTypeField = MPJReflectionKit.getFieldMap(mybatisLabel.getOfType());
             //列名去重
-            String columnName = StringUtils.getTargetColumn(r.getSelectNormal().getColumn());
+            String columnName = r.getSelectNormal().getTagColumn();
             SelectLabel label;
             FieldCache field = ofTypeField.get(r.getProperty());
             String index = r.getIndex();

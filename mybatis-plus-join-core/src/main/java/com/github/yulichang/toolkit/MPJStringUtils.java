@@ -37,6 +37,18 @@ import static java.util.stream.Collectors.joining;
 public final class MPJStringUtils {
 
     /**
+     * 判断是否是中文
+     */
+    public static boolean isChinese(String str) {
+        if(isBlank(str))
+            return false;
+        char c = str.charAt(0);
+        return c >= 0x4E00 && c <= 0x9FA5;
+    }
+
+    /* *************************** 以下为拷贝内容 **************************** */
+
+    /**
      * 字符串 is
      */
     public static final String IS = "is";
@@ -138,6 +150,9 @@ public final class MPJStringUtils {
      * @return 字段名
      */
     public static String getTargetColumn(String column) {
+        if(isChinese(column)){
+            return column;
+        }
         if (isNotColumnName(column)) {
             return column.substring(1, column.length() - 1);
         }
@@ -303,7 +318,7 @@ public final class MPJStringUtils {
      */
     public static String quotaMarkList(Collection<?> coll) {
         return coll.stream().map(MPJStringUtils::quotaMark)
-            .collect(joining(StringPool.COMMA, StringPool.LEFT_BRACKET, StringPool.RIGHT_BRACKET));
+                .collect(joining(StringPool.COMMA, StringPool.LEFT_BRACKET, StringPool.RIGHT_BRACKET));
     }
 
     /**
@@ -522,8 +537,8 @@ public final class MPJStringUtils {
         char lastChar = 'a';
         for (char c : s.toCharArray()) {
             if ((Character.isWhitespace(lastChar)) && (!Character.isWhitespace(c))
-                && ('-' != c) && (buf.length() > 0)
-                && (buf.charAt(buf.length() - 1) != '-')) {
+                    && ('-' != c) && (buf.length() > 0)
+                    && (buf.charAt(buf.length() - 1) != '-')) {
                 buf.append(StringPool.DASH);
             }
             if ('_' == c) {

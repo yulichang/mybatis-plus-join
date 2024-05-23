@@ -15,6 +15,7 @@ import com.github.yulichang.config.ConfigProperties;
 import com.github.yulichang.kt.interfaces.CompareIfExists;
 import com.github.yulichang.kt.interfaces.Func;
 import com.github.yulichang.kt.interfaces.OnCompare;
+import com.github.yulichang.kt.segments.FuncArgs;
 import com.github.yulichang.toolkit.KtUtils;
 import com.github.yulichang.toolkit.MPJSqlInjectionUtils;
 import com.github.yulichang.toolkit.Ref;
@@ -25,15 +26,13 @@ import com.github.yulichang.wrapper.enums.PrefixEnum;
 import com.github.yulichang.wrapper.interfaces.CompareStrIfExists;
 import com.github.yulichang.wrapper.interfaces.FuncStr;
 import com.github.yulichang.wrapper.interfaces.Join;
+import com.github.yulichang.wrapper.segments.SelectFunc;
 import kotlin.reflect.KProperty;
 import lombok.Getter;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.BiPredicate;
-import java.util.function.Consumer;
-import java.util.function.Predicate;
-import java.util.function.Supplier;
+import java.util.function.*;
 
 import static com.baomidou.mybatisplus.core.enums.SqlKeyword.*;
 import static com.baomidou.mybatisplus.core.enums.WrapperKeyword.APPLY;
@@ -308,6 +307,18 @@ public abstract class KtAbstractWrapper<T, Children extends KtAbstractWrapper<T,
     public Children apply(boolean condition, String applySql, Object... values) {
         return maybeDo(condition, () -> appendSqlSegments(APPLY,
                 () -> formatSqlMaybeWithParam(applySql, null, values)));
+    }
+
+    public Children applyFunc(String applySql, Function<FuncArgs, SelectFunc.Arg[]> consumerFunction, Object... values) {
+        return applyFunc(true, applySql, consumerFunction, values);
+    }
+
+    public Children applyFunc(boolean condition, String applySql,
+                              Function<FuncArgs, SelectFunc.Arg[]> consumerFunction, Object... values) {
+        return maybeDo(condition, () -> appendSqlSegments(APPLY,
+                () -> formatSqlMaybeWithParam(String.format(applySql,
+                        Arrays.stream(consumerFunction.apply(new FuncArgs())).map(func ->
+                                columnToString(index, null, (KProperty<?>) func.getProperty(), false, PrefixEnum.CD_FIRST)).toArray()), null, values)));
     }
 
     @Override

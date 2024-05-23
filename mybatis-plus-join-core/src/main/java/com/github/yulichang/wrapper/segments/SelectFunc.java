@@ -75,9 +75,9 @@ public class SelectFunc implements Select {
             boolean ins = i instanceof Fun;
             if (ins) {
                 Fun<?, ?> f = (Fun<?, ?>) i;
-                return new Arg(LambdaUtils.getEntityClass(f.getFunc()), LambdaUtils.getName(f.getFunc()), true, f.getAlias());
+                return new Arg(LambdaUtils.getEntityClass(f.getFunc()), LambdaUtils.getName(f.getFunc()), true, f.getAlias(), null);
             } else {
-                return new Arg(LambdaUtils.getEntityClass(i), LambdaUtils.getName(i), false, null);
+                return new Arg(LambdaUtils.getEntityClass(i), LambdaUtils.getName(i), false, null, null);
             }
         }).toArray(Arg[]::new);
         this.cache = null;
@@ -164,5 +164,6 @@ public class SelectFunc implements Select {
         private final String prop;
         private final boolean hasTableAlias;
         private final String tableAlias;
+        private final Object property;
     }
 }

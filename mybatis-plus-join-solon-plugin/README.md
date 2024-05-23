@@ -8,6 +8,14 @@
 </dependency>
 ```
 
+#### Tips:
+[solon 2.8.0 需要添加如下配置（此问题会在 MPJ 1.4.13+ 解决)](https://gitee.com/best_handsome/mybatis-plus-join/issues/I9RN5N)
+```yml
+mybatis.db1:
+    globalConfig:
+        sqlInjector: com.github.yulichang.injector.MPJSqlInjector
+```
+
 ### mapper继承MPJBaseMapper
 
 ```java

@@ -21,14 +21,13 @@ import com.github.yulichang.toolkit.sql.SqlScriptUtils;
 import com.github.yulichang.wrapper.enums.IfExistsSqlKeyWordEnum;
 import com.github.yulichang.wrapper.enums.PrefixEnum;
 import com.github.yulichang.wrapper.interfaces.*;
+import com.github.yulichang.wrapper.segments.Fun;
+import com.github.yulichang.wrapper.segments.FuncConsumer;
 import lombok.Getter;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.BiPredicate;
-import java.util.function.Consumer;
-import java.util.function.Predicate;
-import java.util.function.Supplier;
+import java.util.function.*;
 
 import static com.baomidou.mybatisplus.core.enums.SqlKeyword.*;
 import static com.baomidou.mybatisplus.core.enums.WrapperKeyword.APPLY;
@@ -328,6 +327,23 @@ public abstract class JoinAbstractWrapper<T, Children extends JoinAbstractWrappe
     public Children apply(boolean condition, String applySql, Object... values) {
         return maybeDo(condition, () -> appendSqlSegments(APPLY,
                 () -> formatSqlMaybeWithParam(applySql, null, values)));
+    }
+
+    public Children applyFunc(String applySql, Function<FuncConsumer, SFunction<?, ?>[]> consumerFunction, Object... values) {
+        return applyFunc(true, applySql, consumerFunction, values);
+    }
+
+    public Children applyFunc(boolean condition, String applySql,
+                              Function<FuncConsumer, SFunction<?, ?>[]> consumerFunction, Object... values) {
+        return maybeDo(condition, () -> appendSqlSegments(APPLY,
+                () -> formatSqlMaybeWithParam(String.format(applySql,
+                        Arrays.stream(consumerFunction.apply(FuncConsumer.func)).map(func -> {
+                            if (func instanceof Fun) {
+                                Fun<?, ?> fun = (Fun<?, ?>) func;
+                                return columnToString(index, fun.getAlias(), fun.getFunc(), false, PrefixEnum.CD_FIRST, false);
+                            }
+                            return columnToString(index, null, func, false, PrefixEnum.CD_FIRST, false);
+                        }).toArray()), null, values)));
     }
 
     @Override

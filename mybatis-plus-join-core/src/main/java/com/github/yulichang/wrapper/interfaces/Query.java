@@ -230,15 +230,15 @@ public interface Query<Children> extends Serializable {
     }
 
 
-    default <X> Children selectFunc(String sql, Function<SelectFunc.Func, SFunction<?, ?>[]> column, String alias) {
-        getSelectColum().add(new SelectFunc(alias, getIndex(), () -> sql, column.apply(SelectFunc.Func.func),
+    default <X> Children selectFunc(String sql, Function<FuncConsumer, SFunction<?, ?>[]> column, String alias) {
+        getSelectColum().add(new SelectFunc(alias, getIndex(), () -> sql, column.apply(FuncConsumer.func),
                 isHasAlias(), getAlias()));
         return getChildren();
     }
 
-    default <X, S> Children selectFunc(String sql, Function<SelectFunc.Func, SFunction<?, ?>[]> column, SFunction<S, ?> alias) {
+    default <X, S> Children selectFunc(String sql, Function<FuncConsumer, SFunction<?, ?>[]> column, SFunction<S, ?> alias) {
         getSelectColum().add(new SelectFunc(LambdaUtils.getName(alias), getIndex(), () -> sql,
-                column.apply(SelectFunc.Func.func), isHasAlias(), getAlias()));
+                column.apply(FuncConsumer.func), isHasAlias(), getAlias()));
         return getChildren();
     }
 

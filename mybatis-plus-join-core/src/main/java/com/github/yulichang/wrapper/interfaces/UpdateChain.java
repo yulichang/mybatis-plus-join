@@ -1,7 +1,5 @@
 package com.github.yulichang.wrapper.interfaces;
 
-import com.baomidou.mybatisplus.core.toolkit.Assert;
-import com.github.yulichang.base.MPJBaseMapper;
 import com.github.yulichang.interfaces.MPJBaseJoin;
 import com.github.yulichang.toolkit.SqlHelper;
 
@@ -28,10 +26,7 @@ public interface UpdateChain<T> {
      * JoinWrappers.update(User.class)<br />
      */
     default int update() {
-        return SqlHelper.exec(getEntityClass(), mapper -> {
-            Assert.isTrue(mapper instanceof MPJBaseMapper, "mapper <%s> is not extends MPJBaseMapper", mapper.getClass().getSimpleName());
-            return ((MPJBaseMapper<T>) mapper).updateJoin(null, (MPJBaseJoin<T>) this);
-        });
+        return SqlHelper.exec(getEntityClass(), mapper -> mapper.updateJoin(null, (MPJBaseJoin<T>) this));
     }
 
     /**
@@ -42,10 +37,7 @@ public interface UpdateChain<T> {
      * JoinWrappers.update(User.class)<br />
      */
     default int update(T entity) {
-        return SqlHelper.exec(getEntityClass(), mapper -> {
-            Assert.isTrue(mapper instanceof MPJBaseMapper, "mapper <%s> is not extends MPJBaseMapper", mapper.getClass().getSimpleName());
-            return ((MPJBaseMapper<T>) mapper).updateJoin(entity, (MPJBaseJoin<T>) this);
-        });
+        return SqlHelper.exec(getEntityClass(), mapper -> mapper.updateJoin(entity, (MPJBaseJoin<T>) this));
     }
 
     /**
@@ -56,10 +48,7 @@ public interface UpdateChain<T> {
      * JoinWrappers.update(User.class)<br />
      */
     default int updateAndNull() {
-        return SqlHelper.exec(getEntityClass(), mapper -> {
-            Assert.isTrue(mapper instanceof MPJBaseMapper, "mapper <%s> is not extends MPJBaseMapper", mapper.getClass().getSimpleName());
-            return ((MPJBaseMapper<T>) mapper).updateJoinAndNull(null, (MPJBaseJoin<T>) this);
-        });
+        return SqlHelper.exec(getEntityClass(), mapper -> mapper.updateJoinAndNull(null, (MPJBaseJoin<T>) this));
     }
 
     /**
@@ -70,9 +59,6 @@ public interface UpdateChain<T> {
      * JoinWrappers.update(User.class)<br />
      */
     default int updateAndNull(T entity) {
-        return SqlHelper.exec(getEntityClass(), mapper -> {
-            Assert.isTrue(mapper instanceof MPJBaseMapper, "mapper <%s> is not extends MPJBaseMapper", mapper.getClass().getSimpleName());
-            return ((MPJBaseMapper<T>) mapper).updateJoinAndNull(entity, (MPJBaseJoin<T>) this);
-        });
+        return SqlHelper.exec(getEntityClass(), mapper -> mapper.updateJoinAndNull(entity, (MPJBaseJoin<T>) this));
     }
 }

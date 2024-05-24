@@ -245,7 +245,7 @@ public class UpdateJoinWrapper<T> extends JoinAbstractLambdaWrapper<T, UpdateJoi
     @SuppressWarnings("DuplicatedCode")
     private void getSqlByEntity(StringBuilder sb, boolean filterNull, List<Object> entityList) {
         for (Object obj : entityList) {
-            Assert.isTrue(tableList.contain(obj.getClass()), "更新的实体不是主表或关联表 <%>", obj.getClass().getSimpleName());
+            Assert.isTrue(tableList.contain(obj.getClass()), "更新的实体不是主表或关联表 <%s>", obj.getClass().getSimpleName());
             TableInfo tableInfo = TableHelper.getAssert(obj.getClass());
             for (TableFieldInfo fieldInfo : tableInfo.getFieldList()) {
                 if (AdapterHelper.getAdapter().mpjHasLogic(tableInfo) && fieldInfo.isLogicDelete()) {
@@ -266,7 +266,7 @@ public class UpdateJoinWrapper<T> extends JoinAbstractLambdaWrapper<T, UpdateJoi
                     continue;
                 }
                 sb.append(tableList.getPrefixByClass(obj.getClass())).append(Constants.DOT)
-                        .append(fieldInfo.getColumn()).append(Constants.EQUALS).append(formatParam(null, val))
+                        .append(fieldInfo.getColumn()).append(Constants.EQUALS).append(formatParam(fieldInfo.getMapping(), val))
                         .append(StringPool.COMMA);
             }
         }

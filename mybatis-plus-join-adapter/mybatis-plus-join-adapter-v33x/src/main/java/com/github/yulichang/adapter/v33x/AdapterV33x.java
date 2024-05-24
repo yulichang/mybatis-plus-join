@@ -3,6 +3,7 @@ package com.github.yulichang.adapter.v33x;
 import com.baomidou.mybatisplus.core.MybatisPlusVersion;
 import com.baomidou.mybatisplus.core.metadata.TableFieldInfo;
 import com.baomidou.mybatisplus.core.metadata.TableInfo;
+import com.baomidou.mybatisplus.core.toolkit.StringPool;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.github.yulichang.adapter.base.IAdapter;
 import com.github.yulichang.adapter.base.metadata.OrderFieldInfo;
@@ -32,6 +33,15 @@ public class AdapterV33x implements IAdapter {
     @Override
     public boolean mpjIsPrimitive(TableFieldInfo tableFieldInfo) {
         return tableFieldInfo.getPropertyType().isPrimitive();
+    }
+
+    @Override
+    public String mpjMapping(TableFieldInfo tableFieldInfo) {
+        String el = tableFieldInfo.getEl();
+        if (StringUtils.isNotBlank(el) && el.contains(StringPool.COMMA)) {
+            return el.substring(el.indexOf(StringPool.COMMA) + 1);
+        }
+        return null;
     }
 
     @Override

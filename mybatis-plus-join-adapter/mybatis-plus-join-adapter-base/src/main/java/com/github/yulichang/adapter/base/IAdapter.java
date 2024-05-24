@@ -25,6 +25,10 @@ public interface IAdapter {
         return tableFieldInfo.isPrimitive();
     }
 
+    default String mpjMapping(TableFieldInfo tableFieldInfo) {
+        return tableFieldInfo.getMapping();
+    }
+
     default TableFieldInfo mpjGetLogicField(TableInfo tableInfo) {
         return tableInfo.getLogicDeleteFieldInfo();
     }

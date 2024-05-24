@@ -7,10 +7,9 @@ import com.baomidou.mybatisplus.core.metadata.TableInfo;
 import com.baomidou.mybatisplus.core.toolkit.*;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.github.yulichang.adapter.AdapterHelper;
-import com.github.yulichang.toolkit.Constant;
+import com.github.yulichang.toolkit.*;
 import com.github.yulichang.toolkit.LambdaUtils;
-import com.github.yulichang.toolkit.TableHelper;
-import com.github.yulichang.toolkit.TableList;
+import com.github.yulichang.toolkit.ReflectionKit;
 import com.github.yulichang.wrapper.interfaces.Update;
 import com.github.yulichang.wrapper.interfaces.UpdateChain;
 import lombok.AllArgsConstructor;
@@ -266,7 +265,8 @@ public class UpdateJoinWrapper<T> extends JoinAbstractLambdaWrapper<T, UpdateJoi
                     continue;
                 }
                 sb.append(tableList.getPrefixByClass(obj.getClass())).append(Constants.DOT)
-                        .append(fieldInfo.getColumn()).append(Constants.EQUALS).append(formatParam(fieldInfo.getMapping(), val))
+                        .append(fieldInfo.getColumn()).append(Constants.EQUALS).append(
+                                formatParam(AdapterHelper.getAdapter().mpjMapping(fieldInfo), val))
                         .append(StringPool.COMMA);
             }
         }

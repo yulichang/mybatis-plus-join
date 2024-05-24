@@ -21,6 +21,13 @@ public interface Update<Children> extends Serializable {
     }
 
     /**
+     * ignore
+     */
+    default <R, V> Children set(SFunction<R, ?> column, SFunction<V, ?> val) {
+        return set(true, column, val);
+    }
+
+    /**
      * 设置 更新 SQL 的 SET 片段
      *
      * @param condition 是否加入 set
@@ -32,10 +39,18 @@ public interface Update<Children> extends Serializable {
         return set(condition, column, val, null);
     }
 
+    default <R, V> Children set(boolean condition, SFunction<R, ?> column, SFunction<V, ?> val) {
+        return set(condition, column, val, null);
+    }
+
     /**
      * ignore
      */
     default <R> Children set(SFunction<R, ?> column, Object val, String mapping) {
+        return set(true, column, val, mapping);
+    }
+
+    default <R, V> Children set(SFunction<R, ?> column, SFunction<V, ?> val, String mapping) {
         return set(true, column, val, mapping);
     }
 
@@ -49,6 +64,8 @@ public interface Update<Children> extends Serializable {
      * @return children
      */
     <R> Children set(boolean condition, SFunction<R, ?> column, Object val, String mapping);
+
+    <R, V> Children set(boolean condition, SFunction<R, ?> column, SFunction<V, ?> val, String mapping);
 
     default <R> Children setIncrBy(SFunction<R, ?> column, Number val) {
         return setIncrBy(true, column, val);

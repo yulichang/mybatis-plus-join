@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -120,6 +121,16 @@ public class UpdateJoinWrapper<T> extends JoinAbstractLambdaWrapper<T, UpdateJoi
     }
 
     @Override
+    public <R, V> UpdateJoinWrapper<T> set(boolean condition, SFunction<R, ?> column, SFunction<V, ?> val, String mapping) {
+        return maybeDo(condition, () -> {
+            if (Objects.isNull(updateSet)) {
+                updateSet = new ArrayList<>();
+            }
+            updateSet.add(new UpdateSet(column, val, mapping, false, null));
+        });
+    }
+
+    @Override
     public <R> UpdateJoinWrapper<T> setIncrBy(boolean condition, SFunction<R, ?> column, Number val) {
         return maybeDo(condition, () -> {
             if (Objects.isNull(updateSet)) {
@@ -164,7 +175,13 @@ public class UpdateJoinWrapper<T> extends JoinAbstractLambdaWrapper<T, UpdateJoi
                         if (i.incOrDnc) {
                             return col + Constants.EQUALS + col + i.cal + i.value;
                         } else {
-                            return col + Constants.EQUALS + formatParam(i.mapping, i.value);
+                            if (i.value instanceof Function) {
+                                SFunction<?, ?> value = (SFunction<?, ?>) i.getValue();
+                                return col + Constants.EQUALS + tableList.getPrefixByClass(LambdaUtils.getEntityClass(value)) +
+                                        Constants.DOT + getCache(value).getColumn();
+                            } else {
+                                return col + Constants.EQUALS + formatParam(i.mapping, i.value);
+                            }
                         }
                     })
                     .collect(Collectors.joining(StringPool.COMMA)) + StringPool.COMMA);
@@ -256,6 +273,7 @@ public class UpdateJoinWrapper<T> extends JoinAbstractLambdaWrapper<T, UpdateJoi
     }
 
     @Override
+    @SuppressWarnings("DuplicatedCode")
     public void clear() {
         super.clear();
         sqlSetStr.toNull();

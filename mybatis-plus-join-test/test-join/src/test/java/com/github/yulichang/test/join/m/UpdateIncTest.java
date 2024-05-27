@@ -7,13 +7,13 @@ import com.github.yulichang.test.join.entity.UserDO;
 import com.github.yulichang.test.join.mapper.UserMapper;
 import com.github.yulichang.test.util.Reset;
 import com.github.yulichang.test.util.ThreadLocalUtils;
+import com.github.yulichang.test.util.Throw;
 import com.github.yulichang.toolkit.JoinWrappers;
 import com.github.yulichang.wrapper.UpdateJoinWrapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.jdbc.BadSqlGrammarException;
 
 import java.util.HashMap;
 import java.util.List;
@@ -47,11 +47,10 @@ public class UpdateIncTest {
     @Test
     void updateInc1() {
         ThreadLocalUtils.set("UPDATE `user` t LEFT JOIN address t1 ON (t1.user_id = t.id) SET t1.address = t.head_img WHERE t.del = false AND t1.del = false");
-        try {
+        Throw.tryDo(() -> {
             JoinWrappers.update(UserDO.class).set(AddressDO::getAddress, UserDO::getImg)
                     .leftJoin(AddressDO.class, AddressDO::getUserId, UserDO::getId).update();
-        } catch (BadSqlGrammarException ignore) {
-        }
+        });
         JoinWrappers.lambda(UserDO.class).list().forEach(System.out::println);
     }
 

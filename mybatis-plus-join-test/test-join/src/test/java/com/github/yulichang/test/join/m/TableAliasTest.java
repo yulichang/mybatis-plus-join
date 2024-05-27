@@ -51,13 +51,14 @@ public class TableAliasTest {
                 "LEFT JOIN address addr2 ON (addr2.id = t.address_id2) " +
                 "LEFT JOIN area area1 ON (area1.id = addr2.area_id) " +
                 "WHERE t.del = false AND addr1.del = false AND addr2.del = false AND area1.del = false " +
-                "GROUP BY t.id ORDER BY addr1.id DESC");
+                "GROUP BY t.id,addr1.id ORDER BY addr1.id DESC");
         MPJLambdaWrapper<UserDO> wrapper = JoinWrappers.lambda(UserDO.class)
                 .selectAll(UserDO.class)
                 .leftJoin(AddressDO.class, "addr1", AddressDO::getId, UserDO::getAddressId)
                 .leftJoin(AddressDO.class, "addr2", AddressDO::getId, UserDO::getAddressId2)
                 .leftJoin(AreaDO.class, "area1", AreaDO::getId, "addr2", AddressDO::getAreaId)
                 .groupBy(UserDO::getId)
+                .groupBy("addr1", AddressDO::getId)
                 .orderByDesc("addr1", AddressDO::getId);
 
         List<UserDO> dos = userMapper.selectJoinList(UserDO.class, wrapper);

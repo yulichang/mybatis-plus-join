@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.injector.AbstractMethod;
 import com.baomidou.mybatisplus.core.injector.ISqlInjector;
 import com.baomidou.mybatisplus.core.metadata.TableInfo;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
+import com.baomidou.mybatisplus.core.toolkit.PluginUtils;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.extension.injector.methods.InsertBatchSomeColumn;
 import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
@@ -12,6 +13,7 @@ import com.baomidou.mybatisplus.extension.plugins.handler.TenantLineHandler;
 import com.baomidou.mybatisplus.extension.plugins.inner.InnerInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.PaginationInnerInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.TenantLineInnerInterceptor;
+import com.baomidou.mybatisplus.extension.toolkit.JdbcUtils;
 import com.github.yulichang.injector.MPJSqlInjector;
 import com.github.yulichang.test.util.ThreadLocalUtils;
 import lombok.SneakyThrows;
@@ -22,6 +24,7 @@ import org.apache.ibatis.executor.Executor;
 import org.apache.ibatis.executor.statement.StatementHandler;
 import org.apache.ibatis.mapping.BoundSql;
 import org.apache.ibatis.mapping.MappedStatement;
+import org.apache.ibatis.mapping.ParameterMapping;
 import org.apache.ibatis.session.ResultHandler;
 import org.apache.ibatis.session.RowBounds;
 import org.springframework.context.annotation.Bean;
@@ -33,6 +36,8 @@ import org.springframework.core.annotation.Order;
 import java.sql.Connection;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
+import java.util.function.Predicate;
 
 /**
  * mybatis-plus配置
@@ -46,7 +51,7 @@ public class MybatisPlusConfig {
     @Bean
     public MybatisPlusInterceptor mybatisPlusInterceptor() {
         MybatisPlusInterceptor interceptor = new MybatisPlusInterceptor();
-        PaginationInnerInterceptor page = new PaginationInnerInterceptor(DbType.H2);
+        PaginationInnerInterceptor page = new PaginationInnerInterceptor();
         page.setOptimizeJoin(false);
         interceptor.addInnerInterceptor(new TenantLineInnerInterceptor(new TenantLineHandler() {
             @Override
@@ -93,10 +98,22 @@ public class MybatisPlusConfig {
      */
     public static class SqlInterceptor implements InnerInterceptor {
 
+        private DbType dbType;
+
+        private static final Predicate<DbType> P = type -> type == DbType.POSTGRE_SQL || type == DbType.ORACLE;
+
         @Override
         @SneakyThrows
+
         public void beforeQuery(Executor executor, MappedStatement ms, Object parameter, RowBounds rowBounds, ResultHandler resultHandler, BoundSql boundSql) {
             String sql = boundSql.getSql();
+            this.dbType = Optional.ofNullable(this.dbType).orElse(JdbcUtils.getDbType(executor));
+            if (P.test(this.dbType)) {
+                PluginUtils.MPBoundSql mpBoundSql = PluginUtils.mpBoundSql(boundSql);
+                List<ParameterMapping> mappings = mpBoundSql.parameterMappings();
+                mpBoundSql.sql(sql.replaceAll("`", "\""));
+                mpBoundSql.parameterMappings(mappings);
+            }
             check(sql);
         }
 
@@ -123,6 +140,13 @@ public class MybatisPlusConfig {
             BoundSql boundSql = sh.getBoundSql();
             if (boundSql != null && StringUtils.isNotBlank(boundSql.getSql())) {
                 String sql = boundSql.getSql();
+                this.dbType = Optional.ofNullable(this.dbType).orElse(JdbcUtils.getDbType(connection.getMetaData().getURL()));
+                if (P.test(this.dbType)) {
+                    PluginUtils.MPBoundSql mpBoundSql = PluginUtils.mpBoundSql(boundSql);
+                    List<ParameterMapping> mappings = mpBoundSql.parameterMappings();
+                    mpBoundSql.sql(sql.replaceAll("`", "\""));
+                    mpBoundSql.parameterMappings(mappings);
+                }
                 if (sql.toUpperCase().startsWith("SELECT")) {
                     return;
                 }
@@ -137,6 +161,10 @@ public class MybatisPlusConfig {
             sql = sql.replaceAll("\n", "");
             sql = sql.replaceAll("\r", "");
             sql = sql.replaceAll("\t", "");
+            if (P.test(this.dbType)) {
+                sql = sql.replaceAll("\"", "`");
+                sql = sql.replaceAll("`", "");
+            }
             return dg(sql);
         }
 

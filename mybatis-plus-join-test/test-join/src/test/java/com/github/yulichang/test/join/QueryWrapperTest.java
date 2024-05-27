@@ -9,10 +9,10 @@ import com.github.yulichang.test.join.entity.UserTenantDO;
 import com.github.yulichang.test.join.mapper.UserMapper;
 import com.github.yulichang.test.join.mapper.UserTenantMapper;
 import com.github.yulichang.test.util.ThreadLocalUtils;
+import com.github.yulichang.test.util.Throw;
 import com.github.yulichang.toolkit.JoinWrappers;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.jdbc.BadSqlGrammarException;
 
 import javax.annotation.Resource;
 import java.util.List;
@@ -61,10 +61,10 @@ class QueryWrapperTest {
                 .setTableName(name -> "fwear")
                 .select("name AS nameName")
                 .last("LIMIT 1");
-        try {
+
+        Throw.tryDoIgnore(() -> {
             userMapper.selectJoinOne(UserDTO.class, wrapper);
-        } catch (BadSqlGrammarException ignored) {
-        }
+        });
     }
 
     @Test

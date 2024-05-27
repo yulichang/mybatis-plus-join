@@ -1,15 +1,7 @@
 #file: noinspection SpringBootApplicationYaml
 spring:
-  datasource:
-    driver-class-name: org.h2.Driver
-    url: jdbc:h2:mem:test
-    username: root
-    password: test
-#  datasource:
-#    driver-class-name: com.mysql.cj.jdbc.Driver
-#    url: jdbc:mysql://localhost:3306/mpj_test
-#    username: root
-#    password: 123456
+  profiles:
+    active: h2
   sql:
     init:
       schema-locations: classpath:db/schema.sql
@@ -32,3 +24,44 @@ mybatis-plus-join:
   sub-table-logic: true
   ms-cache: true
   logic-del-type: where
+
+---
+spring:
+  profiles: h2
+  datasource:
+    driver-class-name: org.h2.Driver
+    url: jdbc:h2:mem:test
+    username: root
+    password: test
+---
+spring:
+  profiles: mysql
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/mpj_test
+    username: root
+    password: 123456
+---
+spring:
+  profiles: pgsql
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/mpj_test
+    username: postgres
+    password: 123456
+  sql:
+    init:
+      schema-locations: classpath:db/pgsql/schema.sql
+      data-locations: classpath:db/pgsql/data.sql
+---
+spring:
+  profiles: oracle
+  datasource:
+    driver-class-name: oracle.jdbc.OracleDriver
+    url: jdbc:oracle:thin:@//localhost:1521/FREE
+    username: sys as sysdba
+    password: 123456
+  sql:
+    init:
+      schema-locations: classpath:db/oracle/schema.sql
+      data-locations: classpath:db/oracle/data.sql

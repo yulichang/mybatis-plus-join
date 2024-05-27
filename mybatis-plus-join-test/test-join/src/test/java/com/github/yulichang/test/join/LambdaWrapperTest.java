@@ -1,5 +1,6 @@
 package com.github.yulichang.test.join;
 
+import com.baomidou.mybatisplus.annotation.DbType;
 import com.baomidou.mybatisplus.core.MybatisPlusVersion;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -14,6 +15,7 @@ import com.github.yulichang.test.join.entity.*;
 import com.github.yulichang.test.join.mapper.*;
 import com.github.yulichang.test.util.Reset;
 import com.github.yulichang.test.util.ThreadLocalUtils;
+import com.github.yulichang.test.util.Throw;
 import com.github.yulichang.toolkit.JoinWrappers;
 import com.github.yulichang.wrapper.DeleteJoinWrapper;
 import com.github.yulichang.wrapper.MPJLambdaWrapper;
@@ -22,7 +24,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.jdbc.BadSqlGrammarException;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -709,12 +710,12 @@ class LambdaWrapperTest {
                 .select(UserDO::getName)
                 .eq(UserDO::getName, "ref");
         userMapper.selectList(wrapper);
-        try {
+        Throw.tryDo(() -> {
             userMapper.insertBatchSomeColumn(new ArrayList<UserDO>() {{
                 add(new UserDO());
             }});
-        } catch (BadSqlGrammarException ignored) {
-        }
+        });
+
     }
 
 
@@ -761,10 +762,9 @@ class LambdaWrapperTest {
                 .selectFunc("if(%s < 5,%s,%s + 100)", arg -> arg.accept(AddressDO::getUserId, AddressDO::getUserId, AddressDO::getUserId), UserDO::getId)
                 .leftJoin(AddressDO.class, AddressDO::getUserId, UserDO::getId);
 
-        try {
+        Throw.tryDo(() -> {
             List<UserDO> dos = userMapper.selectJoinList(UserDO.class, wrapper);
-        } catch (BadSqlGrammarException ignored) {
-        }
+        },DbType.ORACLE);
     }
 
     /**
@@ -818,11 +818,10 @@ class LambdaWrapperTest {
                 .le(UserDO::getId, 10000)
                 .orderByDesc(UserDO::getId)
                 .setTableName(name -> "bbbbbbb");
-        try {
-            List<UserDTO> list = userMapper.selectJoinList(UserDTO.class, wrapper);
-        } catch (BadSqlGrammarException ignored) {
 
-        }
+        Throw.tryDoIgnore(() -> {
+            List<UserDTO> list = userMapper.selectJoinList(UserDTO.class, wrapper);
+        });
     }
 
 
@@ -1031,11 +1030,10 @@ class LambdaWrapperTest {
         DeleteJoinWrapper<OrderDO> w = JoinWrappers.delete(OrderDO.class)
                 .leftJoin(UserDto.class, UserDto::getId, OrderDO::getUserId)
                 .eq(OrderDO::getId, 1);
-        try {
+        Throw.tryDo(() -> {
             int i = orderMapper.deleteJoin(w);
-        } catch (BadSqlGrammarException ignored) {
-            //忽略异常 h2不支持连表删除
-        }
+        });
+        //忽略异常 h2不支持连表删除
         //逻辑删除
         ThreadLocalUtils.set("UPDATE `user` t LEFT JOIN address t1 ON (t1.user_id = t.id) LEFT JOIN area t2 ON (t2.id = t1.area_id) SET t.del=true ,t1.del=true,t2.del=true WHERE t.del=false AND t1.del=false AND t2.del=false AND (t.id = ?)");
         DeleteJoinWrapper<UserDO> wrapper = JoinWrappers.delete(UserDO.class)
@@ -1043,12 +1041,11 @@ class LambdaWrapperTest {
                 .leftJoin(AddressDO.class, AddressDO::getUserId, UserDO::getId)
                 .leftJoin(AreaDO.class, AreaDO::getId, AddressDO::getAreaId)
                 .eq(OrderDO::getId, 1);
-        try {
+        Throw.tryDo(() -> {
             DeleteJoinWrapper<UserDO> wrapper1 = new DeleteJoinWrapper<>(UserDO.class);
             int i = userMapper.deleteJoin(wrapper);
-        } catch (BadSqlGrammarException ignored) {
-            //忽略异常 h2不支持连表删除
-        }
+        });
+        //忽略异常 h2不支持连表删除
     }
 
     @Test
@@ -1062,22 +1059,22 @@ class LambdaWrapperTest {
                 .setUpdateEntityAndNull(new AddressDO())
                 .leftJoin(AddressDO.class, AddressDO::getUserId, UserDO::getId)
                 .eq(OrderDO::getId, 1);
-        try {
+        System.out.println(update.getSqlSet());
+        Throw.tryDo(() -> {
             int i = userMapper.updateJoin(new UserDO().setUpdateBy(123123), update);
-        } catch (BadSqlGrammarException ignored) {
-            //忽略异常 h2不支持连表删除
-        }
+        });
+        //忽略异常 h2不支持连表删除
 
+        ThreadLocalUtils.set("UPDATE `user` t LEFT JOIN address t1 ON (t1.user_id = t.id) SET t.pid=?, " +
+                "t.`name`=?, t.`json`=?, t.sex=?, t.head_img=?, t.create_time=?, t.address_id=?, t.address_id2=?, " +
+                "t.create_by=?, t.update_by=? WHERE t.del=false AND t1.del=false AND (t.id = ?)");
 
-        ThreadLocalUtils.set("UPDATE `user` t LEFT JOIN address t1 ON (t1.user_id = t.id) SET t.pid=?, t.`name`=?, t.`json`=?, t.sex=?, t.head_img=?, t.create_time=?, t.address_id=?, t.address_id2=?, t.create_by=?, t.update_by=? WHERE t.del=false AND t1.del=false AND (t.id = ?)");
         UpdateJoinWrapper<UserDO> up = JoinWrappers.update(UserDO.class)
                 .leftJoin(AddressDO.class, AddressDO::getUserId, UserDO::getId)
                 .eq(OrderDO::getId, 1);
-        try {
+        Throw.tryDo(() -> {
             int i = userMapper.updateJoinAndNull(new UserDO(), up);
-        } catch (BadSqlGrammarException ignored) {
-            //忽略异常 h2不支持连表删除
-        }
+        });
     }
 
     /**

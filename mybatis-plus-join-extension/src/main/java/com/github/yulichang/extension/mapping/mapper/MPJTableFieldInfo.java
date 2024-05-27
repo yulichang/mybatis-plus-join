@@ -152,8 +152,7 @@ public class MPJTableFieldInfo {
     }
 
     private void initBindField(String bindName) {
-        TableInfo info = TableHelper.get(this.joinClass);
-        Assert.notNull(info, "未注册的实体类 <%s>", this.joinClass.getSimpleName());
+        TableInfo info = TableHelper.getAssert(this.joinClass);
         //根据属性名查询
         Field field = info.getFieldList().stream().filter(i -> i.getProperty().equals(bindName))
                 .findFirst().map(f -> getField(this.joinClass, f)).orElse(null);
@@ -304,11 +303,7 @@ public class MPJTableFieldInfo {
     }
 
     private TableInfo getTableInfo(Class<?> clazz) {
-        TableInfo tableInfo = TableHelper.get(clazz);
-        if (tableInfo == null) {
-            throw ExceptionUtils.mpe("未注册 mapper " + clazz.getName());
-        }
-        return tableInfo;
+        return TableHelper.getAssert(clazz);
     }
 
     private Field getField(Class<?> table, TableFieldInfo tableFieldInfo) {

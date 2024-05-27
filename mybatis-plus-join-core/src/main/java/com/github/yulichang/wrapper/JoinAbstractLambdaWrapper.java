@@ -4,7 +4,6 @@ import com.baomidou.mybatisplus.annotation.OrderBy;
 import com.baomidou.mybatisplus.core.conditions.SharedString;
 import com.baomidou.mybatisplus.core.conditions.segments.MergeSegments;
 import com.baomidou.mybatisplus.core.metadata.TableInfo;
-import com.baomidou.mybatisplus.core.toolkit.Assert;
 import com.baomidou.mybatisplus.core.toolkit.Constants;
 import com.baomidou.mybatisplus.core.toolkit.StringPool;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
@@ -345,8 +344,7 @@ public abstract class JoinAbstractLambdaWrapper<T, Children extends JoinAbstract
             for (Children wrapper : onWrappers) {
                 if (StringUtils.isBlank(wrapper.from.getStringValue())) {
                     if (this.subLogicSql && this.logicDelType == LogicDelTypeEnum.ON) {
-                        TableInfo tableInfo = TableHelper.get(wrapper.getJoinClass());
-                        Assert.notNull(tableInfo, "not find tableInfo by class %s", wrapper.getJoinClass().getName());
+                        TableInfo tableInfo = TableHelper.getAssert(wrapper.getJoinClass());
                         if (ConfigProperties.tableInfoAdapter.mpjHasLogic(tableInfo)) {
                             wrapper.appendSqlSegments(APPLY, () -> LogicInfoUtils.getLogicInfoNoAnd(
                                     wrapper.getIndex(), wrapper.getJoinClass(), wrapper.isHasAlias(), wrapper.getAlias()

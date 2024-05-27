@@ -25,29 +25,17 @@ public class LogicInfoUtils implements Constants {
     private static final Map<Class<?>, Map<String, String>> LOGIC_CACHE_INVERT = new ConcurrentHashMap<>();
 
     public static String getLogicInfo(Integer tableIndex, Class<?> clazz, boolean hasAlias, String alias) {
-        Map<String, String> absent = LOGIC_CACHE.get(clazz);
-        if (absent == null) {
-            absent = new ConcurrentHashMap<>();
-            LOGIC_CACHE.put(clazz, absent);
-        }
+        Map<String, String> absent = LOGIC_CACHE.computeIfAbsent(clazz, k -> new ConcurrentHashMap<>());
         return absent.computeIfAbsent(hasAlias ? alias : (alias + tableIndex), key -> getLogicStr(key, clazz, true, false));
     }
 
     public static String getLogicInfoNoAnd(Integer tableIndex, Class<?> clazz, boolean hasAlias, String alias) {
-        Map<String, String> absent = LOGIC_CACHE_NO_AND.get(clazz);
-        if (absent == null) {
-            absent = new ConcurrentHashMap<>();
-            LOGIC_CACHE_NO_AND.put(clazz, absent);
-        }
+        Map<String, String> absent = LOGIC_CACHE_NO_AND.computeIfAbsent(clazz, k -> new ConcurrentHashMap<>());
         return absent.computeIfAbsent(hasAlias ? alias : (alias + tableIndex), key -> getLogicStr(key, clazz, false, false));
     }
 
     public static String getLogicInfoInvert(Integer tableIndex, Class<?> clazz, boolean hasAlias, String alias) {
-        Map<String, String> absent = LOGIC_CACHE_INVERT.get(clazz);
-        if (absent == null) {
-            absent = new ConcurrentHashMap<>();
-            LOGIC_CACHE_INVERT.put(clazz, absent);
-        }
+        Map<String, String> absent = LOGIC_CACHE_INVERT.computeIfAbsent(clazz, k -> new ConcurrentHashMap<>());
         return absent.computeIfAbsent(hasAlias ? alias : (alias + tableIndex), key -> getLogicStr(key, clazz, false, true));
     }
 

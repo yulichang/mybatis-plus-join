@@ -920,15 +920,6 @@ public abstract class JoinAbstractWrapper<T, Children extends JoinAbstractWrappe
         return SerializationUtils.clone(typedThis);
     }
 
-    /**
-     * 做事函数
-     */
-    @FunctionalInterface
-    public interface DoSomething {
-
-        void doIt();
-    }
-
     /* ************************* on语句重载 *************************** */
 
     @Override

@@ -7,7 +7,6 @@ import com.github.yulichang.toolkit.LambdaUtils;
 import com.github.yulichang.toolkit.MPJReflectionKit;
 import com.github.yulichang.toolkit.support.FieldCache;
 import com.github.yulichang.wrapper.resultmap.Label;
-import com.github.yulichang.wrapper.resultmap.MFunc;
 import com.github.yulichang.wrapper.resultmap.MybatisLabel;
 import com.github.yulichang.wrapper.resultmap.MybatisLabelFree;
 
@@ -102,12 +101,12 @@ public interface QueryLabel<Children> {
      */
     default <S, C, Z, F extends Collection<Z>> Children selectCollection(Class<C> child,
                                                                          SFunction<S, F> dtoField,
-                                                                         MFunc<MybatisLabel.Builder<C, Z>> collection) {
+                                                                         MFunction<MybatisLabel.Builder<C, Z>> collection) {
         return selectCollection(null, child, dtoField, collection);
     }
 
     default <S, Z, F extends Collection<Z>> Children selectCollection(SFunction<S, F> dtoField,
-                                                                      MFunc<MybatisLabelFree.Builder<Z>> collection) {
+                                                                      MFunction<MybatisLabelFree.Builder<Z>> collection) {
         //自由映射必须存在泛型Z
         String dtoFieldName = LambdaUtils.getName(dtoField);
         Class<S> dtoClass = LambdaUtils.getEntityClass(dtoField);
@@ -124,7 +123,7 @@ public interface QueryLabel<Children> {
     default <S, C, Z, F extends Collection<Z>> Children selectCollection(String prefix,
                                                                          Class<C> child,
                                                                          SFunction<S, F> dtoField,
-                                                                         MFunc<MybatisLabel.Builder<C, Z>> collection) {
+                                                                         MFunction<MybatisLabel.Builder<C, Z>> collection) {
         String dtoFieldName = LambdaUtils.getName(dtoField);
         Class<S> dtoClass = LambdaUtils.getEntityClass(dtoField);
         FieldCache field = MPJReflectionKit.getFieldMap(dtoClass).get(dtoFieldName);
@@ -165,12 +164,12 @@ public interface QueryLabel<Children> {
      * @since 1.3.0
      */
     default <S, C, F> Children selectAssociation(Class<C> child, SFunction<S, F> dtoField,
-                                                 MFunc<MybatisLabel.Builder<C, F>> collection) {
+                                                 MFunction<MybatisLabel.Builder<C, F>> collection) {
         return selectAssociation(null, child, dtoField, collection);
     }
 
     default <S, C, F> Children selectAssociation(SFunction<S, F> dtoField,
-                                                 MFunc<MybatisLabelFree.Builder<F>> collection) {
+                                                 MFunction<MybatisLabelFree.Builder<F>> collection) {
         String dtoFieldName = LambdaUtils.getName(dtoField);
         Class<S> dtoClass = LambdaUtils.getEntityClass(dtoField);
         FieldCache field = MPJReflectionKit.getFieldMap(dtoClass).get(dtoFieldName);
@@ -182,7 +181,7 @@ public interface QueryLabel<Children> {
     }
 
     default <S, C, F> Children selectAssociation(String prefix, Class<C> child, SFunction<S, F> dtoField,
-                                                 MFunc<MybatisLabel.Builder<C, F>> collection) {
+                                                 MFunction<MybatisLabel.Builder<C, F>> collection) {
         String dtoFieldName = LambdaUtils.getName(dtoField);
         Class<S> dtoClass = LambdaUtils.getEntityClass(dtoField);
         FieldCache field = MPJReflectionKit.getFieldMap(dtoClass).get(dtoFieldName);

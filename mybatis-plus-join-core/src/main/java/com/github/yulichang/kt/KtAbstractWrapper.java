@@ -24,6 +24,7 @@ import com.github.yulichang.toolkit.sql.SqlScriptUtils;
 import com.github.yulichang.wrapper.enums.IfExistsSqlKeyWordEnum;
 import com.github.yulichang.wrapper.enums.PrefixEnum;
 import com.github.yulichang.wrapper.interfaces.CompareStrIfExists;
+import com.github.yulichang.wrapper.interfaces.DoSomething;
 import com.github.yulichang.wrapper.interfaces.FuncStr;
 import com.github.yulichang.wrapper.interfaces.Join;
 import com.github.yulichang.wrapper.segments.SelectFunc;
@@ -791,15 +792,6 @@ public abstract class KtAbstractWrapper<T, Children extends KtAbstractWrapper<T,
     @Override
     public Children clone() {
         return SerializationUtils.clone(typedThis);
-    }
-
-    /**
-     * 做事函数
-     */
-    @FunctionalInterface
-    public interface DoSomething {
-
-        void doIt();
     }
 
     /* ************************* on语句重载 *************************** */

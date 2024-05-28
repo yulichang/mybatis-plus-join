@@ -1,7 +1,5 @@
 package com.github.yulichang.wrapper.interfaces;
 
-import com.baomidou.mybatisplus.core.toolkit.Assert;
-import com.github.yulichang.base.MPJBaseMapper;
 import com.github.yulichang.interfaces.MPJBaseJoin;
 import com.github.yulichang.toolkit.SqlHelper;
 
@@ -15,7 +13,7 @@ import com.github.yulichang.toolkit.SqlHelper;
  * @author yulichang
  * @since 1.4.10
  */
-public interface DeleteChain<T> {
+public interface DeleteChain<T> extends MPJBaseJoin<T> {
 
     Class<T> getEntityClass();
 
@@ -26,11 +24,8 @@ public interface DeleteChain<T> {
      * new DeleteJoinWrapper(User.class)<br />
      * JoinWrappers.delete(User.class)<br />
      */
-    @SuppressWarnings({"unused", "unchecked"})
+    @SuppressWarnings("unused")
     default int deleteJoin() {
-        return SqlHelper.exec(getEntityClass(), mapper -> {
-            Assert.isTrue(mapper instanceof MPJBaseMapper, "mapper <%s> is not extends MPJBaseMapper", mapper.getClass().getSimpleName());
-            return ((MPJBaseMapper<T>) mapper).deleteJoin((MPJBaseJoin<T>) this);
-        });
+        return SqlHelper.exec(getEntityClass(), mapper -> mapper.deleteJoin(this));
     }
 }

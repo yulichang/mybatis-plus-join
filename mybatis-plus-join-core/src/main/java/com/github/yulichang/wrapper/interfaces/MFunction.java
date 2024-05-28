@@ -7,7 +7,7 @@ package com.github.yulichang.wrapper.interfaces;
  * @since 1.1.8
  */
 @FunctionalInterface
-public interface WrapperFunction<T> {
+public interface MFunction<T> {
 
     T apply(T wrapper);
 }

@@ -8,9 +8,9 @@ import com.github.yulichang.toolkit.MPJReflectionKit;
 import com.github.yulichang.toolkit.TableHelper;
 import com.github.yulichang.toolkit.support.ColumnCache;
 import com.github.yulichang.toolkit.support.FieldCache;
+import com.github.yulichang.wrapper.interfaces.MFunction;
 import com.github.yulichang.wrapper.resultmap.IResult;
 import com.github.yulichang.wrapper.resultmap.Label;
-import com.github.yulichang.wrapper.resultmap.MFunc;
 import com.github.yulichang.wrapper.segments.SelectCache;
 import kotlin.reflect.KProperty;
 import lombok.Getter;
@@ -160,7 +160,7 @@ public class MybatisLabel<E, T> implements Label<T> {
             return this;
         }
 
-        public <A, R> Builder<E, T> collection(Class<A> entityClass, KProperty<?> func, MFunc<Builder<A, R>> mFunc) {
+        public <A, R> Builder<E, T> collection(Class<A> entityClass, KProperty<?> func, MFunction<Builder<A, R>> mFunc) {
             return collection(null, entityClass, func, mFunc);
         }
 
@@ -168,7 +168,7 @@ public class MybatisLabel<E, T> implements Label<T> {
          * 嵌套
          */
         public <A, R> Builder<E, T> collection(KProperty<?> func,
-                                               MFunc<MybatisLabelFree.Builder<R>> mFunc) {
+                                               MFunction<MybatisLabelFree.Builder<R>> mFunc) {
             String dtoFieldName = func.getName();
             FieldCache field = MPJReflectionKit.getFieldMap(KtUtils.ref(func)).get(dtoFieldName);
             //获取集合泛型
@@ -185,7 +185,7 @@ public class MybatisLabel<E, T> implements Label<T> {
         public <A, R> Builder<E, T> collection(String prefix,
                                                Class<A> entityClass,
                                                KProperty<?> func,
-                                               MFunc<Builder<A, R>> mFunc) {
+                                               MFunction<Builder<A, R>> mFunc) {
             String dtoFieldName = func.getName();
             FieldCache field = MPJReflectionKit.getFieldMap(KtUtils.ref(func)).get(dtoFieldName);
             //获取集合泛型
@@ -215,7 +215,7 @@ public class MybatisLabel<E, T> implements Label<T> {
         }
 
         public <A, B> Builder<E, T> association(Class<A> child, KProperty<?> dtoField,
-                                                MFunc<Builder<A, B>> collection) {
+                                                MFunction<Builder<A, B>> collection) {
             return association(null, child, dtoField, collection);
         }
 
@@ -223,7 +223,7 @@ public class MybatisLabel<E, T> implements Label<T> {
          * 嵌套
          */
         public <A, B> Builder<E, T> association(KProperty<?> dtoField,
-                                                MFunc<MybatisLabelFree.Builder<B>> collection) {
+                                                MFunction<MybatisLabelFree.Builder<B>> collection) {
             String dtoFieldName = dtoField.getName();
             FieldCache field = MPJReflectionKit.getFieldMap(KtUtils.ref(dtoField)).get(dtoFieldName);
             Assert.isFalse(Collection.class.isAssignableFrom(field.getType()), "association 不支持集合类");
@@ -236,7 +236,7 @@ public class MybatisLabel<E, T> implements Label<T> {
          * 嵌套
          */
         public <A, B> Builder<E, T> association(String index, Class<A> child, KProperty<?> dtoField,
-                                                MFunc<Builder<A, B>> collection) {
+                                                MFunction<Builder<A, B>> collection) {
             String dtoFieldName = dtoField.getName();
             FieldCache field = MPJReflectionKit.getFieldMap(KtUtils.ref(dtoField)).get(dtoFieldName);
             Assert.isFalse(Collection.class.isAssignableFrom(field.getType()), "association 不支持集合类");

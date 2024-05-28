@@ -8,9 +8,9 @@ import com.github.yulichang.toolkit.MPJReflectionKit;
 import com.github.yulichang.toolkit.TableHelper;
 import com.github.yulichang.toolkit.support.ColumnCache;
 import com.github.yulichang.toolkit.support.FieldCache;
+import com.github.yulichang.wrapper.interfaces.MFunction;
 import com.github.yulichang.wrapper.resultmap.IResult;
 import com.github.yulichang.wrapper.resultmap.Label;
-import com.github.yulichang.wrapper.resultmap.MFunc;
 import com.github.yulichang.wrapper.resultmap.ResultList;
 import com.github.yulichang.wrapper.segments.SelectCache;
 import kotlin.reflect.KProperty;
@@ -176,11 +176,11 @@ public class MybatisLabelFree<T> implements Label<T> {
             return this;
         }
 
-        public Builder<T> collection(Class<?> entityClass, KProperty<?> func, MFunc<MybatisLabel.Builder<?, ?>> mFunc) {
+        public Builder<T> collection(Class<?> entityClass, KProperty<?> func, MFunction<MybatisLabel.Builder<?, ?>> mFunc) {
             return collection(null, entityClass, func, mFunc);
         }
 
-        public Builder<T> collection(KProperty<?> func, MFunc<Builder<?>> mFunc) {
+        public Builder<T> collection(KProperty<?> func, MFunction<Builder<?>> mFunc) {
             String dtoFieldName = func.getName();
             FieldCache field = MPJReflectionKit.getFieldMap(KtUtils.ref(func)).get(dtoFieldName);
             //获取集合泛型
@@ -196,7 +196,7 @@ public class MybatisLabelFree<T> implements Label<T> {
         public Builder<T> collection(String prefix,
                                      Class<?> entityClass,
                                      KProperty<?> func,
-                                     MFunc<MybatisLabel.Builder<?, ?>> mFunc) {
+                                     MFunction<MybatisLabel.Builder<?, ?>> mFunc) {
             String dtoFieldName = func.getName();
             FieldCache field = MPJReflectionKit.getFieldMap(KtUtils.ref(func)).get(dtoFieldName);
             //获取集合泛型
@@ -225,7 +225,7 @@ public class MybatisLabelFree<T> implements Label<T> {
         }
 
         public Builder<T> association(Class<?> child, KProperty<?> dtoField,
-                                      MFunc<MybatisLabel.Builder<?, ?>> collection) {
+                                      MFunction<MybatisLabel.Builder<?, ?>> collection) {
             return association(null, child, dtoField, collection);
         }
 
@@ -233,7 +233,7 @@ public class MybatisLabelFree<T> implements Label<T> {
          * 嵌套
          */
         public Builder<T> association(String index, Class<?> child, KProperty<?> dtoField,
-                                      MFunc<MybatisLabel.Builder<?, ?>> collection) {
+                                      MFunction<MybatisLabel.Builder<?, ?>> collection) {
             String dtoFieldName = dtoField.getName();
             FieldCache field = MPJReflectionKit.getFieldMap(KtUtils.ref(dtoField)).get(dtoFieldName);
             Assert.isFalse(Collection.class.isAssignableFrom(field.getType()), "association 不支持集合类");

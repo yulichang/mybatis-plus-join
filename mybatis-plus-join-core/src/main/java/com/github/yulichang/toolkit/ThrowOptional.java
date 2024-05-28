@@ -1,5 +1,7 @@
 package com.github.yulichang.toolkit;
 
+import com.github.yulichang.wrapper.interfaces.DoSomething;
+
 import java.util.Objects;
 import java.util.function.Consumer;
 
@@ -24,17 +26,17 @@ public class ThrowOptional {
 
     public void catchDo() {
         try {
-            this.doSomething.doSomething();
+            this.doSomething.doIt();
         } catch (Throwable ignored) {
         }
     }
 
     public void catchDo(DoSomething doSomething) {
         try {
-            this.doSomething.doSomething();
+            this.doSomething.doIt();
         } catch (Throwable ignored) {
             try {
-                doSomething.doSomething();
+                doSomething.doIt();
             } catch (Throwable e) {
                 throw new RuntimeException(e);
             }
@@ -43,15 +45,10 @@ public class ThrowOptional {
 
     public void catchDo(Consumer<Throwable> consumer) {
         try {
-            this.doSomething.doSomething();
+            this.doSomething.doIt();
         } catch (Throwable throwable) {
             consumer.accept(throwable);
         }
     }
 
-
-    @FunctionalInterface
-    public interface DoSomething {
-        void doSomething() throws Throwable;
-    }
 }

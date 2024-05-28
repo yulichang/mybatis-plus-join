@@ -7,8 +7,8 @@ import com.github.yulichang.kt.resultmap.MybatisLabelFree;
 import com.github.yulichang.toolkit.KtUtils;
 import com.github.yulichang.toolkit.MPJReflectionKit;
 import com.github.yulichang.toolkit.support.FieldCache;
+import com.github.yulichang.wrapper.interfaces.MFunction;
 import com.github.yulichang.wrapper.resultmap.Label;
-import com.github.yulichang.wrapper.resultmap.MFunc;
 import kotlin.reflect.KProperty;
 
 import java.util.Collection;
@@ -92,11 +92,11 @@ public interface QueryLabel<Children> {
      */
     default Children selectCollection(Class<?> child,
                                       KProperty<?> dtoField,
-                                      MFunc<MybatisLabel.Builder<?, ?>> collection) {
+                                      MFunction<MybatisLabel.Builder<?, ?>> collection) {
         return selectCollection(null, child, dtoField, collection);
     }
 
-    default Children selectCollection(KProperty<?> dtoField, MFunc<MybatisLabelFree.Builder<?>> collection) {
+    default Children selectCollection(KProperty<?> dtoField, MFunction<MybatisLabelFree.Builder<?>> collection) {
         //自由映射必须存在泛型Z
         String dtoFieldName = dtoField.getName();
         FieldCache field = MPJReflectionKit.getFieldMap(KtUtils.ref(dtoField)).get(dtoFieldName);
@@ -111,7 +111,7 @@ public interface QueryLabel<Children> {
     default Children selectCollection(String prefix,
                                       Class<?> child,
                                       KProperty<?> dtoField,
-                                      MFunc<MybatisLabel.Builder<?, ?>> collection) {
+                                      MFunction<MybatisLabel.Builder<?, ?>> collection) {
         String dtoFieldName = dtoField.getName();
         FieldCache field = MPJReflectionKit.getFieldMap(KtUtils.ref(dtoField)).get(dtoFieldName);
         //获取集合泛型
@@ -149,12 +149,12 @@ public interface QueryLabel<Children> {
      * @since 1.3.0
      */
     default Children selectAssociation(Class<?> child, KProperty<?> dtoField,
-                                       MFunc<MybatisLabel.Builder<?, ?>> collection) {
+                                       MFunction<MybatisLabel.Builder<?, ?>> collection) {
         return selectAssociation(null, child, dtoField, collection);
     }
 
     default Children selectAssociation(KProperty<?> dtoField,
-                                       MFunc<MybatisLabelFree.Builder<?>> collection) {
+                                       MFunction<MybatisLabelFree.Builder<?>> collection) {
         String dtoFieldName = dtoField.getName();
         FieldCache field = MPJReflectionKit.getFieldMap(KtUtils.ref(dtoField)).get(dtoFieldName);
         Assert.isFalse(Collection.class.isAssignableFrom(field.getType()), "association 不支持集合类");
@@ -165,7 +165,7 @@ public interface QueryLabel<Children> {
     }
 
     default Children selectAssociation(String prefix, Class<?> child, KProperty<?> dtoField,
-                                       MFunc<MybatisLabel.Builder<?, ?>> collection) {
+                                       MFunction<MybatisLabel.Builder<?, ?>> collection) {
         String dtoFieldName = dtoField.getName();
         FieldCache field = MPJReflectionKit.getFieldMap(KtUtils.ref(dtoField)).get(dtoFieldName);
         Assert.isFalse(Collection.class.isAssignableFrom(field.getType()), "association 不支持集合类");

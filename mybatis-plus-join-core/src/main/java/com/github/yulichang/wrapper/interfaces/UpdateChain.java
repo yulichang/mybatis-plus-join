@@ -13,8 +13,8 @@ import com.github.yulichang.toolkit.SqlHelper;
  * @author yulichang
  * @since 1.4.10
  */
-@SuppressWarnings({"unchecked", "unused"})
-public interface UpdateChain<T> {
+@SuppressWarnings("unused")
+public interface UpdateChain<T> extends MPJBaseJoin<T> {
 
     Class<T> getEntityClass();
 
@@ -26,7 +26,7 @@ public interface UpdateChain<T> {
      * JoinWrappers.update(User.class)<br />
      */
     default int update() {
-        return SqlHelper.exec(getEntityClass(), mapper -> mapper.updateJoin(null, (MPJBaseJoin<T>) this));
+        return SqlHelper.exec(getEntityClass(), mapper -> mapper.updateJoin(null, this));
     }
 
     /**
@@ -37,7 +37,7 @@ public interface UpdateChain<T> {
      * JoinWrappers.update(User.class)<br />
      */
     default int update(T entity) {
-        return SqlHelper.exec(getEntityClass(), mapper -> mapper.updateJoin(entity, (MPJBaseJoin<T>) this));
+        return SqlHelper.exec(getEntityClass(), mapper -> mapper.updateJoin(entity, this));
     }
 
     /**
@@ -48,7 +48,7 @@ public interface UpdateChain<T> {
      * JoinWrappers.update(User.class)<br />
      */
     default int updateAndNull() {
-        return SqlHelper.exec(getEntityClass(), mapper -> mapper.updateJoinAndNull(null, (MPJBaseJoin<T>) this));
+        return SqlHelper.exec(getEntityClass(), mapper -> mapper.updateJoinAndNull(null, this));
     }
 
     /**
@@ -59,6 +59,6 @@ public interface UpdateChain<T> {
      * JoinWrappers.update(User.class)<br />
      */
     default int updateAndNull(T entity) {
-        return SqlHelper.exec(getEntityClass(), mapper -> mapper.updateJoinAndNull(entity, (MPJBaseJoin<T>) this));
+        return SqlHelper.exec(getEntityClass(), mapper -> mapper.updateJoinAndNull(entity, this));
     }
 }

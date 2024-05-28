@@ -9,6 +9,7 @@ import com.github.yulichang.toolkit.MPJReflectionKit;
 import com.github.yulichang.toolkit.TableHelper;
 import com.github.yulichang.toolkit.support.ColumnCache;
 import com.github.yulichang.toolkit.support.FieldCache;
+import com.github.yulichang.wrapper.interfaces.MFunction;
 import com.github.yulichang.wrapper.segments.SelectCache;
 import lombok.Getter;
 
@@ -158,7 +159,7 @@ public class MybatisLabel<E, T> implements Label<T> {
             return this;
         }
 
-        public <A, R, B extends Collection<R>> Builder<E, T> collection(Class<A> entityClass, SFunction<T, B> func, MFunc<Builder<A, R>> mFunc) {
+        public <A, R, B extends Collection<R>> Builder<E, T> collection(Class<A> entityClass, SFunction<T, B> func, MFunction<Builder<A, R>> mFunc) {
             return collection(null, entityClass, func, mFunc);
         }
 
@@ -166,7 +167,7 @@ public class MybatisLabel<E, T> implements Label<T> {
          * 嵌套
          */
         public <A, R, B extends Collection<R>> Builder<E, T> collection(SFunction<T, B> func,
-                                                                        MFunc<MybatisLabelFree.Builder<R>> mFunc) {
+                                                                        MFunction<MybatisLabelFree.Builder<R>> mFunc) {
             String dtoFieldName = LambdaUtils.getName(func);
             Class<T> dtoClass = LambdaUtils.getEntityClass(func);
             FieldCache field = MPJReflectionKit.getFieldMap(dtoClass).get(dtoFieldName);
@@ -184,7 +185,7 @@ public class MybatisLabel<E, T> implements Label<T> {
         public <A, R, B extends Collection<R>> Builder<E, T> collection(String prefix,
                                                                         Class<A> entityClass,
                                                                         SFunction<T, B> func,
-                                                                        MFunc<Builder<A, R>> mFunc) {
+                                                                        MFunction<Builder<A, R>> mFunc) {
             String dtoFieldName = LambdaUtils.getName(func);
             Class<T> dtoClass = LambdaUtils.getEntityClass(func);
             FieldCache field = MPJReflectionKit.getFieldMap(dtoClass).get(dtoFieldName);
@@ -216,7 +217,7 @@ public class MybatisLabel<E, T> implements Label<T> {
         }
 
         public <A, B> Builder<E, T> association(Class<A> child, SFunction<T, B> dtoField,
-                                                MFunc<MybatisLabel.Builder<A, B>> collection) {
+                                                MFunction<MybatisLabel.Builder<A, B>> collection) {
             return association(null, child, dtoField, collection);
         }
 
@@ -224,7 +225,7 @@ public class MybatisLabel<E, T> implements Label<T> {
          * 嵌套
          */
         public <A, B> Builder<E, T> association(SFunction<T, B> dtoField,
-                                                MFunc<MybatisLabelFree.Builder<B>> collection) {
+                                                MFunction<MybatisLabelFree.Builder<B>> collection) {
             String dtoFieldName = LambdaUtils.getName(dtoField);
             Class<T> dtoClass = LambdaUtils.getEntityClass(dtoField);
             FieldCache field = MPJReflectionKit.getFieldMap(dtoClass).get(dtoFieldName);
@@ -238,7 +239,7 @@ public class MybatisLabel<E, T> implements Label<T> {
          * 嵌套
          */
         public <A, B> Builder<E, T> association(String index, Class<A> child, SFunction<T, B> dtoField,
-                                                MFunc<MybatisLabel.Builder<A, B>> collection) {
+                                                MFunction<MybatisLabel.Builder<A, B>> collection) {
             String dtoFieldName = LambdaUtils.getName(dtoField);
             Class<T> dtoClass = LambdaUtils.getEntityClass(dtoField);
             FieldCache field = MPJReflectionKit.getFieldMap(dtoClass).get(dtoFieldName);

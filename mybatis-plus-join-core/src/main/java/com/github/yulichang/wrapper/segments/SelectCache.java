@@ -3,7 +3,6 @@ package com.github.yulichang.wrapper.segments;
 import com.baomidou.mybatisplus.core.metadata.TableFieldInfo;
 import com.baomidou.mybatisplus.core.metadata.TableInfo;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
-import com.github.yulichang.config.ConfigProperties;
 import com.github.yulichang.toolkit.MPJStringUtils;
 import com.github.yulichang.toolkit.TableHelper;
 import lombok.Getter;
@@ -85,7 +84,7 @@ public class SelectCache {
             this.hasTypeHandle = this.tableFieldInfo.getTypeHandler() != null && tableFieldInfo.getTypeHandler() != UnknownTypeHandler.class;
             if (this.hasTypeHandle) {
                 TableInfo info = TableHelper.getAssert(clazz);
-                this.typeHandler = getTypeHandler(ConfigProperties.tableInfoAdapter.mpjGetConfiguration(info), tableFieldInfo);
+                this.typeHandler = getTypeHandler(info.getConfiguration(), tableFieldInfo);
             } else {
                 this.typeHandler = null;
             }

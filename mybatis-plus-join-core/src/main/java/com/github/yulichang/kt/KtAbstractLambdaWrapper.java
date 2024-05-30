@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.core.metadata.TableInfo;
 import com.baomidou.mybatisplus.core.toolkit.Constants;
 import com.baomidou.mybatisplus.core.toolkit.StringPool;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
+import com.github.yulichang.adapter.AdapterHelper;
 import com.github.yulichang.config.ConfigProperties;
 import com.github.yulichang.config.enums.LogicDelTypeEnum;
 import com.github.yulichang.kt.interfaces.QueryJoin;
@@ -333,7 +334,7 @@ public abstract class KtAbstractLambdaWrapper<T, Children extends KtAbstractLamb
                 if (StringUtils.isBlank(wrapper.from.getStringValue())) {
                     if (this.subLogicSql && this.logicDelType == LogicDelTypeEnum.ON) {
                         TableInfo tableInfo = TableHelper.getAssert(wrapper.getJoinClass());
-                        if (ConfigProperties.tableInfoAdapter.mpjHasLogic(tableInfo)) {
+                        if (AdapterHelper.getAdapter().mpjHasLogic(tableInfo)) {
                             wrapper.appendSqlSegments(APPLY, () -> LogicInfoUtils.getLogicInfoNoAnd(
                                     wrapper.getIndex(), wrapper.getJoinClass(), wrapper.isHasAlias(), wrapper.getAlias()
                             ));

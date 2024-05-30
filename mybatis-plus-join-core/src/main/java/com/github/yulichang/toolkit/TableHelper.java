@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.TableInfo;
 import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
 import com.baomidou.mybatisplus.core.toolkit.ClassUtils;
+import com.baomidou.mybatisplus.core.toolkit.ExceptionUtils;
 import com.github.yulichang.config.MPJInterceptorConfig;
 import org.apache.ibatis.type.SimpleTypeRegistry;
 
@@ -70,7 +71,11 @@ public class TableHelper {
     public static TableInfo getAssert(Class<?> clazz) {
         Objects.requireNonNull(clazz);
         TableInfo tableInfo = get(clazz);
-        Asserts.hasTable(tableInfo, clazz);
+        if (tableInfo == null) {
+            throw ExceptionUtils.mpe(String.format(
+                    "mapper not find by class <%s> , add mapper and extends BaseMapper<T> or MPJBaseMapper<T>",
+                    clazz.getSimpleName()));
+        }
         return tableInfo;
     }
 }

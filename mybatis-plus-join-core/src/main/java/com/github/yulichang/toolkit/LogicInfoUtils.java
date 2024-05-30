@@ -4,7 +4,7 @@ import com.baomidou.mybatisplus.core.metadata.TableFieldInfo;
 import com.baomidou.mybatisplus.core.metadata.TableInfo;
 import com.baomidou.mybatisplus.core.toolkit.Constants;
 import com.baomidou.mybatisplus.core.toolkit.StringPool;
-import com.github.yulichang.config.ConfigProperties;
+import com.github.yulichang.adapter.AdapterHelper;
 
 import java.util.Map;
 import java.util.Objects;
@@ -42,8 +42,8 @@ public class LogicInfoUtils implements Constants {
     private static String getLogicStr(String prefix, Class<?> clazz, boolean and, boolean invert) {
         String logicStr;
         TableInfo tableInfo = TableHelper.getAssert(clazz);
-        TableFieldInfo logicField = ConfigProperties.tableInfoAdapter.mpjGetLogicField(tableInfo);
-        if (ConfigProperties.tableInfoAdapter.mpjHasLogic(tableInfo) && Objects.nonNull(logicField)) {
+        TableFieldInfo logicField = AdapterHelper.getAdapter().mpjGetLogicField(tableInfo);
+        if (AdapterHelper.getAdapter().mpjHasLogic(tableInfo) && Objects.nonNull(logicField)) {
             final String notDeleteValue = logicField.getLogicNotDeleteValue();
             final String deleteValue = logicField.getLogicDeleteValue();
             if (NULL.equalsIgnoreCase(notDeleteValue)) {

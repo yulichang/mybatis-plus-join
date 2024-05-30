@@ -9,7 +9,6 @@ import com.github.yulichang.adapter.base.IAdapter;
 import com.github.yulichang.adapter.base.metadata.OrderFieldInfo;
 import com.github.yulichang.adapter.base.tookit.VersionUtils;
 import com.github.yulichang.adapter.jsqlparser.v46.JSqlParserHelperV46;
-import org.apache.ibatis.session.Configuration;
 
 import java.lang.reflect.Field;
 import java.util.List;
@@ -54,11 +53,6 @@ public class AdapterV33x implements IAdapter {
     public boolean mpjHasPK(TableInfo tableInfo) {
         return StringUtils.isNotBlank(tableInfo.getKeyProperty()) ||
                 StringUtils.isNotBlank(tableInfo.getKeyColumn());
-    }
-
-    @Override
-    public Configuration mpjGetConfiguration(TableInfo tableInfo) {
-        return tableInfo.getConfiguration();
     }
 
     @Override

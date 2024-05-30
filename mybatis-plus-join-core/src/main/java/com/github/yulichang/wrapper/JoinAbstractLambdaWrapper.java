@@ -8,6 +8,7 @@ import com.baomidou.mybatisplus.core.toolkit.Constants;
 import com.baomidou.mybatisplus.core.toolkit.StringPool;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
+import com.github.yulichang.adapter.AdapterHelper;
 import com.github.yulichang.config.ConfigProperties;
 import com.github.yulichang.config.enums.LogicDelTypeEnum;
 import com.github.yulichang.toolkit.*;
@@ -345,7 +346,7 @@ public abstract class JoinAbstractLambdaWrapper<T, Children extends JoinAbstract
                 if (StringUtils.isBlank(wrapper.from.getStringValue())) {
                     if (this.subLogicSql && this.logicDelType == LogicDelTypeEnum.ON) {
                         TableInfo tableInfo = TableHelper.getAssert(wrapper.getJoinClass());
-                        if (ConfigProperties.tableInfoAdapter.mpjHasLogic(tableInfo)) {
+                        if (AdapterHelper.getAdapter().mpjHasLogic(tableInfo)) {
                             wrapper.appendSqlSegments(APPLY, () -> LogicInfoUtils.getLogicInfoNoAnd(
                                     wrapper.getIndex(), wrapper.getJoinClass(), wrapper.isHasAlias(), wrapper.getAlias()
                             ));

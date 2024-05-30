@@ -9,6 +9,7 @@ import com.baomidou.mybatisplus.core.exceptions.MybatisPlusException;
 import com.baomidou.mybatisplus.core.metadata.TableFieldInfo;
 import com.baomidou.mybatisplus.core.metadata.TableInfo;
 import com.baomidou.mybatisplus.core.toolkit.*;
+import com.github.yulichang.adapter.AdapterHelper;
 import com.github.yulichang.adapter.base.tookit.VersionUtils;
 import com.github.yulichang.config.ConfigProperties;
 import com.github.yulichang.query.interfaces.CompareIfExists;
@@ -239,7 +240,7 @@ public class MPJQueryWrapper<T> extends AbstractWrapper<T, String, MPJQueryWrapp
     @SuppressWarnings({"DuplicatedCode", "UnusedReturnValue"})
     public final MPJQueryWrapper<T> selectAll(Class<?> clazz, String as) {
         TableInfo info = TableHelper.getAssert(clazz);
-        if (ConfigProperties.tableInfoAdapter.mpjHasPK(info)) {
+        if (AdapterHelper.getAdapter().mpjHasPK(info)) {
             selectColumns.add(as + StringPool.DOT + info.getKeySqlSelect());
         }
         selectColumns.addAll(info.getFieldList().stream().map(i ->

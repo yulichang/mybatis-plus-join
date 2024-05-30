@@ -2,7 +2,7 @@ package com.github.yulichang.toolkit.support;
 
 import com.baomidou.mybatisplus.core.metadata.TableFieldInfo;
 import com.baomidou.mybatisplus.core.metadata.TableInfo;
-import com.github.yulichang.config.ConfigProperties;
+import com.github.yulichang.adapter.AdapterHelper;
 import com.github.yulichang.toolkit.FieldStringMap;
 import com.github.yulichang.toolkit.TableHelper;
 import com.github.yulichang.wrapper.segments.SelectCache;
@@ -31,7 +31,7 @@ public class ColumnCache {
         return LIST_CACHE.computeIfAbsent(clazz, c -> {
             TableInfo tableInfo = TableHelper.getAssert(clazz);
             List<SelectCache> list = new ArrayList<>();
-            if (ConfigProperties.tableInfoAdapter.mpjHasPK(tableInfo)) {
+            if (AdapterHelper.getAdapter().mpjHasPK(tableInfo)) {
                 list.add(new SelectCache(clazz, true, tableInfo.getKeyColumn(), tableInfo.getKeyType(),
                         tableInfo.getKeyProperty(), null));
             }

@@ -123,10 +123,10 @@ public class MPJLambdaWrapper<T> extends JoinAbstractLambdaWrapper<T, MPJLambdaW
      * 不建议直接 new 该实例，使用 JoinWrappers.lambda(UserDO.class)
      */
     protected MPJLambdaWrapper(T entity, Class<T> entityClass, SharedString sqlSelect, AtomicInteger paramNameSeq,
-                     Map<String, Object> paramNameValuePairs, MergeSegments mergeSegments, SharedString paramAlias,
-                     SharedString lastSql, SharedString sqlComment, SharedString sqlFirst,
-                     TableList tableList, Integer index, String keyWord, Class<?> joinClass, String tableName,
-                     BiPredicate<Object, IfExistsSqlKeyWordEnum> IfExists) {
+                               Map<String, Object> paramNameValuePairs, MergeSegments mergeSegments, SharedString paramAlias,
+                               SharedString lastSql, SharedString sqlComment, SharedString sqlFirst,
+                               TableList tableList, Integer index, String keyWord, Class<?> joinClass, String tableName,
+                               BiPredicate<Object, IfExistsSqlKeyWordEnum> IfExists) {
         super.setEntity(entity);
         super.setEntityClass(entityClass);
         this.paramNameSeq = paramNameSeq;
@@ -195,6 +195,30 @@ public class MPJLambdaWrapper<T> extends JoinAbstractLambdaWrapper<T, MPJLambdaW
     @Override
     public MPJLambdaWrapper<T> selectAll(Class<?> clazz) {
         return Query.super.selectAll(clazz);
+    }
+
+    /**
+     * 查询实体类全部字段
+     *
+     * @param clazz   查询的实体类
+     * @param exclude 排除字段
+     */
+    @Override
+    @SafeVarargs
+    public final <E> MPJLambdaWrapper<T> selectAll(Class<E> clazz, SFunction<E, ?>... exclude) {
+        return Query.super.selectAll(clazz, exclude);
+    }
+
+    /**
+     * 查询实体类全部字段
+     *
+     * @param clazz   查询的实体类
+     * @param exclude 排除字段
+     */
+    @Override
+    @SafeVarargs
+    public final <E> MPJLambdaWrapper<T> selectAll(Class<E> clazz, String prefix, SFunction<E, ?>... exclude) {
+        return Query.super.selectAll(clazz, prefix, exclude);
     }
 
     /**

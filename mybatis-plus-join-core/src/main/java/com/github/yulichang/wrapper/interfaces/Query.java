@@ -16,8 +16,7 @@ import com.github.yulichang.wrapper.enums.DefaultFuncEnum;
 import com.github.yulichang.wrapper.segments.*;
 
 import java.io.Serializable;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -170,6 +169,38 @@ public interface Query<Children> extends Serializable {
     default Children selectAll(Class<?> clazz, String prefix) {
         getSelectColum().addAll(ColumnCache.getListField(clazz).stream().map(i ->
                 new SelectNormal(i, getIndex(), true, prefix)).collect(Collectors.toList()));
+        return getChildren();
+    }
+
+    /**
+     * 查询实体类全部字段
+     *
+     * @param clazz   查询的实体类
+     * @param exclude 排除字段
+     */
+    @SuppressWarnings("unchecked")
+    default <E> Children selectAll(Class<E> clazz, SFunction<E, ?>... exclude) {
+        Set<String> excludeSet = Arrays.stream(exclude).map(i ->
+                LambdaUtils.getName(i).toUpperCase(Locale.ENGLISH)).collect(Collectors.toSet());
+        getSelectColum().addAll(ColumnCache.getListField(clazz).stream().filter(e ->
+                !excludeSet.contains(e.getColumProperty().toUpperCase(Locale.ENGLISH))).map(i ->
+                new SelectNormal(i, getIndex(), isHasAlias(), getAlias())).collect(Collectors.toList()));
+        return getChildren();
+    }
+
+    /**
+     * 查询实体类全部字段
+     *
+     * @param clazz   查询的实体类
+     * @param exclude 排除字段
+     */
+    @SuppressWarnings("unchecked")
+    default <E> Children selectAll(Class<E> clazz, String prefix, SFunction<E, ?>... exclude) {
+        Set<String> excludeSet = Arrays.stream(exclude).map(i ->
+                LambdaUtils.getName(i).toUpperCase(Locale.ENGLISH)).collect(Collectors.toSet());
+        getSelectColum().addAll(ColumnCache.getListField(clazz).stream().filter(e ->
+                !excludeSet.contains(e.getColumProperty().toUpperCase(Locale.ENGLISH))).map(e ->
+                new SelectNormal(e, getIndex(), true, prefix)).collect(Collectors.toList()));
         return getChildren();
     }
 

@@ -16,6 +16,7 @@ public class Reset {
 
     @SuppressWarnings({"DataFlowIssue"})
     public static void reset() {
+        ThreadLocalUtils.set("");
         SqlSession session = SpringContentUtils.getBean(SqlSessionTemplate.class)
                 .getSqlSessionFactory().openSession(true);
         Connection connection = session.getConnection();

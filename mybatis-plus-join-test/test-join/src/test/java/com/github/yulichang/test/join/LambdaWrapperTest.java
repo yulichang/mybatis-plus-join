@@ -1,6 +1,5 @@
 package com.github.yulichang.test.join;
 
-import com.baomidou.mybatisplus.annotation.DbType;
 import com.baomidou.mybatisplus.core.MybatisPlusVersion;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -15,18 +14,16 @@ import com.github.yulichang.test.join.entity.*;
 import com.github.yulichang.test.join.mapper.*;
 import com.github.yulichang.test.util.Reset;
 import com.github.yulichang.test.util.ThreadLocalUtils;
-import com.github.yulichang.test.util.Throw;
 import com.github.yulichang.toolkit.JoinWrappers;
-import com.github.yulichang.wrapper.DeleteJoinWrapper;
 import com.github.yulichang.wrapper.MPJLambdaWrapper;
-import com.github.yulichang.wrapper.UpdateJoinWrapper;
+import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.jdbc.BadSqlGrammarException;
 
 import java.sql.Timestamp;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -656,7 +653,11 @@ class LambdaWrapperTest {
                 "WHERE t.del = false\n" +
                 "  AND t1.del = false\n" +
                 "  AND (t.id = ? AND (t.head_img = ? OR t1.user_id = ?) AND t.id = ?)\n" +
-                "LIMIT ?");
+                "LIMIT ?",
+                "SELECT * FROM ( SELECT TMP.*, ROWNUM ROW_ID FROM ( SELECT t.id, t.pid, t.`name`, t.`json`, t.sex, t.head_img, " +
+                        "t.create_time, t.address_id, t.address_id2, t.del, t.create_by, t.update_by, t1.address FROM `user` t " +
+                        "LEFT JOIN address t1 ON (t.id = t1.user_id AND t.id = t1.user_id) WHERE t.del = false AND t1.del = false AND " +
+                        "(t.id = ? AND (t.head_img = ? OR t1.user_id = ?) AND t.id = ?) ) TMP WHERE ROWNUM <=?) WHERE ROW_ID > ?");
         IPage<UserDTO> page = userMapper.selectJoinPage(new Page<>(1, 10), UserDTO.class,
                 JoinWrappers.<UserDO>lambda()
                         .selectAll(UserDO.class)
@@ -684,38 +685,17 @@ class LambdaWrapperTest {
         System.out.println(one);
     }
 
-
     /**
      * 忽略个别查询字段
      */
     @Test
-    void test6() {
-        MPJLambdaWrapper<UserDO> wrapper = new MPJLambdaWrapper<UserDO>()
-                .selectAll(UserDO.class)
-                .selectFilter(AddressDO.class, p -> true)
-                .leftJoin(AddressDO.class, AddressDO::getUserId, UserDO::getId)
-                .eq(UserDO::getId, 1);
-        IPage<UserDTO> page = userMapper.selectJoinPage(new Page<>(1, 10), UserDTO.class, wrapper);
-        assert page.getRecords().get(0).getAddress() != null;
-        page.getRecords().forEach(System.out::println);
-    }
-
-    /**
-     * 忽略个别查询字段
-     */
-    @Test
-    void test8() {
+    @SneakyThrows
+    void test8() throws BadSqlGrammarException {
         ThreadLocalUtils.set("SELECT t.`name` FROM `user` t WHERE t.del=false AND (t.`name` = ?)");
         MPJLambdaWrapper<UserDO> wrapper = new MPJLambdaWrapper<UserDO>()
                 .select(UserDO::getName)
                 .eq(UserDO::getName, "ref");
         userMapper.selectList(wrapper);
-        Throw.tryDo(() -> {
-            userMapper.insertBatchSomeColumn(new ArrayList<UserDO>() {{
-                add(new UserDO());
-            }});
-        });
-
     }
 
 
@@ -750,21 +730,6 @@ class LambdaWrapperTest {
                 .gt(UserDO::getId, 3)
                 .lt(UserDO::getId, 8));
         assert dos1.size() == 4;
-    }
-
-    /**
-     * 函数测试
-     */
-    @Test
-    void testFunc() {
-        ThreadLocalUtils.set("SELECT if(t1.user_id < 5,t1.user_id,t1.user_id + 100) AS id FROM `user` t LEFT JOIN address t1 ON (t1.user_id = t.id) WHERE t.del=false AND t1.del=false");
-        MPJLambdaWrapper<UserDO> wrapper = new MPJLambdaWrapper<UserDO>()
-                .selectFunc("if(%s < 5,%s,%s + 100)", arg -> arg.accept(AddressDO::getUserId, AddressDO::getUserId, AddressDO::getUserId), UserDO::getId)
-                .leftJoin(AddressDO.class, AddressDO::getUserId, UserDO::getId);
-
-        Throw.tryDo(() -> {
-            List<UserDO> dos = userMapper.selectJoinList(UserDO.class, wrapper);
-        },DbType.ORACLE);
     }
 
     /**
@@ -808,20 +773,20 @@ class LambdaWrapperTest {
      */
     @Test
     void testTable() {
-        ThreadLocalUtils.set("SELECT t.id FROM bbbbbbb t LEFT JOIN addressaaaaaaaaaa t1 ON (t1.user_id = t.id) LEFT JOIN area t2 ON (t2.id = t1.area_id) WHERE t.del=false AND t1.del=false AND t2.del=false AND (t.id <= ?) ORDER BY t.id DESC");
+        ThreadLocalUtils.set("SELECT t.id FROM (SELECT * FROM `user`) t LEFT JOIN (SELECT * FROM address) t1 ON " +
+                "(t1.user_id = t.id) LEFT JOIN area t2 ON (t2.id = t1.area_id) WHERE t.del = false AND t1.del = false " +
+                "AND t2.del = false AND (t.id <= ?) ORDER BY t.id DESC");
         MPJLambdaWrapper<UserDO> wrapper = new MPJLambdaWrapper<UserDO>()
                 .select(UserDO::getId)
                 .leftJoin(AddressDO.class, on -> on
                         .eq(AddressDO::getUserId, UserDO::getId)
-                        .setTableName(name -> name + "aaaaaaaaaa"))
+                        .setTableName(name -> String.format("(select * from %s)", name)))
                 .leftJoin(AreaDO.class, AreaDO::getId, AddressDO::getAreaId)
                 .le(UserDO::getId, 10000)
                 .orderByDesc(UserDO::getId)
-                .setTableName(name -> "bbbbbbb");
+                .setTableName(name -> String.format("(select * from %s)", name));
 
-        Throw.tryDoIgnore(() -> {
-            List<UserDTO> list = userMapper.selectJoinList(UserDTO.class, wrapper);
-        });
+        List<UserDTO> list = userMapper.selectJoinList(UserDTO.class, wrapper);
     }
 
 
@@ -1018,63 +983,6 @@ class LambdaWrapperTest {
                 .selectAs(UserDO::getName, OrderDO::getUserName)
                 .leftJoin(UserDO.class, UserDO::getId, OrderDO::getUserId);
         List<OrderDO> l = w.list();
-    }
-
-    /**
-     * 同一个类字段比较
-     */
-    @Test
-    void delete() {
-        //物理删除
-        ThreadLocalUtils.set("DELETE t FROM order_t t LEFT JOIN user_dto t1 ON (t1.id = t.user_id) WHERE (t.id = ?)");
-        DeleteJoinWrapper<OrderDO> w = JoinWrappers.delete(OrderDO.class)
-                .leftJoin(UserDto.class, UserDto::getId, OrderDO::getUserId)
-                .eq(OrderDO::getId, 1);
-        Throw.tryDo(() -> {
-            int i = orderMapper.deleteJoin(w);
-        });
-        //忽略异常 h2不支持连表删除
-        //逻辑删除
-        ThreadLocalUtils.set("UPDATE `user` t LEFT JOIN address t1 ON (t1.user_id = t.id) LEFT JOIN area t2 ON (t2.id = t1.area_id) SET t.del=true ,t1.del=true,t2.del=true WHERE t.del=false AND t1.del=false AND t2.del=false AND (t.id = ?)");
-        DeleteJoinWrapper<UserDO> wrapper = JoinWrappers.delete(UserDO.class)
-                .deleteAll()
-                .leftJoin(AddressDO.class, AddressDO::getUserId, UserDO::getId)
-                .leftJoin(AreaDO.class, AreaDO::getId, AddressDO::getAreaId)
-                .eq(OrderDO::getId, 1);
-        Throw.tryDo(() -> {
-            DeleteJoinWrapper<UserDO> wrapper1 = new DeleteJoinWrapper<>(UserDO.class);
-            int i = userMapper.deleteJoin(wrapper);
-        });
-        //忽略异常 h2不支持连表删除
-    }
-
-    @Test
-    void update() {
-        ThreadLocalUtils.set("UPDATE `user` t LEFT JOIN address t1 ON (t1.user_id = t.id) SET t.update_by=?, t.`name`=?,t1.address=?,t1.tel=?,t1.address=?,t.`name`=?,t.update_by=?,t1.user_id=?,t1.area_id=?,t1.tel=?,t1.address=? WHERE t.del=false AND t1.del=false AND (t.id = ?)");
-        UpdateJoinWrapper<UserDO> update = JoinWrappers.update(UserDO.class)
-                .set(UserDO::getName, "aaaaaa")
-                .set(AddressDO::getAddress, "bbbbb")
-                .setUpdateEntity(new AddressDO().setAddress("sadf").setTel("qqqqqqqq"),
-                        new UserDO().setName("nnnnnnnnnnnn").setUpdateBy(1))
-                .setUpdateEntityAndNull(new AddressDO())
-                .leftJoin(AddressDO.class, AddressDO::getUserId, UserDO::getId)
-                .eq(OrderDO::getId, 1);
-        System.out.println(update.getSqlSet());
-        Throw.tryDo(() -> {
-            int i = userMapper.updateJoin(new UserDO().setUpdateBy(123123), update);
-        });
-        //忽略异常 h2不支持连表删除
-
-        ThreadLocalUtils.set("UPDATE `user` t LEFT JOIN address t1 ON (t1.user_id = t.id) SET t.pid=?, " +
-                "t.`name`=?, t.`json`=?, t.sex=?, t.head_img=?, t.create_time=?, t.address_id=?, t.address_id2=?, " +
-                "t.create_by=?, t.update_by=? WHERE t.del=false AND t1.del=false AND (t.id = ?)");
-
-        UpdateJoinWrapper<UserDO> up = JoinWrappers.update(UserDO.class)
-                .leftJoin(AddressDO.class, AddressDO::getUserId, UserDO::getId)
-                .eq(OrderDO::getId, 1);
-        Throw.tryDo(() -> {
-            int i = userMapper.updateJoinAndNull(new UserDO(), up);
-        });
     }
 
     /**

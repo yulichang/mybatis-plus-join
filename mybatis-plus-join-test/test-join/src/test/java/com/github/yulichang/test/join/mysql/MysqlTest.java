@@ -1,27 +1,45 @@
-package com.github.yulichang.test.join.m;
+package com.github.yulichang.test.join.mysql;
 
-import com.baomidou.mybatisplus.annotation.DbType;
 import com.github.yulichang.test.join.entity.AddressDO;
 import com.github.yulichang.test.join.entity.UserDO;
 import com.github.yulichang.test.join.mapper.UserMapper;
 import com.github.yulichang.test.util.Reset;
 import com.github.yulichang.test.util.ThreadLocalUtils;
-import com.github.yulichang.test.util.Throw;
 import com.github.yulichang.wrapper.MPJLambdaWrapper;
 import com.github.yulichang.wrapper.segments.Fun;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.EnabledIf;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+/**
+ * 由于不同数据库函数支持情况不同
+ * 此类用于测试 mysql 专属语法或函数
+ */
 @SpringBootTest
-public class FuncAliasTest {
+@EnabledIf("com.github.yulichang.test.util.EnabledIf#runWithMysql")
+public class MysqlTest {
+
     @Autowired
     private UserMapper userMapper;
 
     @BeforeEach
     void setUp() {
         Reset.reset();
+    }
+
+
+    /**
+     * 函数测试
+     */
+    @Test
+    void testFunc() {
+        ThreadLocalUtils.set("SELECT if(t1.user_id < 5,t1.user_id,t1.user_id + 100) AS id FROM `user` t LEFT JOIN address t1 ON (t1.user_id = t.id) WHERE t.del=false AND t1.del=false");
+        MPJLambdaWrapper<UserDO> wrapper = new MPJLambdaWrapper<UserDO>()
+                .selectFunc("if(%s < 5,%s,%s + 100)", arg -> arg.accept(AddressDO::getUserId, AddressDO::getUserId, AddressDO::getUserId), UserDO::getId)
+                .leftJoin(AddressDO.class, AddressDO::getUserId, UserDO::getId);
+        userMapper.selectJoinList(UserDO.class, wrapper);
     }
 
     @Test
@@ -43,8 +61,7 @@ public class FuncAliasTest {
                 .leftJoin(AddressDO.class, "addr", AddressDO::getUserId, UserDO::getId)
                 .groupBy(UserDO::getId);
 
-        Throw.tryDo(() -> {
-            userMapper.selectJoinList(UserDO.class, wrapper);
-        }, DbType.POSTGRE_SQL, DbType.ORACLE);
+        userMapper.selectJoinList(UserDO.class, wrapper);
     }
+
 }

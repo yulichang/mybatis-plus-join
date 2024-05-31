@@ -1,4 +1,4 @@
-package com.github.yulichang.test.join.m;
+package com.github.yulichang.test.join.unit;
 
 import com.github.yulichang.test.join.entity.AddressDO;
 import com.github.yulichang.test.join.entity.AreaDO;

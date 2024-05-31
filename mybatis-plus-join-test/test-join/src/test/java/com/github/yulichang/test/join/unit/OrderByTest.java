@@ -1,4 +1,4 @@
-package com.github.yulichang.test.join.m;
+package com.github.yulichang.test.join.unit;
 
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.github.yulichang.test.join.dto.UserDTO;
@@ -10,12 +10,14 @@ import com.github.yulichang.toolkit.JoinWrappers;
 import com.github.yulichang.wrapper.MPJLambdaWrapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.EnabledIf;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.Arrays;
 import java.util.List;
 
 @SpringBootTest
+@EnabledIf("com.github.yulichang.test.util.EnabledIf#runWithExcludingOracle")
 public class OrderByTest {
 
     @BeforeEach

@@ -1,25 +1,31 @@
-package com.github.yulichang.test.join.m;
+package com.github.yulichang.test.join.mysql;
 
 import com.baomidou.mybatisplus.core.plugins.IgnoreStrategy;
 import com.baomidou.mybatisplus.core.plugins.InterceptorIgnoreHelper;
 import com.github.yulichang.test.join.entity.AddressDO;
+import com.github.yulichang.test.join.entity.OrderDO;
 import com.github.yulichang.test.join.entity.UserDO;
 import com.github.yulichang.test.join.mapper.UserMapper;
 import com.github.yulichang.test.util.Reset;
 import com.github.yulichang.test.util.ThreadLocalUtils;
-import com.github.yulichang.test.util.Throw;
 import com.github.yulichang.toolkit.JoinWrappers;
 import com.github.yulichang.wrapper.UpdateJoinWrapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.EnabledIf;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.HashMap;
 import java.util.List;
 
+/**
+ * 连表更新没有同意语法语法，不同数据库差别较大
+ * MPJ 连表更新 目前只支持 mysql
+ */
 @SpringBootTest
-public class UpdateIncTest {
+@EnabledIf("com.github.yulichang.test.util.EnabledIf#runWithMysql")
+public class UpdateJoinTest {
 
     @Autowired
     private UserMapper userMapper;
@@ -28,7 +34,6 @@ public class UpdateIncTest {
     void setUp() {
         Reset.reset();
     }
-
 
     @Test
     void updateInc() {
@@ -47,10 +52,8 @@ public class UpdateIncTest {
     @Test
     void updateInc1() {
         ThreadLocalUtils.set("UPDATE `user` t LEFT JOIN address t1 ON (t1.user_id = t.id) SET t1.address = t.head_img WHERE t.del = false AND t1.del = false");
-        Throw.tryDo(() -> {
-            JoinWrappers.update(UserDO.class).set(AddressDO::getAddress, UserDO::getImg)
-                    .leftJoin(AddressDO.class, AddressDO::getUserId, UserDO::getId).update();
-        });
+        JoinWrappers.update(UserDO.class).set(AddressDO::getAddress, UserDO::getImg)
+                .leftJoin(AddressDO.class, AddressDO::getUserId, UserDO::getId).update();
         JoinWrappers.lambda(UserDO.class).list().forEach(System.out::println);
     }
 
@@ -78,4 +81,28 @@ public class UpdateIncTest {
         });
     }
 
+
+    @Test
+    void update() {
+        ThreadLocalUtils.set("UPDATE `user` t LEFT JOIN address t1 ON (t1.user_id = t.id) SET t.update_by=?, t.`name`=?,t1.address=?,t1.tel=?,t1.address=?,t.`name`=?,t.update_by=?,t1.user_id=?,t1.area_id=?,t1.tel=?,t1.address=? WHERE t.del=false AND t1.del=false AND (t.id = ?)");
+        UpdateJoinWrapper<UserDO> update = JoinWrappers.update(UserDO.class)
+                .set(UserDO::getName, "aaaaaa")
+                .set(AddressDO::getAddress, "bbbbb")
+                .setUpdateEntity(new AddressDO().setAddress("sadf").setTel("qqqqqqqq"),
+                        new UserDO().setName("nnnnnnnnnnnn").setUpdateBy(1))
+                .setUpdateEntityAndNull(new AddressDO())
+                .leftJoin(AddressDO.class, AddressDO::getUserId, UserDO::getId)
+                .eq(OrderDO::getId, 1);
+        System.out.println(update.getSqlSet());
+        userMapper.updateJoin(new UserDO().setUpdateBy(123123), update);
+
+        ThreadLocalUtils.set("UPDATE `user` t LEFT JOIN address t1 ON (t1.user_id = t.id) SET t.pid=?, " +
+                "t.`name`=?, t.`json`=?, t.sex=?, t.head_img=?, t.create_time=?, t.address_id=?, t.address_id2=?, " +
+                "t.create_by=?, t.update_by=? WHERE t.del=false AND t1.del=false AND (t.id = ?)");
+
+        UpdateJoinWrapper<UserDO> up = JoinWrappers.update(UserDO.class)
+                .leftJoin(AddressDO.class, AddressDO::getUserId, UserDO::getId)
+                .eq(OrderDO::getId, 1);
+        userMapper.updateJoinAndNull(new UserDO(), up);
+    }
 }

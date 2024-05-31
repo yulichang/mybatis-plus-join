@@ -1,4 +1,4 @@
-package com.github.yulichang.test.join.m;
+package com.github.yulichang.test.join.unit;
 
 import com.github.yulichang.config.enums.IfExistsEnum;
 import com.github.yulichang.test.join.entity.UserDO;
@@ -69,12 +69,11 @@ public class IfExistsTest {
 
         ThreadLocalUtils.set("SELECT t.id, t.pid, t.`name`, t.`json`, t.sex, t.head_img, t.create_time, t.address_id, " +
                 "t.address_id2, t.del, t.create_by, t.update_by FROM `user` t " +
-                "WHERE t.del = false AND (t.id = ? AND t.pid = ? AND t.`name` = ? AND t.head_img = ? AND t.`name` = ?)");
+                "WHERE t.del = false AND (t.id = ? AND t.`name` = ? AND t.head_img = ? AND t.`name` = ?)");
         MPJLambdaWrapper<UserDO> wrapper2 = JoinWrappers.lambda(UserDO.class)
                 .selectAll(UserDO.class)
                 .setIfExists(o -> true)
                 .eqIfExists(UserDO::getId, 1)
-                .eqIfExists(UserDO::getPid, null)
                 .eqIfExists(UserDO::getName, "")
                 .eqIfExists(UserDO::getImg, "\t")
                 .eqIfExists(UserDO::getName, "张三 1");

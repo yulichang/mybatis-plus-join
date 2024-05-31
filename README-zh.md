@@ -113,44 +113,6 @@ WHERE (
     AND t.id > ?)
 ```
 
-说明:
-
-* UserDTO.class 查询结果返回类(resultType)
-* selectAll() 查询指定实体类的全部字段
-* select() 查询指定的字段,支持可变参数,同一个select只能查询相同表的字段
-* selectAs() 字段别名查询,用于数据库字段与业务实体类属性名不一致时使用
-* leftJoin() 参数说明  
-  第一个参数:  参与连表的实体类class  
-  第二个参数:  连表的ON字段,这个属性必须是第一个参数实体类的属性  
-  第三个参数:  参与连表的ON的另一个实体类属性
-* 默认主表别名是t,其他的表别名以先后调用的顺序使用t1,t2,t3....
-* 条件查询,可以查询主表以及参与连接的所有表的字段,全部调用mp原生的方法,正常使用没有sql注入风险
-
-#### 一对多查询
-
-```java
-class test {
-    @Resource
-    private UserMapper userMapper;
-
-    @Test
-    void testResultMap() {
-        MPJLambdaWrapper<UserDO> wrapper = new MPJLambdaWrapper<>(User.class)
-                .selectAll(UserDO.class)
-                //对多查询
-                .selectCollection(AddressDO.class, UesrDTO::getAddressList)
-                //对一查询
-                .selectAssociation(AddressDO.class, UesrDTO::getAddress)
-                .leftJoin(AddressDO.class, AddressDO::getUserId, UserDO::getId);
-
-        List<UserDTO> dtoList = userMapper.selectJoinList(UserDTO.class, wrapper);
-
-        //关于对多分页查询
-        //由于嵌套结果方式会导致结果集被折叠，因此分页查询的结果在折叠后总数会减少，所以无法保证分页结果数量正确。
-    }
-}
-```
-
 MPJLambdaWrapper其他功能
 
 * <a href="https://yulichang.github.io/mybatis-plus-join-doc/pages/core/lambda/select/selectCollection.html" target="_blank">

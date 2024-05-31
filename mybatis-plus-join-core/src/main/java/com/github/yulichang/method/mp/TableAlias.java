@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.metadata.TableInfo;
 import com.baomidou.mybatisplus.core.toolkit.Constants;
 import com.baomidou.mybatisplus.core.toolkit.ExceptionUtils;
 import com.baomidou.mybatisplus.core.toolkit.sql.SqlScriptUtils;
+import com.github.yulichang.adapter.AdapterHelper;
 import com.github.yulichang.interfaces.MPJBaseJoin;
 import com.github.yulichang.method.MPJBaseMethod;
 import org.apache.ibatis.session.Configuration;
@@ -39,7 +40,8 @@ public interface TableAlias extends Constants, MPJBaseMethod {
             try {
                 table = TableInfo.class.getDeclaredConstructor(Class.class).newInstance(tableInfo.getEntityType());
             } catch (Exception e) {
-                table = TableInfo.class.getDeclaredConstructor(Configuration.class, Class.class).newInstance(tableInfo.getConfiguration(), tableInfo.getEntityType());
+                table = TableInfo.class.getDeclaredConstructor(Configuration.class, Class.class).newInstance(
+                        AdapterHelper.getAdapter().mpjGetConfiguration(tableInfo), tableInfo.getEntityType());
             }
             //反射拷贝对象
             Field[] fields = TableInfo.class.getDeclaredFields();

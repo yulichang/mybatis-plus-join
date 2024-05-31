@@ -47,12 +47,12 @@ QQ群:680016987  或者
   <dependency>
       <groupId>com.github.yulichang</groupId>
       <artifactId>mybatis-plus-join-boot-starter</artifactId>
-      <version>1.4.12</version>
+      <version>1.4.13</version>
   </dependency>
   ```
 - Gradle
   ```
-   implementation 'com.github.yulichang:mybatis-plus-join-boot-starter:1.4.12'
+   implementation 'com.github.yulichang:mybatis-plus-join-boot-starter:1.4.13'
   ```
   或者clone代码到本地执行 mvn install, 再引入以上依赖  
   <br>
@@ -160,5 +160,5 @@ MPJLambdaWrapper其他功能
 * <a href="https://yulichang.github.io/mybatis-plus-join-doc/" target="_blank">其他全部功能请参考使用文档</a>
 
 # <a href="https://yulichang.github.io/mybatis-plus-join-doc" target="_blank">使用文档 wiki</a>
-# 捐赠
-![捐赠 mybatis-plus-join](https://foruda.gitee.com/images/1715967492739259773/c8f375b5_2020985.png "支持一下mybatis-plus-join")
+# 用爱发电
+![捐赠 mybatis-plus-join](https://foruda.gitee.com/images/1717191488951888381/8463cfcd_2020985.png "支持一下mybatis-plus-join")

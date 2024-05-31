@@ -19,6 +19,7 @@ import com.github.yulichang.toolkit.TableHelper;
 import com.github.yulichang.toolkit.reflect.GenericTypeUtils;
 import lombok.Getter;
 import org.apache.ibatis.builder.MapperBuilderAssistant;
+import org.apache.ibatis.session.Configuration;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -85,13 +86,25 @@ public class MPJSqlInjector extends DefaultSqlInjector {
 
     /**
      * mybatis plus 3.4.3.2
+     * <p>
+     * Deprecated
+     * 3.5.6 getMethodList(Configuration, Class, TableInfo)
      */
     @Override
+    @Deprecated
     public List<AbstractMethod> getMethodList(Class<?> mapperClass, TableInfo tableInfo) {
         if (Objects.nonNull(sqlInjector)) {
             return methodFilter(sqlInjector.getMethodList(mapperClass, tableInfo));
         }
         return methodFilter(super.getMethodList(mapperClass, tableInfo));
+    }
+
+    @Override
+    public List<AbstractMethod> getMethodList(Configuration configuration, Class<?> mapperClass, TableInfo tableInfo) {
+        if (Objects.nonNull(sqlInjector)) {
+            return methodFilter(sqlInjector.getMethodList(configuration, mapperClass, tableInfo));
+        }
+        return methodFilter(super.getMethodList(configuration, mapperClass, tableInfo));
     }
 
     private List<AbstractMethod> methodFilter(List<AbstractMethod> list) {

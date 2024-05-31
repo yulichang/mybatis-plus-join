@@ -3,6 +3,7 @@ package com.github.yulichang.adapter.base;
 import com.baomidou.mybatisplus.core.metadata.TableFieldInfo;
 import com.baomidou.mybatisplus.core.metadata.TableInfo;
 import com.github.yulichang.adapter.base.metadata.OrderFieldInfo;
+import org.apache.ibatis.session.Configuration;
 
 import java.lang.reflect.Field;
 import java.util.List;
@@ -34,6 +35,10 @@ public interface IAdapter {
 
     default boolean mpjHasPK(TableInfo tableInfo) {
         return tableInfo.havePK();
+    }
+
+    default Configuration mpjGetConfiguration(TableInfo tableInfo) {
+        return tableInfo.getConfiguration();
     }
 
     default Field mpjGetField(TableFieldInfo fieldInfo, Supplier<Field> supplier) {

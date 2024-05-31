@@ -17,7 +17,7 @@ import org.springframework.boot.test.context.SpringBootTest;
  * 连表删除没有同意语法语法，不同数据库差别较大
  * MPJ 连表更新 目前只支持 mysql
  */
-@SpringBootTest
+@SpringBootTest("spring.profiles.active=mysql")
 @EnabledIf("com.github.yulichang.test.util.EnabledIf#runWithMysql")
 public class DeleteJoinTest {
 

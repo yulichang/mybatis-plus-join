@@ -40,7 +40,7 @@
     </modules>
 
     <properties>
-        <revision>1.4.12</revision>
+        <revision>1.4.13</revision>
         <mpj.mybatis.plus.version>3.5.6</mpj.mybatis.plus.version>
 
         <jdkVersion>1.8</jdkVersion>
@@ -56,13 +56,13 @@
             <dependency>
                 <groupId>org.projectlombok</groupId>
                 <artifactId>lombok</artifactId>
-                <version>1.18.30</version>
+                <version>1.18.32</version>
                 <scope>provided</scope>
             </dependency>
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-aop</artifactId>
-                <version>5.3.32</version>
+                <version>5.3.36</version>
                 <scope>provided</scope>
             </dependency>
             <dependency>

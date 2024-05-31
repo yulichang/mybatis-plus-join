@@ -99,14 +99,14 @@ public abstract class JoinAbstractLambdaWrapper<T, Children extends JoinAbstract
     /**
      * 推荐使用 带 class 的构造方法
      */
-    public JoinAbstractLambdaWrapper() {
+    protected JoinAbstractLambdaWrapper() {
         initNeed();
     }
 
     /**
      * 推荐使用此构造方法
      */
-    public JoinAbstractLambdaWrapper(Class<T> clazz) {
+    protected JoinAbstractLambdaWrapper(Class<T> clazz) {
         initNeed();
         setEntityClass(clazz);
         tableList.setRootClass(clazz);
@@ -117,7 +117,7 @@ public abstract class JoinAbstractLambdaWrapper<T, Children extends JoinAbstract
      *
      * @param entity 主表实体
      */
-    public JoinAbstractLambdaWrapper(T entity) {
+    protected JoinAbstractLambdaWrapper(T entity) {
         initNeed();
         setEntity(entity);
         if (entity != null) {
@@ -128,7 +128,7 @@ public abstract class JoinAbstractLambdaWrapper<T, Children extends JoinAbstract
     /**
      * 自定义主表别名
      */
-    public JoinAbstractLambdaWrapper(String alias) {
+    protected JoinAbstractLambdaWrapper(String alias) {
         this.alias = alias;
         initNeed();
         tableList.setAlias(alias);
@@ -140,7 +140,7 @@ public abstract class JoinAbstractLambdaWrapper<T, Children extends JoinAbstract
      * @param clazz 主表class类
      * @param alias 主表别名
      */
-    public JoinAbstractLambdaWrapper(Class<T> clazz, String alias) {
+    protected JoinAbstractLambdaWrapper(Class<T> clazz, String alias) {
         this.alias = alias;
         setEntityClass(clazz);
         initNeed();
@@ -154,7 +154,7 @@ public abstract class JoinAbstractLambdaWrapper<T, Children extends JoinAbstract
      * @param entity 主表实体类
      * @param alias  主表别名
      */
-    public JoinAbstractLambdaWrapper(T entity, String alias) {
+    protected JoinAbstractLambdaWrapper(T entity, String alias) {
         this.alias = alias;
         setEntity(entity);
         initNeed();

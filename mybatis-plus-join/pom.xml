@@ -41,7 +41,7 @@
     </scm>
 
     <properties>
-        <revision>1.4.12</revision>
+        <revision>1.4.13</revision>
 
         <jdkVersion>1.8</jdkVersion>
         <jdkVersion.test>1.8</jdkVersion.test>

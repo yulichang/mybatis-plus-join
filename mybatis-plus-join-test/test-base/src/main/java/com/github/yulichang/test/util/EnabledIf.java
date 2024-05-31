@@ -9,6 +9,10 @@ public class EnabledIf {
         return DbTypeUtil.getDbType() == DbType.MYSQL;
     }
 
+    public static boolean runWithPgsql() {
+        return DbTypeUtil.getDbType() == DbType.POSTGRE_SQL;
+    }
+
     public static boolean runWithExcludingOracle() {
         return DbTypeUtil.getDbType() != DbType.ORACLE;
     }

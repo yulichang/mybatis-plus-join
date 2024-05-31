@@ -222,7 +222,7 @@ public class UpdateJoinWrapper<T> extends JoinAbstractLambdaWrapper<T, UpdateJoi
     /**
      * 不建议直接 new 该实例，使用 JoinWrappers.update(User.class)
      */
-    public UpdateJoinWrapper(T entity, Class<T> entityClass, AtomicInteger paramNameSeq,
+    protected UpdateJoinWrapper(T entity, Class<T> entityClass, AtomicInteger paramNameSeq,
                              Map<String, Object> paramNameValuePairs, MergeSegments mergeSegments,
                              SharedString lastSql, SharedString sqlComment, SharedString sqlFirst,
                              TableList tableList, Integer index, String keyWord, Class<?> joinClass, String tableName) {

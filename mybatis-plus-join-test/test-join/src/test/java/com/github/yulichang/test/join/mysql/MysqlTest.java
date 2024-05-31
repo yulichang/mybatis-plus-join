@@ -17,7 +17,7 @@ import org.springframework.boot.test.context.SpringBootTest;
  * 由于不同数据库函数支持情况不同
  * 此类用于测试 mysql 专属语法或函数
  */
-@SpringBootTest
+@SpringBootTest("spring.profiles.active=mysql")
 @EnabledIf("com.github.yulichang.test.util.EnabledIf#runWithMysql")
 public class MysqlTest {
 

@@ -222,10 +222,10 @@ public class DeleteJoinWrapper<T> extends JoinAbstractLambdaWrapper<T, DeleteJoi
     /**
      * 不建议直接 new 该实例，使用 JoinWrappers.delete(User.class)
      */
-    public DeleteJoinWrapper(T entity, Class<T> entityClass, AtomicInteger paramNameSeq,
-                             Map<String, Object> paramNameValuePairs, MergeSegments mergeSegments,
-                             SharedString lastSql, SharedString sqlComment, SharedString sqlFirst,
-                             TableList tableList, Integer index, String keyWord, Class<?> joinClass, String tableName) {
+    protected DeleteJoinWrapper(T entity, Class<T> entityClass, AtomicInteger paramNameSeq,
+                                Map<String, Object> paramNameValuePairs, MergeSegments mergeSegments,
+                                SharedString lastSql, SharedString sqlComment, SharedString sqlFirst,
+                                TableList tableList, Integer index, String keyWord, Class<?> joinClass, String tableName) {
         super.setEntity(entity);
         super.setEntityClass(entityClass);
         this.paramNameSeq = paramNameSeq;

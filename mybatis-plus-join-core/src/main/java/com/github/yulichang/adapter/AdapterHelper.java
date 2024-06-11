@@ -22,7 +22,7 @@ public class AdapterHelper {
 
 
     static {
-        String lastAdapter = "3.5.6";
+        String lastAdapter = "3.5.7";
         String version = Optional.of(MybatisPlusVersion.getVersion()).orElse(lastAdapter);
 
         if (VersionUtils.compare(version, lastAdapter) >= 0) {

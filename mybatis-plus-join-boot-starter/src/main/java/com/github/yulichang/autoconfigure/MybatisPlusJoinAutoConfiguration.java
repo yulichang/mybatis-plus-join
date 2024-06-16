@@ -65,11 +65,12 @@ public class MybatisPlusJoinAutoConfiguration {
                                             ObjectProvider<MybatisPlusJoinIfExistsConsumer> IfExistsConsumers) {
         this.properties = Optional.ofNullable(propertiesConsumers.getIfAvailable()).map(c -> c.config(properties)).orElse(properties);
         ConfigProperties.banner = this.properties.getBanner();
-        ConfigProperties.subTableLogic = this.properties.getSubTableLogic();
         ConfigProperties.msCache = this.properties.isMsCache();
         ConfigProperties.tableAlias = this.properties.getTableAlias();
         ConfigProperties.joinPrefix = this.properties.getJoinPrefix();
         ConfigProperties.logicDelType = this.properties.getLogicDelType();
+        ConfigProperties.subQueryAlias = this.properties.getSubQueryAlias();
+        ConfigProperties.subTableLogic = this.properties.getSubTableLogic();
         ConfigProperties.mappingMaxCount = this.properties.getMappingMaxCount();
         ConfigProperties.ifExists = Optional.ofNullable(IfExistsConsumers.getIfAvailable())
                 .map(m -> (BiPredicate<Object, IfExistsSqlKeyWordEnum>) m)

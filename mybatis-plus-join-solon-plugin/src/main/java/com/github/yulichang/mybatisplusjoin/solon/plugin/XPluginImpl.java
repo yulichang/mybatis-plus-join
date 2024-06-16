@@ -51,13 +51,14 @@ public class XPluginImpl implements Plugin {
         // 读取配置
         Prop prop = new Prop(context.cfg());
         ConfigProperties.banner = prop.get("banner", Boolean::parseBoolean);
-        ConfigProperties.subTableLogic = prop.get("subTableLogic", Boolean::parseBoolean);
         ConfigProperties.msCache = prop.get("msCache", Boolean::parseBoolean);
         ConfigProperties.tableAlias = prop.get("tableAlias", Function.identity());
         ConfigProperties.joinPrefix = prop.get("joinPrefix", Function.identity());
         ConfigProperties.logicDelType = prop.get("logicDelType", val ->
                 // fix on/off yes/no 会转为Boolean
                 LogicDelTypeEnum.WHERE.name().equalsIgnoreCase(val) ? LogicDelTypeEnum.WHERE : LogicDelTypeEnum.ON);
+        ConfigProperties.subTableLogic = prop.get("subTableLogic", Boolean::parseBoolean);
+        ConfigProperties.subQueryAlias = prop.get("subQueryAlias", Function.identity());
         ConfigProperties.mappingMaxCount = prop.get("mappingMaxCount", Integer::parseInt);
         ConfigProperties.ifExists = prop.get("ifExists", val ->
                 Arrays.stream(IfExistsEnum.values()).filter(e -> e.name().equalsIgnoreCase(val)).findFirst()

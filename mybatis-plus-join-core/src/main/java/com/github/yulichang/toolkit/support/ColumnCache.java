@@ -1,6 +1,5 @@
 package com.github.yulichang.toolkit.support;
 
-import com.baomidou.mybatisplus.core.metadata.TableFieldInfo;
 import com.baomidou.mybatisplus.core.metadata.TableInfo;
 import com.github.yulichang.adapter.AdapterHelper;
 import com.github.yulichang.toolkit.FieldStringMap;
@@ -33,10 +32,10 @@ public class ColumnCache {
             List<SelectCache> list = new ArrayList<>();
             if (AdapterHelper.getAdapter().mpjHasPK(tableInfo)) {
                 list.add(new SelectCache(clazz, true, tableInfo.getKeyColumn(), tableInfo.getKeyType(),
-                        tableInfo.getKeyProperty(), null));
+                        tableInfo.getKeyProperty(), true, null));
             }
-            list.addAll(tableInfo.getFieldList().stream().filter(TableFieldInfo::isSelect).map(f ->
-                            new SelectCache(clazz, false, f.getColumn(), f.getPropertyType(), f.getProperty(), f))
+            list.addAll(tableInfo.getFieldList().stream().map(f ->
+                            new SelectCache(clazz, false, f.getColumn(), f.getPropertyType(), f.getProperty(), f.isSelect(), f))
                     .collect(Collectors.toList()));
             return list;
         });

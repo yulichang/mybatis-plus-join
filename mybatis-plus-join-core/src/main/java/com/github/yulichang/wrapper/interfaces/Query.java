@@ -52,7 +52,7 @@ public interface Query<Children> extends Serializable {
     default <E> Children select(Class<E> entityClass, Predicate<TableFieldInfo> predicate) {
         TableInfo info = TableHelper.getAssert(entityClass);
         Map<String, SelectCache> cacheMap = ColumnCache.getMapField(entityClass);
-        info.getFieldList().stream().filter(predicate).collect(Collectors.toList()).forEach(
+        info.getFieldList().stream().filter(TableFieldInfo::isSelect).filter(predicate).collect(Collectors.toList()).forEach(
                 i -> getSelectColum().add(new SelectNormal(cacheMap.get(i.getProperty()), getIndex(), isHasAlias(), getAlias())));
         return getChildren();
     }
@@ -71,7 +71,7 @@ public interface Query<Children> extends Serializable {
     default <E> Children selectFilter(Class<E> entityClass, Predicate<SelectCache> predicate) {
         TableInfo info = TableHelper.getAssert(entityClass);
         List<SelectCache> cacheList = ColumnCache.getListField(entityClass);
-        cacheList.stream().filter(predicate).collect(Collectors.toList()).forEach(
+        cacheList.stream().filter(SelectCache::isSelect).filter(predicate).collect(Collectors.toList()).forEach(
                 i -> getSelectColum().add(new SelectNormal(i, getIndex(), isHasAlias(), getAlias())));
         return getChildren();
     }
@@ -130,7 +130,9 @@ public interface Query<Children> extends Serializable {
         for (FieldCache cache : fieldList) {
             if (normalMap.containsKey(cache.getField().getName())) {
                 SelectCache selectCache = normalMap.get(cache.getField().getName());
-                getSelectColum().add(new SelectNormal(selectCache, getIndex(), isHasAlias(), getAlias()));
+                if (selectCache.isSelect()) {
+                    getSelectColum().add(new SelectNormal(selectCache, getIndex(), isHasAlias(), getAlias()));
+                }
             }
         }
         return getChildren();
@@ -158,7 +160,7 @@ public interface Query<Children> extends Serializable {
      * 查询实体类全部字段
      */
     default Children selectAll(Class<?> clazz) {
-        getSelectColum().addAll(ColumnCache.getListField(clazz).stream().map(i ->
+        getSelectColum().addAll(ColumnCache.getListField(clazz).stream().filter(SelectCache::isSelect).map(i ->
                 new SelectNormal(i, getIndex(), isHasAlias(), getAlias())).collect(Collectors.toList()));
         return getChildren();
     }
@@ -167,7 +169,7 @@ public interface Query<Children> extends Serializable {
      * 查询实体类全部字段
      */
     default Children selectAll(Class<?> clazz, String prefix) {
-        getSelectColum().addAll(ColumnCache.getListField(clazz).stream().map(i ->
+        getSelectColum().addAll(ColumnCache.getListField(clazz).stream().filter(SelectCache::isSelect).map(i ->
                 new SelectNormal(i, getIndex(), true, prefix)).collect(Collectors.toList()));
         return getChildren();
     }
@@ -182,7 +184,7 @@ public interface Query<Children> extends Serializable {
     default <E> Children selectAll(Class<E> clazz, SFunction<E, ?>... exclude) {
         Set<String> excludeSet = Arrays.stream(exclude).map(i ->
                 LambdaUtils.getName(i).toUpperCase(Locale.ENGLISH)).collect(Collectors.toSet());
-        getSelectColum().addAll(ColumnCache.getListField(clazz).stream().filter(e ->
+        getSelectColum().addAll(ColumnCache.getListField(clazz).stream().filter(e -> e.isSelect() &&
                 !excludeSet.contains(e.getColumProperty().toUpperCase(Locale.ENGLISH))).map(i ->
                 new SelectNormal(i, getIndex(), isHasAlias(), getAlias())).collect(Collectors.toList()));
         return getChildren();
@@ -198,7 +200,7 @@ public interface Query<Children> extends Serializable {
     default <E> Children selectAll(Class<E> clazz, String prefix, SFunction<E, ?>... exclude) {
         Set<String> excludeSet = Arrays.stream(exclude).map(i ->
                 LambdaUtils.getName(i).toUpperCase(Locale.ENGLISH)).collect(Collectors.toSet());
-        getSelectColum().addAll(ColumnCache.getListField(clazz).stream().filter(e ->
+        getSelectColum().addAll(ColumnCache.getListField(clazz).stream().filter(e -> e.isSelect() &&
                 !excludeSet.contains(e.getColumProperty().toUpperCase(Locale.ENGLISH))).map(e ->
                 new SelectNormal(e, getIndex(), true, prefix)).collect(Collectors.toList()));
         return getChildren();

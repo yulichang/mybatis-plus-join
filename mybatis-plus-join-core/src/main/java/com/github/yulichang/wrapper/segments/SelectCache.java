@@ -70,7 +70,12 @@ public class SelectCache {
      */
     private final TypeHandler<?> typeHandler;
 
-    public SelectCache(Class<?> clazz, boolean isPk, String column, Class<?> columnType, String columProperty, TableFieldInfo tableFieldInfo) {
+    /**
+     * 是否查询
+     */
+    private final boolean isSelect;
+
+    public SelectCache(Class<?> clazz, boolean isPk, String column, Class<?> columnType, String columProperty, boolean isSelect, TableFieldInfo tableFieldInfo) {
         this.clazz = clazz;
         this.isPk = isPk;
         this.column = column;
@@ -78,6 +83,7 @@ public class SelectCache {
         this.columProperty = columProperty;
         this.tagColumn = MPJStringUtils.getTargetColumn(column);
         this.tableFieldInfo = tableFieldInfo;
+        this.isSelect = isSelect;
         if (Objects.isNull(tableFieldInfo)) {
             this.hasTypeHandle = false;
             this.typeHandler = null;

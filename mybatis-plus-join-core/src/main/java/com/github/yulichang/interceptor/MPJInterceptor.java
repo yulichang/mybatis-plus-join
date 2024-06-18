@@ -10,7 +10,6 @@ import com.github.yulichang.adapter.AdapterHelper;
 import com.github.yulichang.adapter.base.tookit.VersionUtils;
 import com.github.yulichang.config.ConfigProperties;
 import com.github.yulichang.interfaces.MPJBaseJoin;
-import com.github.yulichang.query.MPJQueryWrapper;
 import com.github.yulichang.toolkit.*;
 import com.github.yulichang.toolkit.support.FieldCache;
 import com.github.yulichang.wrapper.interfaces.SelectWrapper;
@@ -26,7 +25,6 @@ import org.apache.ibatis.mapping.ResultFlag;
 import org.apache.ibatis.mapping.ResultMap;
 import org.apache.ibatis.mapping.ResultMapping;
 import org.apache.ibatis.plugin.*;
-import org.apache.ibatis.session.Configuration;
 import org.apache.ibatis.session.ResultHandler;
 import org.apache.ibatis.session.RowBounds;
 
@@ -36,9 +34,8 @@ import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * 连表拦截器
+ * <p>
  * 用于实现动态resultType
- * 之前的实现方式是mybatis-plus的Interceptor,无法修改args,存在并发问题
- * 所以将这个拦截器独立出来
  *
  * @author yulichang
  */
@@ -50,24 +47,18 @@ public class MPJInterceptor implements Interceptor {
 
     private static final List<ResultMapping> EMPTY_RESULT_MAPPING = new ArrayList<>(0);
 
-    /**
-     * 缓存MappedStatement,不需要每次都去构建MappedStatement
-     */
-    private static final Map<String, Map<Configuration, MappedStatement>> MS_CACHE = new ConcurrentHashMap<>();
-
     private static final Map<String, Val> MS_MAPPER_CACHE = new ConcurrentHashMap<>();
 
     private static final Map<String, Val> RES_MAPPER_CACHE = new ConcurrentHashMap<>();
 
     @Override
-    @SuppressWarnings("Java8MapApi")
     public Object intercept(Invocation invocation) throws Throwable {
         Object[] args = invocation.getArgs();
         if (args[0] instanceof MappedStatement) {
             MappedStatement ms = (MappedStatement) args[0];
             if (args[1] instanceof Map) {
                 Map<String, Object> map = (Map<String, Object>) args[1];
-                Object ew = map.containsKey(Constants.WRAPPER) ? map.get(Constants.WRAPPER) : null;
+                Object ew = map.getOrDefault(Constants.WRAPPER, null);
                 if (Objects.nonNull(ew) && ew instanceof MPJBaseJoin) {
                     if (CollectionUtils.isNotEmpty(map)) {
                         Class<?> rt = null;
@@ -97,56 +88,25 @@ public class MPJInterceptor implements Interceptor {
     /**
      * 获取MappedStatement
      */
-    @SuppressWarnings("rawtypes")
-    public MappedStatement getMappedStatement(MappedStatement ms, Class<?> resultType, Object ew) {
-        String id = ms.getId() + StringPool.DASH + (resultType.getName().replaceAll("\\.", StringPool.DASH));
+    public <E> MappedStatement getMappedStatement(MappedStatement ms, Class<?> resultType, Object ew) {
         if (ew instanceof SelectWrapper) {
-            SelectWrapper wrapper = (SelectWrapper) ew;
+            SelectWrapper<E, ?> wrapper = (SelectWrapper<E, ?>) ew;
             if (wrapper.getEntityClass() == null) {
-                wrapper.setEntityClass(MPJTableMapperHelper.getEntity(getMapper(ms.getId(), ms.getResource())));
+                wrapper.setEntityClass((Class<E>) MPJTableMapperHelper.getEntity(getMapper(ms.getId(), ms.getResource())));
             }
             if (wrapper.getSelectColumns().isEmpty() && wrapper.getEntityClass() != null) {
                 wrapper.selectAll(wrapper.getEntityClass());
             }
-            //TODO 重构缓存 -> 根据sql缓存
-            //不走缓存
         }
-        if (ew instanceof MPJQueryWrapper) {
-            MPJQueryWrapper wrapper = (MPJQueryWrapper) ew;
-            if (ConfigProperties.msCache) {
-                return getCache(ms, id + StringPool.UNDERSCORE + removeDot(wrapper.getSqlSelect()), resultType, ew);
-            }
-        }
-        return buildMappedStatement(ms, resultType, ew, id);
-    }
-
-
-    /**
-     * 走缓存
-     */
-    private MappedStatement getCache(MappedStatement ms, String id, Class<?> resultType, Object ew) {
-        Map<Configuration, MappedStatement> statementMap = MS_CACHE.get(id);
-        if (CollectionUtils.isNotEmpty(statementMap)) {
-            MappedStatement statement = statementMap.get(ms.getConfiguration());
-            if (Objects.nonNull(statement)) {
-                return statement;
-            }
-        }
-        MappedStatement mappedStatement = buildMappedStatement(ms, resultType, ew, id);
-        if (statementMap == null) {
-            statementMap = new ConcurrentHashMap<>();
-            MS_CACHE.put(id, statementMap);
-        }
-        statementMap.put(ms.getConfiguration(), mappedStatement);
-        return mappedStatement;
+        return buildMappedStatement(ms, resultType, ew);
     }
 
 
     /**
      * 构建新的MappedStatement
      */
-    private MappedStatement buildMappedStatement(MappedStatement ms, Class<?> resultType, Object ew, String id) {
-        MappedStatement.Builder builder = new MappedStatement.Builder(ms.getConfiguration(), id, ms.getSqlSource(), ms.getSqlCommandType())
+    private MappedStatement buildMappedStatement(MappedStatement ms, Class<?> resultType, Object ew) {
+        MappedStatement.Builder builder = new MappedStatement.Builder(ms.getConfiguration(), ms.getId(), ms.getSqlSource(), ms.getSqlCommandType())
                 .resource(ms.getResource())
                 .fetchSize(ms.getFetchSize())
                 .statementType(ms.getStatementType())
@@ -168,7 +128,6 @@ public class MPJInterceptor implements Interceptor {
     /**
      * 构建resultMap TODO 可以用lambda简化代码
      */
-    @SuppressWarnings({"rawtypes", "unchecked"})
     private List<ResultMap> buildResultMap(MappedStatement ms, Class<?> resultType, Object obj) {
         List<ResultMap> result = new ArrayList<>();
         TableInfo tableInfo = TableHelper.get(resultType);
@@ -182,7 +141,7 @@ public class MPJInterceptor implements Interceptor {
             result.add(getDefaultResultMap(tableInfo, ms, resultType, id));
             return result;
         }
-        SelectWrapper wrapper = (SelectWrapper) obj;
+        SelectWrapper<?, ?> wrapper = (SelectWrapper<?, ?>) obj;
         Map<String, FieldCache> fieldMap = MPJReflectionKit.getFieldMap(resultType);
         List<Select> columnList = wrapper.getSelectColumns();
         //移除对多查询列，为了可重复使用wrapper
@@ -421,14 +380,6 @@ public class MPJInterceptor implements Interceptor {
         }).getVal();
 
         return clazz;
-    }
-
-    private String removeDot(String str) {
-        if (StringUtils.isBlank(str)) {
-            return str;
-        } else {
-            return str.replaceAll("\\.", StringPool.DASH);
-        }
     }
 
     @Override

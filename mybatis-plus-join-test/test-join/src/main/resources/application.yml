@@ -15,8 +15,8 @@ mybatis-plus:
       logic-delete-value: true
       logic-not-delete-value: false
     banner: true
-  configuration:
-    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+#  configuration:
+#    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
 
 mybatis-plus-join:
   # 打印 mybatis plus join banner
@@ -24,6 +24,11 @@ mybatis-plus-join:
   sub-table-logic: true
   ms-cache: true
   logic-del-type: where
+
+
+logging:
+  level:
+    com.github.yulichang: debug
 
 ---
 spring:

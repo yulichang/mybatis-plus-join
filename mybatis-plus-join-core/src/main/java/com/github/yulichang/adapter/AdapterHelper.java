@@ -25,7 +25,7 @@ public class AdapterHelper {
         String lastAdapter = "3.5.7";
         String version = Optional.of(MybatisPlusVersion.getVersion()).orElse(lastAdapter);
 
-        if (VersionUtils.compare(version, lastAdapter) >= 0) {
+        if (VersionUtils.compare(version, "3.5.6") >= 0) {
             adapter = new Adapter();
         } else if (VersionUtils.compare(version, "3.5.4") >= 0) {
             adapter = new Adapter355();

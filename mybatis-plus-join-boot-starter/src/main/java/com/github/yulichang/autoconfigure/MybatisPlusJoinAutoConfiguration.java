@@ -19,6 +19,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.ListableBeanFactory;
 import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
@@ -135,8 +136,8 @@ public class MybatisPlusJoinAutoConfiguration {
         }
     }
 
-    private void info(String info) {
-        if (properties.getBanner()) {
+    private static void info(String info) {
+        if (ConfigProperties.banner) {
             logger.info(info);
         }
     }
@@ -175,6 +176,16 @@ public class MybatisPlusJoinAutoConfiguration {
         public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
             this.listableBeanFactory = beanFactory;
             SpringContentUtils.setSpringContext(this);
+
+            try {
+                String[] names = beanFactory.getBeanNamesForType(SqlSessionFactory.class);
+                for (String name : names) {
+                    BeanDefinition definition = beanFactory.getBeanDefinition(name);
+                    info(String.format("MPJ SqlSessionFactory bean definition: %s factoryBeanName: %s factoryMethodName: %s source: %s",
+                            name, definition.getFactoryBeanName(), definition.getFactoryMethodName(), definition.getSource()));
+                }
+            } catch (Exception ignore) {
+            }
         }
     }
 }

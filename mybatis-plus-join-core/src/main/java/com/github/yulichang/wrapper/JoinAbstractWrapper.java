@@ -881,9 +881,7 @@ public abstract class JoinAbstractWrapper<T, Children extends JoinAbstractWrappe
     /**
      * 获取 columnName
      */
-    protected <X> String columnToString(Integer index, String alias, X column, boolean isJoin, PrefixEnum prefixEnum, boolean orderBy) {
-        return (String) column;
-    }
+    abstract protected <X> String columnToString(Integer index, String alias, SFunction<X, ?> column, boolean isJoin, PrefixEnum prefixEnum, boolean orderBy);
 
     protected String columnToString(String column) {
         if (checkSqlInjection && MPJSqlInjectionUtils.check(column)) {
@@ -906,11 +904,10 @@ public abstract class JoinAbstractWrapper<T, Children extends JoinAbstractWrappe
      *
      * @param columns 多字段
      */
-    abstract <X> String columnsToString(Integer index, PrefixEnum prefixEnum, String alias, X... columns);
+    abstract <X> String columnsToString(Integer index, PrefixEnum prefixEnum, String alias, SFunction<X, ?>... columns);
 
     public <X> String columnsToString(Integer index, PrefixEnum prefixEnum, String alias, boolean orderBy, List<X> columns) {
-        return columns.stream().map(i ->
-                        columnToString(index, alias, (SFunction<?, ?>) i, false, prefixEnum, orderBy))
+        return columns.stream().map(i -> columnToString(index, alias, (SFunction<?, ?>) i, false, prefixEnum, orderBy))
                 .collect(joining(StringPool.COMMA));
     }
 

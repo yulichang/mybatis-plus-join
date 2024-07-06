@@ -66,7 +66,6 @@
                 <artifactId>flatten-maven-plugin</artifactId>
                 <version>1.5.0</version>
                 <configuration>
-                    <!-- 是否更新pom文件，此处还有更高级的用法 -->
                     <updatePomFile>true</updatePomFile>
                     <flattenMode>resolveCiFriendliesOnly</flattenMode>
                 </configuration>

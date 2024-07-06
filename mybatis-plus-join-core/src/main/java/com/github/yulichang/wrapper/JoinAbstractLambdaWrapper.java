@@ -216,20 +216,16 @@ public abstract class JoinAbstractLambdaWrapper<T, Children extends JoinAbstract
         return decode;
     }
 
-    @Override
-    protected <X> String columnToString(Integer index, String alias, X column, boolean isJoin, PrefixEnum prefixEnum, boolean orderBy) {
-        return columnToString(index, alias, (SFunction<?, ?>) column, isJoin, prefixEnum, orderBy);
-    }
 
     @Override
     @SafeVarargs
-    protected final <X> String columnsToString(Integer index, PrefixEnum prefixEnum, String alias, X... columns) {
-        return Arrays.stream(columns).map(i ->
-                        columnToString(index, alias, (SFunction<?, ?>) i, false, prefixEnum, false))
+    protected final <X> String columnsToString(Integer index, PrefixEnum prefixEnum, String alias, SFunction<X, ?>... columns) {
+        return Arrays.stream(columns).map(i -> columnToString(index, alias, i, false, prefixEnum, false))
                 .collect(joining(StringPool.COMMA));
     }
 
-    protected String columnToString(Integer index, String alias, SFunction<?, ?> column, boolean isJoin, PrefixEnum prefixEnum, boolean orderBy) {
+    @Override
+    protected <X> String columnToString(Integer index, String alias, SFunction<X, ?> column, boolean isJoin, PrefixEnum prefixEnum, boolean orderBy) {
         Class<?> entityClass = LambdaUtils.getEntityClass(column);
         if (orderBy) {
             TableInfo info = TableHelper.get(entityClass);

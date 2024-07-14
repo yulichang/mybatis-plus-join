@@ -1,5 +1,6 @@
 package com.github.yulichang.wrapper.interfaces;
 
+import com.github.yulichang.wrapper.resultmap.Label;
 import com.github.yulichang.wrapper.segments.Select;
 
 import java.util.List;
@@ -16,11 +17,11 @@ public interface SelectWrapper<Entity, Children> {
 
     List<Select> getSelectColumns();
 
-    Children selectAll(Class<?> clazz);
+    Children selectAll();
 
     boolean isResultMap();
 
-    List<?> getResultMapMybatisLabel();
+    List<Label<?>> getResultMapMybatisLabel();
 
     String getFrom();
 

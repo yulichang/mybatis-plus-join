@@ -1,6 +1,8 @@
 package com.github.yulichang.wrapper.segments;
 
 import com.baomidou.mybatisplus.core.metadata.TableFieldInfo;
+import com.github.yulichang.apt.BaseColumn;
+import com.github.yulichang.apt.Column;
 import com.github.yulichang.wrapper.enums.BaseFuncEnum;
 import org.apache.ibatis.type.TypeHandler;
 
@@ -51,4 +53,12 @@ public interface Select extends Serializable {
     boolean isLabel();
 
     boolean isStr();
+
+    default Column[] getColumns() {
+        return null;
+    }
+
+    default BaseColumn<?> getBaseColumn() {
+        return null;
+    }
 }

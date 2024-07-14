@@ -2,6 +2,7 @@ package com.github.yulichang.wrapper.segments;
 
 
 import com.baomidou.mybatisplus.core.metadata.TableFieldInfo;
+import com.github.yulichang.apt.BaseColumn;
 import com.github.yulichang.wrapper.enums.BaseFuncEnum;
 import lombok.Getter;
 import org.apache.ibatis.type.TypeHandler;
@@ -29,24 +30,28 @@ public class SelectLabel implements Select {
 
     private final String tableAlias;
 
-    public SelectLabel(SelectCache cache, Integer index, Class<?> tagClass, boolean hasTableAlias, String tableAlias) {
+    private final BaseColumn<?> baseColumn;
+
+    public SelectLabel(SelectCache cache, Integer index, Class<?> tagClass, boolean hasTableAlias, String tableAlias, BaseColumn<?> baseColumn) {
         this.cache = cache;
         this.index = index;
         this.tagClass = tagClass;
         this.hasAlias = false;
         this.alias = null;
         this.hasTableAlias = hasTableAlias;
-        this.tableAlias = tableAlias;
+        this.tableAlias = hasTableAlias ? tableAlias : null;
+        this.baseColumn = baseColumn;
     }
 
-    public SelectLabel(SelectCache cache, Integer index, Class<?> tagClass, String column, boolean hasTableAlias, String tableAlias) {
+    public SelectLabel(SelectCache cache, Integer index, Class<?> tagClass, String column, boolean hasTableAlias, String tableAlias, BaseColumn<?> baseColumn) {
         this.cache = cache;
         this.index = index;
         this.tagClass = tagClass;
         this.hasAlias = true;
         this.alias = column;
         this.hasTableAlias = hasTableAlias;
-        this.tableAlias = tableAlias;
+        this.tableAlias = hasTableAlias ? tableAlias : null;
+        this.baseColumn = baseColumn;
     }
 
     @Override

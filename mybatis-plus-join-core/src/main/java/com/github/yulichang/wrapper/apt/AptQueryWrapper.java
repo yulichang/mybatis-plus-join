@@ -1,21 +1,26 @@
-package com.github.yulichang.wrapper;
+package com.github.yulichang.wrapper.apt;
 
 import com.baomidou.mybatisplus.core.conditions.SharedString;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.segments.MergeSegments;
 import com.baomidou.mybatisplus.core.toolkit.*;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
+import com.github.yulichang.apt.BaseColumn;
+import com.github.yulichang.apt.Column;
 import com.github.yulichang.config.ConfigProperties;
 import com.github.yulichang.toolkit.LambdaUtils;
 import com.github.yulichang.toolkit.*;
 import com.github.yulichang.toolkit.support.ColumnCache;
+import com.github.yulichang.wrapper.apt.interfaces.Query;
+import com.github.yulichang.wrapper.apt.interfaces.QueryLabel;
 import com.github.yulichang.wrapper.enums.IfExistsSqlKeyWordEnum;
 import com.github.yulichang.wrapper.interfaces.Chain;
-import com.github.yulichang.wrapper.interfaces.Query;
-import com.github.yulichang.wrapper.interfaces.QueryLabel;
 import com.github.yulichang.wrapper.interfaces.SelectWrapper;
 import com.github.yulichang.wrapper.resultmap.Label;
-import com.github.yulichang.wrapper.segments.*;
+import com.github.yulichang.wrapper.segments.Select;
+import com.github.yulichang.wrapper.segments.SelectApt;
+import com.github.yulichang.wrapper.segments.SelectCache;
+import com.github.yulichang.wrapper.segments.SelectSub;
 import lombok.Getter;
 
 import java.util.*;
@@ -25,14 +30,14 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 /**
- * 参考 {@link com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper}
  * Lambda 语法使用 Wrapper
  *
  * @author yulichang
+ * @since 1.5.0
  */
-@SuppressWarnings({"unused", "DuplicatedCode"})
-public class MPJLambdaWrapper<T> extends JoinAbstractLambdaWrapper<T, MPJLambdaWrapper<T>> implements
-        Query<MPJLambdaWrapper<T>>, QueryLabel<MPJLambdaWrapper<T>>, Chain<T>, SelectWrapper<T, MPJLambdaWrapper<T>> {
+@SuppressWarnings("unused")
+public class AptQueryWrapper<T> extends AptAbstractWrapper<T, AptQueryWrapper<T>> implements
+        Query<AptQueryWrapper<T>>, QueryLabel<AptQueryWrapper<T>>, Chain<T>, SelectWrapper<T, AptQueryWrapper<T>> {
 
     /**
      * 查询字段 sql
@@ -69,66 +74,32 @@ public class MPJLambdaWrapper<T> extends JoinAbstractLambdaWrapper<T, MPJLambdaW
     @Getter
     private Map<String, Wrapper<?>> wrapperMap;
 
-    /**
-     * 推荐使用 带 class 的构造方法
-     */
-    public MPJLambdaWrapper() {
-        super();
-    }
 
     /**
      * 推荐使用此构造方法
      */
-    public MPJLambdaWrapper(Class<T> clazz) {
-        super(clazz);
+    public AptQueryWrapper(BaseColumn<T> baseColumn) {
+        super(baseColumn);
     }
 
-    /**
-     * 构造方法
-     *
-     * @param entity 主表实体
-     */
-    public MPJLambdaWrapper(T entity) {
-        super(entity);
+
+    public AptQueryWrapper(BaseColumn<T> baseColumn, T entity) {
+        super(baseColumn, entity);
     }
 
-    /**
-     * 自定义主表别名
-     */
-    public MPJLambdaWrapper(String alias) {
-        super(alias);
-    }
-
-    /**
-     * 构造方法
-     *
-     * @param clazz 主表class类
-     * @param alias 主表别名
-     */
-    public MPJLambdaWrapper(Class<T> clazz, String alias) {
-        super(clazz, alias);
-    }
-
-    /**
-     * 构造方法
-     *
-     * @param entity 主表实体类
-     * @param alias  主表别名
-     */
-    public MPJLambdaWrapper(T entity, String alias) {
-        super(entity, alias);
-    }
 
     /**
      * 不建议直接 new 该实例，使用 JoinWrappers.lambda(UserDO.class)
      */
-    protected MPJLambdaWrapper(T entity, Class<T> entityClass, SharedString sqlSelect, AtomicInteger paramNameSeq,
-                               Map<String, Object> paramNameValuePairs, MergeSegments mergeSegments, SharedString paramAlias,
-                               SharedString lastSql, SharedString sqlComment, SharedString sqlFirst,
-                               TableList tableList, Integer index, String keyWord, Class<?> joinClass, String tableName,
-                               BiPredicate<Object, IfExistsSqlKeyWordEnum> IfExists) {
+    protected AptQueryWrapper(T entity, BaseColumn<T> baseColumn, SharedString sqlSelect, AtomicInteger paramNameSeq,
+                              Map<String, Object> paramNameValuePairs, MergeSegments mergeSegments, SharedString paramAlias,
+                              SharedString lastSql, SharedString sqlComment, SharedString sqlFirst,
+                              TableMap<BaseColumn<?>, String> aptIndex, Integer index, String keyWord, Class<?> joinClass, String tableName,
+                              BiPredicate<Object, IfExistsSqlKeyWordEnum> IfExists) {
+        super(baseColumn);
         super.setEntity(entity);
-        super.setEntityClass(entityClass);
+        super.setEntityClass(baseColumn.getColumnClass());
+        this.baseColumn = baseColumn;
         this.paramNameSeq = paramNameSeq;
         this.paramNameValuePairs = paramNameValuePairs;
         this.expression = mergeSegments;
@@ -137,7 +108,7 @@ public class MPJLambdaWrapper<T> extends JoinAbstractLambdaWrapper<T, MPJLambdaW
         this.lastSql = lastSql;
         this.sqlComment = sqlComment;
         this.sqlFirst = sqlFirst;
-        this.tableList = tableList;
+        this.aptIndex = aptIndex;
         this.index = index;
         this.keyWord = keyWord;
         this.joinClass = joinClass;
@@ -150,7 +121,7 @@ public class MPJLambdaWrapper<T> extends JoinAbstractLambdaWrapper<T, MPJLambdaW
      * sql去重
      * select distinct
      */
-    public MPJLambdaWrapper<T> distinct() {
+    public AptQueryWrapper<T> distinct() {
         this.selectDistinct = true;
         return typedThis;
     }
@@ -168,7 +139,7 @@ public class MPJLambdaWrapper<T> extends JoinAbstractLambdaWrapper<T, MPJLambdaW
     }
 
     @Override
-    public MPJLambdaWrapper<T> getChildren() {
+    public AptQueryWrapper<T> getChildren() {
         return typedThis;
     }
 
@@ -179,47 +150,26 @@ public class MPJLambdaWrapper<T> extends JoinAbstractLambdaWrapper<T, MPJLambdaW
      * @param columns 字段数组
      * @return children
      */
-    @SafeVarargs
-    public final <E> MPJLambdaWrapper<T> select(SFunction<E, ?>... columns) {
+    public final AptQueryWrapper<T> select(Column... columns) {
         if (ArrayUtils.isNotEmpty(columns)) {
-            Class<?> aClass = LambdaUtils.getEntityClass(columns[0]);
-            Map<String, SelectCache> cacheMap = ColumnCache.getMapField(aClass);
-            for (SFunction<E, ?> s : columns) {
-                SelectCache cache = cacheMap.get(LambdaUtils.getName(s));
-                getSelectColum().add(new SelectNormal(cache, index, hasAlias, alias));
+            for (Column s : columns) {
+                Map<String, SelectCache> cacheMap = ColumnCache.getMapField(s.getClazz());
+                SelectCache cache = cacheMap.get(s.getProperty());
+                getSelectColum().add(new SelectApt(cache, s));
             }
         }
         return typedThis;
     }
 
-    @Override
-    public MPJLambdaWrapper<T> selectAll(Class<?> clazz) {
-        return Query.super.selectAll(clazz);
-    }
 
     /**
      * 查询实体类全部字段
-     *
-     * @param clazz   查询的实体类
-     * @param exclude 排除字段
      */
     @Override
-    @SafeVarargs
-    public final <E> MPJLambdaWrapper<T> selectAll(Class<E> clazz, SFunction<E, ?>... exclude) {
-        return Query.super.selectAll(clazz, exclude);
+    public final <E> AptQueryWrapper<T> selectAll(BaseColumn<E> baseColumn, Column... exclude) {
+        return Query.super.selectAll(baseColumn, exclude);
     }
 
-    /**
-     * 查询实体类全部字段
-     *
-     * @param clazz   查询的实体类
-     * @param exclude 排除字段
-     */
-    @Override
-    @SafeVarargs
-    public final <E> MPJLambdaWrapper<T> selectAll(Class<E> clazz, String prefix, SFunction<E, ?>... exclude) {
-        return Query.super.selectAll(clazz, prefix, exclude);
-    }
 
     /**
      * 查询主表全部字段
@@ -228,53 +178,52 @@ public class MPJLambdaWrapper<T> extends JoinAbstractLambdaWrapper<T, MPJLambdaW
      *
      * @return children
      */
-    public MPJLambdaWrapper<T> selectAll() {
-        Assert.notNull(getEntityClass(), "使用 JoinWrappers.lambda(clazz) 或者 new MPJLambdaQueryWrapper<>(clazz)");
-        return selectAll(getEntityClass());
+    @Override
+    public AptQueryWrapper<T> selectAll() {
+        Assert.notNull(getEntityClass(), "使用 JoinWrappers.apt(clazz) 或者 new JoinAptQueryWrapper<>(BaseColum)");
+        return selectAll(getBaseColumn());
     }
 
     /**
      * 子查询
      */
-    public <E, F> MPJLambdaWrapper<T> selectSub(Class<E> clazz, Consumer<MPJLambdaWrapper<E>> consumer, SFunction<F, ?> alias) {
-        return selectSub(clazz, ConfigProperties.subQueryAlias, consumer, alias);
+    public <E, F> AptQueryWrapper<T> selectSub(BaseColumn<E> baseColumn, Consumer<AptQueryWrapper<E>> consumer, SFunction<F, ?> alias) {
+        return selectSub(baseColumn, ConfigProperties.subQueryAlias, consumer, alias);
     }
 
     /**
      * 子查询
      */
-    public <E, F> MPJLambdaWrapper<T> selectSub(Class<E> clazz, String st, Consumer<MPJLambdaWrapper<E>> consumer, SFunction<F, ?> alias) {
-        MPJLambdaWrapper<E> wrapper = new MPJLambdaWrapper<E>(null, clazz, SharedString.emptyString(),
+    public <E, F> AptQueryWrapper<T> selectSub(BaseColumn<E> baseColumn, String st, Consumer<AptQueryWrapper<E>> consumer, SFunction<F, ?> alias) {
+        AptQueryWrapper<E> wrapper = new AptQueryWrapper<E>(null, baseColumn, SharedString.emptyString(),
                 paramNameSeq, paramNameValuePairs, new MergeSegments(), new SharedString(this.paramAlias
                 .getStringValue()), SharedString.emptyString(), SharedString.emptyString(), SharedString.emptyString(),
-                new TableList(), null, null, null, null, ifExists) {
+                this.aptIndex, null, null, null, null, ifExists) {
         };
-        wrapper.tableList.setAlias(st);
-        wrapper.tableList.setRootClass(clazz);
-        wrapper.tableList.setParent(this.tableList);
         wrapper.alias = st;
         wrapper.subTableAlias = st;
         consumer.accept(wrapper);
         addCustomWrapper(wrapper);
         String name = LambdaUtils.getName(alias);
-        this.selectColumns.add(new SelectSub(() -> WrapperUtils.buildSubSqlByWrapper(clazz, wrapper, name), hasAlias, this.alias, name));
+        this.selectColumns.add(new SelectSub(() -> AptWrapperUtils.buildSubSqlByWrapper(baseColumn.getColumnClass(), wrapper, name), hasAlias, this.alias, name));
         return typedThis;
     }
+
 
     /**
      * union
      * <p>
      * 例： wrapper.union(UserDO.class, union -> union.selectAll(UserDO.class))
      *
-     * @param clazz union语句的主表类型
+     * @param baseColumn union语句的主表类型
      * @since 1.4.8
      */
-    public <U> MPJLambdaWrapper<T> union(Class<U> clazz, Consumer<MPJLambdaWrapper<U>> consumer) {
-        MPJLambdaWrapper<U> unionWrapper = JoinWrappers.lambda(clazz);
+    public <U> AptQueryWrapper<T> union(BaseColumn<U> baseColumn, Consumer<AptQueryWrapper<U>> consumer) {
+        AptQueryWrapper<U> unionWrapper = JoinWrappers.apt(baseColumn);
         addCustomWrapper(unionWrapper);
         consumer.accept(unionWrapper);
 
-        String sb = " UNION " + WrapperUtils.buildUnionSqlByWrapper(clazz, unionWrapper);
+        String sb = " UNION " + AptWrapperUtils.buildUnionSqlByWrapper(baseColumn.getColumnClass(), unionWrapper);
 
         if (Objects.isNull(unionSql)) {
             unionSql = SharedString.emptyString();
@@ -282,22 +231,21 @@ public class MPJLambdaWrapper<T> extends JoinAbstractLambdaWrapper<T, MPJLambdaW
         unionSql.setStringValue(unionSql.getStringValue() + sb);
         return typedThis;
     }
-
 
     /**
      * union
      * <p>
      * 例： wrapper.unionAll(UserDO.class, union -> union.selectAll(UserDO.class))
      *
-     * @param clazz union语句的主表类型
+     * @param baseColumn union语句的主表类型
      * @since 1.4.8
      */
-    public <U> MPJLambdaWrapper<T> unionAll(Class<U> clazz, Consumer<MPJLambdaWrapper<U>> consumer) {
-        MPJLambdaWrapper<U> unionWrapper = JoinWrappers.lambda(clazz);
+    public <U> AptQueryWrapper<T> unionAll(BaseColumn<U> baseColumn, Consumer<AptQueryWrapper<U>> consumer) {
+        AptQueryWrapper<U> unionWrapper = JoinWrappers.apt(baseColumn);
         addCustomWrapper(unionWrapper);
         consumer.accept(unionWrapper);
 
-        String sb = " UNION ALL " + WrapperUtils.buildUnionSqlByWrapper(clazz, unionWrapper);
+        String sb = " UNION ALL " + AptWrapperUtils.buildUnionSqlByWrapper(baseColumn.getColumnClass(), unionWrapper);
 
         if (Objects.isNull(unionSql)) {
             unionSql = SharedString.emptyString();
@@ -306,7 +254,7 @@ public class MPJLambdaWrapper<T> extends JoinAbstractLambdaWrapper<T, MPJLambdaW
         return typedThis;
     }
 
-    private void addCustomWrapper(MPJLambdaWrapper<?> wrapper) {
+    private void addCustomWrapper(AptQueryWrapper<?> wrapper) {
         if (Objects.isNull(wrapperIndex)) {
             wrapperIndex = new AtomicInteger(0);
         }
@@ -329,27 +277,18 @@ public class MPJLambdaWrapper<T> extends JoinAbstractLambdaWrapper<T, MPJLambdaW
                 if (i.isStr()) {
                     return i.getColumn();
                 }
-                String prefix;
-                if (i.isHasTableAlias()) {
-                    prefix = i.getTableAlias();
-                } else {
-                    prefix = tableList.getPrefix(i.getIndex(), i.getClazz(), i.isLabel());
-                }
-                String str = prefix + StringPool.DOT + i.getColumn();
                 if (i.isFunc()) {
-                    SelectFunc.Arg[] args = i.getArgs();
-                    if (Objects.isNull(args) || args.length == 0) {
-                        return String.format(i.getFunc().getSql(), str) + Constant.AS + i.getAlias();
-                    } else {
-                        return String.format(i.getFunc().getSql(), Arrays.stream(args).map(arg -> {
-                            String pf = arg.isHasTableAlias() ? arg.getTableAlias() : tableList.getPrefixByClass(arg.getClazz());
-                            Map<String, SelectCache> mapField = ColumnCache.getMapField(arg.getClazz());
-                            SelectCache cache = mapField.get(arg.getProp());
-                            return pf + StringPool.DOT + cache.getColumn();
-                        }).toArray()) + Constant.AS + i.getAlias();
-                    }
+                    return String.format(i.getFunc().getSql(), Arrays.stream(i.getColumns()).map(c ->
+                            getPrefix(c.getRoot()) + StringPool.DOT + i.getColumn()).toArray()) + Constant.AS + i.getAlias();
                 } else {
-                    return i.isHasAlias() ? (str + Constant.AS + i.getAlias()) : str;
+                    String prefix;
+                    if (null == i.getTableAlias() && null != i.getBaseColumn()) {
+                        prefix = getPrefix(i.getBaseColumn());
+                    } else {
+                        prefix = i.getTableAlias();
+                    }
+                    String col = prefix + StringPool.DOT + i.getColumn();
+                    return i.isHasAlias() ? col + Constants.AS + i.getAlias() : col;
                 }
             }).collect(Collectors.joining(StringPool.COMMA));
             sqlSelect.setStringValue(s);
@@ -371,20 +310,20 @@ public class MPJLambdaWrapper<T> extends JoinAbstractLambdaWrapper<T, MPJLambdaW
      * <p>故 sqlSelect 不向下传递</p>
      */
     @Override
-    protected MPJLambdaWrapper<T> instance() {
+    protected AptQueryWrapper<T> instance() {
         return instance(index, null, null, null);
     }
 
     @Override
-    protected MPJLambdaWrapper<T> instanceEmpty() {
-        return new MPJLambdaWrapper<>();
+    protected AptQueryWrapper<T> instanceEmpty() {
+        return new AptQueryWrapper<>(getBaseColumn());
     }
 
     @Override
-    protected MPJLambdaWrapper<T> instance(Integer index, String keyWord, Class<?> joinClass, String tableName) {
-        return new MPJLambdaWrapper<>(getEntity(), getEntityClass(), null, paramNameSeq, paramNameValuePairs,
+    protected AptQueryWrapper<T> instance(Integer index, String keyWord, Class<?> joinClass, String tableName) {
+        return new AptQueryWrapper<>(getEntity(), baseColumn, null, paramNameSeq, paramNameValuePairs,
                 new MergeSegments(), this.paramAlias, SharedString.emptyString(), SharedString.emptyString(), SharedString.emptyString(),
-                this.tableList, index, keyWord, joinClass, tableName, ifExists);
+                this.aptIndex, index, keyWord, joinClass, tableName, ifExists);
     }
 
     @Override

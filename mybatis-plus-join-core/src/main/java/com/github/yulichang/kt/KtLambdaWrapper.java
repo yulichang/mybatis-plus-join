@@ -188,8 +188,8 @@ public class KtLambdaWrapper<T> extends KtAbstractLambdaWrapper<T, KtLambdaWrapp
     }
 
     @Override
-    public KtLambdaWrapper<T> selectAll(Class<?> clazz) {
-        return Query.super.selectAll(clazz);
+    public KtLambdaWrapper<T> selectAll() {
+        return Query.super.selectAll(getEntityClass());
     }
 
     /**

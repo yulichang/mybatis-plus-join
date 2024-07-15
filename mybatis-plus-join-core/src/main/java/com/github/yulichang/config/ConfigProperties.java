@@ -3,8 +3,7 @@ package com.github.yulichang.config;
 import com.github.yulichang.config.enums.IfExistsEnum;
 import com.github.yulichang.config.enums.LogicDelTypeEnum;
 import com.github.yulichang.wrapper.enums.IfExistsSqlKeyWordEnum;
-
-import java.util.function.BiPredicate;
+import com.github.yulichang.wrapper.interfaces.MBiPredicate;
 
 /**
  * @author yulichang
@@ -53,5 +52,13 @@ public class ConfigProperties {
      * <p>
      * NOT_BLANK 非空白字符串  例： "" -> false, " " -> false, "\r" -> false, "abc" -> true ...
      */
-    public static BiPredicate<Object, IfExistsSqlKeyWordEnum> ifExists = (val, key) -> IfExistsEnum.NOT_EMPTY.test(val);
+    public static MBiPredicate<Object, IfExistsSqlKeyWordEnum> ifExists = (val, key) -> IfExistsEnum.NOT_EMPTY.test(val);
+
+
+    /**
+     * 暂存 不可使用 用于规避starter包中需要序列化
+     */
+    public static class Convert {
+        public static IfExistsEnum IfExists = IfExistsEnum.NOT_EMPTY;
+    }
 }

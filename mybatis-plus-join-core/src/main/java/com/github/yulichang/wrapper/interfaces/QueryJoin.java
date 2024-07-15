@@ -362,7 +362,7 @@ public interface QueryJoin<Children, Entity> extends MPJBaseJoin<Entity>, String
      * @param right   扩展 用于关联表的 select 和 where
      */
     default <T, X> Children join(String keyWord, Class<T> clazz, SFunction<T, ?> left, String rightAlias, SFunction<X, ?> right) {
-        return join(keyWord, clazz, on -> on.eq(left, rightAlias,right));
+        return join(keyWord, clazz, on -> on.eq(left, rightAlias, right));
     }
 
     /**

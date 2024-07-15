@@ -264,7 +264,7 @@ public class MybatisLabel<E, T> implements Label<T> {
                         result.setIndex(mybatisLabel.index);
                         result.setProperty(i.getColumProperty());
                         result.setJavaType(i.getColumnType());
-                        result.setJdbcType(Objects.isNull(i.getTableFieldInfo()) ? null : i.getTableFieldInfo().getJdbcType());
+                        result.setJdbcType(i.getJdbcType());
                         result.setSelectNormal(i);
                         return result;
                     }).collect(Collectors.toList()));

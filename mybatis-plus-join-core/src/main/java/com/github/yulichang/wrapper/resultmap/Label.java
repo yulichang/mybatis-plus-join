@@ -1,5 +1,6 @@
 package com.github.yulichang.wrapper.resultmap;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
@@ -8,7 +9,7 @@ import java.util.List;
  * @author yulichang
  * @since 2023/3/17 11:35
  */
-public interface Label<T> {
+public interface Label<T> extends Serializable {
 
     String getProperty();
 

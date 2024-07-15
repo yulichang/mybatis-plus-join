@@ -1,8 +1,8 @@
 package com.github.yulichang.wrapper.segments;
 
-import com.baomidou.mybatisplus.core.metadata.TableFieldInfo;
 import com.baomidou.mybatisplus.core.toolkit.StringPool;
 import com.github.yulichang.wrapper.enums.BaseFuncEnum;
+import org.apache.ibatis.type.JdbcType;
 import org.apache.ibatis.type.TypeHandler;
 
 import java.util.Objects;
@@ -24,7 +24,7 @@ public class SelectSub implements Select {
 
     private final String tagProperty;
 
-    public SelectSub(Supplier<String> column, boolean hasTableAlias, String tableAlias,String tagProperty) {
+    public SelectSub(Supplier<String> column, boolean hasTableAlias, String tableAlias, String tagProperty) {
         this.column = column;
         this.hasTableAlias = hasTableAlias;
         this.tableAlias = tableAlias;
@@ -97,7 +97,12 @@ public class SelectSub implements Select {
     }
 
     @Override
-    public TableFieldInfo getTableFieldInfo() {
+    public Class<?> getPropertyType() {
+        return null;
+    }
+
+    @Override
+    public JdbcType getJdbcType() {
         return null;
     }
 

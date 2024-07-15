@@ -3,7 +3,9 @@ package com.github.yulichang.wrapper.resultmap;
 import com.github.yulichang.wrapper.segments.SelectCache;
 import org.apache.ibatis.type.JdbcType;
 
-public interface IResult {
+import java.io.Serializable;
+
+public interface IResult extends Serializable {
 
     boolean isId();
 

@@ -1,12 +1,12 @@
 package com.github.yulichang.wrapper.segments;
 
 
-import com.baomidou.mybatisplus.core.metadata.TableFieldInfo;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.github.yulichang.toolkit.LambdaUtils;
 import com.github.yulichang.wrapper.enums.BaseFuncEnum;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import org.apache.ibatis.type.JdbcType;
 import org.apache.ibatis.type.TypeHandler;
 
 import java.util.Arrays;
@@ -143,8 +143,13 @@ public class SelectFunc implements Select {
     }
 
     @Override
-    public TableFieldInfo getTableFieldInfo() {
-        return Objects.isNull(cache) ? null : cache.getTableFieldInfo();
+    public Class<?> getPropertyType() {
+        return Objects.isNull(cache) ? null : cache.getPropertyType();
+    }
+
+    @Override
+    public JdbcType getJdbcType() {
+        return Objects.isNull(cache) ? null : cache.getJdbcType();
     }
 
     @Override

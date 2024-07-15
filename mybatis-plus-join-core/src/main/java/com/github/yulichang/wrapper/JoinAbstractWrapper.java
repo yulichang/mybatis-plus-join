@@ -122,7 +122,7 @@ public abstract class JoinAbstractWrapper<T, Children extends JoinAbstractWrappe
      * IfExists 策略
      */
     @Getter
-    protected BiPredicate<Object, IfExistsSqlKeyWordEnum> ifExists = ConfigProperties.ifExists;
+    protected MBiPredicate<Object, IfExistsSqlKeyWordEnum> ifExists = ConfigProperties.ifExists;
 
     @Override
     public T getEntity() {
@@ -175,7 +175,7 @@ public abstract class JoinAbstractWrapper<T, Children extends JoinAbstractWrappe
         return typedThis;
     }
 
-    public Children setIfExists(BiPredicate<Object, IfExistsSqlKeyWordEnum> IfExists) {
+    public Children setIfExists(MBiPredicate<Object, IfExistsSqlKeyWordEnum> IfExists) {
         this.ifExists = IfExists;
         return typedThis;
     }
@@ -329,7 +329,7 @@ public abstract class JoinAbstractWrapper<T, Children extends JoinAbstractWrappe
                 () -> formatSqlMaybeWithParam(applySql, null, values)));
     }
 
-    public Children applyFunc(String applySql, Function<FuncConsumer, SFunction<?, ?>[]> consumerFunction, Object... values) {
+    public Children applyFunc(String applySql, SFunction<FuncConsumer, SFunction<?, ?>[]> consumerFunction, Object... values) {
         return applyFunc(true, applySql, consumerFunction, values);
     }
 

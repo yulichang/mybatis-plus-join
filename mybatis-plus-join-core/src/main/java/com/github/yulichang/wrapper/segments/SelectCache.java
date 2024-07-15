@@ -8,11 +8,15 @@ import com.github.yulichang.toolkit.MPJStringUtils;
 import com.github.yulichang.toolkit.TableHelper;
 import lombok.Getter;
 import org.apache.ibatis.session.Configuration;
+import org.apache.ibatis.type.JdbcType;
 import org.apache.ibatis.type.TypeHandler;
 import org.apache.ibatis.type.TypeHandlerRegistry;
 import org.apache.ibatis.type.UnknownTypeHandler;
 
+import java.io.Serializable;
+import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * 缓存
@@ -21,7 +25,7 @@ import java.util.Objects;
  * @since 1.3.10
  */
 @Getter
-public class SelectCache {
+public class SelectCache implements Serializable {
 
     /**
      * 实体类
@@ -56,19 +60,16 @@ public class SelectCache {
     private final String columProperty;
 
     /**
-     * mp 字段信息
-     */
-    private final TableFieldInfo tableFieldInfo;
-
-    /**
      * 使用使用 hasTypeHandle
      */
     private final boolean hasTypeHandle;
 
     /**
-     * hasTypeHandle 类型
+     * tableFieldInfo中信息
      */
-    private final TypeHandler<?> typeHandler;
+    private final Class<?> propertyType;
+    private final JdbcType jdbcType;
+    private final Class<? extends TypeHandler<?>> typeHandlerClass;
 
     /**
      * 是否查询
@@ -82,29 +83,48 @@ public class SelectCache {
         this.columnType = columnType;
         this.columProperty = columProperty;
         this.tagColumn = MPJStringUtils.getTargetColumn(column);
-        this.tableFieldInfo = tableFieldInfo;
         this.isSelect = isSelect;
         if (Objects.isNull(tableFieldInfo)) {
             this.hasTypeHandle = false;
-            this.typeHandler = null;
+            this.propertyType = null;
+            this.jdbcType = null;
+            this.typeHandlerClass = null;
         } else {
-            this.hasTypeHandle = this.tableFieldInfo.getTypeHandler() != null && tableFieldInfo.getTypeHandler() != UnknownTypeHandler.class;
-            if (this.hasTypeHandle) {
-                TableInfo info = TableHelper.getAssert(clazz);
-                this.typeHandler = getTypeHandler(AdapterHelper.getAdapter().mpjGetConfiguration(info), tableFieldInfo);
-            } else {
-                this.typeHandler = null;
-            }
+            this.propertyType = tableFieldInfo.getPropertyType();
+            this.jdbcType = tableFieldInfo.getJdbcType();
+            this.typeHandlerClass = tableFieldInfo.getTypeHandler();
+            this.hasTypeHandle = tableFieldInfo.getTypeHandler() != null && tableFieldInfo.getTypeHandler() != UnknownTypeHandler.class;
         }
     }
 
+    public TypeHandler<?> getTypeHandler() {
+        if (this.hasTypeHandle) {
+            return Cache.getTypeHandlerCache(this.clazz, this.typeHandlerClass, this.propertyType);
+        }
+        return null;
+    }
 
-    private TypeHandler<?> getTypeHandler(Configuration configuration, TableFieldInfo info) {
+    private static TypeHandler<?> getTypeHandler(Configuration configuration, Class<?> propertyType, Class<? extends TypeHandler<?>> typeHandlerClass) {
         TypeHandlerRegistry registry = configuration.getTypeHandlerRegistry();
-        TypeHandler<?> typeHandler = registry.getMappingTypeHandler(info.getTypeHandler());
+        TypeHandler<?> typeHandler = registry.getMappingTypeHandler(typeHandlerClass);
         if (typeHandler == null) {
-            typeHandler = registry.getInstance(info.getPropertyType(), info.getTypeHandler());
+            typeHandler = registry.getInstance(propertyType, typeHandlerClass);
         }
         return typeHandler;
+    }
+
+    public static class Cache {
+        private static final Map<Class<?>, Map<Class<?>, TypeHandler<?>>> CACHE = new ConcurrentHashMap<>();
+
+        public static TypeHandler<?> getTypeHandlerCache(Class<?> table, Class<? extends TypeHandler<?>> typeHandler, Class<?> propertyType) {
+            if (table == null || typeHandler == null) {
+                return null;
+            }
+            Map<Class<?>, TypeHandler<?>> map = CACHE.computeIfAbsent(table, k -> new ConcurrentHashMap<>());
+            return map.computeIfAbsent(typeHandler, k -> {
+                TableInfo info = TableHelper.getAssert(table);
+                return getTypeHandler(AdapterHelper.getAdapter().mpjGetConfiguration(info), propertyType, typeHandler);
+            });
+        }
     }
 }

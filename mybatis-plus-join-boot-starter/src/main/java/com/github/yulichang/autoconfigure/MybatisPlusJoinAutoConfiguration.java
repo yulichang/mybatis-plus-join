@@ -12,6 +12,7 @@ import com.github.yulichang.injector.MPJSqlInjector;
 import com.github.yulichang.interceptor.MPJInterceptor;
 import com.github.yulichang.toolkit.SpringContentUtils;
 import com.github.yulichang.wrapper.enums.IfExistsSqlKeyWordEnum;
+import com.github.yulichang.wrapper.interfaces.MBiPredicate;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.mybatis.spring.SqlSessionFactoryBean;
 import org.slf4j.Logger;
@@ -42,7 +43,6 @@ import org.springframework.core.annotation.Order;
 import javax.sql.DataSource;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.BiPredicate;
 
 /**
  * springboot 自动配置类
@@ -73,9 +73,10 @@ public class MybatisPlusJoinAutoConfiguration {
         ConfigProperties.subQueryAlias = this.properties.getSubQueryAlias();
         ConfigProperties.subTableLogic = this.properties.getSubTableLogic();
         ConfigProperties.mappingMaxCount = this.properties.getMappingMaxCount();
+        ConfigProperties.Convert.IfExists = this.properties.getIfExists();
         ConfigProperties.ifExists = Optional.ofNullable(IfExistsConsumers.getIfAvailable())
-                .map(m -> (BiPredicate<Object, IfExistsSqlKeyWordEnum>) m)
-                .orElse((val, key) -> this.properties.getIfExists().test(val));
+                .map(m -> (MBiPredicate<Object, IfExistsSqlKeyWordEnum>) m)
+                .orElse((val, key) -> ConfigProperties.Convert.IfExists.test(val));
         info("mybatis plus join properties config complete");
     }
 

@@ -1,12 +1,14 @@
 package com.github.yulichang.wrapper.enums;
 
+import java.io.Serializable;
+
 /**
  * if absent 枚举
  *
  * @author yulichang
  * @since 1.4.9
  */
-public enum IfExistsSqlKeyWordEnum {
+public enum IfExistsSqlKeyWordEnum implements Serializable {
     EQ,
     NE,
     GT,

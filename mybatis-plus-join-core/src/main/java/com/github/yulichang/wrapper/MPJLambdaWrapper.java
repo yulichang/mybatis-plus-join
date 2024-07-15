@@ -10,17 +10,13 @@ import com.github.yulichang.toolkit.LambdaUtils;
 import com.github.yulichang.toolkit.*;
 import com.github.yulichang.toolkit.support.ColumnCache;
 import com.github.yulichang.wrapper.enums.IfExistsSqlKeyWordEnum;
-import com.github.yulichang.wrapper.interfaces.Chain;
-import com.github.yulichang.wrapper.interfaces.Query;
-import com.github.yulichang.wrapper.interfaces.QueryLabel;
-import com.github.yulichang.wrapper.interfaces.SelectWrapper;
+import com.github.yulichang.wrapper.interfaces.*;
 import com.github.yulichang.wrapper.resultmap.Label;
 import com.github.yulichang.wrapper.segments.*;
 import lombok.Getter;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.BiPredicate;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -126,7 +122,7 @@ public class MPJLambdaWrapper<T> extends JoinAbstractLambdaWrapper<T, MPJLambdaW
                                Map<String, Object> paramNameValuePairs, MergeSegments mergeSegments, SharedString paramAlias,
                                SharedString lastSql, SharedString sqlComment, SharedString sqlFirst,
                                TableList tableList, Integer index, String keyWord, Class<?> joinClass, String tableName,
-                               BiPredicate<Object, IfExistsSqlKeyWordEnum> IfExists) {
+                               MBiPredicate<Object, IfExistsSqlKeyWordEnum> IfExists) {
         super.setEntity(entity);
         super.setEntityClass(entityClass);
         this.paramNameSeq = paramNameSeq;

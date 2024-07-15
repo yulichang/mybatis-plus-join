@@ -191,7 +191,7 @@ public class MPJInterceptor implements Interceptor {
     }
 
     private ResultMapping selectToResult(Class<?> entity, Select select, Class<?> type, ResultMapping.Builder builder) {
-        if (select.hasTypeHandle() && select.getTableFieldInfo().getPropertyType().isAssignableFrom(type)) {
+        if (select.hasTypeHandle() && select.getPropertyType().isAssignableFrom(type)) {
             builder.typeHandler(select.getTypeHandle());
         }
         if (select.isPk() && entity == select.getClazz()) {

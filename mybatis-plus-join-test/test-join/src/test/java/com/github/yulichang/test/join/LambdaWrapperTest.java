@@ -64,14 +64,14 @@ class LambdaWrapperTest {
         ThreadLocalUtils.set("SELECT t.id, t.user_id, t.tenant_id FROM user_tenant t WHERE t.tenant_id = 1");
         MPJLambdaWrapper<UserTenantDO> lambda = JoinWrappers.lambda(UserTenantDO.class)
                 .selectAsClass(UserTenantDO.class, UserTenantDTO.class);
-        List<UserTenantDO> list = userTenantMapper.selectJoinList(UserTenantDO.class, lambda);
+        List<UserTenantDO> list = userTenantMapper.selectJoinList(UserTenantDO.class, lambda.clone());
         assert list.size() == 5 && list.get(0).getIdea() != null;
 
 
         ThreadLocalUtils.set("SELECT t.tenant_id, t.user_id, t.id FROM user_tenant t WHERE t.tenant_id = 1");
         MPJLambdaWrapper<UserTenantDO> lambda1 = JoinWrappers.lambda(UserTenantDO.class)
                 .selectAsClass(UserTenantDO.class, UserTenantDescDTO.class);
-        List<UserTenantDO> list1 = userTenantMapper.selectJoinList(UserTenantDO.class, lambda1);
+        List<UserTenantDO> list1 = userTenantMapper.selectJoinList(UserTenantDO.class, lambda1.clone());
         assert list1.size() == 5 && list1.get(0).getIdea() != null;
     }
 
@@ -79,7 +79,7 @@ class LambdaWrapperTest {
     void testSimple() {
         MPJLambdaWrapper<UserTenantDO> lambda = JoinWrappers.lambda(UserTenantDO.class);
         lambda.selectAs(UserTenantDO::getIdea, UserTenantDO::getIdea);
-        List<UserTenantDO> list = userTenantMapper.selectList(lambda);
+        List<UserTenantDO> list = userTenantMapper.selectList(lambda.clone());
 
         assert list.size() == 5 && list.get(0).getIdea() != null;
     }
@@ -126,7 +126,7 @@ class LambdaWrapperTest {
                 .leftJoin(AreaDO.class, AreaDO::getId, AddressDO::getAreaId)
                 .le(UserDO::getId, 10000)
                 .orderByDesc(UserDO::getId);
-        List<UserDTO> list = userMapper.selectJoinList(UserDTO.class, wrapper);
+        List<UserDTO> list = userMapper.selectJoinList(UserDTO.class, wrapper.clone());
 
         assert wrapper.checkJoinTable(AddressDO.class);
         assert wrapper.checkJoinTable(AreaDO.class);
@@ -167,7 +167,7 @@ class LambdaWrapperTest {
                 .leftJoin(AddressDO.class, AddressDO::getUserId, UserDO::getId)
                 .le(UserDO::getId, 10000)
                 .orderByDesc(UserDO::getId);
-        List<UserDTO> list = userMapper.selectJoinList(UserDTO.class, wrapper);
+        List<UserDTO> list = userMapper.selectJoinList(UserDTO.class, wrapper.clone());
 
         assert list.get(0).getAddressIds() != null;
         list.forEach(System.out::println);
@@ -214,7 +214,7 @@ class LambdaWrapperTest {
                 .leftJoin(AddressDO.class, AddressDO::getUserId, UserDO::getId)
                 .leftJoin(AreaDO.class, AreaDO::getId, AddressDO::getAreaId)
                 .orderByDesc(UserDO::getId);
-        List<UserDTO> list = userMapper.selectJoinList(UserDTO.class, wrapper);
+        List<UserDTO> list = userMapper.selectJoinList(UserDTO.class, wrapper.clone());
 
         assert list.get(0).getAddressList().get(0).getId() != null;
         list.forEach(System.out::println);
@@ -237,7 +237,7 @@ class LambdaWrapperTest {
                 .select(UserDO::getId)
                 .leftJoin(AddressDO.class, AddressDO::getUserId, UserDO::getId)
                 .leftJoin(AreaDO.class, AreaDO::getId, AddressDO::getAreaId);
-        List<Integer> list = userMapper.selectJoinList(Integer.class, wrapper);
+        List<Integer> list = userMapper.selectJoinList(Integer.class, wrapper.clone());
 
         assert list.get(0) != null;
         System.out.println(list);
@@ -255,7 +255,7 @@ class LambdaWrapperTest {
                 .select(UserDO::getCreateTime)
                 .leftJoin(AddressDO.class, AddressDO::getUserId, UserDO::getId)
                 .leftJoin(AreaDO.class, AreaDO::getId, AddressDO::getAreaId);
-        List<Timestamp> list1 = userMapper.selectJoinList(Timestamp.class, wrapper1);
+        List<Timestamp> list1 = userMapper.selectJoinList(Timestamp.class, wrapper1.clone());
 
         assert list1.get(0) != null;
         System.out.println(list);
@@ -281,9 +281,9 @@ class LambdaWrapperTest {
                 "  AND t.del = false\n" +
                 "  AND (t.id <= ?)\n" +
                 "ORDER BY t.id ASC, t.`name` ASC");
-        MPJLambdaWrapper<UserDO> wrapper = new MPJLambdaWrapper<UserDO>(new UserDO() {{
-            setId(1);
-        }})
+        UserDO userDO = new UserDO();
+        userDO.setId(1);
+        MPJLambdaWrapper<UserDO> wrapper = new MPJLambdaWrapper<>(userDO)
                 .selectAll(UserDO.class)
 //                .setEntity(new UserDO() {{
 //                    setId(1);
@@ -291,7 +291,7 @@ class LambdaWrapperTest {
                 .le(UserDO::getId, 100)
                 .orderByAsc(UserDO::getId, UserDO::getName);
 
-        List<UserDO> list = userMapper.selectList(wrapper);
+        List<UserDO> list = userMapper.selectList(wrapper.clone());
         list.forEach(System.out::println);
     }
 
@@ -322,7 +322,7 @@ class LambdaWrapperTest {
                         .ge(UserDO::getId, 0))
                 .leftJoin(UserDO.class, "uc", UserDO::getId, UserDto::getUpdateBy, ext -> ext
                         .selectAs(UserDO::getName, UserDto::getUpdateName));
-        List<UserDto> userDtos = userDTOMapper.selectJoinList(UserDto.class, wrapper);
+        List<UserDto> userDtos = userDTOMapper.selectJoinList(UserDto.class, wrapper.clone());
         assert StringUtils.isNotBlank(userDtos.get(0).getUserName());
         assert StringUtils.isNotBlank(userDtos.get(0).getCreateName());
         assert StringUtils.isNotBlank(userDtos.get(0).getUpdateName());
@@ -360,7 +360,7 @@ class LambdaWrapperTest {
                         .select(UserDO::getImg))
                 .leftJoin(UserDO.class, "uc", UserDO::getId, UserDO::getUpdateBy)
                 .eq(UserDO::getId, UserDO::getId);
-        userMapper.selectJoinList(UserDO.class, w);
+        userMapper.selectJoinList(UserDO.class, w.clone());
         System.out.println(1);
     }
 
@@ -404,7 +404,7 @@ class LambdaWrapperTest {
                 .selectCollection(UserDO.class, UserDO::getChildren)
                 .leftJoin(UserDO.class, UserDO::getPid, UserDO::getId)
                 .gt(UserDO::getId, 0);
-        List<UserDO> list = userMapper.selectJoinList(UserDO.class, wrapper);
+        List<UserDO> list = userMapper.selectJoinList(UserDO.class, wrapper.clone());
         System.out.println(list);
 
         ThreadLocalUtils.set("SELECT t.id,\n" +
@@ -438,7 +438,7 @@ class LambdaWrapperTest {
                             .eq(UserDO::getId, UserDO::getUpdateBy);
                 })
                 .eq(UserDO::getId, UserDO::getId);
-        List<UserDO> dos = userMapper.selectJoinList(UserDO.class, w);
+        List<UserDO> dos = userMapper.selectJoinList(UserDO.class, w.clone());
         assert dos.get(0).getCreateName() != null && dos.get(0).getUpdateName() != null;
 
 
@@ -494,7 +494,7 @@ class LambdaWrapperTest {
                         .leftJoin(UserDO.class, UserDO::getPid, UserDO::getId)
                         .le(UserDO::getId, 5))
                 .le(UserDO::getId, 4);
-        List<UserDO> list1 = userMapper.selectJoinList(UserDO.class, wrapper1);
+        List<UserDO> list1 = userMapper.selectJoinList(UserDO.class, wrapper1.clone());
         System.out.println(list1);
     }
 
@@ -503,20 +503,20 @@ class LambdaWrapperTest {
      */
     @Test
     void testLogicDel() {
-        List<UserDTO> l1 = userMapper.selectJoinList(UserDTO.class, new MPJLambdaWrapper<>());
+        List<UserDTO> l1 = userMapper.selectJoinList(UserDTO.class, new MPJLambdaWrapper<UserDO>().clone());
         assert l1.size() == 14;
 
         List<UserDTO> l2 = userMapper.selectJoinList(UserDTO.class, new MPJLambdaWrapper<UserDO>()
                 .selectAll(UserDO.class)
                 .select(AddressDO::getAddress)
-                .leftJoin(AddressDO.class, AddressDO::getUserId, UserDO::getId));
+                .leftJoin(AddressDO.class, AddressDO::getUserId, UserDO::getId).clone());
         assert l2.size() == 10;
 
         List<UserDTO> l3 = userMapper.selectJoinList(UserDTO.class, new MPJLambdaWrapper<UserDO>()
                 .disableSubLogicDel()
                 .selectAll(UserDO.class)
                 .selectCollection(AddressDO.class, UserDTO::getAddressList)
-                .leftJoin(AddressDO.class, AddressDO::getUserId, UserDO::getId));
+                .leftJoin(AddressDO.class, AddressDO::getUserId, UserDO::getId).clone());
         assert l3.size() == 14 && l3.get(0).getAddressList().size() == 9;
 
         List<UserDTO> l4 = userMapper.selectJoinList(UserDTO.class, new MPJLambdaWrapper<UserDO>()
@@ -525,7 +525,7 @@ class LambdaWrapperTest {
                 .selectCollection(AddressDO.class, UserDTO::getAddressList)
                 .leftJoin(AddressDO.class, on -> on
                         .eq(AddressDO::getUserId, UserDO::getId)
-                        .eq(AddressDO::getDel, false)));
+                        .eq(AddressDO::getDel, false)).clone());
         assert l4.size() == 14 && l4.get(0).getAddressList().size() == 5;
     }
 
@@ -540,7 +540,7 @@ class LambdaWrapperTest {
                 .selectAll(UserDO.class)
                 .selectCollection(UserDO.class, UserDO::getChildren)
                 .leftJoin(UserDO.class, UserDO::getPid, UserDO::getId);
-        List<UserDO> list = userMapper.selectJoinList(UserDO.class, wrapper);
+        List<UserDO> list = userMapper.selectJoinList(UserDO.class, wrapper.clone());
         assert list.get(0).getName() != null && list.get(0).getChildren().get(0).getName() != null;
         assert list.get(0).getImg() != null && list.get(0).getChildren().get(0).getImg() != null;
         System.out.println(list);
@@ -557,7 +557,7 @@ class LambdaWrapperTest {
                 .select(UserDO::getId)
                 .leftJoin(AddressDO.class, AddressDO::getUserId, UserDO::getId)
                 .orderByDesc(UserDO::getId);
-        List<Object> list = userMapper.selectObjs(wrapper);
+        List<Object> list = userMapper.selectObjs(wrapper.clone());
     }
 
     @Test
@@ -590,7 +590,7 @@ class LambdaWrapperTest {
                 .selectAll(AddressDO.class, "aa")
 //                .selectCollection(UserDO.class, UserDO::getChildren)
                 .leftJoin(AddressDO.class, "aa", AddressDO::getUserId, UserDO::getId);
-        List<UserDO> list = userMapper.selectJoinList(UserDO.class, wrapper);
+        List<UserDO> list = userMapper.selectJoinList(UserDO.class, wrapper.clone());
 
         System.out.println(list);
     }
@@ -604,7 +604,7 @@ class LambdaWrapperTest {
                 .selectCollection("t2", AddressDO.class, UserDO::getAddressList2)
                 .leftJoin(AddressDO.class, AddressDO::getId, UserDO::getAddressId)
                 .leftJoin(AddressDO.class, AddressDO::getId, UserDO::getAddressId2);
-        List<UserDO> list = userMapper.selectJoinList(UserDO.class, wrapper);
+        List<UserDO> list = userMapper.selectJoinList(UserDO.class, wrapper.clone());
 
         assert list.get(0).getAddressList().get(0).getAddress() != null;
         assert list.get(0).getAddressList2().get(0).getAddress() != null;
@@ -625,7 +625,7 @@ class LambdaWrapperTest {
                         .select(AddressDO::getAddress)
                         .select(AreaDO::getProvince)
                         .leftJoin(AddressDO.class, AddressDO::getUserId, UserDO::getId)
-                        .leftJoin(AreaDO.class, AreaDO::getId, AddressDO::getAreaId));
+                        .leftJoin(AreaDO.class, AreaDO::getId, AddressDO::getAreaId).clone());
         iPage.getRecords().forEach(System.out::println);
     }
 
@@ -636,24 +636,24 @@ class LambdaWrapperTest {
     @Test
     void test3() {
         ThreadLocalUtils.set("SELECT t.id,\n" +
-                "       t.pid,\n" +
-                "       t.`name`,\n" +
-                "       t.`json`,\n" +
-                "       t.sex,\n" +
-                "       t.head_img,\n" +
-                "       t.create_time,\n" +
-                "       t.address_id,\n" +
-                "       t.address_id2,\n" +
-                "       t.del,\n" +
-                "       t.create_by,\n" +
-                "       t.update_by,\n" +
-                "       t1.address\n" +
-                "FROM `user` t\n" +
-                "         LEFT JOIN address t1 ON (t.id = t1.user_id AND t.id = t1.user_id)\n" +
-                "WHERE t.del = false\n" +
-                "  AND t1.del = false\n" +
-                "  AND (t.id = ? AND (t.head_img = ? OR t1.user_id = ?) AND t.id = ?)\n" +
-                "LIMIT ?",
+                        "       t.pid,\n" +
+                        "       t.`name`,\n" +
+                        "       t.`json`,\n" +
+                        "       t.sex,\n" +
+                        "       t.head_img,\n" +
+                        "       t.create_time,\n" +
+                        "       t.address_id,\n" +
+                        "       t.address_id2,\n" +
+                        "       t.del,\n" +
+                        "       t.create_by,\n" +
+                        "       t.update_by,\n" +
+                        "       t1.address\n" +
+                        "FROM `user` t\n" +
+                        "         LEFT JOIN address t1 ON (t.id = t1.user_id AND t.id = t1.user_id)\n" +
+                        "WHERE t.del = false\n" +
+                        "  AND t1.del = false\n" +
+                        "  AND (t.id = ? AND (t.head_img = ? OR t1.user_id = ?) AND t.id = ?)\n" +
+                        "LIMIT ?",
                 "SELECT * FROM ( SELECT TMP.*, ROWNUM ROW_ID FROM ( SELECT t.id, t.pid, t.`name`, t.`json`, t.sex, t.head_img, " +
                         "t.create_time, t.address_id, t.address_id2, t.del, t.create_by, t.update_by, t1.address FROM `user` t " +
                         "LEFT JOIN address t1 ON (t.id = t1.user_id AND t.id = t1.user_id) WHERE t.del = false AND t1.del = false AND " +
@@ -669,7 +669,7 @@ class LambdaWrapperTest {
                         .and(i -> i.eq(UserDO::getImg, "er")
                                 .or()
                                 .eq(AddressDO::getUserId, 1))
-                        .eq(UserDO::getId, 1));
+                        .eq(UserDO::getId, 1).clone());
         page.getRecords().forEach(System.out::println);
     }
 
@@ -681,7 +681,7 @@ class LambdaWrapperTest {
         UserDTO one = userMapper.selectJoinOne(UserDTO.class, JoinWrappers.<UserDO>lambda()
                 .selectSum(UserDO::getId)
                 .selectMax(UserDO::getId, UserDTO::getHeadImg)
-                .leftJoin(AddressDO.class, AddressDO::getUserId, UserDO::getId));
+                .leftJoin(AddressDO.class, AddressDO::getUserId, UserDO::getId).clone());
         System.out.println(one);
     }
 
@@ -707,7 +707,7 @@ class LambdaWrapperTest {
         List<Map<String, Object>> list = userMapper.selectJoinMaps(JoinWrappers.<UserDO>lambda()
                 .selectAll(UserDO.class)
                 .select(AddressDO::getAddress)
-                .leftJoin(AddressDO.class, AddressDO::getUserId, UserDO::getId));
+                .leftJoin(AddressDO.class, AddressDO::getUserId, UserDO::getId).clone());
         assert list.get(0).get("ADDRESS") != null || list.get(0).get("address") != null;
         list.forEach(System.out::println);
     }
@@ -719,7 +719,7 @@ class LambdaWrapperTest {
     void testMP() {
         List<UserDO> dos = userMapper.selectList(new LambdaQueryWrapper<UserDO>()
                 .gt(UserDO::getId, 3)
-                .lt(UserDO::getId, 8));
+                .lt(UserDO::getId, 8).clone());
         assert dos.size() == 4;
 
         ThreadLocalUtils.set(
@@ -728,7 +728,7 @@ class LambdaWrapperTest {
                 "SELECT * FROM `user` t WHERE t.del=false AND (t.id > ? AND t.id < ?) ");
         List<UserDO> dos1 = userMapper.selectList(new MPJLambdaWrapper<UserDO>()
                 .gt(UserDO::getId, 3)
-                .lt(UserDO::getId, 8));
+                .lt(UserDO::getId, 8).clone());
         assert dos1.size() == 4;
     }
 
@@ -758,13 +758,13 @@ class LambdaWrapperTest {
         MPJLambdaWrapper<UserDO> wrapper = new MPJLambdaWrapper<UserDO>()
                 .leftJoin(AddressDO.class, AddressDO::getUserId, UserDO::getId)
                 .leftJoin(AreaDO.class, AreaDO::getId, AddressDO::getAreaId);
-        Object integer = userMapper.selectCount(wrapper);
+        Object integer = userMapper.selectCount(wrapper.clone());
 
         ThreadLocalUtils.set("SELECT COUNT( * ) FROM `user` t LEFT JOIN address t1 ON (t1.user_id = t.id) LEFT JOIN area t2 ON (t2.id = t1.area_id) WHERE t.del=false AND t1.del=false AND t2.del=false");
         MPJLambdaWrapper<UserDO> wrapper1 = new MPJLambdaWrapper<UserDO>()
                 .leftJoin(AddressDO.class, AddressDO::getUserId, UserDO::getId)
                 .leftJoin(AreaDO.class, AreaDO::getId, AddressDO::getAreaId);
-        Long aLong1 = userMapper.selectJoinCount(wrapper1);
+        Long aLong1 = userMapper.selectJoinCount(wrapper1.clone());
     }
 
 
@@ -786,7 +786,7 @@ class LambdaWrapperTest {
                 .orderByDesc(UserDO::getId)
                 .setTableName(name -> String.format("(select * from %s)", name));
 
-        List<UserDTO> list = userMapper.selectJoinList(UserDTO.class, wrapper);
+        List<UserDTO> list = userMapper.selectJoinList(UserDTO.class, wrapper.clone());
     }
 
 
@@ -835,7 +835,7 @@ class LambdaWrapperTest {
                 .le(UserDO::getId, 10000)
                 .orderByDesc(UserDO::getId);
         System.out.println(wrapper.getFrom());
-        List<UserDTO> list = userMapper.selectJoinList(UserDTO.class, wrapper);
+        List<UserDTO> list = userMapper.selectJoinList(UserDTO.class, wrapper.clone());
 
         assert list.get(0).getAddressList() != null && list.get(0).getAddressList().get(0).getId() != null;
         list.forEach(System.out::println);
@@ -909,7 +909,7 @@ class LambdaWrapperTest {
                 .le(UserDO::getId, 10000)
                 .orderByDesc(UserDO::getId);
 
-        List<UserDTO> list = wrapper.list(UserDTO.class);
+        List<UserDTO> list = wrapper.clone().list(UserDTO.class);
 
         System.out.println(list);
         assert list.get(0).getAddressList() != null && list.get(0).getAddressList().get(0).getId() != null;
@@ -924,7 +924,7 @@ class LambdaWrapperTest {
                 .leftJoin(UserDO.class, UserDO::getAddressId, AddressDO::getId)
                 .leftJoin(UserDO.class, UserDO::getPid, UserDO::getId);
 
-        List<AddressDO> addressDOS = wrapper.list();
+        List<AddressDO> addressDOS = wrapper.clone().list();
     }
 
     /**
@@ -938,7 +938,7 @@ class LambdaWrapperTest {
                 .leftJoin(AddressDO.class, AddressDO::getUserId, UserDO::getId)
                 .eq(AddressDO::getId, AddressDO::getId);
 
-        List<UserDO> addressDOS = wrapper.list();
+        List<UserDO> addressDOS = wrapper.clone().list();
     }
 
     /**
@@ -952,7 +952,7 @@ class LambdaWrapperTest {
                 .leftJoin(AddressDO.class, "aaa", AddressDO::getUserId, UserDO::getId, ext -> ext
                         .eq(AddressDO::getId, AddressDO::getId))
                 .eq(AddressDO::getId, AddressDO::getId);
-        List<UserDO> addressDOS = wrapper.list();
+        List<UserDO> addressDOS = wrapper.clone().list();
     }
 
     /**
@@ -969,7 +969,7 @@ class LambdaWrapperTest {
                     "SELECT id,user_id,name FROM order_t t");
         }
         MPJLambdaWrapper<OrderDO> wrapper = JoinWrappers.lambda(OrderDO.class);
-        List<OrderDO> list = wrapper.list();
+        List<OrderDO> list = wrapper.clone().list();
 
         if (VersionUtils.compare(MybatisPlusVersion.getVersion(), "3.4.3") >= 0) {
             ThreadLocalUtils.set("SELECT t.id,t.user_id,t.name,t1.`name` AS userName FROM order_t t LEFT JOIN `user` t1 ON (t1.id = t.user_id) WHERE t1.del=false ORDER BY t.name DESC",
@@ -982,7 +982,7 @@ class LambdaWrapperTest {
                 .selectAll(OrderDO.class)
                 .selectAs(UserDO::getName, OrderDO::getUserName)
                 .leftJoin(UserDO.class, UserDO::getId, OrderDO::getUserId);
-        List<OrderDO> l = w.list();
+        List<OrderDO> l = w.clone().list();
     }
 
     /**
@@ -996,6 +996,6 @@ class LambdaWrapperTest {
                 .le(UserDO::getId, 100)
                 .checkSqlInjection()
                 .orderByDesc("t.id");
-        wrapper.list();
+        wrapper.clone().list();
     }
 }

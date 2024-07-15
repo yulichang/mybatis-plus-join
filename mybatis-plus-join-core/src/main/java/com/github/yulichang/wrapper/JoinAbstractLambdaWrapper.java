@@ -24,7 +24,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiConsumer;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static com.baomidou.mybatisplus.core.enums.WrapperKeyword.APPLY;
@@ -66,7 +65,7 @@ public abstract class JoinAbstractLambdaWrapper<T, Children extends JoinAbstract
     /**
      * 主表 表名处理方法
      */
-    protected Function<String, String> tableFunc;
+    protected SFunction<String, String> tableFunc;
 
     /**
      * 逻辑删除位置
@@ -170,7 +169,7 @@ public abstract class JoinAbstractLambdaWrapper<T, Children extends JoinAbstract
      *
      * @return 自定义表别名
      */
-    public Children setTableName(Function<String, String> tableFunc) {
+    public Children setTableName(SFunction<String, String> tableFunc) {
         if (isMain) {
             if (tableFunc != null) {
                 this.dynamicTableName = true;

@@ -1,9 +1,10 @@
 package com.github.yulichang.config.enums;
 
 import com.github.yulichang.toolkit.MPJStringUtils;
+import com.github.yulichang.wrapper.interfaces.MPredicate;
 
+import java.io.Serializable;
 import java.util.Objects;
-import java.util.function.Predicate;
 
 /**
  * 条件判断策略
@@ -11,7 +12,7 @@ import java.util.function.Predicate;
  * @author yulichang
  * @since 1.4.9
  */
-public enum IfExistsEnum implements Predicate<Object> {
+public enum IfExistsEnum implements MPredicate<Object>, Serializable {
 
     /**
      * 非null
@@ -26,9 +27,9 @@ public enum IfExistsEnum implements Predicate<Object> {
      */
     NOT_BLANK(val -> NOT_NULL.and(v -> !(v instanceof CharSequence) || MPJStringUtils.isNotBlank((CharSequence) v)).test(val));
 
-    private final Predicate<Object> predicate;
+    private final MPredicate<Object> predicate;
 
-    IfExistsEnum(Predicate<Object> predicate) {
+    IfExistsEnum(MPredicate<Object> predicate) {
         this.predicate = predicate;
     }
 

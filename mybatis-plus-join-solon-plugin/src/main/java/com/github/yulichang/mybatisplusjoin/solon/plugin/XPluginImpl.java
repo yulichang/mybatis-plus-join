@@ -10,6 +10,7 @@ import com.github.yulichang.injector.MPJSqlInjector;
 import com.github.yulichang.toolkit.SpringContentUtils;
 import com.github.yulichang.toolkit.reflect.GenericTypeUtils;
 import com.github.yulichang.wrapper.enums.IfExistsSqlKeyWordEnum;
+import com.github.yulichang.wrapper.interfaces.MBiPredicate;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.solon.MybatisAdapter;
 import org.apache.ibatis.solon.integration.MybatisAdapterManager;
@@ -22,7 +23,6 @@ import org.noear.solon.core.util.GenericUtil;
 
 import javax.sql.DataSource;
 import java.util.*;
-import java.util.function.BiPredicate;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -62,7 +62,7 @@ public class XPluginImpl implements Plugin {
         ConfigProperties.mappingMaxCount = prop.get("mappingMaxCount", Integer::parseInt);
         ConfigProperties.ifExists = prop.get("ifExists", val ->
                 Arrays.stream(IfExistsEnum.values()).filter(e -> e.name().equalsIgnoreCase(val)).findFirst()
-                        .map(m -> (BiPredicate<Object, IfExistsSqlKeyWordEnum>) (o, enums) -> m.test(o))
+                        .map(m -> (MBiPredicate<Object, IfExistsSqlKeyWordEnum>) (o, enums) -> m.test(o))
                         .orElseThrow(() -> ExceptionUtils.mpe("mybatis-plus-join.ifExists 配置错误")));
         // 后续操作
         context.onEvent(AppLoadEndEvent.class, e -> {

@@ -1,7 +1,7 @@
 package com.github.yulichang.wrapper.segments;
 
-import com.baomidou.mybatisplus.core.metadata.TableFieldInfo;
 import com.github.yulichang.wrapper.enums.BaseFuncEnum;
+import org.apache.ibatis.type.JdbcType;
 import org.apache.ibatis.type.TypeHandler;
 
 /**
@@ -86,7 +86,12 @@ public class SelectString implements Select {
     }
 
     @Override
-    public TableFieldInfo getTableFieldInfo() {
+    public Class<?> getPropertyType() {
+        return null;
+    }
+
+    @Override
+    public JdbcType getJdbcType() {
         return null;
     }
 

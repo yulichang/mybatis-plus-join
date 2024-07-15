@@ -1,9 +1,9 @@
 package com.github.yulichang.wrapper.segments;
 
 
-import com.baomidou.mybatisplus.core.metadata.TableFieldInfo;
 import com.github.yulichang.wrapper.enums.BaseFuncEnum;
 import lombok.Getter;
+import org.apache.ibatis.type.JdbcType;
 import org.apache.ibatis.type.TypeHandler;
 
 /**
@@ -100,8 +100,13 @@ public class SelectLabel implements Select {
     }
 
     @Override
-    public TableFieldInfo getTableFieldInfo() {
-        return cache.getTableFieldInfo();
+    public Class<?> getPropertyType() {
+        return cache.getPropertyType();
+    }
+
+    @Override
+    public JdbcType getJdbcType() {
+        return cache.getJdbcType();
     }
 
     @Override

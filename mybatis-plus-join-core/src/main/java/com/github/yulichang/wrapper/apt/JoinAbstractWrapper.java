@@ -528,13 +528,11 @@ public abstract class JoinAbstractWrapper<T, Children extends JoinAbstractWrappe
     }
 
     protected <X, S> Children addCondition(boolean condition, Column column, SqlKeyword sqlKeyword, Column val) {
-        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(column), sqlKeyword, columnToSqlSegment(val)
-        ));
+        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(column), sqlKeyword, columnToSqlSegment(val)));
     }
 
     protected Children addCondition(boolean condition, String column, SqlKeyword sqlKeyword, Object val) {
-        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(column), sqlKeyword,
-                () -> formatParam(null, val)));
+        return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(column), sqlKeyword, () -> formatParam(null, val)));
     }
 
     /**

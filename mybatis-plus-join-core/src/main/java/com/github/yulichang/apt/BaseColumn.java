@@ -1,6 +1,8 @@
 package com.github.yulichang.apt;
 
-public interface BaseColumn<T> {
+import java.io.Serializable;
+
+public interface BaseColumn<T> extends Serializable {
 
     Class<T> getColumnClass();
 

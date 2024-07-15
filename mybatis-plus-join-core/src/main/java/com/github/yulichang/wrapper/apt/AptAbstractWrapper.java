@@ -4,7 +4,6 @@ import com.baomidou.mybatisplus.annotation.OrderBy;
 import com.baomidou.mybatisplus.core.conditions.SharedString;
 import com.baomidou.mybatisplus.core.conditions.segments.MergeSegments;
 import com.baomidou.mybatisplus.core.metadata.TableInfo;
-import com.baomidou.mybatisplus.core.toolkit.Assert;
 import com.baomidou.mybatisplus.core.toolkit.Constants;
 import com.baomidou.mybatisplus.core.toolkit.StringPool;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
@@ -109,7 +108,7 @@ public abstract class AptAbstractWrapper<T, Children extends AptAbstractWrapper<
      * apt别名对应
      */
     @Getter
-    protected TableMap<BaseColumn<?>, String> aptIndex;
+    protected TableMap aptIndex;
 
     /**
      * 构造方法
@@ -185,19 +184,6 @@ public abstract class AptAbstractWrapper<T, Children extends AptAbstractWrapper<
         return decode;
     }
 
-
-    protected String getPrefix(BaseColumn<?> baseColumn) {
-        if (Objects.nonNull(baseColumn.getAlias())) {
-            return baseColumn.getAlias();
-        }
-        if (aptIndex.getRoot() == baseColumn) {
-            return aptIndex.getRootAlias();
-        }
-        String pf = aptIndex.get(baseColumn);
-        Assert.notEmpty(pf, "table not find %s", baseColumn.getColumnClass().getName());
-        return pf;
-    }
-
     @Override
     protected String columnsToString(Column... columns) {
         return Arrays.stream(columns).map(this::columnToString)
@@ -210,7 +196,7 @@ public abstract class AptAbstractWrapper<T, Children extends AptAbstractWrapper<
         if (Objects.nonNull(pf)) {
             return pf + StringPool.DOT + getCache(column).getColumn();
         }
-        return getPrefix(column.getRoot()) + StringPool.DOT + getCache(column).getColumn();
+        return this.aptIndex.get(column.getRoot()) + StringPool.DOT + getCache(column).getColumn();
     }
 
     protected SelectCache getCache(Column fn) {
@@ -257,7 +243,7 @@ public abstract class AptAbstractWrapper<T, Children extends AptAbstractWrapper<
             if (aptIndex.isEmpty()) {
                 return StringPool.EMPTY;
             }
-            return aptIndex.keyList().stream().map(key -> LogicInfoUtils.getLogicInfoApt(key.getColumnClass(), getPrefix(key)))
+            return aptIndex.keyList().stream().map(key -> LogicInfoUtils.getLogicInfoApt(key.getColumnClass(), this.aptIndex.get(key)))
                     .collect(Collectors.joining(StringPool.SPACE));
         }
         return StringPool.EMPTY;
@@ -408,7 +394,7 @@ public abstract class AptAbstractWrapper<T, Children extends AptAbstractWrapper<
         lastSql = SharedString.emptyString();
         sqlComment = SharedString.emptyString();
         sqlFirst = SharedString.emptyString();
-        aptIndex = new TableMap<>(this.baseColumn, this.alias);
+        aptIndex = new TableMap(this.baseColumn, this.alias);
     }
 
     @Override

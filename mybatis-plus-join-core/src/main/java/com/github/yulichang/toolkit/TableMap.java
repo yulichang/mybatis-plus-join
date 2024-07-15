@@ -1,51 +1,70 @@
 package com.github.yulichang.toolkit;
 
+import com.baomidou.mybatisplus.core.toolkit.ExceptionUtils;
+import com.github.yulichang.apt.BaseColumn;
 import lombok.Getter;
+import lombok.Setter;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.io.Serializable;
+import java.util.Collection;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
-public class TableMap<K, V> {
+public class TableMap implements Serializable {
+
+    @Setter
+    @Getter
+    private TableMap parent;
 
     @Getter
-    private final K root;
+    private final BaseColumn<?> root;
+
     @Getter
-    private final String rootAlias;
+    @Setter
+    private String rootAlias;
 
-    private final Map<K, V> map = new HashMap<>();
+    private final Map<BaseColumn<?>, String> tableMap = new LinkedHashMap<>();
 
-    private final List<K> list = new ArrayList<>();
-
-    public TableMap(K root, String rootAlias) {
+    public TableMap(BaseColumn<?> root, String rootAlias) {
         this.root = root;
         this.rootAlias = rootAlias;
     }
 
-    public V put(K key, V value) {
-        V v = this.map.put(key, value);
-        if (null == v) {
-            this.list.add(key);
+    public String put(BaseColumn<?> key, String value) {
+        return tableMap.put(key, value);
+    }
+
+    public String get(BaseColumn<?> key) {
+        return get(this, key);
+    }
+
+    private String get(TableMap tableMap, BaseColumn<?> key) {
+        if (null != key.getAlias()) {
+            return key.getAlias();
         }
-        return v;
+        if (key == tableMap.root) {
+            return tableMap.rootAlias;
+        }
+        String pf = tableMap.tableMap.get(key);
+        if (null == pf) {
+            if (tableMap.parent == null) {
+                throw ExceptionUtils.mpe("table not found %s", key.getColumnClass().getName());
+            } else {
+                return get(tableMap.parent, key);
+            }
+        }
+        return pf;
     }
 
-    public V get(K key) {
-        return this.map.get(key);
-    }
-
-    public List<K> keyList() {
-        return this.list;
+    public Collection<BaseColumn<?>> keyList() {
+        return tableMap.keySet();
     }
 
     public boolean isEmpty() {
-        return this.map.isEmpty();
+        return this.tableMap.isEmpty();
     }
 
     public void clear() {
-        this.map.clear();
-        this.list.clear();
+        this.tableMap.clear();
     }
-
 }

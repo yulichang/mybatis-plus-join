@@ -31,7 +31,7 @@ public class UnionTest {
                 .unionAll(AddressDO.class, union -> union
                         .select(AddressDO::getId)
                         .disableLogicDel()
-                        .eq(UserDO::getId, 2))
+                        .eq(AddressDO::getId, 2))
                 .unionAll(AreaDO.class, union -> union
                         .selectSub(AreaDO.class, sub -> sub
                                 .select(AreaDO::getId)

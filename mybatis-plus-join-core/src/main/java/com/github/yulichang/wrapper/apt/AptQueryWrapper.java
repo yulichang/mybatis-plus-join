@@ -94,7 +94,7 @@ public class AptQueryWrapper<T> extends AptAbstractWrapper<T, AptQueryWrapper<T>
     protected AptQueryWrapper(T entity, BaseColumn<T> baseColumn, SharedString sqlSelect, AtomicInteger paramNameSeq,
                               Map<String, Object> paramNameValuePairs, MergeSegments mergeSegments, SharedString paramAlias,
                               SharedString lastSql, SharedString sqlComment, SharedString sqlFirst,
-                              TableMap<BaseColumn<?>, String> aptIndex, Integer index, String keyWord, Class<?> joinClass, String tableName,
+                              TableMap aptIndex, Integer index, String keyWord, Class<?> joinClass, String tableName,
                               BiPredicate<Object, IfExistsSqlKeyWordEnum> IfExists) {
         super(baseColumn);
         super.setEntity(entity);
@@ -108,7 +108,9 @@ public class AptQueryWrapper<T> extends AptAbstractWrapper<T, AptQueryWrapper<T>
         this.lastSql = lastSql;
         this.sqlComment = sqlComment;
         this.sqlFirst = sqlFirst;
-        this.aptIndex = aptIndex;
+        if (aptIndex != null) {
+            this.aptIndex = aptIndex;
+        }
         this.index = index;
         this.keyWord = keyWord;
         this.joinClass = joinClass;
@@ -188,20 +190,17 @@ public class AptQueryWrapper<T> extends AptAbstractWrapper<T, AptQueryWrapper<T>
      * 子查询
      */
     public <E, F> AptQueryWrapper<T> selectSub(BaseColumn<E> baseColumn, Consumer<AptQueryWrapper<E>> consumer, SFunction<F, ?> alias) {
-        return selectSub(baseColumn, ConfigProperties.subQueryAlias, consumer, alias);
-    }
-
-    /**
-     * 子查询
-     */
-    public <E, F> AptQueryWrapper<T> selectSub(BaseColumn<E> baseColumn, String st, Consumer<AptQueryWrapper<E>> consumer, SFunction<F, ?> alias) {
         AptQueryWrapper<E> wrapper = new AptQueryWrapper<E>(null, baseColumn, SharedString.emptyString(),
                 paramNameSeq, paramNameValuePairs, new MergeSegments(), new SharedString(this.paramAlias
                 .getStringValue()), SharedString.emptyString(), SharedString.emptyString(), SharedString.emptyString(),
-                this.aptIndex, null, null, null, null, ifExists) {
+                null, null, null, null, null, ifExists) {
         };
-        wrapper.alias = st;
-        wrapper.subTableAlias = st;
+        wrapper.aptIndex.setParent(this.aptIndex);
+        if (null == baseColumn.getAlias()) {
+            wrapper.alias = ConfigProperties.subQueryAlias;
+            wrapper.aptIndex.setRootAlias(ConfigProperties.subQueryAlias);
+        }
+        wrapper.subTableAlias = ConfigProperties.subQueryAlias;
         consumer.accept(wrapper);
         addCustomWrapper(wrapper);
         String name = LambdaUtils.getName(alias);
@@ -279,11 +278,11 @@ public class AptQueryWrapper<T> extends AptAbstractWrapper<T, AptQueryWrapper<T>
                 }
                 if (i.isFunc()) {
                     return String.format(i.getFunc().getSql(), Arrays.stream(i.getColumns()).map(c ->
-                            getPrefix(c.getRoot()) + StringPool.DOT + i.getColumn()).toArray()) + Constant.AS + i.getAlias();
+                            this.aptIndex.get(c.getRoot()) + StringPool.DOT + i.getColumn()).toArray()) + Constant.AS + i.getAlias();
                 } else {
                     String prefix;
                     if (null == i.getTableAlias() && null != i.getBaseColumn()) {
-                        prefix = getPrefix(i.getBaseColumn());
+                        prefix = this.aptIndex.get(i.getBaseColumn());
                     } else {
                         prefix = i.getTableAlias();
                     }

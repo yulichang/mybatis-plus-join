@@ -2,7 +2,6 @@ package com.github.yulichang.wrapper.apt.interfaces;
 
 import com.github.yulichang.apt.Column;
 
-import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
 import java.util.function.Consumer;
@@ -13,7 +12,7 @@ import java.util.function.Consumer;
  * copy {@link com.baomidou.mybatisplus.core.conditions.interfaces.Func}
  */
 @SuppressWarnings("unused")
-public interface Func<Children> extends Serializable {
+public interface Func<Children> extends FuncLambda<Children> {
 
 
     default Children isNull(Column column) {
@@ -63,7 +62,6 @@ public interface Func<Children> extends Serializable {
     }
 
     Children inSql(boolean condition, Column column, String inValue);
-
 
     default Children notInSql(Column column, String inValue) {
         return notInSql(true, column, inValue);
@@ -132,7 +130,6 @@ public interface Func<Children> extends Serializable {
     default Children orderByAsc(Column column, Column... columns) {
         return orderByAsc(true, column, columns);
     }
-
 
     default Children orderByAsc(boolean condition, Column column, Column... columns) {
         return orderBy(condition, true, column, columns);

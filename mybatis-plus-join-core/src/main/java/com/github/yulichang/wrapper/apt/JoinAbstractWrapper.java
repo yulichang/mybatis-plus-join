@@ -11,8 +11,10 @@ import com.baomidou.mybatisplus.core.exceptions.MybatisPlusException;
 import com.baomidou.mybatisplus.core.toolkit.*;
 import com.baomidou.mybatisplus.core.toolkit.sql.SqlUtils;
 import com.baomidou.mybatisplus.core.toolkit.sql.StringEscape;
+import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.github.yulichang.apt.Column;
 import com.github.yulichang.config.ConfigProperties;
+import com.github.yulichang.toolkit.LambdaUtils;
 import com.github.yulichang.toolkit.MPJSqlInjectionUtils;
 import com.github.yulichang.toolkit.Ref;
 import com.github.yulichang.toolkit.sql.SqlScriptUtils;
@@ -30,6 +32,7 @@ import lombok.Getter;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.*;
+import java.util.stream.Collectors;
 
 import static com.baomidou.mybatisplus.core.enums.SqlKeyword.*;
 import static com.baomidou.mybatisplus.core.enums.WrapperKeyword.APPLY;
@@ -417,12 +420,6 @@ public abstract class JoinAbstractWrapper<T, Children extends JoinAbstractWrappe
     }
 
     @Override
-    public Children groupBy(Column column, Column... columns) {
-        return groupBy(true, column, columns);
-    }
-
-
-    @Override
     public Children groupBy(boolean condition, Column column, Column... columns) {
         return maybeDo(condition, () -> {
             String one = columnToString(column);
@@ -445,25 +442,6 @@ public abstract class JoinAbstractWrapper<T, Children extends JoinAbstractWrappe
     }
 
     @Override
-    public Children orderByAsc(Column column, Column... columns) {
-        return orderByAsc(true, column, columns);
-    }
-
-    /**
-     * 排序：ORDER BY 字段, ... ASC
-     * <p>例: orderByAsc("id", "name")</p>
-     *
-     * @param condition 执行条件
-     * @param column    单个字段
-     * @param columns   字段数组
-     * @return children
-     */
-    @Override
-    public Children orderByAsc(boolean condition, Column column, Column... columns) {
-        return orderBy(condition, true, column, columns);
-    }
-
-    @Override
     public Children orderByDesc(boolean condition, List<Column> columns) {
         return maybeDo(condition, () -> {
             if (CollectionUtils.isNotEmpty(columns)) {
@@ -471,26 +449,6 @@ public abstract class JoinAbstractWrapper<T, Children extends JoinAbstractWrappe
                         columnToSqlSegment(columnSqlInjectFilter(c)), DESC));
             }
         });
-    }
-
-    @Override
-    public Children orderByDesc(Column column, Column... columns) {
-        return orderByDesc(true, column, columns);
-    }
-
-
-    /**
-     * 排序：ORDER BY 字段, ... DESC
-     * <p>例: orderByDesc("id", "name")</p>
-     *
-     * @param condition 执行条件
-     * @param column    单个字段
-     * @param columns   字段数组
-     * @return children
-     */
-    @Override
-    public Children orderByDesc(boolean condition, Column column, Column... columns) {
-        return orderBy(condition, false, column, columns);
     }
 
     @Override
@@ -830,6 +788,67 @@ public abstract class JoinAbstractWrapper<T, Children extends JoinAbstractWrappe
     }
 
     /* ****************************************** **/
+
+
+    /* ******* lambda group by order by   ********* */
+
+    @Override
+    public <X> Children groupByLambda(boolean condition, List<SFunction<X, ?>> columns) {
+        return groupBy(condition, columns.stream().map(LambdaUtils::getName).collect(joining(StringPool.COMMA)));
+    }
+
+    @Override
+    @SafeVarargs
+    public final <X> Children groupBy(SFunction<X, ?> column, SFunction<X, ?>... columns) {
+        return groupBy(true, column, columns);
+    }
+
+    @Override
+    @SafeVarargs
+    public final <X> Children groupBy(boolean condition, SFunction<X, ?> column, SFunction<X, ?>... columns) {
+        return groupBy(condition, LambdaUtils.getName(column), Arrays.stream(columns).map(LambdaUtils::getName).toArray(String[]::new));
+    }
+
+    @Override
+    public <X> Children orderByAscLambda(boolean condition, List<SFunction<X, ?>> columns) {
+        return orderByAscStr(condition, columns.stream().map(LambdaUtils::getName).collect(Collectors.toList()));
+    }
+
+    @Override
+    @SafeVarargs
+    public final <X> Children orderByAsc(SFunction<X, ?> column, SFunction<X, ?>... columns) {
+        return orderByAsc(true, column, columns);
+    }
+
+    @Override
+    @SafeVarargs
+    public final <X> Children orderByAsc(boolean condition, SFunction<X, ?> column, SFunction<X, ?>... columns) {
+        return orderByAsc(condition, LambdaUtils.getName(column), Arrays.stream(columns).map(LambdaUtils::getName).toArray(String[]::new));
+    }
+
+    @Override
+    public <X> Children orderByDescLambda(boolean condition, List<SFunction<X, ?>> columns) {
+        return orderByDescStr(condition, columns.stream().map(LambdaUtils::getName).collect(Collectors.toList()));
+    }
+
+    @Override
+    @SafeVarargs
+    public final <X> Children orderByDesc(SFunction<X, ?> column, SFunction<X, ?>... columns) {
+        return orderByDesc(true, column, columns);
+    }
+
+    @Override
+    @SafeVarargs
+    public final <X> Children orderByDesc(boolean condition, SFunction<X, ?> column, SFunction<X, ?>... columns) {
+        return orderByDesc(condition, LambdaUtils.getName(column), Arrays.stream(columns).map(LambdaUtils::getName).toArray(String[]::new));
+    }
+
+    @Override
+    @SafeVarargs
+    public final <X> Children orderBy(boolean condition, boolean isAsc, SFunction<X, ?> column, SFunction<X, ?>... columns) {
+        return orderBy(condition, isAsc, LambdaUtils.getName(column), Arrays.stream(columns).map(LambdaUtils::getName).toArray(String[]::new));
+    }
+    /* ******************************************** */
 
 
     @Override

@@ -61,9 +61,7 @@ QQ群:680016987  或者
 
 ### 使用
 
-* mapper继承MPJBaseMapper (必选)
-* service继承MPJBaseService (可选)
-* serviceImpl继承MPJBaseServiceImpl (可选)
+* mapper继承MPJBaseMapper
 
 ### Lambda形式用法（MPJLambdaWrapper）
 

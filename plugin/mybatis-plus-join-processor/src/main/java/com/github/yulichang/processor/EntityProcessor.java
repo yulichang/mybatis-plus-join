@@ -9,9 +9,11 @@ import com.github.yulichang.processor.matedata.TableInfo;
 import com.github.yulichang.processor.utils.StringUtil;
 
 import javax.annotation.processing.AbstractProcessor;
+import javax.annotation.processing.Messager;
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.annotation.processing.RoundEnvironment;
 import javax.lang.model.SourceVersion;
+import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
@@ -35,21 +37,28 @@ public class EntityProcessor extends AbstractProcessor {
 
     private Elements elementUtils;
     private Types typeUtils;
+    private Messager messager;
 
     @Override
     public synchronized void init(ProcessingEnvironment processingEnv) {
         super.init(processingEnv);
         this.elementUtils = processingEnv.getElementUtils();
         this.typeUtils = processingEnv.getTypeUtils();
+        this.messager = processingEnv.getMessager();
     }
+
 
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
         if (!roundEnv.processingOver()) {
-            roundEnv.getElementsAnnotatedWith(Table.class).stream().filter(f -> f instanceof TypeElement)
-                    .map(f -> (TypeElement) f).map(this::createColumn)
-                    .collect(Collectors.groupingBy(TableInfo::getClassPackage))
-                    .forEach(this::createTables);
+            TypeElement table = annotations.stream().filter(i -> i.toString().equals(Table.class.getName())).findFirst().orElse(null);
+            if (table != null) {
+                Set<? extends Element> tables = roundEnv.getElementsAnnotatedWith(table);
+                tables.stream().filter(f -> f instanceof TypeElement)
+                        .map(f -> (TypeElement) f).map(this::createColumn)
+                        .collect(Collectors.groupingBy(TableInfo::getClassPackage))
+                        .forEach(this::createTables);
+            }
         }
         return false;
     }
@@ -71,9 +80,7 @@ public class EntityProcessor extends AbstractProcessor {
      * 生成Column类
      */
     private TableInfo createColumn(TypeElement element) {
-        TableInfo tableInfo = new TableInfo(element.getAnnotation(Table.class));
-        tableInfo.setClassName(element.toString());
-        tableInfo.setSimpleClassName(element.getSimpleName().toString());
+        TableInfo tableInfo = new TableInfo(element.getAnnotation(Table.class), element.toString(), element.getSimpleName().toString());
         tableInfo.setClassPackage(elementUtils.getPackageOf(element).getQualifiedName().toString());
         tableInfo.setClassComment(elementUtils.getDocComment(element));
 
@@ -146,7 +153,7 @@ public class EntityProcessor extends AbstractProcessor {
             writer.flush();
             writer.close();
         } catch (Exception e) {
-            processingEnv.getMessager().printMessage(Diagnostic.Kind.ERROR, e.getMessage());
+            this.messager.printMessage(Diagnostic.Kind.ERROR, e.getMessage());
         }
     }
 

@@ -27,11 +27,11 @@ public class OgnlRoot {
         /**
          * 类名
          */
-        private final String className;
+        public final String className;
         /**
          * 包名
          */
-        private final String packageName;
+        public final String packageName;
 
 
         public ClassInfo(String className, String packageName) {

@@ -1,6 +1,5 @@
 package com.github.yulichang.processor.matedata;
 
-import com.github.yulichang.annotation.Table;
 import com.github.yulichang.apt.OgnlRoot;
 import org.apache.ibatis.builder.BuilderException;
 import org.apache.ibatis.ognl.Ognl;
@@ -27,15 +26,17 @@ public class TableInfo {
 
     private String classPackage;
 
-    private final Table tableAnnotation;
+    private final Conf conf;
 
     private Set<FieldInfo> fields;
 
     private String tagClassName;
     private String tagPackageName;
+    private String tagTablesName;
+    private String tagTablesPackageName;
 
-    public TableInfo(Table tableAnnotation, String className, String simpleClassName) {
-        this.tableAnnotation = tableAnnotation;
+    public TableInfo(Conf conf, String className, String simpleClassName) {
+        this.conf = conf;
         this.className = className;
         this.simpleClassName = simpleClassName;
     }
@@ -45,7 +46,7 @@ public class TableInfo {
      */
     public String getTagClassName() {
         if (tagClassName == null) {
-            tagClassName = parse(tableAnnotation.value(), this.simpleClassName);
+            tagClassName = parse(conf.getClassName(), this.simpleClassName);
         }
         return tagClassName;
     }
@@ -55,11 +56,30 @@ public class TableInfo {
      */
     public String getTagPackage() {
         if (tagPackageName == null) {
-            tagPackageName = parse(tableAnnotation.packageName(), this.classPackage);
+            tagPackageName = parse(conf.getPackageName(), this.classPackage);
         }
         return tagPackageName;
     }
 
+    /**
+     * 获取Tables的字段名
+     */
+    public String getTagTablesName() {
+        if (tagTablesName == null) {
+            tagTablesName = parse(conf.getTablesName(), this.simpleClassName);
+        }
+        return tagTablesName;
+    }
+
+    /**
+     * 获取Tables的路径
+     */
+    public String getTagTablesPackageName() {
+        if (tagTablesPackageName == null) {
+            tagTablesPackageName = parse(conf.getTablasPackageName(), this.classPackage);
+        }
+        return tagTablesPackageName;
+    }
 
     private String parse(String expression, String source) {
         String tag;
@@ -94,7 +114,7 @@ public class TableInfo {
         this.classComment = classComment;
     }
 
-    public String getClassPackage() {
+    public String getClassPackage1() {
         return classPackage;
     }
 
@@ -102,8 +122,8 @@ public class TableInfo {
         this.classPackage = classPackage;
     }
 
-    public Table getTableAnnotation() {
-        return tableAnnotation;
+    public boolean isGenTables() {
+        return this.conf.isGenTables();
     }
 
     public Set<FieldInfo> getFields() {

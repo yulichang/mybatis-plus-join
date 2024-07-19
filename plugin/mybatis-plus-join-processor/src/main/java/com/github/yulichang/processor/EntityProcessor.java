@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.github.yulichang.annotation.Table;
 import com.github.yulichang.apt.BaseColumn;
 import com.github.yulichang.apt.Column;
+import com.github.yulichang.processor.matedata.Conf;
 import com.github.yulichang.processor.matedata.FieldInfo;
 import com.github.yulichang.processor.matedata.TableInfo;
 import com.github.yulichang.processor.utils.StringUtil;
@@ -13,19 +14,13 @@ import javax.annotation.processing.Messager;
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.annotation.processing.RoundEnvironment;
 import javax.lang.model.SourceVersion;
-import javax.lang.model.element.Element;
-import javax.lang.model.element.ElementKind;
-import javax.lang.model.element.Modifier;
-import javax.lang.model.element.TypeElement;
+import javax.lang.model.element.*;
 import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
 import javax.tools.Diagnostic;
 import javax.tools.JavaFileObject;
 import java.io.Writer;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -38,6 +33,7 @@ public class EntityProcessor extends AbstractProcessor {
     private Elements elementUtils;
     private Types typeUtils;
     private Messager messager;
+    private Conf globalConf;
 
     @Override
     public synchronized void init(ProcessingEnvironment processingEnv) {
@@ -45,6 +41,11 @@ public class EntityProcessor extends AbstractProcessor {
         this.elementUtils = processingEnv.getElementUtils();
         this.typeUtils = processingEnv.getTypeUtils();
         this.messager = processingEnv.getMessager();
+        this.globalConf = new Conf(processingEnv.getFiler(), this::note);
+    }
+
+    private void note(String msg) {
+        messager.printMessage(Diagnostic.Kind.NOTE, msg + " - " + UUID.randomUUID());
     }
 
 
@@ -53,10 +54,12 @@ public class EntityProcessor extends AbstractProcessor {
         if (!roundEnv.processingOver()) {
             TypeElement table = annotations.stream().filter(i -> i.toString().equals(Table.class.getName())).findFirst().orElse(null);
             if (table != null) {
+                note("mybatis plus join processor start");
                 Set<? extends Element> tables = roundEnv.getElementsAnnotatedWith(table);
                 tables.stream().filter(f -> f instanceof TypeElement)
                         .map(f -> (TypeElement) f).map(this::createColumn)
-                        .collect(Collectors.groupingBy(TableInfo::getClassPackage))
+                        .filter(Objects::nonNull).filter(TableInfo::isGenTables)
+                        .collect(Collectors.groupingBy(TableInfo::getTagTablesPackageName))
                         .forEach(this::createTables);
             }
         }
@@ -80,7 +83,16 @@ public class EntityProcessor extends AbstractProcessor {
      * 生成Column类
      */
     private TableInfo createColumn(TypeElement element) {
-        TableInfo tableInfo = new TableInfo(element.getAnnotation(Table.class), element.toString(), element.getSimpleName().toString());
+        AnnotationMirror tb = element.getAnnotationMirrors().stream().filter(a ->
+                a.getAnnotationType().asElement().toString().equals(Table.class.getName())).findFirst().orElse(null);
+        Table table = element.getAnnotation(Table.class);
+        if (tb == null) {
+            return null;
+        }
+        Set<String> keySet = tb.getElementValues().keySet().stream().map(k ->
+                k.getSimpleName().toString()).collect(Collectors.toSet());
+        Conf conf = Conf.getConf(globalConf, table, keySet);
+        TableInfo tableInfo = new TableInfo(conf, element.toString(), element.getSimpleName().toString());
         tableInfo.setClassPackage(elementUtils.getPackageOf(element).getQualifiedName().toString());
         tableInfo.setClassComment(elementUtils.getDocComment(element));
 
@@ -127,7 +139,7 @@ public class EntityProcessor extends AbstractProcessor {
     private void createTables(String tagPackage, List<TableInfo> tableInfos) {
         StringBuilderHelper content = new StringBuilderHelper();
         // package
-        content.addPackage(tagPackage + ".tables");
+        content.addPackage(tagPackage);
         content.newLine();
         // import
         tableInfos.forEach(tableInfo -> content.addImport(tableInfo.getTagPackage() + "." + tableInfo.getTagClassName()));
@@ -141,7 +153,7 @@ public class EntityProcessor extends AbstractProcessor {
                 // 添加table字段
                 .addTablesFields(tableInfos));
 
-        writerFile(tagPackage + ".tables.Tables", content.getContent());
+        writerFile(tagPackage + ".Tables", content.getContent());
     }
 
     private void writerFile(String fullClassName, String content) {
@@ -220,7 +232,7 @@ public class EntityProcessor extends AbstractProcessor {
                 addComment("\t", tableInfo.getClassComment());
                 sb.append(String.format("\tpublic static final %s %s = new %s();\n",
                         tableInfo.getTagClassName(),
-                        String.format(tableInfo.getTableAnnotation().tablesName(), tableInfo.getSimpleClassName()),
+                        String.format(tableInfo.getTagTablesName(), tableInfo.getSimpleClassName()),
                         tableInfo.getTagClassName()));
                 newLine();
             });

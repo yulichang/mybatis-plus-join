@@ -124,7 +124,6 @@ public class EntityProcessor extends AbstractProcessor {
                 .addClass(tableInfo.getClassComment(), tableInfo.getTagClassName(),
                         BaseColumn.class.getSimpleName() + "<" + tableInfo.getSimpleClassName() + ">",
                         c -> c
-                                .addDefaultField()
                                 .addConstructor(tableInfo)
                                 .addFields(tableInfo)
                                 .addMethod(tableInfo)
@@ -188,7 +187,7 @@ public class EntityProcessor extends AbstractProcessor {
             addComment("", comment);
             sb.append("public class ").append(tagClassName);
             if (StringUtil.isNotEmpty(impl)) {
-                sb.append(" implements ").append(impl);
+                sb.append(" extends ").append(impl);
             }
             sb.append(" {\n");
             consumer.accept(this);
@@ -198,11 +197,12 @@ public class EntityProcessor extends AbstractProcessor {
 
         public StringBuilderHelper addConstructor(TableInfo tableInfo) {
             // 无参构造
+            newLine();
             sb.append(String.format("\tpublic %s() {\n\t}\n", tableInfo.getTagClassName()));
             newLine();
             //有参构造
             sb.append("\tpublic ").append(tableInfo.getTagClassName()).append("(String alias) {\n" +
-                    "\t\tthis._alias_q2Gv$ = alias;\n" +
+                    "\t\tsuper.alias = alias;\n" +
                     "\t}\n");
             newLine();
             return this;
@@ -239,23 +239,11 @@ public class EntityProcessor extends AbstractProcessor {
             return this;
         }
 
-        public StringBuilderHelper addDefaultField() {
-            newLine();
-            sb.append("\tprivate String _alias_q2Gv$;\n");
-            newLine();
-            return this;
-        }
-
         public StringBuilderHelper addMethod(TableInfo tableInfo) {
             sb.append("\t@Override\n" +
                             "\tpublic Class<").append(tableInfo.getSimpleClassName()).append("> getColumnClass() {\n")
                     .append("\t\treturn ").append(tableInfo.getSimpleClassName()).append(".class;\n")
                     .append("\t}\n");
-            newLine();
-            sb.append("\t@Override\n" +
-                    "\tpublic String getAlias() {\n" +
-                    "\t\treturn this._alias_q2Gv$;\n" +
-                    "\t}\n");
             newLine();
             return this;
         }

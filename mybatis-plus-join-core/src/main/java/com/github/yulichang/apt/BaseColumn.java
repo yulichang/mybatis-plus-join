@@ -1,10 +1,20 @@
 package com.github.yulichang.apt;
 
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
 import java.io.Serializable;
 
-public interface BaseColumn<T> extends Serializable {
+/**
+ * @author yulichang
+ * @since 1.5.0
+ */
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public abstract class BaseColumn<T> implements Serializable {
 
-    Class<T> getColumnClass();
+    protected String alias;
 
-    String getAlias();
+    abstract public Class<T> getColumnClass();
 }

@@ -127,6 +127,7 @@ public class EntityProcessor extends AbstractProcessor {
                                 .addConstructor(tableInfo)
                                 .addFields(tableInfo)
                                 .addMethod(tableInfo)
+                                .addBuild(tableInfo)
                 );
         writerFile(tableInfo.getTagClassPackage() + "." + tableInfo.getTagClassName(), content.getContent());
         return tableInfo;
@@ -243,6 +244,18 @@ public class EntityProcessor extends AbstractProcessor {
             sb.append("\t@Override\n" +
                             "\tpublic Class<").append(tableInfo.getSimpleClassName()).append("> getColumnClass() {\n")
                     .append("\t\treturn ").append(tableInfo.getSimpleClassName()).append(".class;\n")
+                    .append("\t}\n");
+            newLine();
+            return this;
+        }
+
+        public StringBuilderHelper addBuild(TableInfo tableInfo) {
+            sb.append("\tpublic static ").append(tableInfo.getTagClassName()).append(" build() {\n")
+                    .append("\t\treturn new ").append(tableInfo.getTagClassName()).append("();\n")
+                    .append("\t}\n");
+            newLine();
+            sb.append("\tpublic static ").append(tableInfo.getTagClassName()).append(" build(String alias) {\n")
+                    .append("\t\treturn new ").append(tableInfo.getTagClassName()).append("(alias);\n")
                     .append("\t}\n");
             newLine();
             return this;

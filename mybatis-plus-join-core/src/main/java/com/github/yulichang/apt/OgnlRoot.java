@@ -13,8 +13,14 @@ import java.util.Objects;
 @Getter
 public class OgnlRoot {
 
+    /**
+     * 类名
+     */
     private final String className;
 
+    /**
+     * 包名
+     */
     private final String classPackage;
 
     private final StringHelper util = new StringHelper();
@@ -26,6 +32,22 @@ public class OgnlRoot {
 
     @SuppressWarnings("unused")
     public static final class StringHelper {
+        /**
+         * 移除后缀
+         *
+         * @param str    原字符串
+         * @param suffix 指定后缀
+         */
+        public String removeSuffix(String str, String suffix) {
+            if (isBlank(str) || isBlank(suffix)) {
+                return str;
+            }
+            if (str.endsWith(suffix)) {
+                return str.substring(0, str.length() - suffix.length());
+            }
+            return str;
+        }
+
         /**
          * 替换后缀
          *

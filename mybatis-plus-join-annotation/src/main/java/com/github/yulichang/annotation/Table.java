@@ -29,10 +29,10 @@ import java.lang.annotation.Target;
  * <p>
  * 举例：
  * <ul>
- *   <li>去掉3长度的后缀并且大写  Ognl#classInfo.className.substring(0, classInfo.className.length() - 3).toUpperCase() </li>
- *   <li>以“APT”结尾 Ognl#classInfo.className + 'APT'</li>
- *   <li>全大写并且以“APT”结尾 Ognl#classInfo.className.toUpperCase() + 'APT' </li>
- *   <li>"PO"结尾替换为“APT”且全大写  Ognl#stringHelper.replaceSuffix(classInfo.className, 'PO', 'APT').toUpperCase() </li>
+ *   <li>去掉3长度的后缀并且大写  Ognl#className.substring(0, className.length() - 3).toUpperCase() </li>
+ *   <li>以“APT”结尾 Ognl#className + 'APT'</li>
+ *   <li>全大写并且以“APT”结尾 Ognl#className.toUpperCase() + 'APT' </li>
+ *   <li>"PO"结尾替换为“APT”且全大写  Ognl#util.replaceSuffix(className, 'PO', 'APT').toUpperCase() </li>
  * </ul>
  * <p>
  * 支持 三元运算 String所有方法 如lastIndexOf subString toUpperCase等 Ognl语法<p>

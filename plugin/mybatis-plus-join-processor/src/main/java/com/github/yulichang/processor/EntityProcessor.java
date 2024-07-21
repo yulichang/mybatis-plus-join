@@ -115,7 +115,7 @@ public class EntityProcessor extends AbstractProcessor {
         tableInfo.setFields(fieldInfos);
 
         StringBuilderHelper content = new StringBuilderHelper()
-                .addPackage(tableInfo.getTagPackage())
+                .addPackage(tableInfo.getTagClassPackage())
                 .newLine()
                 .addImport(BaseColumn.class.getName())
                 .addImport(Column.class.getName())
@@ -124,12 +124,12 @@ public class EntityProcessor extends AbstractProcessor {
                 .addClass(tableInfo.getClassComment(), tableInfo.getTagClassName(),
                         BaseColumn.class.getSimpleName() + "<" + tableInfo.getSimpleClassName() + ">",
                         c -> c
-                                .addDefaultField(tableInfo.getSimpleClassName())
+                                .addDefaultField()
                                 .addConstructor(tableInfo)
                                 .addFields(tableInfo)
                                 .addMethod(tableInfo)
                 );
-        writerFile(tableInfo.getTagPackage() + "." + tableInfo.getTagClassName(), content.getContent());
+        writerFile(tableInfo.getTagClassPackage() + "." + tableInfo.getTagClassName(), content.getContent());
         return tableInfo;
     }
 
@@ -142,7 +142,7 @@ public class EntityProcessor extends AbstractProcessor {
         content.addPackage(tagPackage);
         content.newLine();
         // import
-        tableInfos.forEach(tableInfo -> content.addImport(tableInfo.getTagPackage() + "." + tableInfo.getTagClassName()));
+        tableInfos.forEach(tableInfo -> content.addImport(tableInfo.getTagClassPackage() + "." + tableInfo.getTagClassName()));
         content.newLine();
         // class
         String tables = "Tables";
@@ -220,8 +220,8 @@ public class EntityProcessor extends AbstractProcessor {
         public StringBuilderHelper addFields(TableInfo tableInfo) {
             tableInfo.getFields().forEach(fieldInfo -> {
                 addComment("\t", fieldInfo.getComment());
-                sb.append(String.format("\tpublic final Column %s = new Column(this, %s.class, \"%s\", () -> this._alias_q2Gv$);\n",
-                        fieldInfo.getProperty(), tableInfo.getSimpleClassName(), fieldInfo.getProperty()));
+                sb.append(String.format("\tpublic final Column %s = new Column(this, \"%s\");\n",
+                        fieldInfo.getProperty(), fieldInfo.getProperty()));
                 newLine();
             });
             return this;
@@ -239,9 +239,7 @@ public class EntityProcessor extends AbstractProcessor {
             return this;
         }
 
-        public StringBuilderHelper addDefaultField(String simpleClassName) {
-            newLine();
-            sb.append("\tprivate static final Class<").append(simpleClassName).append("> _class_e76G$ = ").append(simpleClassName).append(".class;\n");
+        public StringBuilderHelper addDefaultField() {
             newLine();
             sb.append("\tprivate String _alias_q2Gv$;\n");
             newLine();
@@ -251,7 +249,7 @@ public class EntityProcessor extends AbstractProcessor {
         public StringBuilderHelper addMethod(TableInfo tableInfo) {
             sb.append("\t@Override\n" +
                             "\tpublic Class<").append(tableInfo.getSimpleClassName()).append("> getColumnClass() {\n")
-                    .append("\t\treturn this._class_e76G$;\n")
+                    .append("\t\treturn ").append(tableInfo.getSimpleClassName()).append(".class;\n")
                     .append("\t}\n");
             newLine();
             sb.append("\t@Override\n" +

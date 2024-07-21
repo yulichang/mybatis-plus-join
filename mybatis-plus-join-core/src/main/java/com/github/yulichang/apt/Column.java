@@ -1,20 +1,31 @@
 package com.github.yulichang.apt;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 
 import java.io.Serializable;
 import java.util.function.Supplier;
 
-@Data
-@AllArgsConstructor
+/**
+ * @author yulichang
+ * @since 1.5.0
+ */
+@Getter
 public class Column implements Serializable {
 
-    private BaseColumn<?> root;
+    private final BaseColumn<?> root;
 
-    private Class<?> clazz;
+    private final String property;
 
-    private String property;
+    public Column(BaseColumn<?> root, String property) {
+        this.root = root;
+        this.property = property;
+    }
 
-    private Supplier<String> alias;
+    public Class<?> getClazz() {
+        return root.getColumnClass();
+    }
+
+    public Supplier<String> getAlias() {
+        return root::getAlias;
+    }
 }

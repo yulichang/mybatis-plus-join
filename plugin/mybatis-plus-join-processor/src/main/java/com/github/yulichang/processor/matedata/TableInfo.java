@@ -54,9 +54,9 @@ public class TableInfo {
     /**
      * 生成类的路径
      */
-    public String getTagPackage() {
+    public String getTagClassPackage() {
         if (tagPackageName == null) {
-            tagPackageName = parse(conf.getPackageName(), this.classPackage);
+            tagPackageName = parse(conf.getClassPackage(), this.classPackage);
         }
         return tagPackageName;
     }
@@ -66,7 +66,7 @@ public class TableInfo {
      */
     public String getTagTablesName() {
         if (tagTablesName == null) {
-            tagTablesName = parse(conf.getTablesName(), this.simpleClassName);
+            tagTablesName = parse(conf.getTablesClassName(), this.simpleClassName);
         }
         return tagTablesName;
     }
@@ -76,7 +76,7 @@ public class TableInfo {
      */
     public String getTagTablesPackageName() {
         if (tagTablesPackageName == null) {
-            tagTablesPackageName = parse(conf.getTablasPackageName(), this.classPackage);
+            tagTablesPackageName = parse(conf.getTablasClassPackage(), this.classPackage);
         }
         return tagTablesPackageName;
     }

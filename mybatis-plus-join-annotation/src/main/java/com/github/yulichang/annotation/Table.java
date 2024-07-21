@@ -21,8 +21,9 @@ import java.lang.annotation.Target;
  * 支持Ognl语法字段说明<br/>
  * Ognl上下文
  * <ul>
- *   <li>classInfo {@link com.github.yulichang.apt.OgnlRoot.ClassInfo}</li>
- *   <li>stringHelper {@link com.github.yulichang.apt.OgnlRoot.StringHelper}</li>
+ *   <li>className 类名</li>
+ *   <li>classPackage 包名</li>
+ *   <li>util 工具类 stringHelper {@link com.github.yulichang.apt.OgnlRoot.StringHelper}</li>
  * </ul>
  * 指定开头 Ognl# 这不是ognl语法，这是MPJ规定的 用于区分 ognl还是String.format
  * <p>
@@ -55,7 +56,7 @@ public @interface Table {
      * <p>
      * 支持Ognl 默认使用String.format()
      */
-    String packageName() default "%s.apt";
+    String classPackage() default "%s.apt";
 
     /**
      * 是否在Tables中生成对应的类字段
@@ -67,13 +68,13 @@ public @interface Table {
      * <p>
      * 支持Ognl 默认使用String.format()
      */
-    String tablesPackageName() default "%s.tables";
+    String tablesClassPackage() default "%s.tables";
 
     /**
      * Tables中的字段名 默认大写的类名
      * <p>
      * 支持Ognl 默认使用String.format()
      */
-    String tablesName() default "%S";
+    String tablesClassName() default "%S";
 
 }

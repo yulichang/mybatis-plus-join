@@ -29,6 +29,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import static com.github.yulichang.test.join.entity.tables.Tables.*;
+
 /**
  * 连表测试类
  * <p>
@@ -64,7 +66,7 @@ class AptWrapperTest {
     void testSelectSort() {
         ThreadLocalUtils.set("SELECT t.id, t.user_id, t.tenant_id FROM user_tenant t WHERE t.tenant_id = 1");
 
-        UserTenantDOCol ut = new UserTenantDOCol();
+        UserTenantDOCol ut = USERTENANTDO;
 
         AptQueryWrapper<UserTenantDO> lambda = JoinWrappers.apt(ut)
                 .selectAsClass(ut, UserTenantDTO.class);
@@ -81,7 +83,7 @@ class AptWrapperTest {
 
     @Test
     void testSimple() {
-        UserTenantDOCol ut = new UserTenantDOCol();
+        UserTenantDOCol ut = USERTENANTDO;
         AptQueryWrapper<UserTenantDO> lambda = JoinWrappers.apt(ut);
         lambda.selectAs(ut.idea, UserTenantDO::getIdea);
         List<UserTenantDO> list = userTenantMapper.selectList(lambda);
@@ -124,9 +126,9 @@ class AptWrapperTest {
                 "  AND (t.id <= ?)\n" +
                 "ORDER BY t.id DESC");
 
-        UserDOCol u = new UserDOCol();
-        AddressDOCol addr = new AddressDOCol();
-        AreaDOCol ar = new AreaDOCol();
+        UserDOCol u = USERDO;
+        AddressDOCol addr = ADDRESSDO;
+        AreaDOCol ar = AREADO;
 
         AptQueryWrapper<UserDO> wrapper = new AptQueryWrapper<>(u)
                 .selectAll()
@@ -170,9 +172,9 @@ class AptWrapperTest {
                 "  AND (t.id <= ?)\n" +
                 "ORDER BY t.id DESC");
 
-        UserDOCol u = new UserDOCol();
-        AddressDOCol addr = new AddressDOCol();
-        AreaDOCol ar = new AreaDOCol();
+        UserDOCol u = USERDO;
+        AddressDOCol addr = ADDRESSDO;
+        AreaDOCol ar = AREADO;
 
         AptQueryWrapper<UserDO> wrapper = new AptQueryWrapper<>(u)
                 .selectAll()
@@ -222,9 +224,9 @@ class AptWrapperTest {
                 "  AND t2.del = false\n" +
                 "ORDER BY t.id DESC");
 
-        UserDOCol u = new UserDOCol();
-        AddressDOCol addr = new AddressDOCol();
-        AreaDOCol ar = new AreaDOCol();
+        UserDOCol u = USERDO;
+        AddressDOCol addr = ADDRESSDO;
+        AreaDOCol ar = AREADO;
 
         AptQueryWrapper<UserDO> wrapper = new AptQueryWrapper<>(u)
                 .selectAll()
@@ -252,9 +254,9 @@ class AptWrapperTest {
                 "  AND t1.del = false\n" +
                 "  AND t2.del = false");
 
-        UserDOCol u = new UserDOCol();
-        AddressDOCol addr = new AddressDOCol();
-        AreaDOCol ar = new AreaDOCol();
+        UserDOCol u = USERDO;
+        AddressDOCol addr = ADDRESSDO;
+        AreaDOCol ar = AREADO;
 
         //基本数据类型 和 String
         AptQueryWrapper<UserDO> wrapper = new AptQueryWrapper<>(u)
@@ -306,9 +308,9 @@ class AptWrapperTest {
                 "  AND (t.id <= ?)\n" +
                 "ORDER BY t.id ASC, t.`name` ASC");
 
-        UserDOCol u = new UserDOCol();
-        AddressDOCol addr = new AddressDOCol();
-        AreaDOCol ar = new AreaDOCol();
+        UserDOCol u = USERDO;
+        AddressDOCol addr = ADDRESSDO;
+        AreaDOCol ar = AREADO;
 
         UserDO userDO = new UserDO();
         userDO.setId(1);
@@ -438,7 +440,7 @@ class AptWrapperTest {
                 "WHERE t.del = false\n" +
                 "  AND (t.id > ?)");
 
-        UserDOCol u = new UserDOCol();
+        UserDOCol u =  USERDO;
         UserDOCol ua = new UserDOCol();
 
         //自连接

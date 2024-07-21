@@ -13,31 +13,15 @@ import java.util.Objects;
 @Getter
 public class OgnlRoot {
 
-    private final ClassInfo classInfo;
+    private final String className;
 
-    private final StringHelper stringHelper;
+    private final String classPackage;
 
-    public OgnlRoot(String className, String packageName) {
-        this.classInfo = new ClassInfo(className, packageName);
-        this.stringHelper = new StringHelper();
-    }
+    private final StringHelper util = new StringHelper();
 
-    @Getter
-    public static class ClassInfo {
-        /**
-         * 类名
-         */
-        public final String className;
-        /**
-         * 包名
-         */
-        public final String packageName;
-
-
-        public ClassInfo(String className, String packageName) {
-            this.className = className;
-            this.packageName = packageName;
-        }
+    public OgnlRoot(String className, String classPackage) {
+        this.className = className;
+        this.classPackage = classPackage;
     }
 
     @SuppressWarnings("unused")

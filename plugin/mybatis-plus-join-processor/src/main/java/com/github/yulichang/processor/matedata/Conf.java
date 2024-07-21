@@ -18,19 +18,19 @@ import java.util.function.Function;
 public class Conf {
 
     private String className = "%sCol";
-    private String packageName = "%s.apt";
+    private String classPackage = "%s.apt";
     private boolean genTables = true;
-    private String tablasPackageName = "%s.tables";
-    private String tablesName = "%S";
+    private String tablasClassPackage = "%s.tables";
+    private String tablesClassName = "%S";
 
     private boolean initFlag = false;
 
     private Conf(Conf conf) {
         this.className = conf.className;
-        this.packageName = conf.packageName;
+        this.classPackage = conf.classPackage;
         this.genTables = conf.genTables;
-        this.tablasPackageName = conf.tablasPackageName;
-        this.tablesName = conf.tablesName;
+        this.tablasClassPackage = conf.tablasClassPackage;
+        this.tablesClassName = conf.tablesClassName;
         this.initFlag = conf.initFlag;
     }
 
@@ -69,10 +69,10 @@ public class Conf {
         Properties properties = new Properties();
         properties.load(Files.newInputStream(confFile.toPath()));
         this.className = properties.getOrDefault("className", this.className).toString();
-        this.packageName = properties.getOrDefault("packageName", this.packageName).toString();
+        this.classPackage = properties.getOrDefault("classPackage", this.classPackage).toString();
         this.genTables = Boolean.parseBoolean(properties.getOrDefault("genTables", Boolean.toString(this.genTables)).toString());
-        this.tablasPackageName = properties.getOrDefault("tablasPackageName", this.tablasPackageName).toString();
-        this.tablesName = properties.getOrDefault("tablesName", this.tablesName).toString();
+        this.tablasClassPackage = properties.getOrDefault("tablasClassPackage", this.tablasClassPackage).toString();
+        this.tablesClassName = properties.getOrDefault("tablesClassName", this.tablesClassName).toString();
     }
 
     public static Conf getConf(Conf globalConf, Table table, Collection<String> keys) {
@@ -92,12 +92,12 @@ public class Conf {
         this.className = className;
     }
 
-    public String getPackageName() {
-        return packageName;
+    public String getClassPackage() {
+        return classPackage;
     }
 
-    public void setPackageName(String packageName) {
-        this.packageName = packageName;
+    public void setClassPackage(String classPackage) {
+        this.classPackage = classPackage;
     }
 
     public boolean isGenTables() {
@@ -108,28 +108,28 @@ public class Conf {
         this.genTables = genTables;
     }
 
-    public String getTablasPackageName() {
-        return tablasPackageName;
+    public String getTablasClassPackage() {
+        return tablasClassPackage;
     }
 
-    public void setTablasPackageName(String tablasPackageName) {
-        this.tablasPackageName = tablasPackageName;
+    public void setTablasClassPackage(String tablasClassPackage) {
+        this.tablasClassPackage = tablasClassPackage;
     }
 
-    public String getTablesName() {
-        return tablesName;
+    public String getTablesClassName() {
+        return tablesClassName;
     }
 
-    public void setTablesName(String tablesName) {
-        this.tablesName = tablesName;
+    public void setTablesClassName(String tablesClassName) {
+        this.tablesClassName = tablesClassName;
     }
 
     public enum ConfItem {
         className("value", Table::value, (c, v) -> c.setClassName(v.toString())),
-        packageName("packageName", Table::packageName, (c, v) -> c.setPackageName(v.toString())),
+        packageName("classPackage", Table::classPackage, (c, v) -> c.setClassPackage(v.toString())),
         genTables("genTables", Table::genTables, (c, v) -> c.setGenTables((boolean) v)),
-        tablasPackageName("tablasPackageName", Table::tablesPackageName, (c, v) -> c.setTablasPackageName(v.toString())),
-        tablesName("tablesName", Table::tablesName, (c, v) -> c.setTablesName(v.toString()));
+        tablasPackageName("tablesClassPackage", Table::tablesClassPackage, (c, v) -> c.setTablasClassPackage(v.toString())),
+        tablesName("tablesClassName", Table::tablesClassName, (c, v) -> c.setTablesClassName(v.toString()));
 
         private final String action;
 
@@ -153,10 +153,11 @@ public class Conf {
     public String toString() {
         return "Conf{" +
                 "className='" + className + '\'' +
-                ", packageName='" + packageName + '\'' +
+                ", classPackage='" + classPackage + '\'' +
                 ", genTables=" + genTables +
-                ", tablasPackageName='" + tablasPackageName + '\'' +
-                ", tablesName='" + tablesName + '\'' +
+                ", tablasClassPackage='" + tablasClassPackage + '\'' +
+                ", tablesClassName='" + tablesClassName + '\'' +
+                ", initFlag=" + initFlag +
                 '}';
     }
 }

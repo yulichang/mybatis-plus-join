@@ -38,10 +38,10 @@ public class TableAliasTest {
                 "LEFT JOIN area area1 ON (area1.id = addr1.area_id) " +
                 "WHERE t.del = false AND addr1.del = false AND addr2.del = false AND area1.del = false " +
                 "GROUP BY t.id");
-        UserDOCol u = new UserDOCol();
-        AddressDOCol addr1 = new AddressDOCol("addr1");
-        AddressDOCol addr2 = new AddressDOCol("addr2");
-        AreaDOCol area1 = new AreaDOCol("area1");
+        UserDOCol u = UserDOCol.build();
+        AddressDOCol addr1 = AddressDOCol.build("addr1");
+        AddressDOCol addr2 = AddressDOCol.build("addr2");
+        AreaDOCol area1 = AreaDOCol.build("area1");
 
         AptQueryWrapper<UserDO> wrapper = JoinWrappers.apt(u)
                 .selectAll()
@@ -63,10 +63,10 @@ public class TableAliasTest {
                 "WHERE t.del = false AND addr1.del = false AND addr2.del = false AND area1.del = false " +
                 "GROUP BY t.id,addr1.id ORDER BY addr1.id DESC");
 
-        UserDOCol u = new UserDOCol();
-        AddressDOCol addr1 = new AddressDOCol("addr1");
-        AddressDOCol addr2 = new AddressDOCol("addr2");
-        AreaDOCol area1 = new AreaDOCol("area1");
+        UserDOCol u = UserDOCol.build();
+        AddressDOCol addr1 = AddressDOCol.build("addr1");
+        AddressDOCol addr2 = AddressDOCol.build("addr2");
+        AreaDOCol area1 = AreaDOCol.build("area1");
 
         AptQueryWrapper<UserDO> wrapper = JoinWrappers.apt(u)
                 .selectAll()
@@ -90,10 +90,10 @@ public class TableAliasTest {
                 "LEFT JOIN area area1 ON (area1.id = addr2.area_id) WHERE t.del = false AND addr1.del = false AND addr2.del = false AND area1.del = false " +
                 "AND (addr1.id = ? AND addr2.id = ? AND addr1.id = ?)");
 
-        UserDOCol u = new UserDOCol();
-        AddressDOCol addr1 = new AddressDOCol("addr1");
-        AddressDOCol addr2 = new AddressDOCol("addr2");
-        AreaDOCol area1 = new AreaDOCol("area1");
+        UserDOCol u = UserDOCol.build();
+        AddressDOCol addr1 = AddressDOCol.build("addr1");
+        AddressDOCol addr2 = AddressDOCol.build("addr2");
+        AreaDOCol area1 = AreaDOCol.build("area1");
 
         AptQueryWrapper<UserDO> wrapper = JoinWrappers.apt(u)
                 .selectAll()
@@ -113,7 +113,7 @@ public class TableAliasTest {
         ThreadLocalUtils.set("SELECT aaa.id, aaa.pid, aaa.`name`, aaa.`json`, aaa.sex, aaa.head_img, aaa.create_time, " +
                 "aaa.address_id, aaa.address_id2, aaa.del, aaa.create_by, aaa.update_by FROM `user` aaa WHERE aaa.`name` = ? AND aaa.del = false");
 
-        UserDOCol u = new UserDOCol("aaa");
+        UserDOCol u = UserDOCol.build("aaa");
 
         UserDO userDO = new UserDO();
         userDO.setName("aaa");

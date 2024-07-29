@@ -31,7 +31,7 @@ public class OrderByTest {
     void orderBy() {
         ThreadLocalUtils.set("SELECT t.id, t.pid, t.`name`, t.`json`, t.sex, t.head_img, t.create_time, t.address_id, t.address_id2, t.del, t.create_by, t.update_by " +
                 "FROM `user` t WHERE t.del = false AND (t.id = ?) ORDER BY t.id ASC, t.`name` ASC, t.pid ASC");
-        UserDOCol u = new UserDOCol();
+        UserDOCol u = UserDOCol.build();
         List<Column> columList = Arrays.asList(u.id, u.name, u.pid);
 
         AptQueryWrapper<UserDO> wrapper = JoinWrappers.apt(u)
@@ -48,7 +48,7 @@ public class OrderByTest {
     void orderBy1() {
         ThreadLocalUtils.set("SELECT t.id, t.pid, t.`name`, t.`json`, t.sex, t.head_img, t.create_time, t.address_id, t.address_id2, t.del, t.create_by, t.update_by " +
                 "FROM `user` t WHERE t.del = false AND (t.id = ?) GROUP BY t.id, t.`name`, t.pid");
-        UserDOCol u = new UserDOCol();
+        UserDOCol u = UserDOCol.build();
         List<Column> columList = Arrays.asList(u.id, u.name, u.pid);
 
         AptQueryWrapper<UserDO> wrapper = JoinWrappers.apt(u)
@@ -64,8 +64,8 @@ public class OrderByTest {
 
     @Test
     void orderBy2() {
-        UserDOCol u = new UserDOCol();
-        AddressDOCol addr = new AddressDOCol();
+        UserDOCol u = UserDOCol.build();
+        AddressDOCol addr =  AddressDOCol.build();
 
         AptQueryWrapper<UserDO> wrapper = JoinWrappers.apt(u)
                 .selectAll()

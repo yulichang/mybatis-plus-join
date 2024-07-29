@@ -126,6 +126,10 @@ public class TableInfo {
         return this.conf.isGenTables();
     }
 
+    public boolean isCache() {
+        return this.conf.isCache();
+    }
+
     public Set<FieldInfo> getFields() {
         return fields;
     }

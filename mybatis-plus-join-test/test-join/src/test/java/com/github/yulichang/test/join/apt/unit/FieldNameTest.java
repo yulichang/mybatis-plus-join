@@ -28,8 +28,8 @@ public class FieldNameTest {
 
     @Test
     void testFieldName() {
-        AreaDOCol ar = new AreaDOCol();
-        UserDtoCol ud = new UserDtoCol();
+        AreaDOCol ar = AreaDOCol.build();
+        UserDtoCol ud = UserDtoCol.build();
         List<AreaDO> list = areaMapper.selectJoinList(AreaDO.class, JoinWrappers.apt(ar)
                 .select(ar.Postcode)
                 .leftJoin(ud, ud.id, ar.id));
@@ -39,8 +39,8 @@ public class FieldNameTest {
 
     @Test
     void testFieldName1() {
-        AreaDOCol ar = new AreaDOCol();
-        UserDtoCol ud = new UserDtoCol();
+        AreaDOCol ar = AreaDOCol.build();
+        UserDtoCol ud = UserDtoCol.build();
         List<AreaDTO> list = areaMapper.selectJoinList(AreaDTO.class, JoinWrappers.apt(ar)
                 .selectAs(ar.Postcode, AreaDTO::getPostcode)
                 .leftJoin(ud, ud.id, ar.id));

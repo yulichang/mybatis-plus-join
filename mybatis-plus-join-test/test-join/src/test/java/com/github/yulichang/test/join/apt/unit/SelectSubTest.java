@@ -30,10 +30,10 @@ public class SelectSubTest {
     @Test
     void sub() {
         ThreadLocalUtils.set("SELECT (SELECT st.id FROM `user` st WHERE st.del = false AND (st.id = t.id AND st.id = ?) LIMIT 1) AS id, (SELECT st.id FROM `user` st WHERE st.del = false AND (st.id = t.id AND st.id = ?) LIMIT 1) AS name FROM `user` t LEFT JOIN address t1 ON (t1.user_id = t.id) WHERE t.del = false AND t1.del = false AND (t.id <= ?)");
-        UserDOCol u = new UserDOCol();
-        UserDOCol sb = new UserDOCol();
-        UserDOCol sb2 = new UserDOCol();
-        AddressDOCol addr = new AddressDOCol();
+        UserDOCol u = UserDOCol.build();
+        UserDOCol sb = UserDOCol.build();
+        UserDOCol sb2 = UserDOCol.build();
+        AddressDOCol addr = AddressDOCol.build();
 
         AptQueryWrapper<UserDO> wrapper = JoinWrappers.apt(u)
                 .selectSub(sb, w -> w.select(sb.id)
@@ -48,9 +48,9 @@ public class SelectSubTest {
                 .le(u.id, 100);
         wrapper.list();
 
-        UserDOCol u1 = new UserDOCol();
-        AddressDOCol addr1 = new AddressDOCol();
-        AreaDOCol area = new AreaDOCol();
+        UserDOCol u1 = UserDOCol.build();
+        AddressDOCol addr1 = AddressDOCol.build();
+        AreaDOCol area = AreaDOCol.build();
 
         ThreadLocalUtils.set("SELECT (SELECT st.id FROM area st WHERE st.del = false AND (st.id = t1.id) LIMIT 1) AS id FROM `user` t LEFT JOIN address t1 ON (t1.user_id = t.id) WHERE t.del = false AND t1.del = false AND (t.id <= ?)");
         AptQueryWrapper<UserDO> wrapper1 = JoinWrappers.apt(u1)
@@ -65,9 +65,9 @@ public class SelectSubTest {
     @Test
     void sub1() {
         ThreadLocalUtils.set("SELECT (SELECT st.id FROM `area` st WHERE st.del = false AND (st.id = t1.id) LIMIT 1) AS id FROM `user` t LEFT JOIN address t1 ON (t1.user_id = t.id) WHERE t.del = false AND t1.del = false AND (t.id <= ?)");
-        UserDOCol u = new UserDOCol();
-        AddressDOCol addr = new AddressDOCol();
-        AreaDOCol ar = new AreaDOCol();
+        UserDOCol u = UserDOCol.build();
+        AddressDOCol addr = AddressDOCol.build();
+        AreaDOCol ar = AreaDOCol.build();
 
         AptQueryWrapper<UserDO> wrapper1 = JoinWrappers.apt(u)
                 .selectSub(ar, w -> w.select(ar.id)

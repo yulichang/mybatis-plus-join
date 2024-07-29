@@ -341,10 +341,10 @@ class AptWrapperTest {
                 "  AND uc.del = false\n" +
                 "  AND (ua.id <= ? AND ub.id >= ?)");
 
-        UserDtoCol tt = new UserDtoCol("tt");
-        UserDOCol ua = new UserDOCol("ua");
-        UserDOCol ub = new UserDOCol("ub");
-        UserDOCol uc = new UserDOCol("uc");
+        UserDtoCol tt = UserDtoCol.build("tt");
+        UserDOCol ua = UserDOCol.build("ua");
+        UserDOCol ub = UserDOCol.build("ub");
+        UserDOCol uc = UserDOCol.build("uc");
 
         AptQueryWrapper<UserDto> wrapper = new AptQueryWrapper<>(tt)
                 .selectAll()
@@ -387,10 +387,10 @@ class AptWrapperTest {
                 "  AND uc.del = false\n" +
                 "  AND (ua.head_img = tt.`name` AND tt.id = ua.id)");
 
-        UserDOCol ut = new UserDOCol("tt");
-        UserDOCol ua1 = new UserDOCol("ua");
-        UserDOCol ub1 = new UserDOCol("ub");
-        UserDOCol uc1 = new UserDOCol("uc");
+        UserDOCol ut = UserDOCol.build("tt");
+        UserDOCol ua1 = UserDOCol.build("ua");
+        UserDOCol ub1 = UserDOCol.build("ub");
+        UserDOCol uc1 = UserDOCol.build("uc");
 
         AptQueryWrapper<UserDO> w = new AptQueryWrapper<>(ut)
                 .selectAll()
@@ -440,8 +440,8 @@ class AptWrapperTest {
                 "WHERE t.del = false\n" +
                 "  AND (t.id > ?)");
 
-        UserDOCol u =  USERDO;
-        UserDOCol ua = new UserDOCol();
+        UserDOCol u = USERDO;
+        UserDOCol ua = UserDOCol.build();
 
         //自连接
         AptQueryWrapper<UserDO> wrapper = new AptQueryWrapper<>(u)
@@ -472,9 +472,9 @@ class AptWrapperTest {
                 "         LEFT JOIN `user` t2 ON (t2.id = t.update_by)\n" +
                 "WHERE (t2.id = t.update_by AND t.id = t1.id)");
 
-        UserDOCol uu = new UserDOCol();
-        UserDOCol uua = new UserDOCol();
-        UserDOCol uub = new UserDOCol();
+        UserDOCol uu = UserDOCol.build();
+        UserDOCol uua = UserDOCol.build();
+        UserDOCol uub = UserDOCol.build();
 
         //关联一张表多次
         AptQueryWrapper<UserDO> w = new AptQueryWrapper<>(uu)
@@ -534,9 +534,9 @@ class AptWrapperTest {
                 "WHERE t.del = false\n" +
                 "  AND (t1.id <= ? AND t.id <= ?)");
 
-        UserDOCol uuu = new UserDOCol();
-        UserDOCol uuua = new UserDOCol();
-        UserDOCol uuub = new UserDOCol();
+        UserDOCol uuu = UserDOCol.build();
+        UserDOCol uuua = UserDOCol.build();
+        UserDOCol uuub = UserDOCol.build();
 
         AptQueryWrapper<UserDO> wrapper1 = new AptQueryWrapper<>(uuu)
                 .disableSubLogicDel()
@@ -557,20 +557,20 @@ class AptWrapperTest {
      */
     @Test
     void testLogicDel() {
-        UserDOCol u1 = new UserDOCol();
+        UserDOCol u1 = UserDOCol.build();
         List<UserDTO> l1 = userMapper.selectJoinList(UserDTO.class, new AptQueryWrapper<>(u1));
         assert l1.size() == 14;
 
-        UserDOCol u2 = new UserDOCol();
-        AddressDOCol addr2 = new AddressDOCol();
+        UserDOCol u2 = UserDOCol.build();
+        AddressDOCol addr2 = AddressDOCol.build();
         List<UserDTO> l2 = userMapper.selectJoinList(UserDTO.class, new AptQueryWrapper<>(u2)
                 .selectAll()
                 .select(addr2.address)
                 .leftJoin(addr2, addr2.userId, u2.id));
         assert l2.size() == 10;
 
-        UserDOCol u3 = new UserDOCol();
-        AddressDOCol addr3 = new AddressDOCol();
+        UserDOCol u3 = UserDOCol.build();
+        AddressDOCol addr3 = AddressDOCol.build();
         List<UserDTO> l3 = userMapper.selectJoinList(UserDTO.class, new AptQueryWrapper<>(u3)
                 .disableSubLogicDel()
                 .selectAll()
@@ -578,8 +578,8 @@ class AptWrapperTest {
                 .leftJoin(addr3, addr3.userId, u3.id));
         assert l3.size() == 14 && l3.get(0).getAddressList().size() == 9;
 
-        UserDOCol u4 = new UserDOCol();
-        AddressDOCol addr4 = new AddressDOCol();
+        UserDOCol u4 = UserDOCol.build();
+        AddressDOCol addr4 = AddressDOCol.build();
         List<UserDTO> l4 = userMapper.selectJoinList(UserDTO.class, new AptQueryWrapper<>(u4)
                 .disableSubLogicDel()
                 .selectAll()
@@ -595,8 +595,8 @@ class AptWrapperTest {
      */
     @Test
     void testAlias() {
-        UserDOCol u = new UserDOCol();
-        UserDOCol uu = new UserDOCol();
+        UserDOCol u = UserDOCol.build();
+        UserDOCol uu = UserDOCol.build();
         AptQueryWrapper<UserDO> wrapper = new AptQueryWrapper<>(u)
 //                .disableSubLogicDel()//关闭副表逻辑删除
 //                .disableLogicDel()//关闭主表逻辑删除
@@ -616,8 +616,8 @@ class AptWrapperTest {
     void testObj() {
         ThreadLocalUtils.set("SELECT DISTINCT t.id FROM `user` t LEFT JOIN address t1 ON (t1.user_id = t.id) WHERE t.del=false AND t1.del=false ORDER BY t.id DESC");
 
-        UserDOCol u = new UserDOCol();
-        AddressDOCol addr = new AddressDOCol();
+        UserDOCol u = UserDOCol.build();
+        AddressDOCol addr = AddressDOCol.build();
         AptQueryWrapper<UserDO> wrapper = new AptQueryWrapper<>(u)
                 .distinct()
                 .select(u.id)
@@ -651,8 +651,8 @@ class AptWrapperTest {
                 "WHERE t.del = false\n" +
                 "  AND aa.del = false");
 
-        UserDOCol u = new UserDOCol();
-        AddressDOCol addr = new AddressDOCol("aa");
+        UserDOCol u = UserDOCol.build();
+        AddressDOCol addr = AddressDOCol.build("aa");
         AptQueryWrapper<UserDO> wrapper = new AptQueryWrapper<>(u)
 //                .disableLogicDel()//关闭主表逻辑删除
                 .selectAll()
@@ -666,9 +666,9 @@ class AptWrapperTest {
 
     @Test
     void testLabel() {
-        UserDOCol u = new UserDOCol();
-        AddressDOCol addr1 = new AddressDOCol("t1");
-        AddressDOCol addr2 = new AddressDOCol("t2");
+        UserDOCol u = UserDOCol.build();
+        AddressDOCol addr1 = AddressDOCol.build("t1");
+        AddressDOCol addr2 = AddressDOCol.build("t2");
 
         AptQueryWrapper<UserDO> wrapper = new AptQueryWrapper<>(u)
                 .disableSubLogicDel()
@@ -690,9 +690,9 @@ class AptWrapperTest {
      */
     @Test
     void test1() {
-        UserDOCol u = new UserDOCol();
-        AddressDOCol addr = new AddressDOCol();
-        AreaDOCol ar = new AreaDOCol();
+        UserDOCol u = UserDOCol.build();
+        AddressDOCol addr = AddressDOCol.build();
+        AreaDOCol ar = AreaDOCol.build();
 
         Page<UserDTO> page = new Page<>(1, 10);
         page.setSearchCount(false);
@@ -735,8 +735,8 @@ class AptWrapperTest {
                         "LEFT JOIN address t1 ON (t.id = t1.user_id AND t.id = t1.user_id) WHERE t.del = false AND t1.del = false AND " +
                         "(t.id = ? AND (t.head_img = ? OR t1.user_id = ?) AND t.id = ?) ) TMP WHERE ROWNUM <=?) WHERE ROW_ID > ?");
 
-        UserDOCol u = new UserDOCol();
-        AddressDOCol addr = new AddressDOCol();
+        UserDOCol u = UserDOCol.build();
+        AddressDOCol addr = AddressDOCol.build();
 
         IPage<UserDTO> page = userMapper.selectJoinPage(new Page<>(1, 10), UserDTO.class, JoinWrappers.apt(u)
                 .selectAll()
@@ -758,8 +758,8 @@ class AptWrapperTest {
      */
     @Test
     void test4() {
-        UserDOCol u = new UserDOCol();
-        AddressDOCol addr = new AddressDOCol();
+        UserDOCol u = UserDOCol.build();
+        AddressDOCol addr = AddressDOCol.build();
 
         AptQueryWrapper<UserDO> wrapper = JoinWrappers.apt(u)
                 .selectSum(u.id)
@@ -777,7 +777,7 @@ class AptWrapperTest {
     @SneakyThrows
     void test8() throws BadSqlGrammarException {
         ThreadLocalUtils.set("SELECT t.`name` FROM `user` t WHERE t.del=false AND (t.`name` = ?)");
-        UserDOCol u = new UserDOCol();
+        UserDOCol u = UserDOCol.build();
         AptQueryWrapper<UserDO> wrapper = new AptQueryWrapper<>(u)
                 .select(u.name)
                 .eq(u.name, "ref");
@@ -790,8 +790,8 @@ class AptWrapperTest {
      */
     @Test
     void test7() {
-        UserDOCol u = new UserDOCol();
-        AddressDOCol addr = new AddressDOCol();
+        UserDOCol u = UserDOCol.build();
+        AddressDOCol addr = AddressDOCol.build();
         List<Map<String, Object>> list = userMapper.selectJoinMaps(JoinWrappers.apt(u)
                 .selectAll()
                 .select(addr.address)
@@ -814,7 +814,7 @@ class AptWrapperTest {
                 "SELECT t.id, t.pid, t.`name`, t.`json`, t.sex, t.head_img, t.create_time, t.address_id, t.address_id2, t.del, t.create_by, t.update_by FROM `user` t WHERE t.del = false AND (t.id > ? AND t.id < ?)",
                 "SELECT id, pid, `name`, `json`, sex, head_img, create_time, address_id, address_id2, del, create_by, update_by FROM `user` t WHERE t.del = false AND (t.id > ? AND t.id < ?)",
                 "SELECT * FROM `user` t WHERE t.del=false AND (t.id > ? AND t.id < ?) ");
-        UserDOCol u = new UserDOCol();
+        UserDOCol u = UserDOCol.build();
         List<UserDO> dos1 = userMapper.selectList(new AptQueryWrapper<>(u)
                 .gt(u.id, 3)
                 .lt(u.id, 8));
@@ -826,7 +826,7 @@ class AptWrapperTest {
      */
     @Test
     void testGeneric() {
-        AddressDOCol addr = new AddressDOCol();
+        AddressDOCol addr = AddressDOCol.build();
         AptQueryWrapper<AddressDO> wrapper = new AptQueryWrapper<>(addr)
                 .selectAll()
                 .le(addr.id, 10000)
@@ -845,18 +845,18 @@ class AptWrapperTest {
                 "SELECT COUNT( 1 ) FROM `user` t LEFT JOIN address t1 ON (t1.user_id = t.id) LEFT JOIN area t2 ON (t2.id = t1.area_id) WHERE t.del=false AND t1.del=false AND t2.del=false",
                 "SELECT COUNT( * ) FROM `user` t LEFT JOIN address t1 ON (t1.user_id = t.id) LEFT JOIN area t2 ON (t2.id = t1.area_id) WHERE t.del=false AND t1.del=false AND t2.del=false",
                 "SELECT COUNT( * ) AS total FROM `user` t LEFT JOIN address t1 ON (t1.user_id = t.id) LEFT JOIN area t2 ON (t2.id = t1.area_id) WHERE t.del=false AND t1.del=false AND t2.del=false");
-        UserDOCol u = new UserDOCol();
-        AddressDOCol addr = new AddressDOCol();
-        AreaDOCol ar = new AreaDOCol();
+        UserDOCol u = UserDOCol.build();
+        AddressDOCol addr = AddressDOCol.build();
+        AreaDOCol ar = AreaDOCol.build();
         AptQueryWrapper<UserDO> wrapper = new AptQueryWrapper<>(u)
                 .leftJoin(addr, addr.userId, u.id)
                 .leftJoin(ar, ar.id, addr.areaId);
         Object integer = userMapper.selectCount(wrapper);
 
         ThreadLocalUtils.set("SELECT COUNT( * ) FROM `user` t LEFT JOIN address t1 ON (t1.user_id = t.id) LEFT JOIN area t2 ON (t2.id = t1.area_id) WHERE t.del=false AND t1.del=false AND t2.del=false");
-        UserDOCol u1 = new UserDOCol();
-        AddressDOCol addr1 = new AddressDOCol();
-        AreaDOCol ar1 = new AreaDOCol();
+        UserDOCol u1 = UserDOCol.build();
+        AddressDOCol addr1 = AddressDOCol.build();
+        AreaDOCol ar1 = AreaDOCol.build();
         AptQueryWrapper<UserDO> wrapper1 = new AptQueryWrapper<>(u1)
                 .leftJoin(addr1, addr1.userId, u1.id)
                 .leftJoin(ar1, ar1.id, addr1.areaId);
@@ -872,9 +872,9 @@ class AptWrapperTest {
         ThreadLocalUtils.set("SELECT t.id FROM (SELECT * FROM `user`) t LEFT JOIN (SELECT * FROM address) t1 ON " +
                 "(t1.user_id = t.id) LEFT JOIN area t2 ON (t2.id = t1.area_id) WHERE t.del = false AND t1.del = false " +
                 "AND t2.del = false AND (t.id <= ?) ORDER BY t.id DESC");
-        UserDOCol u = new UserDOCol();
-        AddressDOCol addr = new AddressDOCol();
-        AreaDOCol ar = new AreaDOCol();
+        UserDOCol u = UserDOCol.build();
+        AddressDOCol addr = AddressDOCol.build();
+        AreaDOCol ar = AreaDOCol.build();
 
         AptQueryWrapper<UserDO> wrapper = new AptQueryWrapper<>(u)
                 .select(u.id)
@@ -925,9 +925,9 @@ class AptWrapperTest {
                 "WHERE t.del = false\n" +
                 "  AND (t.id <= ?)\n" +
                 "ORDER BY t.id DESC\n");
-        UserDOCol u = new UserDOCol();
-        AddressDOCol addr = new AddressDOCol();
-        AreaDOCol ar = new AreaDOCol();
+        UserDOCol u = UserDOCol.build();
+        AddressDOCol addr = AddressDOCol.build();
+        AreaDOCol ar = AreaDOCol.build();
         AptQueryWrapper<UserDO> wrapper = new AptQueryWrapper<>(u)
                 .logicDelToOn()
                 .selectAll()
@@ -978,9 +978,9 @@ class AptWrapperTest {
                 "WHERE t.del = false\n" +
                 "  AND (t.id <= ?)\n" +
                 "ORDER BY t.id DESC\n");
-        UserDOCol u = new UserDOCol();
-        AddressDOCol addr = new AddressDOCol();
-        AreaDOCol ar = new AreaDOCol();
+        UserDOCol u = UserDOCol.build();
+        AddressDOCol addr = AddressDOCol.build();
+        AreaDOCol ar = AreaDOCol.build();
 
         AptQueryWrapper<UserDO> wrapper = JoinWrappers.apt(u)
                 .logicDelToOn()
@@ -1001,9 +1001,9 @@ class AptWrapperTest {
 
     @Test
     void joinRandomMap() {
-        UserDOCol u = new UserDOCol();
-        AddressDOCol addr = new AddressDOCol();
-        AreaDOCol ar = new AreaDOCol();
+        UserDOCol u = UserDOCol.build();
+        AddressDOCol addr = AddressDOCol.build();
+        AreaDOCol ar = AreaDOCol.build();
         AptQueryWrapper<UserDO> wrapper = JoinWrappers.apt(u)
                 .logicDelToOn()
                 .selectAll()
@@ -1028,9 +1028,9 @@ class AptWrapperTest {
     @Test
     void joinRandomMap111() {
         ThreadLocalUtils.set("SELECT t.id,t.user_id,t.area_id,t.tel,t.address,t.del FROM address t LEFT JOIN `user` t1 ON (t1.address_id = t.id) LEFT JOIN `user` t2 ON (t2.pid = t1.id) WHERE t.del=false AND t1.del=false AND t2.del=false");
-        UserDOCol u = new UserDOCol();
-        UserDOCol u1 = new UserDOCol();
-        AddressDOCol addr = new AddressDOCol();
+        UserDOCol u = UserDOCol.build();
+        UserDOCol u1 = UserDOCol.build();
+        AddressDOCol addr = AddressDOCol.build();
         AptQueryWrapper<AddressDO> wrapper = JoinWrappers.apt(addr)
                 .selectAll()
                 .leftJoin(u, u.addressId, addr.id)
@@ -1045,8 +1045,8 @@ class AptWrapperTest {
     @Test
     void joinOwn() {
         ThreadLocalUtils.set("SELECT t.id,t.pid,t.`name`,t.`json`,t.sex,t.head_img,t.create_time,t.address_id,t.address_id2,t.del,t.create_by,t.update_by FROM `user` t LEFT JOIN address t1 ON (t1.user_id = t.id) WHERE t.del=false AND t1.del=false AND (t1.id = t1.id)");
-        UserDOCol u = new UserDOCol();
-        AddressDOCol addr = new AddressDOCol();
+        UserDOCol u = UserDOCol.build();
+        AddressDOCol addr = AddressDOCol.build();
         AptQueryWrapper<UserDO> wrapper = JoinWrappers.apt(u)
                 .selectAll()
                 .leftJoin(addr, addr.userId, u.id)
@@ -1062,8 +1062,8 @@ class AptWrapperTest {
     void joinOwn1() {
         ThreadLocalUtils.set("SELECT t.id,t.pid,t.`name`,t.`json`,t.sex,t.head_img,t.create_time,t.address_id,t.address_id2,t.del,t.create_by,t.update_by FROM `user` t " +
                 "LEFT JOIN address aaa ON (aaa.user_id = t.id) WHERE t.del=false AND aaa.del=false AND (aaa.id = t.id AND aaa.id = aaa.id)");
-        UserDOCol u = new UserDOCol();
-        AddressDOCol addr = new AddressDOCol("aaa");
+        UserDOCol u = UserDOCol.build();
+        AddressDOCol addr = AddressDOCol.build("aaa");
         AptQueryWrapper<UserDO> wrapper = JoinWrappers.apt(u)
                 .selectAll()
                 .leftJoin(addr, addr.userId, u.id)
@@ -1071,8 +1071,6 @@ class AptWrapperTest {
                 .eq(addr.id, addr.id);
         List<UserDO> addressDOS = wrapper.list();
     }
-//执行sql: SELECT t.id, t.pid, t.`name`, t.`json`, t.sex, t.head_img, t.create_time, t.address_id, t.address_id2, t.del, t.create_by, t.update_by FROM `user` t LEFT JOIN address aaa ON (aaa.user_id = aaa.id) WHERE t.del = false AND aaa.del = false AND (aaa.id = t.id AND aaa.id = aaa.id)
-//预期sql: SELECT t.id, t.pid, t.`name`, t.`json`, t.sex, t.head_img, t.create_time, t.address_id, t.address_id2, t.del, t.create_by, t.update_by FROM `user` t LEFT JOIN address aaa ON (aaa.user_id = t.id) WHERE t.del=false AND aaa.del=false AND (aaa.id = t.id AND aaa.id = aaa.id)
 
     /**
      * 同一个类字段比较
@@ -1087,7 +1085,7 @@ class AptWrapperTest {
             ThreadLocalUtils.set("SELECT id,user_id,name FROM order_t t",
                     "SELECT id,user_id,name FROM order_t t");
         }
-        OrderDOCol o = new OrderDOCol();
+        OrderDOCol o = OrderDOCol.build();
         AptQueryWrapper<OrderDO> wrapper = JoinWrappers.apt(o);
         List<OrderDO> list = wrapper.list();
 
@@ -1099,8 +1097,8 @@ class AptWrapperTest {
                     "SELECT t.id,t.user_id,t.name,t1.`name` AS userName FROM order_t t LEFT JOIN `user` t1 ON (t1.id = t.user_id) WHERE t1.del=false");
         }
 
-        UserDOCol u = new UserDOCol();
-        OrderDOCol o1 = new OrderDOCol();
+        UserDOCol u = UserDOCol.build();
+        OrderDOCol o1 = OrderDOCol.build();
         AptQueryWrapper<OrderDO> w = JoinWrappers.apt(o1)
                 .selectAll()
                 .selectAs(u.name, OrderDO::getUserName)
@@ -1113,8 +1111,8 @@ class AptWrapperTest {
      */
     @Test
     void checkOrderBy() {
-        UserDOCol u = new UserDOCol();
-        AddressDOCol addr = new AddressDOCol();
+        UserDOCol u = UserDOCol.build();
+        AddressDOCol addr = AddressDOCol.build();
         AptQueryWrapper<UserDO> wrapper = JoinWrappers.apt(u)
                 .selectAll()
                 .leftJoin(addr, addr.userId, u.id)

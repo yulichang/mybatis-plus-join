@@ -21,6 +21,7 @@ import javax.tools.Diagnostic;
 import javax.tools.JavaFileObject;
 import java.io.Writer;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -114,20 +115,25 @@ public class EntityProcessor extends AbstractProcessor {
 
         tableInfo.setFields(fieldInfos);
 
-        StringBuilderHelper content = new StringBuilderHelper()
+        StringBuilderHelper content = new StringBuilderHelper(tableInfo)
                 .addPackage(tableInfo.getTagClassPackage())
                 .newLine()
-                .addImport(BaseColumn.class.getName())
-                .addImport(Column.class.getName())
-                .addImport(tableInfo.getClassName())
+                .addImport(true, BaseColumn.class.getName())
+                .addImport(true, Column.class.getName())
+                .addImport(true, tableInfo.getClassName())
+                .newLine(tableInfo.isCache())
+                .addImport(tableInfo.isCache(), Map.class.getName())
+                .addImport(tableInfo.isCache(), Objects.class.getName())
+                .addImport(tableInfo.isCache(), ConcurrentHashMap.class.getName())
                 .newLine()
                 .addClass(tableInfo.getClassComment(), tableInfo.getTagClassName(),
                         BaseColumn.class.getSimpleName() + "<" + tableInfo.getSimpleClassName() + ">",
                         c -> c
-                                .addConstructor(tableInfo)
-                                .addFields(tableInfo)
-                                .addMethod(tableInfo)
-                                .addBuild(tableInfo)
+                                .addConstructor()
+                                .addFields()
+                                .addMethod()
+                                .addBuild()
+                                .addCacheClass()
                 );
         writerFile(tableInfo.getTagClassPackage() + "." + tableInfo.getTagClassName(), content.getContent());
         return tableInfo;
@@ -142,7 +148,7 @@ public class EntityProcessor extends AbstractProcessor {
         content.addPackage(tagPackage);
         content.newLine();
         // import
-        tableInfos.forEach(tableInfo -> content.addImport(tableInfo.getTagClassPackage() + "." + tableInfo.getTagClassName()));
+        tableInfos.forEach(tableInfo -> content.addImport(true, tableInfo.getTagClassPackage() + "." + tableInfo.getTagClassName()));
         content.newLine();
         // class
         String tables = "Tables";
@@ -172,14 +178,24 @@ public class EntityProcessor extends AbstractProcessor {
     @SuppressWarnings("UnusedReturnValue")
     public static class StringBuilderHelper {
         private final StringBuilder sb = new StringBuilder();
+        private TableInfo tableInfo;
+
+        public StringBuilderHelper() {
+        }
+
+        public StringBuilderHelper(TableInfo tableInfo) {
+            this.tableInfo = tableInfo;
+        }
 
         public StringBuilderHelper addPackage(String packageName) {
             sb.append("package ").append(packageName).append(";\n");
             return this;
         }
 
-        public StringBuilderHelper addImport(String importName) {
-            sb.append("import ").append(importName).append(";\n");
+        public StringBuilderHelper addImport(boolean cond, String importName) {
+            if (cond) {
+                sb.append("import ").append(importName).append(";\n");
+            }
             return this;
         }
 
@@ -196,7 +212,7 @@ public class EntityProcessor extends AbstractProcessor {
             return this;
         }
 
-        public StringBuilderHelper addConstructor(TableInfo tableInfo) {
+        public StringBuilderHelper addConstructor() {
             // 无参构造
             newLine();
             sb.append(String.format("\tpublic %s() {\n\t}\n", tableInfo.getTagClassName()));
@@ -218,7 +234,7 @@ public class EntityProcessor extends AbstractProcessor {
             return this;
         }
 
-        public StringBuilderHelper addFields(TableInfo tableInfo) {
+        public StringBuilderHelper addFields() {
             tableInfo.getFields().forEach(fieldInfo -> {
                 addComment("\t", fieldInfo.getComment());
                 sb.append(String.format("\tpublic final Column %s = new Column(this, \"%s\");\n",
@@ -231,7 +247,7 @@ public class EntityProcessor extends AbstractProcessor {
         public StringBuilderHelper addTablesFields(List<TableInfo> tableInfos) {
             tableInfos.forEach(tableInfo -> {
                 addComment("\t", tableInfo.getClassComment());
-                sb.append(String.format("\tpublic static final %s %s = new %s();\n",
+                sb.append(String.format("\tpublic static final %s %s = %s.build();\n",
                         tableInfo.getTagClassName(),
                         String.format(tableInfo.getTagTablesName(), tableInfo.getSimpleClassName()),
                         tableInfo.getTagClassName()));
@@ -240,7 +256,7 @@ public class EntityProcessor extends AbstractProcessor {
             return this;
         }
 
-        public StringBuilderHelper addMethod(TableInfo tableInfo) {
+        public StringBuilderHelper addMethod() {
             sb.append("\t@Override\n" +
                             "\tpublic Class<").append(tableInfo.getSimpleClassName()).append("> getColumnClass() {\n")
                     .append("\t\treturn ").append(tableInfo.getSimpleClassName()).append(".class;\n")
@@ -249,15 +265,30 @@ public class EntityProcessor extends AbstractProcessor {
             return this;
         }
 
-        public StringBuilderHelper addBuild(TableInfo tableInfo) {
-            sb.append("\tpublic static ").append(tableInfo.getTagClassName()).append(" build() {\n")
-                    .append("\t\treturn new ").append(tableInfo.getTagClassName()).append("();\n")
-                    .append("\t}\n");
+        public StringBuilderHelper addBuild() {
+            sb.append("\tpublic static ").append(tableInfo.getTagClassName()).append(" build() {\n");
+            sb.append("\t\treturn new ").append(tableInfo.getTagClassName()).append("();\n");
+            sb.append("\t}\n");
             newLine();
-            sb.append("\tpublic static ").append(tableInfo.getTagClassName()).append(" build(String alias) {\n")
-                    .append("\t\treturn new ").append(tableInfo.getTagClassName()).append("(alias);\n")
-                    .append("\t}\n");
+            sb.append("\tpublic static ").append(tableInfo.getTagClassName()).append(" build(String alias) {\n");
+            if (tableInfo.isCache()) {
+                sb.append("\t\tObjects.requireNonNull(alias);\n");
+                sb.append("\t\treturn Cache.CACHE.computeIfAbsent(alias, key -> new ").append(tableInfo.getTagClassName()).append("(key));\n");
+            } else {
+                sb.append("\t\treturn new ").append(tableInfo.getTagClassName()).append("(alias);\n");
+            }
+            sb.append("\t}\n");
             newLine();
+            return this;
+        }
+
+        public StringBuilderHelper addCacheClass() {
+            if (tableInfo.isCache()) {
+                sb.append("\tpublic static class Cache {\n")
+                        .append("\t\tprivate static final Map<String, ").append(tableInfo.getTagClassName()).append("> CACHE = new ConcurrentHashMap<>();\n")
+                        .append("\t}\n");
+                newLine();
+            }
             return this;
         }
 
@@ -273,6 +304,13 @@ public class EntityProcessor extends AbstractProcessor {
 
         public StringBuilderHelper newLine() {
             sb.append("\n");
+            return this;
+        }
+
+        public StringBuilderHelper newLine(boolean cond) {
+            if (cond) {
+                sb.append("\n");
+            }
             return this;
         }
 

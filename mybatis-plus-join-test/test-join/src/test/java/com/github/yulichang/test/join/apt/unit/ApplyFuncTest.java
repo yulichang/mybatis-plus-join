@@ -1,13 +1,11 @@
 package com.github.yulichang.test.join.apt.unit;
 
-import com.github.yulichang.test.join.entity.AddressDO;
 import com.github.yulichang.test.join.entity.UserDO;
 import com.github.yulichang.test.join.entity.apt.AddressDOCol;
 import com.github.yulichang.test.join.entity.apt.UserDOCol;
 import com.github.yulichang.test.util.Reset;
 import com.github.yulichang.test.util.ThreadLocalUtils;
 import com.github.yulichang.toolkit.JoinWrappers;
-import com.github.yulichang.wrapper.segments.Fun;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -31,8 +29,8 @@ public class ApplyFuncTest {
                 "LEFT JOIN address t1 ON (t1.user_id = t.id) WHERE t.del = false AND t1.del = false " +
                 "AND (concat(t.id, t1.user_id, ?) IS NOT NULL " +
                 "AND concat(t.id, t1.user_id, ?) IS NOT NULL)");
-        UserDOCol u = new UserDOCol();
-        AddressDOCol addr = new AddressDOCol();
+        UserDOCol u = UserDOCol.build();
+        AddressDOCol addr = AddressDOCol.build();
 
         List<UserDO> list = JoinWrappers.apt(u)
                 .selectAll()
@@ -49,8 +47,8 @@ public class ApplyFuncTest {
                 "AND (concat(t.id, t1.user_id, ?) IS NOT NULL " +
                 "AND concat(t.id, t1.user_id, ?) IS NOT NULL)");
 
-        UserDOCol u1 = new UserDOCol();
-        AddressDOCol addr1 = new AddressDOCol();
+        UserDOCol u1 = UserDOCol.build();
+        AddressDOCol addr1 = AddressDOCol.build();
 
         List<UserDO> list1 = JoinWrappers.apt(u1)
                 .selectAll(u1, u1.id)

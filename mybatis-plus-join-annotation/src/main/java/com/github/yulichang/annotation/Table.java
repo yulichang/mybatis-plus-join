@@ -77,4 +77,8 @@ public @interface Table {
      */
     String tablesClassName() default "%S";
 
+    /**
+     * 是否缓存
+     */
+    boolean cache() default true;
 }

@@ -22,6 +22,7 @@ public class Conf {
     private boolean genTables = true;
     private String tablasClassPackage = "%s.tables";
     private String tablesClassName = "%S";
+    private boolean cache = true;
 
     private boolean initFlag = false;
 
@@ -32,6 +33,7 @@ public class Conf {
         this.tablasClassPackage = conf.tablasClassPackage;
         this.tablesClassName = conf.tablesClassName;
         this.initFlag = conf.initFlag;
+        this.cache = conf.cache;
     }
 
 
@@ -73,6 +75,7 @@ public class Conf {
         this.genTables = Boolean.parseBoolean(properties.getOrDefault("genTables", Boolean.toString(this.genTables)).toString());
         this.tablasClassPackage = properties.getOrDefault("tablasClassPackage", this.tablasClassPackage).toString();
         this.tablesClassName = properties.getOrDefault("tablesClassName", this.tablesClassName).toString();
+        this.cache = Boolean.parseBoolean(properties.getOrDefault("cache", this.cache).toString());
     }
 
     public static Conf getConf(Conf globalConf, Table table, Collection<String> keys) {
@@ -124,12 +127,21 @@ public class Conf {
         this.tablesClassName = tablesClassName;
     }
 
+    public boolean isCache() {
+        return cache;
+    }
+
+    public void setCache(boolean cache) {
+        this.cache = cache;
+    }
+
     public enum ConfItem {
         className("value", Table::value, (c, v) -> c.setClassName(v.toString())),
         packageName("classPackage", Table::classPackage, (c, v) -> c.setClassPackage(v.toString())),
         genTables("genTables", Table::genTables, (c, v) -> c.setGenTables((boolean) v)),
         tablasPackageName("tablesClassPackage", Table::tablesClassPackage, (c, v) -> c.setTablasClassPackage(v.toString())),
-        tablesName("tablesClassName", Table::tablesClassName, (c, v) -> c.setTablesClassName(v.toString()));
+        tablesName("tablesClassName", Table::tablesClassName, (c, v) -> c.setTablesClassName(v.toString())),
+        cache("cache", Table::cache, (c, v) -> c.setCache((boolean) v));
 
         private final String action;
 

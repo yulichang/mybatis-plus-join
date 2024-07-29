@@ -30,6 +30,7 @@ public class CustomWrapperTest {
 
 
     //自定义wrapper扩展
+    @SuppressWarnings("unused")
     public static class CWrapper<T> extends AptQueryWrapper<T> {
 
         public CWrapper(BaseColumn<T> baseColumn) {
@@ -54,7 +55,7 @@ public class CustomWrapperTest {
     @Test
     void testWrapperCustomer() {
         ThreadLocalUtils.set("SELECT t.id, t.pid, t.`name`, t.`json`, t.sex, t.head_img, t.create_time, t.address_id, t.address_id2, t.del, t.create_by, t.update_by FROM `user` t WHERE t.del = false AND (t.id = ?)");
-        UserDOCol u = new UserDOCol();
+        UserDOCol u = UserDOCol.build();
         CWrapper<UserDO> wrapper = new CWrapper<>(u)
                 .selectAll()
                 .toChildren(CWrapper::toCWrapper)
@@ -62,7 +63,7 @@ public class CustomWrapperTest {
         List<UserDO> dos = userMapper.selectList(wrapper);
         dos.forEach(System.out::println);
 
-        UserDOCol u1 = new UserDOCol();
+        UserDOCol u1 = UserDOCol.build();
         ThreadLocalUtils.set("SELECT t.id, t.pid, t.`name`, t.`json`, t.sex, t.head_img, t.create_time, t.address_id, t.address_id2, t.del, t.create_by, t.update_by FROM `user` t WHERE t.del = false");
         CWrapper<UserDO> wrapper1 = new CWrapper<>(u1)
                 .selectAll()

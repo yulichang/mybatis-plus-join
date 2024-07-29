@@ -28,10 +28,10 @@ public class UnionTest {
     void unionAll1() {
         ThreadLocalUtils.set("SELECT t.id FROM `user` t WHERE t.del = false AND (t.id = ?) UNION ALL SELECT t.id FROM address t WHERE (t.id = ?) UNION ALL SELECT (SELECT st.id FROM area st WHERE st.del = false AND (st.id = ? AND (st.id = ?))) AS id FROM area t WHERE t.del = false AND (t.id = ? AND (t.id = ?))");
 
-        UserDOCol u = new UserDOCol();
-        AddressDOCol addr = new AddressDOCol();
-        AreaDOCol area = new AreaDOCol();
-        AreaDOCol areaSb = new AreaDOCol();
+        UserDOCol u = UserDOCol.build();
+        AddressDOCol addr = AddressDOCol.build();
+        AreaDOCol area = AreaDOCol.build();
+        AreaDOCol areaSb = AreaDOCol.build();
 
         AptQueryWrapper<UserDO> wrapper = JoinWrappers.apt(u)
                 .select(u.id)

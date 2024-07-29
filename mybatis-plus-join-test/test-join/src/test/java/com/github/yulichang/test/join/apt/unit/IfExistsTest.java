@@ -6,7 +6,6 @@ import com.github.yulichang.test.join.entity.apt.UserDOCol;
 import com.github.yulichang.test.util.Reset;
 import com.github.yulichang.test.util.ThreadLocalUtils;
 import com.github.yulichang.toolkit.JoinWrappers;
-import com.github.yulichang.wrapper.MPJLambdaWrapper;
 import com.github.yulichang.wrapper.apt.AptQueryWrapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -45,7 +44,7 @@ public class IfExistsTest {
         ThreadLocalUtils.set("SELECT t.id, t.pid, t.`name`, t.`json`, t.sex, t.head_img, t.create_time, t.address_id, " +
                 "t.address_id2, t.del, t.create_by, t.update_by FROM `user` t " +
                 "WHERE t.del = false AND (t.id = ? AND t.head_img = ? AND t.`name` = ?)");
-        UserDOCol u = new UserDOCol();
+        UserDOCol u = UserDOCol.build();
         AptQueryWrapper<UserDO> wrapper = JoinWrappers.apt(u)
                 .selectAll()
                 .eqIfExists(u.id, 1)
@@ -59,7 +58,7 @@ public class IfExistsTest {
         ThreadLocalUtils.set("SELECT t.id, t.pid, t.`name`, t.`json`, t.sex, t.head_img, t.create_time, t.address_id, " +
                 "t.address_id2, t.del, t.create_by, t.update_by FROM `user` t " +
                 "WHERE t.del = false AND (t.id = ? AND t.`name` = ?)");
-        UserDOCol u1 = new UserDOCol();
+        UserDOCol u1 = UserDOCol.build();
         AptQueryWrapper<UserDO> wrapper1 = JoinWrappers.apt(u1)
                 .selectAll()
                 .setIfExists(IfExistsEnum.NOT_BLANK)
@@ -74,7 +73,7 @@ public class IfExistsTest {
         ThreadLocalUtils.set("SELECT t.id, t.pid, t.`name`, t.`json`, t.sex, t.head_img, t.create_time, t.address_id, " +
                 "t.address_id2, t.del, t.create_by, t.update_by FROM `user` t " +
                 "WHERE t.del = false AND (t.id = ? AND t.`name` = ? AND t.head_img = ? AND t.`name` = ?)");
-        UserDOCol u2 = new UserDOCol();
+        UserDOCol u2 = UserDOCol.build();
         AptQueryWrapper<UserDO> wrapper2 = JoinWrappers.apt(u2)
                 .selectAll()
                 .setIfExists(o -> true)

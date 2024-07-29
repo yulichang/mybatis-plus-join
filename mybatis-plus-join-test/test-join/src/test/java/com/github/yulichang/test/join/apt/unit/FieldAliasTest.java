@@ -34,8 +34,8 @@ public class FieldAliasTest {
 
     @Test
     void fieldAlias() {
-        UserDOCol u = new UserDOCol();
-        AddressDOCol addr = new AddressDOCol();
+        UserDOCol u = UserDOCol.build();
+        AddressDOCol addr = AddressDOCol.build();
         List<UserDO> list = userMapper.selectList(JoinWrappers.apt(u)
                 .selectAll()
                 .leftJoin(addr, addr.userId, u.id));
@@ -48,8 +48,8 @@ public class FieldAliasTest {
 
     @Test
     void fieldAlias1() {
-        UserTenantDOCol ut = new UserTenantDOCol();
-        UserDOCol u = new UserDOCol();
+        UserTenantDOCol ut = UserTenantDOCol.build();
+        UserDOCol u = UserDOCol.build();
         AptQueryWrapper<UserTenantDO> wrapper = JoinWrappers.apt(ut)
                 .selectAll()
                 .leftJoin(u, u.id, ut.uuid);

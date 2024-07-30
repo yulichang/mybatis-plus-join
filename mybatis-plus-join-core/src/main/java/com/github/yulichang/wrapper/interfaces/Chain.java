@@ -1,10 +1,12 @@
 package com.github.yulichang.wrapper.interfaces;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.github.yulichang.interfaces.MPJBaseJoin;
 import com.github.yulichang.toolkit.SqlHelper;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * 链式调用
@@ -62,7 +64,7 @@ public interface Chain<T> extends MPJBaseJoin<T> {
      * JoinWrappers.lambda(User.class)<br />
      */
     default T first() {
-        return list().stream().findFirst().orElse(null);
+        return Optional.of(list()).filter(CollectionUtils::isNotEmpty).map(m -> m.get(0)).orElse(null);
     }
 
     /**
@@ -73,7 +75,7 @@ public interface Chain<T> extends MPJBaseJoin<T> {
      * JoinWrappers.lambda(User.class)<br />
      */
     default <R> R first(Class<R> resultType) {
-        return list(resultType).stream().findFirst().orElse(null);
+        return Optional.of(list(resultType)).filter(CollectionUtils::isNotEmpty).map(m -> m.get(0)).orElse(null);
     }
 
     /**

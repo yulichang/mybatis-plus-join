@@ -1,10 +1,10 @@
 package com.github.yulichang.wrapper.segments;
 
 
-import com.baomidou.mybatisplus.core.metadata.TableFieldInfo;
 import com.github.yulichang.apt.BaseColumn;
 import com.github.yulichang.wrapper.enums.BaseFuncEnum;
 import lombok.Getter;
+import org.apache.ibatis.type.JdbcType;
 import org.apache.ibatis.type.TypeHandler;
 
 /**
@@ -43,7 +43,7 @@ public class SelectLabel implements Select {
         this.baseColumn = baseColumn;
     }
 
-    public SelectLabel(SelectCache cache, Integer index, Class<?> tagClass, String column, boolean hasTableAlias, String tableAlias) {
+    public SelectLabel(SelectCache cache, Integer index, Class<?> tagClass, String column, boolean hasTableAlias, String tableAlias, BaseColumn<?> baseColumn) {
         this.cache = cache;
         this.index = index;
         this.tagClass = tagClass;

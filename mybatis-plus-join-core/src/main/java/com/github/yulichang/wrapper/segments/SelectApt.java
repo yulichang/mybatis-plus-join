@@ -1,11 +1,11 @@
 package com.github.yulichang.wrapper.segments;
 
-import com.baomidou.mybatisplus.core.metadata.TableFieldInfo;
 import com.github.yulichang.apt.BaseColumn;
 import com.github.yulichang.apt.Column;
 import com.github.yulichang.wrapper.enums.BaseFuncEnum;
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.ibatis.type.JdbcType;
 import org.apache.ibatis.type.TypeHandler;
 
 /**
@@ -194,9 +194,17 @@ public class SelectApt implements Select {
     }
 
     @Override
-    public TableFieldInfo getTableFieldInfo() {
+    public Class<?> getPropertyType() {
         if (cache != null) {
-            return cache.getTableFieldInfo();
+            return cache.getPropertyType();
+        }
+        return null;
+    }
+
+    @Override
+    public JdbcType getJdbcType() {
+        if (cache != null) {
+            return cache.getJdbcType();
         }
         return null;
     }

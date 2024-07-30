@@ -1,6 +1,5 @@
 package com.github.yulichang.wrapper.apt.resultmap;
 
-import com.baomidou.mybatisplus.core.metadata.TableFieldInfo;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.github.yulichang.apt.BaseColumn;
@@ -16,7 +15,6 @@ import org.apache.ibatis.type.JdbcType;
 
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 
 /**
  * result 标签
@@ -71,7 +69,7 @@ public class Result implements IResult {
             result.selectNormal = selectCache;
             result.property = selectCache.getColumProperty();
             result.javaType = selectCache.getColumnType();
-            result.jdbcType = Optional.ofNullable(selectCache.getTableFieldInfo()).map(TableFieldInfo::getJdbcType).orElse(null);
+            result.jdbcType = selectCache.getJdbcType();
         }
 
         public Builder(boolean isId, BaseColumn<?> baseColumn, SelectCache selectCache) {
@@ -82,7 +80,7 @@ public class Result implements IResult {
             result.selectNormal = selectCache;
             result.property = selectCache.getColumProperty();
             result.javaType = selectCache.getColumnType();
-            result.jdbcType = Optional.ofNullable(selectCache.getTableFieldInfo()).map(TableFieldInfo::getJdbcType).orElse(null);
+            result.jdbcType = selectCache.getJdbcType();
         }
 
         public Builder<T> property(SFunction<T, ?> property) {
@@ -102,7 +100,7 @@ public class Result implements IResult {
                 result.javaType = normal.getColumnType();
             }
             if (Objects.isNull(result.jdbcType)) {
-                result.jdbcType = Objects.isNull(normal.getTableFieldInfo()) ? null : normal.getTableFieldInfo().getJdbcType();
+                result.jdbcType = normal.getJdbcType();
             }
             return this;
         }

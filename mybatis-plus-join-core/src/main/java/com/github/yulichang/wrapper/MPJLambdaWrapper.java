@@ -260,33 +260,6 @@ public class MPJLambdaWrapper<T> extends JoinAbstractLambdaWrapper<T, MPJLambdaW
     /**
      * union
      * <p>
-     * 推荐使用 union(Class&lt;U&gt; clazz, ConsumerConsumer&lt;MPJLambdaWrapper&lt;U&gt;&gt; consumer)
-     * <p>
-     * 例： wrapper.union(UserDO.class, union -> union.selectAll(UserDO.class))
-     *
-     * @see #union(Class, Consumer)
-     * @deprecated union 不支持子查询
-     */
-    @Deprecated
-    @SuppressWarnings({"UnusedReturnValue", "DeprecatedIsStillUsed"})
-    public final MPJLambdaWrapper<T> union(MPJLambdaWrapper<?>... wrappers) {
-        StringBuilder sb = new StringBuilder();
-        for (MPJLambdaWrapper<?> wrapper : wrappers) {
-            addCustomWrapper(wrapper);
-            Class<?> entityClass = wrapper.getEntityClass();
-            Assert.notNull(entityClass, "请使用 new MPJLambdaWrapper(主表.class) 或 JoinWrappers.lambda(主表.class) 构造方法");
-            sb.append(" UNION ").append(WrapperUtils.buildUnionSqlByWrapper(entityClass, wrapper));
-        }
-        if (Objects.isNull(unionSql)) {
-            unionSql = SharedString.emptyString();
-        }
-        unionSql.setStringValue(unionSql.getStringValue() + sb);
-        return typedThis;
-    }
-
-    /**
-     * union
-     * <p>
      * 例： wrapper.union(UserDO.class, union -> union.selectAll(UserDO.class))
      *
      * @param clazz union语句的主表类型
@@ -306,32 +279,6 @@ public class MPJLambdaWrapper<T> extends JoinAbstractLambdaWrapper<T, MPJLambdaW
         return typedThis;
     }
 
-    /**
-     * union
-     * <p>
-     * 推荐使用 unionAll(Class&lt;U&gt; clazz, Consumer&lt;MPJLambdaWrapper&lt;U&gt;&gt; consumer)
-     * <p>
-     * 例： wrapper.unionAll(UserDO.class, union -> union.selectAll(UserDO.class))
-     *
-     * @see #unionAll(Class, Consumer)
-     * @deprecated union 不支持子查询
-     */
-    @Deprecated
-    @SuppressWarnings("DeprecatedIsStillUsed")
-    public MPJLambdaWrapper<T> unionAll(MPJLambdaWrapper<?>... wrappers) {
-        StringBuilder sb = new StringBuilder();
-        for (MPJLambdaWrapper<?> wrapper : wrappers) {
-            addCustomWrapper(wrapper);
-            Class<?> entityClass = wrapper.getEntityClass();
-            Assert.notNull(entityClass, "请使用 new MPJLambdaWrapper(主表.class) 或 JoinWrappers.lambda(主表.class) 构造方法");
-            sb.append(" UNION ALL ").append(WrapperUtils.buildUnionSqlByWrapper(entityClass, wrapper));
-        }
-        if (Objects.isNull(unionSql)) {
-            unionSql = SharedString.emptyString();
-        }
-        unionSql.setStringValue(unionSql.getStringValue() + sb);
-        return typedThis;
-    }
 
     /**
      * union
@@ -382,15 +329,7 @@ public class MPJLambdaWrapper<T> extends JoinAbstractLambdaWrapper<T, MPJLambdaW
                 if (i.isHasTableAlias()) {
                     prefix = i.getTableAlias();
                 } else {
-                    if (i.isLabel()) {
-                        if (i.isHasTableAlias()) {
-                            prefix = i.getTableAlias();
-                        } else {
-                            prefix = tableList.getPrefix(i.getIndex(), i.getClazz(), true);
-                        }
-                    } else {
-                        prefix = tableList.getPrefix(i.getIndex(), i.getClazz(), false);
-                    }
+                    prefix = tableList.getPrefix(i.getIndex(), i.getClazz(), i.isLabel());
                 }
                 String str = prefix + StringPool.DOT + i.getColumn();
                 if (i.isFunc()) {

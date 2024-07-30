@@ -35,7 +35,10 @@
         <module>mybatis-plus-join-core</module>
         <module>mybatis-plus-join-annotation</module>
         <module>mybatis-plus-join-extension</module>
-        <module>mybatis-plus-join-solon-plugin</module>
+
+        <module>plugin/mybatis-plus-join-solon-plugin</module>
+        <module>plugin/mybatis-plus-join-processor</module>
+
         <module>mybatis-plus-join-test</module>
     </modules>
 

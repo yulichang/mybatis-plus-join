@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import com.github.yulichang.annotation.DynamicTableName;
+import com.github.yulichang.annotation.Table;
 import com.github.yulichang.test.join.enums.Sex;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -17,6 +18,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
+@Table
 @Data
 @ToString
 @Accessors(chain = true)

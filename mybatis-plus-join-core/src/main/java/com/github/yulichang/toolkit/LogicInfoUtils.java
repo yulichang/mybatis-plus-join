@@ -29,6 +29,11 @@ public class LogicInfoUtils implements Constants {
         return absent.computeIfAbsent(hasAlias ? alias : (alias + tableIndex), key -> getLogicStr(key, clazz, true, false));
     }
 
+    public static String getLogicInfoApt(Class<?> clazz, String alias) {
+        Map<String, String> absent = LOGIC_CACHE.computeIfAbsent(clazz, k -> new ConcurrentHashMap<>());
+        return absent.computeIfAbsent(alias, key -> getLogicStr(key, clazz, true, false));
+    }
+
     public static String getLogicInfoNoAnd(Integer tableIndex, Class<?> clazz, boolean hasAlias, String alias) {
         Map<String, String> absent = LOGIC_CACHE_NO_AND.computeIfAbsent(clazz, k -> new ConcurrentHashMap<>());
         return absent.computeIfAbsent(hasAlias ? alias : (alias + tableIndex), key -> getLogicStr(key, clazz, false, false));

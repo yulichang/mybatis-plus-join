@@ -1,9 +1,11 @@
 package com.github.yulichang.toolkit;
 
+import com.github.yulichang.apt.BaseColumn;
 import com.github.yulichang.query.MPJQueryWrapper;
 import com.github.yulichang.wrapper.DeleteJoinWrapper;
 import com.github.yulichang.wrapper.MPJLambdaWrapper;
 import com.github.yulichang.wrapper.UpdateJoinWrapper;
+import com.github.yulichang.wrapper.apt.AptQueryWrapper;
 
 /**
  * @author yulichang
@@ -101,5 +103,19 @@ public class JoinWrappers {
      */
     public static <T> UpdateJoinWrapper<T> update(String alias, Class<T> clazz) {
         return new UpdateJoinWrapper<>(clazz, alias);
+    }
+
+    /**
+     * JoinWrappers.apt(User.class)
+     */
+    public static <T> AptQueryWrapper<T> apt(BaseColumn<T> baseColumn) {
+        return new AptQueryWrapper<>(baseColumn);
+    }
+
+    /**
+     * JoinWrappers.apt("t", User.class)
+     */
+    public static <T> AptQueryWrapper<T> apt(BaseColumn<T> baseColumn, T entity) {
+        return new AptQueryWrapper<>(baseColumn, entity);
     }
 }

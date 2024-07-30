@@ -4,12 +4,14 @@ import com.baomidou.mybatisplus.annotation.OrderBy;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.github.yulichang.annotation.Table;
 import lombok.Data;
 import lombok.ToString;
 import lombok.experimental.Accessors;
 
 import java.io.Serializable;
 
+@Table
 @Data
 @ToString
 @Accessors(chain = true)

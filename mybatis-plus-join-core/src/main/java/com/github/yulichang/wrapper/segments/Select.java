@@ -1,7 +1,9 @@
 package com.github.yulichang.wrapper.segments;
 
+import com.baomidou.mybatisplus.core.metadata.TableFieldInfo;
+import com.github.yulichang.apt.BaseColumn;
+import com.github.yulichang.apt.Column;
 import com.github.yulichang.wrapper.enums.BaseFuncEnum;
-import org.apache.ibatis.type.JdbcType;
 import org.apache.ibatis.type.TypeHandler;
 
 import java.io.Serializable;
@@ -40,9 +42,7 @@ public interface Select extends Serializable {
 
     String getAlias();
 
-    Class<?> getPropertyType();
-
-    JdbcType getJdbcType();
+    TableFieldInfo getTableFieldInfo();
 
     boolean isFunc();
 
@@ -53,4 +53,12 @@ public interface Select extends Serializable {
     boolean isLabel();
 
     boolean isStr();
+
+    default Column[] getColumns() {
+        return null;
+    }
+
+    default BaseColumn<?> getBaseColumn() {
+        return null;
+    }
 }

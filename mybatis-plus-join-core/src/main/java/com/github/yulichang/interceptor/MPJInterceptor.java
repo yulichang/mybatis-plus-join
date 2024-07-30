@@ -95,7 +95,7 @@ public class MPJInterceptor implements Interceptor {
                 wrapper.setEntityClass((Class<E>) MPJTableMapperHelper.getEntity(getMapper(ms.getId(), ms.getResource())));
             }
             if (wrapper.getSelectColumns().isEmpty() && wrapper.getEntityClass() != null) {
-                wrapper.selectAll(wrapper.getEntityClass());
+                wrapper.selectAll();
             }
         }
         return buildMappedStatement(ms, resultType, ew);
@@ -181,9 +181,8 @@ public class MPJInterceptor implements Interceptor {
             }
         }
         if (wrapper.isResultMap()) {
-            for (Object o : wrapper.getResultMapMybatisLabel()) {
-                Label<?> label = (Label<?>) o;
-                resultMappings.add(buildResult(ms, label, columnSet, columnList));
+            for (Label<?> o : wrapper.getResultMapMybatisLabel()) {
+                resultMappings.add(buildResult(ms, o, columnSet, columnList));
             }
         }
         result.add(new ResultMap.Builder(ms.getConfiguration(), id, resultType, resultMappings).build());
@@ -228,10 +227,10 @@ public class MPJInterceptor implements Interceptor {
             String index = r.getIndex();
             if (columnSet.contains(columnName)) {
                 columnName = getColumn(columnSet, columnName, 0);
-                label = new SelectLabel(r.getSelectNormal(), null, mybatisLabel.getOfType(), columnName, StringUtils.isNotBlank(index), index);
+                label = new SelectLabel(r.getSelectNormal(), null, mybatisLabel.getOfType(), columnName, StringUtils.isNotBlank(index), index, r.getBaseColumn());
             } else {
                 columnSet.add(columnName);
-                label = new SelectLabel(r.getSelectNormal(), null, mybatisLabel.getOfType(), StringUtils.isNotBlank(index), index);
+                label = new SelectLabel(r.getSelectNormal(), null, mybatisLabel.getOfType(), StringUtils.isNotBlank(index), index, r.getBaseColumn());
             }
             columnList.add(label);
             ResultMapping.Builder builder = new ResultMapping.Builder(ms.getConfiguration(), r.getProperty(), columnName, r.getJavaType());

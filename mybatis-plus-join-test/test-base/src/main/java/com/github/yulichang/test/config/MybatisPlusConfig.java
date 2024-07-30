@@ -84,8 +84,17 @@ public class MybatisPlusConfig {
             }
 
             @Override
+            @SuppressWarnings("deprecation")
             public List<AbstractMethod> getMethodList(Class<?> mapperClass, TableInfo tableInfo) {
                 List<AbstractMethod> list = super.getMethodList(mapperClass, tableInfo);
+                //添加你的方法
+                list.add(new InsertBatchSomeColumn());
+                return list;
+            }
+
+            @Override
+            public List<AbstractMethod> getMethodList(org.apache.ibatis.session.Configuration configuration, Class<?> mapperClass, TableInfo tableInfo) {
+                List<AbstractMethod> list = super.getMethodList(configuration, mapperClass, tableInfo);
                 //添加你的方法
                 list.add(new InsertBatchSomeColumn());
                 return list;

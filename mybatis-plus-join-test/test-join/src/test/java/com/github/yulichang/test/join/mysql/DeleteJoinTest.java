@@ -3,22 +3,23 @@ package com.github.yulichang.test.join.mysql;
 import com.github.yulichang.test.join.entity.*;
 import com.github.yulichang.test.join.mapper.OrderMapper;
 import com.github.yulichang.test.join.mapper.UserMapper;
+import com.github.yulichang.test.util.EnabledIfConfig;
 import com.github.yulichang.test.util.Reset;
 import com.github.yulichang.test.util.ThreadLocalUtils;
 import com.github.yulichang.toolkit.JoinWrappers;
 import com.github.yulichang.wrapper.DeleteJoinWrapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.condition.EnabledIf;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit.jupiter.EnabledIf;
 
 /**
  * 连表删除没有同意语法语法，不同数据库差别较大
  * MPJ 连表更新 目前只支持 mysql
  */
 @SpringBootTest("spring.profiles.active=mysql")
-@EnabledIf("com.github.yulichang.test.util.EnabledIf#runWithMysql")
+@EnabledIf(value = EnabledIfConfig.runWithMysql, loadContext = true)
 public class DeleteJoinTest {
 
     @Autowired

@@ -6,15 +6,16 @@ import com.github.yulichang.test.join.entity.AddressDO;
 import com.github.yulichang.test.join.entity.OrderDO;
 import com.github.yulichang.test.join.entity.UserDO;
 import com.github.yulichang.test.join.mapper.UserMapper;
+import com.github.yulichang.test.util.EnabledIfConfig;
 import com.github.yulichang.test.util.Reset;
 import com.github.yulichang.test.util.ThreadLocalUtils;
 import com.github.yulichang.toolkit.JoinWrappers;
 import com.github.yulichang.wrapper.UpdateJoinWrapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.condition.EnabledIf;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit.jupiter.EnabledIf;
 
 import java.util.HashMap;
 import java.util.List;
@@ -24,7 +25,7 @@ import java.util.List;
  * MPJ 连表更新 目前只支持 mysql
  */
 @SpringBootTest("spring.profiles.active=mysql")
-@EnabledIf("com.github.yulichang.test.util.EnabledIf#runWithMysql")
+@EnabledIf(value = EnabledIfConfig.runWithMysql,loadContext = true)
 public class UpdateJoinTest {
 
     @Autowired

@@ -4,20 +4,21 @@ import com.github.yulichang.test.join.entity.AddressDO;
 import com.github.yulichang.test.join.entity.AreaDO;
 import com.github.yulichang.test.join.entity.UserDO;
 import com.github.yulichang.test.join.mapper.UserMapper;
+import com.github.yulichang.test.util.EnabledIfConfig;
 import com.github.yulichang.test.util.Reset;
 import com.github.yulichang.test.util.ThreadLocalUtils;
 import com.github.yulichang.toolkit.JoinWrappers;
 import com.github.yulichang.wrapper.MPJLambdaWrapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.condition.EnabledIf;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit.jupiter.EnabledIf;
 
 import java.util.List;
 
 @SpringBootTest
-@EnabledIf("com.github.yulichang.test.util.EnabledIf#runWithExcludingOracle")
+@EnabledIf(value = EnabledIfConfig.runWithExcludingOracle, loadContext = true)
 public class TableAliasTest {
     @Autowired
     private UserMapper userMapper;

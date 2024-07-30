@@ -92,6 +92,7 @@ public class MPJSqlInjector extends DefaultSqlInjector {
      */
     @Override
     @Deprecated
+    @SuppressWarnings({"deprecation", "DeprecatedIsStillUsed"})
     public List<AbstractMethod> getMethodList(Class<?> mapperClass, TableInfo tableInfo) {
         if (Objects.nonNull(sqlInjector)) {
             return methodFilter(sqlInjector.getMethodList(mapperClass, tableInfo));

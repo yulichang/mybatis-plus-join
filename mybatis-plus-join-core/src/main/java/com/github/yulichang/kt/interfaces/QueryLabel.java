@@ -23,7 +23,7 @@ import java.util.Map;
 @SuppressWarnings({"unused", "DuplicatedCode"})
 public interface QueryLabel<Children> {
 
-    void addLabel(Label<?> label);
+    void addLabel(Label<?> label, boolean isCollection);
 
     Children getChildren();
 
@@ -62,7 +62,7 @@ public interface QueryLabel<Children> {
         } else {
             builder = new MybatisLabel.Builder<>(prefix, dtoFieldName, child, field.getType(), genericType, true);
         }
-        addLabel(builder.build());
+        addLabel(builder.build(), true);
         return getChildren();
     }
 
@@ -104,7 +104,7 @@ public interface QueryLabel<Children> {
         Class<?> genericType = MPJReflectionKit.getGenericType(field.getField());
         MybatisLabelFree.Builder<?> builder = new MybatisLabelFree.Builder<>(dtoFieldName, field.getType(), genericType);
         MybatisLabelFree.Builder<?> czBuilder = collection.apply(builder);
-        addLabel(czBuilder.build());
+        addLabel(czBuilder.build(), true);
         return getChildren();
     }
 
@@ -118,7 +118,7 @@ public interface QueryLabel<Children> {
         Class<?> genericType = MPJReflectionKit.getGenericType(field.getField());
         MybatisLabel.Builder<?, ?> builder = new MybatisLabel.Builder<>(prefix, dtoFieldName, child, field.getType(), genericType, false);
         MybatisLabel.Builder<?, ?> czBuilder = collection.apply(builder);
-        addLabel(czBuilder.build());
+        addLabel(czBuilder.build(), true);
         return getChildren();
     }
 
@@ -139,7 +139,7 @@ public interface QueryLabel<Children> {
         MybatisLabel.Builder<?, ?> builder;
         builder = new MybatisLabel.Builder<>(StringUtils.isBlank(prefix) ? null : prefix,
                 dtoFieldName, child, field.getType(), (Class<?>) field.getType(), true);
-        addLabel(builder.build());
+        addLabel(builder.build(), false);
         return getChildren();
     }
 
@@ -160,7 +160,7 @@ public interface QueryLabel<Children> {
         Assert.isFalse(Collection.class.isAssignableFrom(field.getType()), "association 不支持集合类");
         MybatisLabelFree.Builder<?> builder = new MybatisLabelFree.Builder<>(dtoFieldName, field.getType(), (Class<?>) field.getType());
         MybatisLabelFree.Builder<?> cfBuilder = collection.apply(builder);
-        addLabel(cfBuilder.build());
+        addLabel(cfBuilder.build(), false);
         return getChildren();
     }
 
@@ -172,7 +172,7 @@ public interface QueryLabel<Children> {
         MybatisLabel.Builder<?, ?> builder = new MybatisLabel.Builder<>(StringUtils.isBlank(prefix) ? null : prefix,
                 dtoFieldName, child, field.getType(), (Class<?>) field.getType(), false);
         MybatisLabel.Builder<?, ?> cfBuilder = collection.apply(builder);
-        addLabel(cfBuilder.build());
+        addLabel(cfBuilder.build(), false);
         return getChildren();
     }
 }

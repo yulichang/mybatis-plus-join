@@ -2,6 +2,7 @@ package com.github.yulichang.wrapper.interfaces;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.github.yulichang.interfaces.MPJBaseJoin;
 import com.github.yulichang.toolkit.SqlHelper;
 
@@ -21,7 +22,11 @@ import java.util.Optional;
 @SuppressWarnings("unused")
 public interface Chain<T> extends MPJBaseJoin<T> {
 
+    Page<?> FIRST_PAGE = new Page<>(1, 1).setSearchCount(false);
+
     Class<T> getEntityClass();
+
+    boolean isResultMapCollection();
 
     /**
      * 链式调用 等效于MP mapper的 selectCount()
@@ -63,8 +68,10 @@ public interface Chain<T> extends MPJBaseJoin<T> {
      * new MPJLambdaWrapper(User.class)<br />
      * JoinWrappers.lambda(User.class)<br />
      */
+    @SuppressWarnings("unchecked")
     default T first() {
-        return Optional.of(list()).filter(CollectionUtils::isNotEmpty).map(m -> m.get(0)).orElse(null);
+        List<T> list = this.isResultMapCollection() ? list() : page((Page<T>) FIRST_PAGE).getRecords();
+        return Optional.of(list).filter(CollectionUtils::isNotEmpty).map(m -> m.get(0)).orElse(null);
     }
 
     /**
@@ -74,8 +81,10 @@ public interface Chain<T> extends MPJBaseJoin<T> {
      * new MPJLambdaWrapper(User.class)<br />
      * JoinWrappers.lambda(User.class)<br />
      */
+    @SuppressWarnings("unchecked")
     default <R> R first(Class<R> resultType) {
-        return Optional.of(list(resultType)).filter(CollectionUtils::isNotEmpty).map(m -> m.get(0)).orElse(null);
+        List<R> list = this.isResultMapCollection() ? list(resultType) : page((Page<R>) FIRST_PAGE, resultType).getRecords();
+        return Optional.of(list).filter(CollectionUtils::isNotEmpty).map(m -> m.get(0)).orElse(null);
     }
 
     /**

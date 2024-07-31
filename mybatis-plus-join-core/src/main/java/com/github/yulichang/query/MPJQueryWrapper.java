@@ -365,6 +365,11 @@ public class MPJQueryWrapper<T> extends AbstractWrapper<T, String, MPJQueryWrapp
     }
 
     @Override
+    public boolean isResultMapCollection() {
+        return false;
+    }
+
+    @Override
     public MPJQueryWrapper<T> setEntityClass(Class<T> entityClass) {
         try {
             return super.setEntityClass(entityClass);

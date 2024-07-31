@@ -135,7 +135,10 @@ public class AptQueryWrapper<T> extends AptAbstractWrapper<T, AptQueryWrapper<T>
     }
 
     @Override
-    public void addLabel(Label<?> label) {
+    public void addLabel(Label<?> label, boolean isCollection) {
+        if (isCollection) {
+            this.resultMapCollection = true;
+        }
         this.resultMap = true;
         this.resultMapMybatisLabel.add(label);
     }

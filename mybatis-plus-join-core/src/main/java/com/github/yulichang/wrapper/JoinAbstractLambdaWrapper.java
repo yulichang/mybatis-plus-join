@@ -48,10 +48,15 @@ public abstract class JoinAbstractLambdaWrapper<T, Children extends JoinAbstract
      */
     protected String subTableAlias = ConfigProperties.tableAlias;
     /**
-     * 是否构建是否存在一对多
+     * 是否存在对一或对多
      */
     @Getter
     protected boolean resultMap = false;
+    /**
+     * 是否存在一对多
+     */
+    @Getter
+    protected boolean resultMapCollection = false;
     /**
      * 表序号
      */
@@ -469,6 +474,7 @@ public abstract class JoinAbstractLambdaWrapper<T, Children extends JoinAbstract
         super.clear();
         this.alias = ConfigProperties.tableAlias;
         this.resultMap = false;
+        this.resultMapCollection = false;
         this.tableIndex = 1;
         this.dynamicTableName = false;
         this.tableFunc = null;

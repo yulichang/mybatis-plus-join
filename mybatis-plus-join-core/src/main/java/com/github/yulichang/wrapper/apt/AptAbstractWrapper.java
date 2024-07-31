@@ -56,6 +56,8 @@ public abstract class AptAbstractWrapper<T, Children extends AptAbstractWrapper<
      */
     @Getter
     protected boolean resultMap = false;
+    @Getter
+    protected boolean resultMapCollection = false;
     /**
      * 表序号
      */
@@ -402,6 +404,7 @@ public abstract class AptAbstractWrapper<T, Children extends AptAbstractWrapper<
         super.clear();
         this.alias = ConfigProperties.tableAlias;
         this.resultMap = false;
+        this.resultMapCollection = false;
         this.tableIndex = 1;
         this.dynamicTableName = false;
         this.tableFunc = null;

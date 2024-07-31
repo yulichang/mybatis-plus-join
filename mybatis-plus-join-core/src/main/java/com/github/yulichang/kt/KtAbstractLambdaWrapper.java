@@ -55,6 +55,8 @@ public abstract class KtAbstractLambdaWrapper<T, Children extends KtAbstractLamb
      */
     @Getter
     protected boolean resultMap = false;
+    @Getter
+    protected boolean resultMapCollection = false;
     /**
      * 表序号
      */
@@ -445,6 +447,7 @@ public abstract class KtAbstractLambdaWrapper<T, Children extends KtAbstractLamb
         super.clear();
         this.alias = ConfigProperties.tableAlias;
         this.resultMap = false;
+        this.resultMapCollection = false;
         this.tableIndex = 1;
         this.dynamicTableName = false;
         this.tableFunc = null;

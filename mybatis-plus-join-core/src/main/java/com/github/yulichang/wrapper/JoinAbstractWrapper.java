@@ -493,7 +493,7 @@ public abstract class JoinAbstractWrapper<T, Children extends JoinAbstractWrappe
     @SafeVarargs
     public final <X> Children groupBy(boolean condition, String alias, SFunction<X, ?> column, SFunction<X, ?>... columns) {
         return maybeDo(condition, () -> {
-            String one = columnToString(index, alias, column, false, isOn ? PrefixEnum.ON_FIRST : PrefixEnum.CD_FIRST, false);
+            String one = columnToString(index, alias, column, false, isOn ? PrefixEnum.ON_FIRST : PrefixEnum.CD_FIRST, true);
             if (ArrayUtils.isNotEmpty(columns)) {
                 one += (StringPool.COMMA + columnsToString(index, isOn ? PrefixEnum.ON_FIRST : PrefixEnum.CD_FIRST, alias, columns));
             }

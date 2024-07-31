@@ -219,7 +219,7 @@ public abstract class JoinAbstractLambdaWrapper<T, Children extends JoinAbstract
     @Override
     @SafeVarargs
     protected final <X> String columnsToString(Integer index, PrefixEnum prefixEnum, String alias, SFunction<X, ?>... columns) {
-        return Arrays.stream(columns).map(i -> columnToString(index, alias, i, false, prefixEnum, false))
+        return Arrays.stream(columns).map(i -> columnToString(index, alias, i, false, prefixEnum, true))
                 .collect(joining(StringPool.COMMA));
     }
 

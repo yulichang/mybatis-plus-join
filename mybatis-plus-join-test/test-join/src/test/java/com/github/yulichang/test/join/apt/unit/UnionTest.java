@@ -1,5 +1,7 @@
 package com.github.yulichang.test.join.apt.unit;
 
+import com.github.yulichang.extension.apt.AptQueryWrapper;
+import com.github.yulichang.extension.apt.toolkit.AptWrappers;
 import com.github.yulichang.test.join.entity.AreaDO;
 import com.github.yulichang.test.join.entity.UserDO;
 import com.github.yulichang.test.join.entity.apt.AddressDOCol;
@@ -7,8 +9,6 @@ import com.github.yulichang.test.join.entity.apt.AreaDOCol;
 import com.github.yulichang.test.join.entity.apt.UserDOCol;
 import com.github.yulichang.test.util.Reset;
 import com.github.yulichang.test.util.ThreadLocalUtils;
-import com.github.yulichang.toolkit.JoinWrappers;
-import com.github.yulichang.wrapper.apt.AptQueryWrapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -33,7 +33,7 @@ public class UnionTest {
         AreaDOCol area = AreaDOCol.build();
         AreaDOCol areaSb = AreaDOCol.build();
 
-        AptQueryWrapper<UserDO> wrapper = JoinWrappers.apt(u)
+        AptQueryWrapper<UserDO> wrapper = AptWrappers.query(u)
                 .select(u.id)
                 .eq(u.id, 1)
                 .unionAll(addr, union -> union

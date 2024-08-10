@@ -8,7 +8,7 @@ import com.github.yulichang.test.join.mapper.UserMapper;
 import com.github.yulichang.test.util.Reset;
 import com.github.yulichang.test.util.ThreadLocalUtils;
 import com.github.yulichang.toolkit.Ref;
-import com.github.yulichang.wrapper.apt.AptQueryWrapper;
+import com.github.yulichang.extension.apt.AptQueryWrapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

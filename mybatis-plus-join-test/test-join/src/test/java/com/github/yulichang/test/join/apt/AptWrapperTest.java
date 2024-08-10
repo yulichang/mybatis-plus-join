@@ -6,6 +6,8 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.github.yulichang.adapter.base.tookit.VersionUtils;
+import com.github.yulichang.extension.apt.AptQueryWrapper;
+import com.github.yulichang.extension.apt.toolkit.AptWrappers;
 import com.github.yulichang.test.join.dto.AddressDTO;
 import com.github.yulichang.test.join.dto.UserDTO;
 import com.github.yulichang.test.join.dto.UserTenantDTO;
@@ -15,8 +17,6 @@ import com.github.yulichang.test.join.entity.apt.*;
 import com.github.yulichang.test.join.mapper.*;
 import com.github.yulichang.test.util.Reset;
 import com.github.yulichang.test.util.ThreadLocalUtils;
-import com.github.yulichang.toolkit.JoinWrappers;
-import com.github.yulichang.wrapper.apt.AptQueryWrapper;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -68,14 +68,14 @@ class AptWrapperTest {
 
         UserTenantDOCol ut = USERTENANTDO;
 
-        AptQueryWrapper<UserTenantDO> lambda = JoinWrappers.apt(ut)
+        AptQueryWrapper<UserTenantDO> lambda = AptWrappers.query(ut)
                 .selectAsClass(ut, UserTenantDTO.class);
         List<UserTenantDO> list = userTenantMapper.selectJoinList(UserTenantDO.class, lambda);
         assert list.size() == 5 && list.get(0).getIdea() != null;
 
 
         ThreadLocalUtils.set("SELECT t.tenant_id, t.user_id, t.id FROM user_tenant t WHERE t.tenant_id = 1");
-        AptQueryWrapper<UserTenantDO> lambda1 = JoinWrappers.apt(ut)
+        AptQueryWrapper<UserTenantDO> lambda1 = AptWrappers.query(ut)
                 .selectAsClass(ut, UserTenantDescDTO.class);
         List<UserTenantDO> list1 = userTenantMapper.selectJoinList(UserTenantDO.class, lambda1);
         assert list1.size() == 5 && list1.get(0).getIdea() != null;
@@ -84,7 +84,7 @@ class AptWrapperTest {
     @Test
     void testSimple() {
         UserTenantDOCol ut = USERTENANTDO;
-        AptQueryWrapper<UserTenantDO> lambda = JoinWrappers.apt(ut);
+        AptQueryWrapper<UserTenantDO> lambda = AptWrappers.query(ut);
         lambda.selectAs(ut.idea, UserTenantDO::getIdea);
         List<UserTenantDO> list = userTenantMapper.selectList(lambda);
 
@@ -696,7 +696,7 @@ class AptWrapperTest {
 
         Page<UserDTO> page = new Page<>(1, 10);
         page.setSearchCount(false);
-        IPage<UserDTO> iPage = userMapper.selectJoinPage(page, UserDTO.class, JoinWrappers.apt(u)
+        IPage<UserDTO> iPage = userMapper.selectJoinPage(page, UserDTO.class, AptWrappers.query(u)
                 .selectAll()
                 .select(addr.address)
                 .select(ar.province)
@@ -738,7 +738,7 @@ class AptWrapperTest {
         UserDOCol u = UserDOCol.build();
         AddressDOCol addr = AddressDOCol.build();
 
-        IPage<UserDTO> page = userMapper.selectJoinPage(new Page<>(1, 10), UserDTO.class, JoinWrappers.apt(u)
+        IPage<UserDTO> page = userMapper.selectJoinPage(new Page<>(1, 10), UserDTO.class, AptWrappers.query(u)
                 .selectAll()
                 .select(addr.address)
                 .leftJoin(addr, on -> on
@@ -761,7 +761,7 @@ class AptWrapperTest {
         UserDOCol u = UserDOCol.build();
         AddressDOCol addr = AddressDOCol.build();
 
-        AptQueryWrapper<UserDO> wrapper = JoinWrappers.apt(u)
+        AptQueryWrapper<UserDO> wrapper = AptWrappers.query(u)
                 .selectSum(u.id)
                 .selectMax(u.id, UserDTO::getHeadImg)
                 .leftJoin(addr, addr.userId, u.id);
@@ -792,7 +792,7 @@ class AptWrapperTest {
     void test7() {
         UserDOCol u = UserDOCol.build();
         AddressDOCol addr = AddressDOCol.build();
-        List<Map<String, Object>> list = userMapper.selectJoinMaps(JoinWrappers.apt(u)
+        List<Map<String, Object>> list = userMapper.selectJoinMaps(AptWrappers.query(u)
                 .selectAll()
                 .select(addr.address)
                 .leftJoin(addr, addr.userId, u.id));
@@ -982,7 +982,7 @@ class AptWrapperTest {
         AddressDOCol addr = AddressDOCol.build();
         AreaDOCol ar = AreaDOCol.build();
 
-        AptQueryWrapper<UserDO> wrapper = JoinWrappers.apt(u)
+        AptQueryWrapper<UserDO> wrapper = AptWrappers.query(u)
                 .logicDelToOn()
                 .selectAll()
                 .selectCollection(addr, UserDTO::getAddressList, ad -> ad
@@ -1004,7 +1004,7 @@ class AptWrapperTest {
         UserDOCol u = UserDOCol.build();
         AddressDOCol addr = AddressDOCol.build();
         AreaDOCol ar = AreaDOCol.build();
-        AptQueryWrapper<UserDO> wrapper = JoinWrappers.apt(u)
+        AptQueryWrapper<UserDO> wrapper = AptWrappers.query(u)
                 .logicDelToOn()
                 .selectAll()
                 .selectCollection(UserDTO::getAddressList, ad -> ad
@@ -1031,7 +1031,7 @@ class AptWrapperTest {
         UserDOCol u = UserDOCol.build();
         UserDOCol u1 = UserDOCol.build();
         AddressDOCol addr = AddressDOCol.build();
-        AptQueryWrapper<AddressDO> wrapper = JoinWrappers.apt(addr)
+        AptQueryWrapper<AddressDO> wrapper = AptWrappers.query(addr)
                 .selectAll()
                 .leftJoin(u, u.addressId, addr.id)
                 .leftJoin(u1, u1.pid, u.id);
@@ -1047,7 +1047,7 @@ class AptWrapperTest {
         ThreadLocalUtils.set("SELECT t.id,t.pid,t.`name`,t.`json`,t.sex,t.head_img,t.create_time,t.address_id,t.address_id2,t.del,t.create_by,t.update_by FROM `user` t LEFT JOIN address t1 ON (t1.user_id = t.id) WHERE t.del=false AND t1.del=false AND (t1.id = t1.id)");
         UserDOCol u = UserDOCol.build();
         AddressDOCol addr = AddressDOCol.build();
-        AptQueryWrapper<UserDO> wrapper = JoinWrappers.apt(u)
+        AptQueryWrapper<UserDO> wrapper = AptWrappers.query(u)
                 .selectAll()
                 .leftJoin(addr, addr.userId, u.id)
                 .eq(addr.id, addr.id);
@@ -1064,7 +1064,7 @@ class AptWrapperTest {
                 "LEFT JOIN address aaa ON (aaa.user_id = t.id) WHERE t.del=false AND aaa.del=false AND (aaa.id = t.id AND aaa.id = aaa.id)");
         UserDOCol u = UserDOCol.build();
         AddressDOCol addr = AddressDOCol.build("aaa");
-        AptQueryWrapper<UserDO> wrapper = JoinWrappers.apt(u)
+        AptQueryWrapper<UserDO> wrapper = AptWrappers.query(u)
                 .selectAll()
                 .leftJoin(addr, addr.userId, u.id)
                 .eq(addr.id, u.id)
@@ -1086,7 +1086,7 @@ class AptWrapperTest {
                     "SELECT id,user_id,name FROM order_t t");
         }
         OrderDOCol o = OrderDOCol.build();
-        AptQueryWrapper<OrderDO> wrapper = JoinWrappers.apt(o);
+        AptQueryWrapper<OrderDO> wrapper = AptWrappers.query(o);
         List<OrderDO> list = wrapper.list();
 
         if (VersionUtils.compare(MybatisPlusVersion.getVersion(), "3.4.3") >= 0) {
@@ -1099,7 +1099,7 @@ class AptWrapperTest {
 
         UserDOCol u = UserDOCol.build();
         OrderDOCol o1 = OrderDOCol.build();
-        AptQueryWrapper<OrderDO> w = JoinWrappers.apt(o1)
+        AptQueryWrapper<OrderDO> w = AptWrappers.query(o1)
                 .selectAll()
                 .selectAs(u.name, OrderDO::getUserName)
                 .leftJoin(u, u.id, o1.userId);
@@ -1113,7 +1113,7 @@ class AptWrapperTest {
     void checkOrderBy() {
         UserDOCol u = UserDOCol.build();
         AddressDOCol addr = AddressDOCol.build();
-        AptQueryWrapper<UserDO> wrapper = JoinWrappers.apt(u)
+        AptQueryWrapper<UserDO> wrapper = AptWrappers.query(u)
                 .selectAll()
                 .leftJoin(addr, addr.userId, u.id)
                 .le(u.id, 100)

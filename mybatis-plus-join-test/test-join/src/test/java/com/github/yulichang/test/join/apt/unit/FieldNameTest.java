@@ -1,12 +1,12 @@
 package com.github.yulichang.test.join.apt.unit;
 
+import com.github.yulichang.extension.apt.toolkit.AptWrappers;
 import com.github.yulichang.test.join.dto.AreaDTO;
 import com.github.yulichang.test.join.entity.AreaDO;
 import com.github.yulichang.test.join.entity.apt.AreaDOCol;
 import com.github.yulichang.test.join.entity.apt.UserDtoCol;
 import com.github.yulichang.test.join.mapper.AreaMapper;
 import com.github.yulichang.test.util.Reset;
-import com.github.yulichang.toolkit.JoinWrappers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +30,7 @@ public class FieldNameTest {
     void testFieldName() {
         AreaDOCol ar = AreaDOCol.build();
         UserDtoCol ud = UserDtoCol.build();
-        List<AreaDO> list = areaMapper.selectJoinList(AreaDO.class, JoinWrappers.apt(ar)
+        List<AreaDO> list = areaMapper.selectJoinList(AreaDO.class, AptWrappers.query(ar)
                 .select(ar.Postcode)
                 .leftJoin(ud, ud.id, ar.id));
 
@@ -41,7 +41,7 @@ public class FieldNameTest {
     void testFieldName1() {
         AreaDOCol ar = AreaDOCol.build();
         UserDtoCol ud = UserDtoCol.build();
-        List<AreaDTO> list = areaMapper.selectJoinList(AreaDTO.class, JoinWrappers.apt(ar)
+        List<AreaDTO> list = areaMapper.selectJoinList(AreaDTO.class, AptWrappers.query(ar)
                 .selectAs(ar.Postcode, AreaDTO::getPostcode)
                 .leftJoin(ud, ud.id, ar.id));
 

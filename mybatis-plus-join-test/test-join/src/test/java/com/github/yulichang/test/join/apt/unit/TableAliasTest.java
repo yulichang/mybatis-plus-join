@@ -1,5 +1,7 @@
 package com.github.yulichang.test.join.apt.unit;
 
+import com.github.yulichang.extension.apt.AptQueryWrapper;
+import com.github.yulichang.extension.apt.toolkit.AptWrappers;
 import com.github.yulichang.test.join.entity.UserDO;
 import com.github.yulichang.test.join.entity.apt.AddressDOCol;
 import com.github.yulichang.test.join.entity.apt.AreaDOCol;
@@ -8,8 +10,6 @@ import com.github.yulichang.test.join.mapper.UserMapper;
 import com.github.yulichang.test.util.EnabledIfConfig;
 import com.github.yulichang.test.util.Reset;
 import com.github.yulichang.test.util.ThreadLocalUtils;
-import com.github.yulichang.toolkit.JoinWrappers;
-import com.github.yulichang.wrapper.apt.AptQueryWrapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,7 +43,7 @@ public class TableAliasTest {
         AddressDOCol addr2 = AddressDOCol.build("addr2");
         AreaDOCol area1 = AreaDOCol.build("area1");
 
-        AptQueryWrapper<UserDO> wrapper = JoinWrappers.apt(u)
+        AptQueryWrapper<UserDO> wrapper = AptWrappers.query(u)
                 .selectAll()
                 .leftJoin(addr1, addr1.id, u.addressId)
                 .leftJoin(addr2, addr2.id, u.addressId2)
@@ -68,7 +68,7 @@ public class TableAliasTest {
         AddressDOCol addr2 = AddressDOCol.build("addr2");
         AreaDOCol area1 = AreaDOCol.build("area1");
 
-        AptQueryWrapper<UserDO> wrapper = JoinWrappers.apt(u)
+        AptQueryWrapper<UserDO> wrapper = AptWrappers.query(u)
                 .selectAll()
                 .leftJoin(addr1, addr1.id, u.addressId)
                 .leftJoin(addr2, addr2.id, u.addressId2)
@@ -95,7 +95,7 @@ public class TableAliasTest {
         AddressDOCol addr2 = AddressDOCol.build("addr2");
         AreaDOCol area1 = AreaDOCol.build("area1");
 
-        AptQueryWrapper<UserDO> wrapper = JoinWrappers.apt(u)
+        AptQueryWrapper<UserDO> wrapper = AptWrappers.query(u)
                 .selectAll()
                 .leftJoin(addr1, addr1.id, u.addressId)
                 .leftJoin(addr2, addr2.id, u.addressId2)
@@ -117,7 +117,7 @@ public class TableAliasTest {
 
         UserDO userDO = new UserDO();
         userDO.setName("aaa");
-        AptQueryWrapper<UserDO> wrapper = JoinWrappers.apt(u, userDO);
+        AptQueryWrapper<UserDO> wrapper = AptWrappers.query(u, userDO);
         wrapper.list();
     }
 }

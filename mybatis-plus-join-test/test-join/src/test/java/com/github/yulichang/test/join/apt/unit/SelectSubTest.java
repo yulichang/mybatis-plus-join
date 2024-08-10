@@ -1,5 +1,7 @@
 package com.github.yulichang.test.join.apt.unit;
 
+import com.github.yulichang.extension.apt.AptQueryWrapper;
+import com.github.yulichang.extension.apt.toolkit.AptWrappers;
 import com.github.yulichang.test.join.entity.UserDO;
 import com.github.yulichang.test.join.entity.apt.AddressDOCol;
 import com.github.yulichang.test.join.entity.apt.AreaDOCol;
@@ -7,8 +9,6 @@ import com.github.yulichang.test.join.entity.apt.UserDOCol;
 import com.github.yulichang.test.util.EnabledIfConfig;
 import com.github.yulichang.test.util.Reset;
 import com.github.yulichang.test.util.ThreadLocalUtils;
-import com.github.yulichang.toolkit.JoinWrappers;
-import com.github.yulichang.wrapper.apt.AptQueryWrapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -35,7 +35,7 @@ public class SelectSubTest {
         UserDOCol sb2 = UserDOCol.build();
         AddressDOCol addr = AddressDOCol.build();
 
-        AptQueryWrapper<UserDO> wrapper = JoinWrappers.apt(u)
+        AptQueryWrapper<UserDO> wrapper = AptWrappers.query(u)
                 .selectSub(sb, w -> w.select(sb.id)
                         .eq(sb.id, u.id)
                         .eq(sb.id, 2)
@@ -53,7 +53,7 @@ public class SelectSubTest {
         AreaDOCol area = AreaDOCol.build();
 
         ThreadLocalUtils.set("SELECT (SELECT st.id FROM area st WHERE st.del = false AND (st.id = t1.id) LIMIT 1) AS id FROM `user` t LEFT JOIN address t1 ON (t1.user_id = t.id) WHERE t.del = false AND t1.del = false AND (t.id <= ?)");
-        AptQueryWrapper<UserDO> wrapper1 = JoinWrappers.apt(u1)
+        AptQueryWrapper<UserDO> wrapper1 = AptWrappers.query(u1)
                 .selectSub(area, w -> w.select(area.id)
                         .eq(area.id, addr1.id)
                         .last("limit 1"), UserDO::getId)
@@ -69,7 +69,7 @@ public class SelectSubTest {
         AddressDOCol addr = AddressDOCol.build();
         AreaDOCol ar = AreaDOCol.build();
 
-        AptQueryWrapper<UserDO> wrapper1 = JoinWrappers.apt(u)
+        AptQueryWrapper<UserDO> wrapper1 = AptWrappers.query(u)
                 .selectSub(ar, w -> w.select(ar.id)
                         .eq(ar.id, addr.id)
                         .setTableName(t -> "`" + t + "`")

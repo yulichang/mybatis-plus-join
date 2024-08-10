@@ -1,6 +1,8 @@
 package com.github.yulichang.test.join.apt.unit;
 
 import com.github.yulichang.apt.Column;
+import com.github.yulichang.extension.apt.AptQueryWrapper;
+import com.github.yulichang.extension.apt.toolkit.AptWrappers;
 import com.github.yulichang.test.join.dto.UserDTO;
 import com.github.yulichang.test.join.entity.UserDO;
 import com.github.yulichang.test.join.entity.apt.AddressDOCol;
@@ -8,8 +10,6 @@ import com.github.yulichang.test.join.entity.apt.UserDOCol;
 import com.github.yulichang.test.util.EnabledIfConfig;
 import com.github.yulichang.test.util.Reset;
 import com.github.yulichang.test.util.ThreadLocalUtils;
-import com.github.yulichang.toolkit.JoinWrappers;
-import com.github.yulichang.wrapper.apt.AptQueryWrapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -34,7 +34,7 @@ public class OrderByTest {
         UserDOCol u = UserDOCol.build();
         List<Column> columList = Arrays.asList(u.id, u.name, u.pid);
 
-        AptQueryWrapper<UserDO> wrapper = JoinWrappers.apt(u)
+        AptQueryWrapper<UserDO> wrapper = AptWrappers.query(u)
                 .selectAll()
                 .eq(u.id, 1)
                 .orderByAsc(columList);
@@ -51,7 +51,7 @@ public class OrderByTest {
         UserDOCol u = UserDOCol.build();
         List<Column> columList = Arrays.asList(u.id, u.name, u.pid);
 
-        AptQueryWrapper<UserDO> wrapper = JoinWrappers.apt(u)
+        AptQueryWrapper<UserDO> wrapper = AptWrappers.query(u)
                 .selectAll()
                 .eq(u.id, 1)
                 .groupBy(columList);
@@ -67,7 +67,7 @@ public class OrderByTest {
         UserDOCol u = UserDOCol.build();
         AddressDOCol addr =  AddressDOCol.build();
 
-        AptQueryWrapper<UserDO> wrapper = JoinWrappers.apt(u)
+        AptQueryWrapper<UserDO> wrapper = AptWrappers.query(u)
                 .selectAll()
                 .selectAs(addr.id, UserDTO::getAddress)
                 .leftJoin(addr, addr.userId, u.id)

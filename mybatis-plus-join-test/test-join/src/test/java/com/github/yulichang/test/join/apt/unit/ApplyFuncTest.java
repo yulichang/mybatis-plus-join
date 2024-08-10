@@ -1,11 +1,11 @@
 package com.github.yulichang.test.join.apt.unit;
 
+import com.github.yulichang.extension.apt.toolkit.AptWrappers;
 import com.github.yulichang.test.join.entity.UserDO;
 import com.github.yulichang.test.join.entity.apt.AddressDOCol;
 import com.github.yulichang.test.join.entity.apt.UserDOCol;
 import com.github.yulichang.test.util.Reset;
 import com.github.yulichang.test.util.ThreadLocalUtils;
-import com.github.yulichang.toolkit.JoinWrappers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -32,7 +32,7 @@ public class ApplyFuncTest {
         UserDOCol u = UserDOCol.build();
         AddressDOCol addr = AddressDOCol.build();
 
-        List<UserDO> list = JoinWrappers.apt(u)
+        List<UserDO> list = AptWrappers.query(u)
                 .selectAll()
                 .leftJoin(addr, addr.userId, u.id)
                 .applyFunc("concat(%s,%s,{0}) is not null", arg -> arg.accept(u.id, addr.userId), "12")
@@ -50,7 +50,7 @@ public class ApplyFuncTest {
         UserDOCol u1 = UserDOCol.build();
         AddressDOCol addr1 = AddressDOCol.build();
 
-        List<UserDO> list1 = JoinWrappers.apt(u1)
+        List<UserDO> list1 = AptWrappers.query(u1)
                 .selectAll(u1, u1.id)
                 .leftJoin(addr1, addr1.userId, u1.id)
                 .applyFunc("concat(%s,%s,{0}) is not null", arg -> arg.accept(u1.id, addr1.userId), "12")

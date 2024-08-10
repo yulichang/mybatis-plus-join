@@ -1,12 +1,12 @@
 package com.github.yulichang.test.join.apt.unit;
 
 import com.github.yulichang.config.enums.IfExistsEnum;
+import com.github.yulichang.extension.apt.AptQueryWrapper;
+import com.github.yulichang.extension.apt.toolkit.AptWrappers;
 import com.github.yulichang.test.join.entity.UserDO;
 import com.github.yulichang.test.join.entity.apt.UserDOCol;
 import com.github.yulichang.test.util.Reset;
 import com.github.yulichang.test.util.ThreadLocalUtils;
-import com.github.yulichang.toolkit.JoinWrappers;
-import com.github.yulichang.wrapper.apt.AptQueryWrapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -45,7 +45,7 @@ public class IfExistsTest {
                 "t.address_id2, t.del, t.create_by, t.update_by FROM `user` t " +
                 "WHERE t.del = false AND (t.id = ? AND t.head_img = ? AND t.`name` = ?)");
         UserDOCol u = UserDOCol.build();
-        AptQueryWrapper<UserDO> wrapper = JoinWrappers.apt(u)
+        AptQueryWrapper<UserDO> wrapper = AptWrappers.query(u)
                 .selectAll()
                 .eqIfExists(u.id, 1)
                 .eqIfExists(u.pid, null)
@@ -59,7 +59,7 @@ public class IfExistsTest {
                 "t.address_id2, t.del, t.create_by, t.update_by FROM `user` t " +
                 "WHERE t.del = false AND (t.id = ? AND t.`name` = ?)");
         UserDOCol u1 = UserDOCol.build();
-        AptQueryWrapper<UserDO> wrapper1 = JoinWrappers.apt(u1)
+        AptQueryWrapper<UserDO> wrapper1 = AptWrappers.query(u1)
                 .selectAll()
                 .setIfExists(IfExistsEnum.NOT_BLANK)
                 .eqIfExists(u1.id, 1)
@@ -74,7 +74,7 @@ public class IfExistsTest {
                 "t.address_id2, t.del, t.create_by, t.update_by FROM `user` t " +
                 "WHERE t.del = false AND (t.id = ? AND t.`name` = ? AND t.head_img = ? AND t.`name` = ?)");
         UserDOCol u2 = UserDOCol.build();
-        AptQueryWrapper<UserDO> wrapper2 = JoinWrappers.apt(u2)
+        AptQueryWrapper<UserDO> wrapper2 = AptWrappers.query(u2)
                 .selectAll()
                 .setIfExists(o -> true)
                 .eqIfExists(u2.id, 1)

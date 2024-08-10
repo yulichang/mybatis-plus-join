@@ -1,5 +1,7 @@
 package com.github.yulichang.test.join.apt.unit;
 
+import com.github.yulichang.extension.apt.AptQueryWrapper;
+import com.github.yulichang.extension.apt.toolkit.AptWrappers;
 import com.github.yulichang.test.join.entity.UserDO;
 import com.github.yulichang.test.join.entity.UserTenantDO;
 import com.github.yulichang.test.join.entity.apt.AddressDOCol;
@@ -8,8 +10,6 @@ import com.github.yulichang.test.join.entity.apt.UserTenantDOCol;
 import com.github.yulichang.test.join.mapper.UserMapper;
 import com.github.yulichang.test.join.mapper.UserTenantMapper;
 import com.github.yulichang.test.util.Reset;
-import com.github.yulichang.toolkit.JoinWrappers;
-import com.github.yulichang.wrapper.apt.AptQueryWrapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,7 +36,7 @@ public class FieldAliasTest {
     void fieldAlias() {
         UserDOCol u = UserDOCol.build();
         AddressDOCol addr = AddressDOCol.build();
-        List<UserDO> list = userMapper.selectList(JoinWrappers.apt(u)
+        List<UserDO> list = userMapper.selectList(AptWrappers.query(u)
                 .selectAll()
                 .leftJoin(addr, addr.userId, u.id));
 
@@ -50,7 +50,7 @@ public class FieldAliasTest {
     void fieldAlias1() {
         UserTenantDOCol ut = UserTenantDOCol.build();
         UserDOCol u = UserDOCol.build();
-        AptQueryWrapper<UserTenantDO> wrapper = JoinWrappers.apt(ut)
+        AptQueryWrapper<UserTenantDO> wrapper = AptWrappers.query(ut)
                 .selectAll()
                 .leftJoin(u, u.id, ut.uuid);
         List<UserTenantDO> list = userTenantMapper.selectList(wrapper);

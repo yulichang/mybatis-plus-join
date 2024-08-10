@@ -26,7 +26,7 @@ import java.util.stream.Collectors;
  *
  * @author yulichang
  */
-@SuppressWarnings({"unused", "DuplicatedCode"})
+@SuppressWarnings({"unused"})
 public interface Query<Children> extends Serializable {
 
     List<Select> getSelectColum();
@@ -263,13 +263,13 @@ public interface Query<Children> extends Serializable {
     }
 
 
-    default <X> Children selectFunc(String sql, Function<FuncConsumer, SFunction<?, ?>[]> column, String alias) {
+    default Children selectFunc(String sql, Function<FuncConsumer, SFunction<?, ?>[]> column, String alias) {
         getSelectColum().add(new SelectFunc(alias, getIndex(), () -> sql, column.apply(FuncConsumer.func),
                 isHasAlias(), getAlias()));
         return getChildren();
     }
 
-    default <X, S> Children selectFunc(String sql, Function<FuncConsumer, SFunction<?, ?>[]> column, SFunction<S, ?> alias) {
+    default <S> Children selectFunc(String sql, Function<FuncConsumer, SFunction<?, ?>[]> column, SFunction<S, ?> alias) {
         getSelectColum().add(new SelectFunc(LambdaUtils.getName(alias), getIndex(), () -> sql,
                 column.apply(FuncConsumer.func), isHasAlias(), getAlias()));
         return getChildren();
@@ -288,7 +288,7 @@ public interface Query<Children> extends Serializable {
         return selectFunc(DefaultFuncEnum.SUM, column, alias);
     }
 
-    default <S, X> Children selectSum(SFunction<S, ?> column, String alias) {
+    default <S> Children selectSum(SFunction<S, ?> column, String alias) {
         return selectFunc(DefaultFuncEnum.SUM, column, alias);
     }
 
@@ -311,7 +311,7 @@ public interface Query<Children> extends Serializable {
         return selectFunc(DefaultFuncEnum.COUNT, column, alias);
     }
 
-    default <S, X> Children selectCount(SFunction<S, ?> column, String alias) {
+    default <S> Children selectCount(SFunction<S, ?> column, String alias) {
         return selectFunc(DefaultFuncEnum.COUNT, column, alias);
     }
 
@@ -326,7 +326,7 @@ public interface Query<Children> extends Serializable {
         return selectFunc(DefaultFuncEnum.MAX, column, alias);
     }
 
-    default <S, X> Children selectMax(SFunction<S, ?> column, String alias) {
+    default <S> Children selectMax(SFunction<S, ?> column, String alias) {
         return selectFunc(DefaultFuncEnum.MAX, column, alias);
     }
 
@@ -341,7 +341,7 @@ public interface Query<Children> extends Serializable {
         return selectFunc(DefaultFuncEnum.MIN, column, alias);
     }
 
-    default <S, X> Children selectMin(SFunction<S, ?> column, String alias) {
+    default <S> Children selectMin(SFunction<S, ?> column, String alias) {
         return selectFunc(DefaultFuncEnum.MIN, column, alias);
     }
 
@@ -356,7 +356,7 @@ public interface Query<Children> extends Serializable {
         return selectFunc(DefaultFuncEnum.AVG, column, alias);
     }
 
-    default <S, X> Children selectAvg(SFunction<S, ?> column, String alias) {
+    default <S> Children selectAvg(SFunction<S, ?> column, String alias) {
         return selectFunc(DefaultFuncEnum.AVG, column, alias);
     }
 
@@ -371,7 +371,7 @@ public interface Query<Children> extends Serializable {
         return selectFunc(DefaultFuncEnum.LEN, column, alias);
     }
 
-    default <S, X> Children selectLen(SFunction<S, ?> column, String alias) {
+    default <S> Children selectLen(SFunction<S, ?> column, String alias) {
         return selectFunc(DefaultFuncEnum.LEN, column, alias);
     }
 }

@@ -8,15 +8,17 @@ import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.github.yulichang.apt.BaseColumn;
 import com.github.yulichang.apt.Column;
 import com.github.yulichang.config.ConfigProperties;
-import com.github.yulichang.extension.apt.toolkit.AptWrapperUtils;
-import com.github.yulichang.extension.apt.toolkit.AptWrappers;
-import com.github.yulichang.toolkit.LambdaUtils;
-import com.github.yulichang.toolkit.*;
-import com.github.yulichang.toolkit.support.ColumnCache;
 import com.github.yulichang.extension.apt.interfaces.Query;
 import com.github.yulichang.extension.apt.interfaces.QueryLabel;
+import com.github.yulichang.extension.apt.toolkit.AptWrapperUtils;
+import com.github.yulichang.extension.apt.toolkit.AptWrappers;
+import com.github.yulichang.toolkit.Constant;
+import com.github.yulichang.toolkit.LambdaUtils;
+import com.github.yulichang.toolkit.TableMap;
+import com.github.yulichang.toolkit.support.ColumnCache;
 import com.github.yulichang.wrapper.enums.IfExistsSqlKeyWordEnum;
 import com.github.yulichang.wrapper.interfaces.Chain;
+import com.github.yulichang.wrapper.interfaces.MBiPredicate;
 import com.github.yulichang.wrapper.interfaces.SelectWrapper;
 import com.github.yulichang.wrapper.resultmap.Label;
 import com.github.yulichang.wrapper.segments.Select;
@@ -27,7 +29,6 @@ import lombok.Getter;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.BiPredicate;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -97,7 +98,7 @@ public class AptQueryWrapper<T> extends AptAbstractWrapper<T, AptQueryWrapper<T>
                               Map<String, Object> paramNameValuePairs, MergeSegments mergeSegments, SharedString paramAlias,
                               SharedString lastSql, SharedString sqlComment, SharedString sqlFirst,
                               TableMap aptIndex, Integer index, String keyWord, Class<?> joinClass, String tableName,
-                              BiPredicate<Object, IfExistsSqlKeyWordEnum> IfExists) {
+                              MBiPredicate<Object, IfExistsSqlKeyWordEnum> IfExists) {
         super(baseColumn);
         super.setEntity(entity);
         super.setEntityClass(baseColumn.getColumnClass());

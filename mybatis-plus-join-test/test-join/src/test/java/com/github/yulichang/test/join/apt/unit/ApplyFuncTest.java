@@ -37,6 +37,7 @@ public class ApplyFuncTest {
                 .leftJoin(addr, addr.userId, u.id)
                 .applyFunc("concat(%s,%s,{0}) is not null", arg -> arg.accept(u.id, addr.userId), "12")
                 .applyFunc("concat(%s,%s,{0}) is not null", arg -> arg.accept(u.id, addr.userId), "12")
+                .clone()
                 .list();
 
         list.forEach(System.out::println);
@@ -55,6 +56,7 @@ public class ApplyFuncTest {
                 .leftJoin(addr1, addr1.userId, u1.id)
                 .applyFunc("concat(%s,%s,{0}) is not null", arg -> arg.accept(u1.id, addr1.userId), "12")
                 .applyFunc("concat(%s,%s,{0}) is not null", arg -> arg.accept(u1.id,addr1.userId), "12")
+                .clone()
                 .list();
 
         list1.forEach(System.out::println);

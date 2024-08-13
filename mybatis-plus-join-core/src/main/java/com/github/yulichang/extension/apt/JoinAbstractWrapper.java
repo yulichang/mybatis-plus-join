@@ -22,10 +22,7 @@ import com.github.yulichang.extension.apt.interfaces.CompareIfExists;
 import com.github.yulichang.extension.apt.interfaces.Func;
 import com.github.yulichang.extension.apt.interfaces.OnCompare;
 import com.github.yulichang.wrapper.enums.IfExistsSqlKeyWordEnum;
-import com.github.yulichang.wrapper.interfaces.CompareStrIfExists;
-import com.github.yulichang.wrapper.interfaces.DoSomething;
-import com.github.yulichang.wrapper.interfaces.FuncStr;
-import com.github.yulichang.wrapper.interfaces.Join;
+import com.github.yulichang.wrapper.interfaces.*;
 import com.github.yulichang.wrapper.segments.AptConsumer;
 import lombok.Getter;
 
@@ -113,7 +110,7 @@ public abstract class JoinAbstractWrapper<T, Children extends JoinAbstractWrappe
      * IfExists 策略
      */
     @Getter
-    protected BiPredicate<Object, IfExistsSqlKeyWordEnum> ifExists = ConfigProperties.ifExists;
+    protected MBiPredicate<Object, IfExistsSqlKeyWordEnum> ifExists = ConfigProperties.ifExists;
 
     @Override
     public T getEntity() {
@@ -163,7 +160,7 @@ public abstract class JoinAbstractWrapper<T, Children extends JoinAbstractWrappe
         return typedThis;
     }
 
-    public Children setIfExists(BiPredicate<Object, IfExistsSqlKeyWordEnum> IfExists) {
+    public Children setIfExists(MBiPredicate<Object, IfExistsSqlKeyWordEnum> IfExists) {
         this.ifExists = IfExists;
         return typedThis;
     }
@@ -283,12 +280,12 @@ public abstract class JoinAbstractWrapper<T, Children extends JoinAbstractWrappe
                 () -> formatSqlMaybeWithParam(applySql, null, values)));
     }
 
-    public Children applyFunc(String applySql, Function<AptConsumer, Column[]> consumerFunction, Object... values) {
+    public Children applyFunc(String applySql, SFunction<AptConsumer, Column[]> consumerFunction, Object... values) {
         return applyFunc(true, applySql, consumerFunction, values);
     }
 
     public Children applyFunc(boolean condition, String applySql,
-                              Function<AptConsumer, Column[]> consumerFunction, Object... values) {
+                              SFunction<AptConsumer, Column[]> consumerFunction, Object... values) {
         return maybeDo(condition, () -> appendSqlSegments(APPLY,
                 () -> formatSqlMaybeWithParam(String.format(applySql,
                         Arrays.stream(consumerFunction.apply(AptConsumer.func)).map(this::columnToString).toArray()), null, values)));

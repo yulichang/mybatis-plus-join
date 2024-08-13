@@ -190,8 +190,13 @@ public class MPJInterceptor implements Interceptor {
     }
 
     private ResultMapping selectToResult(Class<?> entity, Select select, Class<?> type, ResultMapping.Builder builder) {
-        if (select.hasTypeHandle() && select.getPropertyType().isAssignableFrom(type)) {
-            builder.typeHandler(select.getTypeHandle());
+        if (select.hasTypeHandle()) {
+            if (select.getPropertyType().isAssignableFrom(type)) {
+                builder.typeHandler(select.getTypeHandle());
+            } else {
+                throw new ClassCastException(String.format("%s not cast to %s [%s]",
+                        select.getPropertyType().getSimpleName(), type.getSimpleName(), entity.getName() + "." + select.getColumProperty()));
+            }
         }
         if (select.isPk() && entity == select.getClazz()) {
             builder.flags(Collections.singletonList(ResultFlag.ID));

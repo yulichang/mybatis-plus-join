@@ -5,15 +5,15 @@ import com.baomidou.mybatisplus.core.metadata.TableInfo;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.github.yulichang.adapter.AdapterHelper;
 import com.github.yulichang.toolkit.MPJStringUtils;
+import com.github.yulichang.toolkit.ReflectionKit;
 import com.github.yulichang.toolkit.TableHelper;
 import lombok.Getter;
-import org.apache.ibatis.session.Configuration;
 import org.apache.ibatis.type.JdbcType;
 import org.apache.ibatis.type.TypeHandler;
-import org.apache.ibatis.type.TypeHandlerRegistry;
 import org.apache.ibatis.type.UnknownTypeHandler;
 
 import java.io.Serializable;
+import java.lang.reflect.Field;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
@@ -99,31 +99,25 @@ public class SelectCache implements Serializable {
 
     public TypeHandler<?> getTypeHandler() {
         if (this.hasTypeHandle) {
-            return Cache.getTypeHandlerCache(this.clazz, this.typeHandlerClass, this.propertyType);
+            return Cache.getTypeHandlerCache(this.clazz, this.typeHandlerClass, this.propertyType, this.columProperty);
         }
         return null;
-    }
-
-    private static TypeHandler<?> getTypeHandler(Configuration configuration, Class<?> propertyType, Class<? extends TypeHandler<?>> typeHandlerClass) {
-        TypeHandlerRegistry registry = configuration.getTypeHandlerRegistry();
-        TypeHandler<?> typeHandler = registry.getMappingTypeHandler(typeHandlerClass);
-        if (typeHandler == null) {
-            typeHandler = registry.getInstance(propertyType, typeHandlerClass);
-        }
-        return typeHandler;
     }
 
     public static class Cache {
         private static final Map<Class<?>, Map<Class<?>, TypeHandler<?>>> CACHE = new ConcurrentHashMap<>();
 
-        public static TypeHandler<?> getTypeHandlerCache(Class<?> table, Class<? extends TypeHandler<?>> typeHandler, Class<?> propertyType) {
+        public static TypeHandler<?> getTypeHandlerCache(Class<?> table, Class<? extends TypeHandler<?>> typeHandler, Class<?> propertyType, String columProperty) {
             if (table == null || typeHandler == null) {
                 return null;
             }
             Map<Class<?>, TypeHandler<?>> map = CACHE.computeIfAbsent(table, k -> new ConcurrentHashMap<>());
             return map.computeIfAbsent(typeHandler, k -> {
                 TableInfo info = TableHelper.getAssert(table);
-                return getTypeHandler(AdapterHelper.getAdapter().mpjGetConfiguration(info), propertyType, typeHandler);
+                @SuppressWarnings("OptionalGetWithoutIsPresent")
+                TableFieldInfo fieldInfo = info.getFieldList().stream().filter(f -> f.getProperty().equals(columProperty)).findFirst().get();
+                Field field = AdapterHelper.getAdapter().mpjGetField(fieldInfo, () -> ReflectionKit.getFieldMap(table).get(columProperty));
+                return AdapterHelper.getAdapter().getTypeHandler(AdapterHelper.getAdapter().mpjGetConfiguration(info), propertyType, typeHandler, field);
             });
         }
     }

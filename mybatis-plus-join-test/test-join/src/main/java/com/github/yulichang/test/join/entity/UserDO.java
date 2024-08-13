@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import com.github.yulichang.annotation.DynamicTableName;
 import com.github.yulichang.annotation.Table;
+import com.github.yulichang.test.join.dto.UserJson;
 import com.github.yulichang.test.join.enums.Sex;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -16,7 +17,6 @@ import lombok.experimental.FieldNameConstants;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Map;
 
 @Table
 @Data
@@ -34,7 +34,7 @@ public class UserDO extends ID<Integer> implements Serializable {
     private String name;
 
     @TableField(value = "`json`", typeHandler = JacksonTypeHandler.class)
-    private Map<String, String> json;
+    private List<UserJson> json;
 
     private Sex sex;
 

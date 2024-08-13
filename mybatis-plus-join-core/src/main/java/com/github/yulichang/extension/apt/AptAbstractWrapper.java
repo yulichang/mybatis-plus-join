@@ -7,17 +7,18 @@ import com.baomidou.mybatisplus.core.metadata.TableInfo;
 import com.baomidou.mybatisplus.core.toolkit.Constants;
 import com.baomidou.mybatisplus.core.toolkit.StringPool;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
+import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.github.yulichang.adapter.AdapterHelper;
 import com.github.yulichang.apt.BaseColumn;
 import com.github.yulichang.apt.Column;
 import com.github.yulichang.config.ConfigProperties;
 import com.github.yulichang.config.enums.LogicDelTypeEnum;
+import com.github.yulichang.extension.apt.interfaces.QueryJoin;
 import com.github.yulichang.toolkit.Constant;
 import com.github.yulichang.toolkit.LogicInfoUtils;
 import com.github.yulichang.toolkit.TableHelper;
 import com.github.yulichang.toolkit.TableMap;
 import com.github.yulichang.toolkit.support.ColumnCache;
-import com.github.yulichang.extension.apt.interfaces.QueryJoin;
 import com.github.yulichang.wrapper.interfaces.MFunction;
 import com.github.yulichang.wrapper.segments.SelectCache;
 import lombok.Getter;
@@ -27,7 +28,6 @@ import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static com.baomidou.mybatisplus.core.enums.WrapperKeyword.APPLY;
@@ -73,7 +73,7 @@ public abstract class AptAbstractWrapper<T, Children extends AptAbstractWrapper<
     /**
      * 主表 表名处理方法
      */
-    protected Function<String, String> tableFunc;
+    protected SFunction<String, String> tableFunc;
 
     /**
      * 逻辑删除位置
@@ -140,7 +140,7 @@ public abstract class AptAbstractWrapper<T, Children extends AptAbstractWrapper<
      *
      * @return 自定义表别名
      */
-    public Children setTableName(Function<String, String> tableFunc) {
+    public Children setTableName(SFunction<String, String> tableFunc) {
         if (isMain) {
             if (tableFunc != null) {
                 this.dynamicTableName = true;

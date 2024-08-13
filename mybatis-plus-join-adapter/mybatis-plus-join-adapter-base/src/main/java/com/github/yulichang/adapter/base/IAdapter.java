@@ -1,9 +1,15 @@
 package com.github.yulichang.adapter.base;
 
+import com.baomidou.mybatisplus.core.handlers.IJsonTypeHandler;
 import com.baomidou.mybatisplus.core.metadata.TableFieldInfo;
 import com.baomidou.mybatisplus.core.metadata.TableInfo;
+import com.baomidou.mybatisplus.core.toolkit.MybatisUtils;
 import com.github.yulichang.adapter.base.metadata.OrderFieldInfo;
+import com.github.yulichang.adapter.jsqlparser.JSqlParserHelper;
 import org.apache.ibatis.session.Configuration;
+import org.apache.ibatis.type.TypeHandler;
+import org.apache.ibatis.type.TypeHandlerRegistry;
+import org.apache.ibatis.type.UnknownTypeHandler;
 
 import java.lang.reflect.Field;
 import java.util.List;
@@ -50,5 +56,23 @@ public interface IAdapter {
                 new OrderFieldInfo(f.getColumn(), f.getType(), f.getSort())).collect(Collectors.toList());
     }
 
-    void parserColum(String alias, String from, String selectSql, Consumer<String> columConsumer);
+    default void parserColum(String alias, String from, String selectSql, Consumer<String> columConsumer) {
+        JSqlParserHelper.parserColum(alias, from, selectSql, columConsumer);
+    }
+
+    default TypeHandler<?> getTypeHandler(Configuration configuration, Class<?> propertyType, Class<? extends TypeHandler<?>> typeHandlerClass, Field field) {
+        TypeHandlerRegistry registry = configuration.getTypeHandlerRegistry();
+        TypeHandler<?> typeHandler = registry.getMappingTypeHandler(typeHandlerClass);
+        if (typeHandlerClass != null && typeHandlerClass != UnknownTypeHandler.class) {
+            if (IJsonTypeHandler.class.isAssignableFrom(typeHandlerClass)) {
+                // 保证每次实例化
+                typeHandler = MybatisUtils.newJsonTypeHandler(typeHandlerClass, propertyType, field);
+            } else {
+                if (typeHandler == null) {
+                    typeHandler = registry.getInstance(propertyType, typeHandlerClass);
+                }
+            }
+        }
+        return typeHandler;
+    }
 }

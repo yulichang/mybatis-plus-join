@@ -20,7 +20,7 @@ public class UserDTO {
     /** user */
     private String PName;
     /** user */
-    private Map<String,String> json;
+    private List<UserJson> json;
     /** user */
     private Sex sex;
     /** user */

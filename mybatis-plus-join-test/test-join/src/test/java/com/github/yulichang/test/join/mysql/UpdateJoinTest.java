@@ -2,6 +2,7 @@ package com.github.yulichang.test.join.mysql;
 
 import com.baomidou.mybatisplus.core.plugins.IgnoreStrategy;
 import com.baomidou.mybatisplus.core.plugins.InterceptorIgnoreHelper;
+import com.github.yulichang.test.join.dto.UserJson;
 import com.github.yulichang.test.join.entity.AddressDO;
 import com.github.yulichang.test.join.entity.OrderDO;
 import com.github.yulichang.test.join.entity.UserDO;
@@ -17,8 +18,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit.jupiter.EnabledIf;
 
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * 连表更新没有同意语法语法，不同数据库差别较大
@@ -60,11 +62,15 @@ public class UpdateJoinTest {
 
     @Test
     void updateInc2() {
-        HashMap<String, String> map = new HashMap<>();
-        map.put("aaa", "bbb");
+        UserJson json = new UserJson();
+        json.setId(1111L);
+        json.setName("11111111111");
+
+        List<UserJson> jsonList = new ArrayList<>();
+        jsonList.add(json);
 
         UserDO userDO = new UserDO();
-        userDO.setJson(map);
+        userDO.setJson(jsonList);
 
         InterceptorIgnoreHelper.handle(IgnoreStrategy.builder().tenantLine(true).build());
 
@@ -78,7 +84,7 @@ public class UpdateJoinTest {
         List<UserDO> list = JoinWrappers.lambda(UserDO.class).list();
         list.forEach(System.out::println);
         list.forEach(c -> {
-            assert c.getJson().get("aaa").equals("bbb");
+            assert Objects.equals(c.getJson().get(0).getName(), "11111111111");
         });
     }
 

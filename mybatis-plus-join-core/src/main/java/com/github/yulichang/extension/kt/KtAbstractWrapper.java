@@ -499,8 +499,14 @@ public abstract class KtAbstractWrapper<T, Children extends KtAbstractWrapper<T,
     }
 
     @Override
-    public Children func(boolean condition, Consumer<Children> consumer) {
-        return maybeDo(condition, () -> consumer.accept(typedThis));
+    public Children func(boolean condition, Consumer<Children> consumer, Consumer<Children> consumerElse) {
+        if (condition) {
+            consumer.accept(typedThis);
+        }
+        if (!condition && Objects.nonNull(consumerElse)) {
+            consumerElse.accept(typedThis);
+        }
+        return typedThis;
     }
 
     /**

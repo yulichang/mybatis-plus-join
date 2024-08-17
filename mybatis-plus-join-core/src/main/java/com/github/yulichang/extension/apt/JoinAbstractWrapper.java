@@ -14,13 +14,13 @@ import com.baomidou.mybatisplus.core.toolkit.sql.StringEscape;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.github.yulichang.apt.Column;
 import com.github.yulichang.config.ConfigProperties;
+import com.github.yulichang.extension.apt.interfaces.CompareIfExists;
+import com.github.yulichang.extension.apt.interfaces.Func;
+import com.github.yulichang.extension.apt.interfaces.OnCompare;
 import com.github.yulichang.toolkit.LambdaUtils;
 import com.github.yulichang.toolkit.MPJSqlInjectionUtils;
 import com.github.yulichang.toolkit.Ref;
 import com.github.yulichang.toolkit.sql.SqlScriptUtils;
-import com.github.yulichang.extension.apt.interfaces.CompareIfExists;
-import com.github.yulichang.extension.apt.interfaces.Func;
-import com.github.yulichang.extension.apt.interfaces.OnCompare;
 import com.github.yulichang.wrapper.enums.IfExistsSqlKeyWordEnum;
 import com.github.yulichang.wrapper.interfaces.*;
 import com.github.yulichang.wrapper.segments.AptConsumer;
@@ -28,7 +28,10 @@ import lombok.Getter;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.*;
+import java.util.function.BiPredicate;
+import java.util.function.Consumer;
+import java.util.function.Predicate;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import static com.baomidou.mybatisplus.core.enums.SqlKeyword.*;
@@ -477,8 +480,14 @@ public abstract class JoinAbstractWrapper<T, Children extends JoinAbstractWrappe
     }
 
     @Override
-    public Children func(boolean condition, Consumer<Children> consumer) {
-        return maybeDo(condition, () -> consumer.accept(typedThis));
+    public Children func(boolean condition, Consumer<Children> consumer, Consumer<Children> consumerElse) {
+        if (condition) {
+            consumer.accept(typedThis);
+        }
+        if (!condition && Objects.nonNull(consumerElse)) {
+            consumerElse.accept(typedThis);
+        }
+        return typedThis;
     }
 
     /**

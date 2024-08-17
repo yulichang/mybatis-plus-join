@@ -526,5 +526,9 @@ public interface Func<Children> extends Serializable {
      * @return children
      * @since 3.3.1
      */
-    Children func(boolean condition, Consumer<Children> consumer);
+    default Children func(boolean condition, Consumer<Children> consumer) {
+        return func(condition, consumer, null);
+    }
+
+    Children func(boolean condition, Consumer<Children> consumer, Consumer<Children> consumerElse);
 }

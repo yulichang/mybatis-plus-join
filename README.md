@@ -23,8 +23,8 @@
   </a>
 </p>
 <p align="center">
-对 <a href="/baomidou/mybatis-plus" target="_blank">MyBatis-Plus</a> 多表查询的扩展 |
-<a href="../mybatis-plus-join-demo" target="_blank">演示工程</a> |
+对 <a href="https://gitee.com/baomidou/mybatis-plus" target="_blank">MyBatis-Plus</a> 多表查询的扩展 |
+<a href="https://gitee.com/best_handsome/mybatis-plus-join-demo" target="_blank">演示工程</a> |
 <a href="https://mybatis-plus-join.github.io" target="_blank">使用文档</a> |
 点个Star支持一下吧 (☆▽☆)
 </p>

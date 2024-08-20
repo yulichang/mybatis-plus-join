@@ -23,9 +23,9 @@
   </a>
 </p>
 <p align="center">
-对 <a href="https://gitee.com/baomidou/mybatis-plus" target="_blank">MyBatis-Plus</a> 多表查询的扩展 |
-<a href="https://gitee.com/best_handsome/mybatis-plus-join-demo" target="_blank">演示工程</a> |
-<a href="https://yulichang.github.io/mybatis-plus-join-doc/" target="_blank">使用文档</a> |
+对 <a href="/baomidou/mybatis-plus" target="_blank">MyBatis-Plus</a> 多表查询的扩展 |
+<a href="../mybatis-plus-join-demo" target="_blank">演示工程</a> |
+<a href="https://mybatis-plus-join.github.io" target="_blank">使用文档</a> |
 点个Star支持一下吧 (☆▽☆)
 </p>
 
@@ -36,7 +36,7 @@ QQ群:680016987  或者
 <img width="200px" height="200px" src="https://foruda.gitee.com/images/1714756135330585984/bcc86eb0_2020985.png"  alt="添加作者微信，备注MPJ，加入微信群"/>
 </p>
 
-### <a href="https://yulichang.github.io/mybatis-plus-join-doc/" target="_blank">使用文档WIKI</a>
+### <a href="https://mybatis-plus-join.github.io" target="_blank">使用文档WIKI</a>
 
 ## 使用方法
 
@@ -113,12 +113,12 @@ WHERE (
 
 MPJLambdaWrapper其他功能
 
-* <a href="https://yulichang.github.io/mybatis-plus-join-doc/pages/core/lambda/select/selectCollection.html" target="_blank">
+* <a href="https://mybatis-plus-join.github.io/pages/core/lambda/select/selectCollection.html" target="_blank">
   一对一，一对多使用</a>
-* <a href="https://yulichang.github.io/mybatis-plus-join-doc/pages/core/lambda/select/selectFunc.html" target="_blank">简单的SQL函数使用</a>
-* <a href="https://yulichang.github.io/mybatis-plus-join-doc/pages/core/lambda/join/leftJoin.html" target="_blank">ON语句多条件支持</a>
-* <a href="https://yulichang.github.io/mybatis-plus-join-doc/" target="_blank">其他全部功能请参考使用文档</a>
+* <a href="https://mybatis-plus-join.github.io/pages/core/lambda/select/selectFunc.html" target="_blank">简单的SQL函数使用</a>
+* <a href="https://mybatis-plus-join.github.io/pages/core/lambda/join/leftJoin.html" target="_blank">ON语句多条件支持</a>
+* <a href="https://mybatis-plus-join.github.io" target="_blank">其他全部功能请参考使用文档</a>
 
-# <a href="https://yulichang.github.io/mybatis-plus-join-doc" target="_blank">使用文档 wiki</a>
+# <a href="https://mybatis-plus-join.github.io" target="_blank">使用文档 wiki</a>
 # 用爱发电
 ![捐赠 mybatis-plus-join](https://foruda.gitee.com/images/1717191488951888381/8463cfcd_2020985.png "支持一下mybatis-plus-join")

@@ -22,8 +22,6 @@ import java.util.Optional;
 @SuppressWarnings("unused")
 public interface Chain<T> extends MPJBaseJoin<T> {
 
-    Page<?> FIRST_PAGE = new Page<>(1, 1).setSearchCount(false);
-
     Class<T> getEntityClass();
 
     boolean isResultMapCollection();
@@ -68,9 +66,9 @@ public interface Chain<T> extends MPJBaseJoin<T> {
      * new MPJLambdaWrapper(User.class)<br />
      * JoinWrappers.lambda(User.class)<br />
      */
-    @SuppressWarnings("unchecked")
     default T first() {
-        List<T> list = this.isResultMapCollection() ? list() : page((Page<T>) FIRST_PAGE).getRecords();
+        List<T> list = this.isResultMapCollection() ? list() :
+                page(new Page<T>(1, 1).setSearchCount(false)).getRecords();
         return Optional.of(list).filter(CollectionUtils::isNotEmpty).map(m -> m.get(0)).orElse(null);
     }
 
@@ -81,9 +79,9 @@ public interface Chain<T> extends MPJBaseJoin<T> {
      * new MPJLambdaWrapper(User.class)<br />
      * JoinWrappers.lambda(User.class)<br />
      */
-    @SuppressWarnings("unchecked")
     default <R> R first(Class<R> resultType) {
-        List<R> list = this.isResultMapCollection() ? list(resultType) : page((Page<R>) FIRST_PAGE, resultType).getRecords();
+        List<R> list = this.isResultMapCollection() ? list(resultType) :
+                page(new Page<R>(1, 1).setSearchCount(false), resultType).getRecords();
         return Optional.of(list).filter(CollectionUtils::isNotEmpty).map(m -> m.get(0)).orElse(null);
     }
 

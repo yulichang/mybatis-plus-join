@@ -20,8 +20,10 @@ import com.github.yulichang.toolkit.TableHelper;
 import com.github.yulichang.toolkit.TableMap;
 import com.github.yulichang.toolkit.support.ColumnCache;
 import com.github.yulichang.wrapper.interfaces.MFunction;
+import com.github.yulichang.wrapper.segments.PageInfo;
 import com.github.yulichang.wrapper.segments.SelectCache;
 import lombok.Getter;
+import lombok.Setter;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
@@ -58,6 +60,12 @@ public abstract class AptAbstractWrapper<T, Children extends AptAbstractWrapper<
     protected boolean resultMap = false;
     @Getter
     protected boolean resultMapCollection = false;
+
+    @Setter
+    protected PageInfo pageInfo;
+
+    @Getter
+    protected boolean pageByMain = false;
     /**
      * 表序号
      */
@@ -132,6 +140,29 @@ public abstract class AptAbstractWrapper<T, Children extends AptAbstractWrapper<
         setEntity(entity);
         this.baseColumn = baseColumn;
         initNeed();
+    }
+
+    /**
+     * 根据主表分页
+     */
+    public Children pageByMain() {
+        this.pageByMain = true;
+        this.pageInfo = new PageInfo();
+        return typedThis;
+    }
+
+    /**
+     * 根据主表分页
+     */
+    public Children pageByMain(MFunction<PageInfo.PageInfoBuilder> function) {
+        this.pageByMain = true;
+        PageInfo.PageInfoBuilder apply = function.apply(PageInfo.builder());
+        this.pageInfo = apply.build();
+        return typedThis;
+    }
+
+    public PageInfo getPageInfo() {
+        return pageInfo == null ? new PageInfo() : pageInfo;
     }
 
     /**
@@ -405,6 +436,8 @@ public abstract class AptAbstractWrapper<T, Children extends AptAbstractWrapper<
         this.alias = ConfigProperties.tableAlias;
         this.resultMap = false;
         this.resultMapCollection = false;
+        this.pageInfo = null;
+        this.pageByMain = false;
         this.tableIndex = 1;
         this.dynamicTableName = false;
         this.tableFunc = null;

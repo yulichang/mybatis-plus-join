@@ -75,4 +75,7 @@ public interface IAdapter {
         }
         return typeHandler;
     }
+
+    default void checkCollectionPage() {
+    }
 }

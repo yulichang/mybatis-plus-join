@@ -1,15 +1,14 @@
 package com.github.yulichang.interceptor;
 
 import com.baomidou.mybatisplus.core.MybatisPlusVersion;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.metadata.TableInfo;
-import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
-import com.baomidou.mybatisplus.core.toolkit.Constants;
-import com.baomidou.mybatisplus.core.toolkit.StringPool;
-import com.baomidou.mybatisplus.core.toolkit.StringUtils;
+import com.baomidou.mybatisplus.core.toolkit.*;
 import com.github.yulichang.adapter.AdapterHelper;
 import com.github.yulichang.adapter.base.tookit.VersionUtils;
 import com.github.yulichang.config.ConfigProperties;
 import com.github.yulichang.interfaces.MPJBaseJoin;
+import com.github.yulichang.toolkit.ReflectionKit;
 import com.github.yulichang.toolkit.*;
 import com.github.yulichang.toolkit.support.FieldCache;
 import com.github.yulichang.wrapper.interfaces.SelectWrapper;
@@ -20,6 +19,8 @@ import com.github.yulichang.wrapper.segments.SelectLabel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.apache.ibatis.executor.Executor;
+import org.apache.ibatis.logging.Log;
+import org.apache.ibatis.logging.LogFactory;
 import org.apache.ibatis.mapping.MappedStatement;
 import org.apache.ibatis.mapping.ResultFlag;
 import org.apache.ibatis.mapping.ResultMap;
@@ -50,6 +51,7 @@ public class MPJInterceptor implements Interceptor {
     private static final Map<String, Val> MS_MAPPER_CACHE = new ConcurrentHashMap<>();
 
     private static final Map<String, Val> RES_MAPPER_CACHE = new ConcurrentHashMap<>();
+    private static final Log log = LogFactory.getLog(MPJInterceptor.class);
 
     @Override
     public Object intercept(Invocation invocation) throws Throwable {
@@ -75,7 +77,7 @@ public class MPJInterceptor implements Interceptor {
                             }
                         }
                         if (Objects.nonNull(rt)) {
-                            args[0] = getMappedStatement(ms, rt, ew);
+                            args[0] = getMappedStatement(ms, rt, ew, map);
                         }
                     }
                 }
@@ -88,7 +90,7 @@ public class MPJInterceptor implements Interceptor {
     /**
      * 获取MappedStatement
      */
-    public <E> MappedStatement getMappedStatement(MappedStatement ms, Class<?> resultType, Object ew) {
+    public <E> MappedStatement getMappedStatement(MappedStatement ms, Class<?> resultType, Object ew, Map<String, Object> map) {
         if (ew instanceof SelectWrapper) {
             SelectWrapper<E, ?> wrapper = (SelectWrapper<E, ?>) ew;
             if (wrapper.getEntityClass() == null) {
@@ -96,6 +98,19 @@ public class MPJInterceptor implements Interceptor {
             }
             if (wrapper.getSelectColumns().isEmpty() && wrapper.getEntityClass() != null) {
                 wrapper.selectAll();
+            }
+            if (wrapper.isResultMapCollection()) {
+                if (map.values().stream().anyMatch(a -> a instanceof IPage)) {
+                    if (wrapper.isPageByMain()) {
+                        AdapterHelper.getAdapter().checkCollectionPage();
+                        IPage<?> page = ParameterUtils.findPage(map).orElse(null);
+                        wrapper.getPageInfo().setInnerPage(page);
+                        map.entrySet().removeIf(entry -> entry.getValue() instanceof IPage);
+                    } else {
+                        // 一对多分页问题警告
+                        log.warn("select one to many and page query will result in errors in the total count statistics, please use xml.");
+                    }
+                }
             }
         }
         return buildMappedStatement(ms, resultType, ew);

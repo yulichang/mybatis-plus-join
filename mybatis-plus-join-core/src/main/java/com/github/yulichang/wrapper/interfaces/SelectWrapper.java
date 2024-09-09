@@ -1,6 +1,7 @@
 package com.github.yulichang.wrapper.interfaces;
 
 import com.github.yulichang.wrapper.resultmap.Label;
+import com.github.yulichang.wrapper.segments.PageInfo;
 import com.github.yulichang.wrapper.segments.Select;
 
 import java.util.List;
@@ -26,4 +27,10 @@ public interface SelectWrapper<Entity, Children> {
     String getFrom();
 
     String getAlias();
+
+    boolean isResultMapCollection();
+
+    PageInfo getPageInfo();
+
+    boolean isPageByMain();
 }

@@ -14,9 +14,12 @@ import com.github.yulichang.extension.kt.interfaces.QueryJoin;
 import com.github.yulichang.toolkit.*;
 import com.github.yulichang.toolkit.support.ColumnCache;
 import com.github.yulichang.wrapper.enums.PrefixEnum;
+import com.github.yulichang.wrapper.interfaces.MFunction;
+import com.github.yulichang.wrapper.segments.PageInfo;
 import com.github.yulichang.wrapper.segments.SelectCache;
 import kotlin.reflect.KProperty;
 import lombok.Getter;
+import lombok.Setter;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
@@ -57,6 +60,12 @@ public abstract class KtAbstractLambdaWrapper<T, Children extends KtAbstractLamb
     protected boolean resultMap = false;
     @Getter
     protected boolean resultMapCollection = false;
+
+    @Setter
+    protected PageInfo pageInfo;
+
+    @Getter
+    protected boolean pageByMain = false;
     /**
      * 表序号
      */
@@ -166,6 +175,29 @@ public abstract class KtAbstractLambdaWrapper<T, Children extends KtAbstractLamb
         if (entity != null) {
             tableList.setRootClass(entity.getClass());
         }
+    }
+
+    /**
+     * 根据主表分页
+     */
+    public Children pageByMain() {
+        this.pageByMain = true;
+        this.pageInfo = new PageInfo();
+        return typedThis;
+    }
+
+    /**
+     * 根据主表分页
+     */
+    public Children pageByMain(MFunction<PageInfo.PageInfoBuilder> function) {
+        this.pageByMain = true;
+        PageInfo.PageInfoBuilder apply = function.apply(PageInfo.builder());
+        this.pageInfo = apply.build();
+        return typedThis;
+    }
+
+    public PageInfo getPageInfo() {
+        return pageInfo == null ? new PageInfo() : pageInfo;
     }
 
     /**
@@ -448,6 +480,8 @@ public abstract class KtAbstractLambdaWrapper<T, Children extends KtAbstractLamb
         this.alias = ConfigProperties.tableAlias;
         this.resultMap = false;
         this.resultMapCollection = false;
+        this.pageInfo = null;
+        this.pageByMain = false;
         this.tableIndex = 1;
         this.dynamicTableName = false;
         this.tableFunc = null;

@@ -51,8 +51,6 @@ public class MybatisPlusConfig {
     @Bean
     public MybatisPlusInterceptor mybatisPlusInterceptor() {
         MybatisPlusInterceptor interceptor = new MybatisPlusInterceptor();
-        PaginationInnerInterceptor page = new PaginationInnerInterceptor();
-        page.setOptimizeJoin(false);
         interceptor.addInnerInterceptor(new TenantLineInnerInterceptor(new TenantLineHandler() {
             @Override
             public Expression getTenantId() {
@@ -64,7 +62,11 @@ public class MybatisPlusConfig {
                 return !tableName.startsWith("user_tenant");
             }
         }));
+
+        PaginationInnerInterceptor page = new PaginationInnerInterceptor();
+        page.setOptimizeJoin(false);
         interceptor.addInnerInterceptor(page);
+
         interceptor.addInnerInterceptor(new SqlInterceptor());
         return interceptor;
     }

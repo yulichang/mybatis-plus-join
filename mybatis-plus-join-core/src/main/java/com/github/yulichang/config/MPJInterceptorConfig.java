@@ -34,7 +34,6 @@ public class MPJInterceptorConfig {
         }
     }
 
-    @SuppressWarnings("unchecked")
     private void replaceInterceptorChain(List<SqlSessionFactory> sqlSessionFactoryList) {
         if (CollectionUtils.isEmpty(sqlSessionFactoryList)) {
             return;
@@ -46,6 +45,7 @@ public class MPJInterceptorConfig {
                 InterceptorChain chain = (InterceptorChain) interceptorChain.get(factory.getConfiguration());
                 Field interceptors = InterceptorChain.class.getDeclaredField("interceptors");
                 interceptors.setAccessible(true);
+                @SuppressWarnings("unchecked")
                 List<Interceptor> list = (List<Interceptor>) interceptors.get(chain);
                 if (CollectionUtils.isEmpty(list)) {
                     interceptors.set(chain, new InterceptorList<>());

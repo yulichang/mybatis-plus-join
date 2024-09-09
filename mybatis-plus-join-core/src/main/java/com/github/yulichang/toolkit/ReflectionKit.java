@@ -71,16 +71,13 @@ public final class ReflectionKit {
      * @param fieldName 字段名称
      * @return 属性值
      */
-    public static Object getFieldValue(Object entity, String fieldName) {
-        Class<?> cls = entity.getClass();
-        Map<String, Field> fieldMaps = getFieldMap(cls);
+    public static <T> T getFieldValue(Object entity, String fieldName) {
         try {
-            Field field = fieldMaps.get(fieldName);
-            Assert.notNull(field, "Error: NoSuchField in %s for %s.  Cause:", cls.getSimpleName(), fieldName);
+            Field field = entity.getClass().getDeclaredField(fieldName);
             field.setAccessible(true);
-            return field.get(entity);
+            return (T) field.get(entity);
         } catch (ReflectiveOperationException e) {
-            throw ExceptionUtils.mpe("Error: Cannot read field in %s.  Cause:", e, cls.getSimpleName());
+            throw ExceptionUtils.mpe("Error: Cannot read field in %s.  Cause:", e, entity.getClass().getSimpleName());
         }
     }
 

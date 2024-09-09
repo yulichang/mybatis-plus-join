@@ -3,6 +3,7 @@ package com.github.yulichang.adapter.v33x;
 import com.baomidou.mybatisplus.core.MybatisPlusVersion;
 import com.baomidou.mybatisplus.core.metadata.TableFieldInfo;
 import com.baomidou.mybatisplus.core.metadata.TableInfo;
+import com.baomidou.mybatisplus.core.toolkit.ExceptionUtils;
 import com.baomidou.mybatisplus.core.toolkit.StringPool;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.github.yulichang.adapter.base.IAdapter;
@@ -86,5 +87,10 @@ public class Adapter33x implements IAdapter {
             typeHandler = registry.getInstance(propertyType, typeHandlerClass);
         }
         return typeHandler;
+    }
+
+    @Override
+    public void checkCollectionPage() {
+        throw ExceptionUtils.mpe("page by main need MP version 3.5.6+, current version: " + MybatisPlusVersion.getVersion());
     }
 }

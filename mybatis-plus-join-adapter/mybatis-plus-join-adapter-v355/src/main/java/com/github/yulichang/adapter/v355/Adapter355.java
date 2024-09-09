@@ -1,5 +1,7 @@
 package com.github.yulichang.adapter.v355;
 
+import com.baomidou.mybatisplus.core.MybatisPlusVersion;
+import com.baomidou.mybatisplus.core.toolkit.ExceptionUtils;
 import com.github.yulichang.adapter.base.IAdapter;
 import com.github.yulichang.adapter.jsqlparser.v46.JSqlParserHelperV46;
 import org.apache.ibatis.session.Configuration;
@@ -28,5 +30,10 @@ public class Adapter355 implements IAdapter {
             typeHandler = registry.getInstance(propertyType, typeHandlerClass);
         }
         return typeHandler;
+    }
+
+    @Override
+    public void checkCollectionPage() {
+        throw ExceptionUtils.mpe("page by main need MP version 3.5.6+, current version: " + MybatisPlusVersion.getVersion());
     }
 }

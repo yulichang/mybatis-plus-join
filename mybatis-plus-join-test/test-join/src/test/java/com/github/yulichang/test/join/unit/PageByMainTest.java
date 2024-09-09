@@ -75,7 +75,7 @@ public class PageByMainTest {
                 .orderByDesc(UserDO::getId)
                 .groupBy(UserDO::getId)
                 .logicDelToOn()
-                .pageByMain(f -> f.countSelectSql("1"));
+                .pageByMain(f -> f.setCountSelectSql("1"));
 
         Page<UserDTO> page = wrapper.page(new Page<>(1, 8), UserDTO.class);
         page.getRecords().forEach(System.out::println);

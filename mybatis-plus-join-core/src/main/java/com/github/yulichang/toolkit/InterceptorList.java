@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.InnerInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.PaginationInnerInterceptor;
 import com.github.yulichang.adapter.AdapterHelper;
+import com.github.yulichang.config.ConfigProperties;
 import com.github.yulichang.interceptor.MPJInterceptor;
 import com.github.yulichang.interceptor.pagination.PageInnerInterceptor;
 import org.apache.ibatis.logging.Log;

@@ -182,22 +182,23 @@ public abstract class JoinAbstractLambdaWrapper<T, Children extends JoinAbstract
      */
     public Children pageByMain() {
         this.pageByMain = true;
-        this.pageInfo = new PageInfo();
         return typedThis;
     }
 
     /**
      * 根据主表分页
      */
-    public Children pageByMain(MFunction<PageInfo.PageInfoBuilder> function) {
+    public Children pageByMain(MFunction<PageInfo> function) {
         this.pageByMain = true;
-        PageInfo.PageInfoBuilder apply = function.apply(PageInfo.builder());
-        this.pageInfo = apply.build();
+        function.apply(getPageInfo());
         return typedThis;
     }
 
     public PageInfo getPageInfo() {
-        return pageInfo == null ? new PageInfo() : pageInfo;
+        if (pageInfo == null) {
+            pageInfo = new PageInfo();
+        }
+        return pageInfo;
     }
 
     /**

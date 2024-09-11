@@ -1,6 +1,6 @@
 package com.github.yulichang.wrapper.resultmap;
 
-import com.github.yulichang.apt.BaseColumn;
+import com.github.yulichang.extension.apt.matedata.BaseColumn;
 import com.github.yulichang.wrapper.segments.SelectCache;
 import org.apache.ibatis.type.JdbcType;
 

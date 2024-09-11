@@ -1,7 +1,7 @@
 package com.github.yulichang.extension.apt.interfaces;
 
-import com.github.yulichang.apt.BaseColumn;
-import com.github.yulichang.apt.Column;
+import com.github.yulichang.extension.apt.matedata.BaseColumn;
+import com.github.yulichang.extension.apt.matedata.Column;
 import com.github.yulichang.interfaces.MPJBaseJoin;
 import com.github.yulichang.query.interfaces.StringJoin;
 import com.github.yulichang.toolkit.Constant;

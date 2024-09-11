@@ -1,6 +1,6 @@
 package com.github.yulichang.extension.apt.interfaces;
 
-import com.github.yulichang.apt.Column;
+import com.github.yulichang.extension.apt.matedata.Column;
 
 import java.util.Collection;
 import java.util.List;

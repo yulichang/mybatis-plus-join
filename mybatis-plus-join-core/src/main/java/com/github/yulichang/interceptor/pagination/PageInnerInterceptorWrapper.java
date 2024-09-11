@@ -2,10 +2,7 @@ package com.github.yulichang.interceptor.pagination;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.metadata.OrderItem;
-import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
-import com.baomidou.mybatisplus.core.toolkit.ExceptionUtils;
-import com.baomidou.mybatisplus.core.toolkit.PluginUtils;
-import com.baomidou.mybatisplus.core.toolkit.StringPool;
+import com.baomidou.mybatisplus.core.toolkit.*;
 import com.baomidou.mybatisplus.extension.parser.JsqlParserGlobal;
 import com.baomidou.mybatisplus.extension.plugins.inner.PaginationInnerInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.pagination.dialects.IDialect;
@@ -35,12 +32,14 @@ import java.util.stream.Collectors;
  * @author yulichang
  * @since 1.5.0
  */
-public class PageInnerInterceptor extends PaginationInnerInterceptor {
+public class PageInnerInterceptorWrapper extends PaginationInnerInterceptor {
 
+    private static final Log log = LogFactory.getLog(PageInnerInterceptorWrapper.class);
 
-    private static final Log log = LogFactory.getLog(PageInnerInterceptor.class);
+    private final PaginationInnerInterceptor paginationInnerInterceptor;
 
-    public PageInnerInterceptor(PaginationInnerInterceptor pagination) {
+    public PageInnerInterceptorWrapper(PaginationInnerInterceptor pagination) {
+        this.paginationInnerInterceptor = pagination;
         super.setOptimizeJoin(true);
         super.setDbType(pagination.getDbType());
         super.setDialect(pagination.getDialect());
@@ -53,13 +52,13 @@ public class PageInnerInterceptor extends PaginationInnerInterceptor {
      */
     @Override
     public boolean willDoQuery(Executor executor, MappedStatement ms, Object parameter, RowBounds rowBounds, ResultHandler resultHandler, BoundSql boundSql) throws SQLException {
-        //没有wrapper 或者 不是对多查询 不做处理
-        SelectWrapper<?, ?> wrapper = findMPJWrapper(parameter).orElse(null);
-        if (wrapper == null || !wrapper.isPageByMain()) {
-            return true;
+        if (unusedPage(parameter)) {
+            return paginationInnerInterceptor.willDoQuery(executor, ms, parameter, rowBounds, resultHandler, boundSql);
         }
+        //没有wrapper 或者 不是对多查询 不做处理
+        SelectWrapper<?, ?> wrapper = findMPJWrapper(parameter).orElseThrow(RuntimeException::new);
         // copy super
-        IPage<?> page = wrapper.getPageInfo().getInnerPage();
+        IPage<?> page = ParameterUtils.findPage(parameter).orElse(null);
         if (page == null || page.getSize() < 0 || !page.searchCount() || resultHandler != Executor.NO_RESULT_HANDLER) {
             return true;
         }
@@ -95,17 +94,16 @@ public class PageInnerInterceptor extends PaginationInnerInterceptor {
      * 添加分页方言
      */
     @Override
-    public void beforeQuery(Executor executor, MappedStatement ms, Object parameter, RowBounds rowBounds, ResultHandler resultHandler, BoundSql boundSql) {
-        SelectWrapper<?, ?> wrapper = findMPJWrapper(parameter).orElse(null);
-        if (wrapper == null || !wrapper.isPageByMain()) {
+    public void beforeQuery(Executor executor, MappedStatement ms, Object parameter, RowBounds rowBounds, ResultHandler resultHandler, BoundSql boundSql) throws SQLException {
+        if (unusedPage(parameter)) {
+            paginationInnerInterceptor.beforeQuery(executor, ms, parameter, rowBounds, resultHandler, boundSql);
             return;
         }
         // copy super
-        IPage<?> page = wrapper.getPageInfo().getInnerPage();
+        IPage<?> page = ParameterUtils.findPage(parameter).orElse(null);
         if (null == page) {
             return;
         }
-
         // 处理 orderBy 拼接
         boolean addOrdered = false;
         String buildSql = boundSql.getSql();
@@ -137,12 +135,11 @@ public class PageInnerInterceptor extends PaginationInnerInterceptor {
         mpBoundSql.parameterMappings(dialect.getFullMappings());
     }
 
-    @Override
-    public void setProperties(Properties properties) {
-        super.setProperties(properties);
+    private boolean unusedPage(Object parameter) {
+        return !findMPJWrapper(parameter).map(SelectWrapper::isPageByMain).orElse(false);
     }
 
-    public String autoCountSql(String sql, List<ParameterMapping> mappings, MappedStatement ms, Object parameter, SelectWrapper<?, ?> wrapper) {
+    private String autoCountSql(String sql, List<ParameterMapping> mappings, MappedStatement ms, Object parameter, SelectWrapper<?, ?> wrapper) {
         try {
             Select select = (Select) JsqlParserGlobal.parse(sql);
             if (select instanceof SetOperationList) {
@@ -228,12 +225,12 @@ public class PageInnerInterceptor extends PaginationInnerInterceptor {
         throw ExceptionUtils.mpe("not support this sql, please use xml. error sql: " + sql);
     }
 
-    protected DialectWrapper findMPJDialect(Executor executor) {
+    private DialectWrapper findMPJDialect(Executor executor) {
         IDialect dialect = super.findIDialect(executor);
         return new DialectWrapper(dialect);
     }
 
-    public static Optional<SelectWrapper<?, ?>> findMPJWrapper(Object parameterObject) {
+    private static Optional<SelectWrapper<?, ?>> findMPJWrapper(Object parameterObject) {
         if (parameterObject != null) {
             if (parameterObject instanceof Map) {
                 Map<?, ?> parameterMap = (Map<?, ?>) parameterObject;

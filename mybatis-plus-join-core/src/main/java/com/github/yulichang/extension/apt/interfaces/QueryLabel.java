@@ -2,7 +2,7 @@ package com.github.yulichang.extension.apt.interfaces;
 
 import com.baomidou.mybatisplus.core.toolkit.Assert;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
-import com.github.yulichang.apt.BaseColumn;
+import com.github.yulichang.extension.apt.matedata.BaseColumn;
 import com.github.yulichang.toolkit.LambdaUtils;
 import com.github.yulichang.toolkit.MPJReflectionKit;
 import com.github.yulichang.toolkit.support.FieldCache;

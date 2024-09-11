@@ -1,6 +1,6 @@
 package com.github.yulichang.test.join.apt.unit;
 
-import com.github.yulichang.apt.Column;
+import com.github.yulichang.extension.apt.matedata.Column;
 import com.github.yulichang.extension.apt.AptQueryWrapper;
 import com.github.yulichang.extension.apt.toolkit.AptWrappers;
 import com.github.yulichang.test.join.dto.UserDTO;

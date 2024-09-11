@@ -1,6 +1,6 @@
 package com.github.yulichang.extension.apt.toolkit;
 
-import com.github.yulichang.apt.BaseColumn;
+import com.github.yulichang.extension.apt.matedata.BaseColumn;
 import com.github.yulichang.extension.apt.AptQueryWrapper;
 
 /**

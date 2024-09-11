@@ -1,7 +1,7 @@
 package com.github.yulichang.test.join.apt.unit;
 
-import com.github.yulichang.apt.BaseColumn;
-import com.github.yulichang.apt.Column;
+import com.github.yulichang.extension.apt.matedata.BaseColumn;
+import com.github.yulichang.extension.apt.matedata.Column;
 import com.github.yulichang.test.join.entity.UserDO;
 import com.github.yulichang.test.join.entity.apt.UserDOCol;
 import com.github.yulichang.test.join.mapper.UserMapper;

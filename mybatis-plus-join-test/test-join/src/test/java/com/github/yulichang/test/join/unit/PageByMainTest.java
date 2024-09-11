@@ -4,17 +4,30 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.github.yulichang.test.join.dto.UserDTO;
 import com.github.yulichang.test.join.entity.AddressDO;
 import com.github.yulichang.test.join.entity.UserDO;
+import com.github.yulichang.test.join.mapper.AreaMapper;
 import com.github.yulichang.test.util.ThreadLocalUtils;
 import com.github.yulichang.toolkit.JoinWrappers;
 import com.github.yulichang.wrapper.MPJLambdaWrapper;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+
+import java.awt.geom.Area;
+import java.util.List;
 
 @SpringBootTest
 public class PageByMainTest {
 
+    @Autowired
+    private AreaMapper areaMapper;
+
+
     @Test
     void pageByMain() {
+        List<Area> all = areaMapper.all();
+        System.out.println(all);
+        assert !all.isEmpty();
+
         ThreadLocalUtils.set("SELECT t.id, t.pid, t.`name`, t.`json`, t.sex, t.head_img, t.create_time, t.address_id, " +
                 "t.address_id2, t.del, t.create_by, t.update_by, t1.id AS joina_id, t1.user_id, t1.area_id, t1.tel, " +
                 "t1.address, t1.del AS joina_del FROM (SELECT * FROM `user` t WHERE t.del = false AND (t.id <= ?) LIMIT ?) t " +

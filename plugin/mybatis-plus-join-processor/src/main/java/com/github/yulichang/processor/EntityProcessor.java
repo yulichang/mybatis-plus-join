@@ -2,8 +2,8 @@ package com.github.yulichang.processor;
 
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.github.yulichang.annotation.Table;
-import com.github.yulichang.apt.BaseColumn;
-import com.github.yulichang.apt.Column;
+import com.github.yulichang.extension.apt.matedata.BaseColumn;
+import com.github.yulichang.extension.apt.matedata.Column;
 import com.github.yulichang.processor.matedata.Conf;
 import com.github.yulichang.processor.matedata.FieldInfo;
 import com.github.yulichang.processor.matedata.TableInfo;

@@ -18,7 +18,7 @@
         <dependency>
             <groupId>com.github.yulichang</groupId>
             <artifactId>mybatis-plus-join-core</artifactId>
-            <version>1.4.13</version>
+            <version>${revision}</version>
         </dependency>
         <dependency>
             <groupId>com.baomidou</groupId>
@@ -26,9 +26,10 @@
             <version>${mpj.mybatis.plus.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.mybatis</groupId>
-            <artifactId>mybatis</artifactId>
-            <version>3.5.16</version>
+            <groupId>com.baomidou</groupId>
+            <artifactId>mybatis-plus-extension</artifactId>
+            <version>3.5.7</version>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 

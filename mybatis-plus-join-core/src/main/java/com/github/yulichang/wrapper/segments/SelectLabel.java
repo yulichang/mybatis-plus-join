@@ -1,7 +1,7 @@
 package com.github.yulichang.wrapper.segments;
 
 
-import com.github.yulichang.apt.BaseColumn;
+import com.github.yulichang.extension.apt.matedata.BaseColumn;
 import com.github.yulichang.wrapper.enums.BaseFuncEnum;
 import lombok.Getter;
 import org.apache.ibatis.type.JdbcType;

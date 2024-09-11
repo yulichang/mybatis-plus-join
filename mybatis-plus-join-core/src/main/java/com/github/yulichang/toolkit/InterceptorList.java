@@ -5,7 +5,7 @@ import com.baomidou.mybatisplus.extension.plugins.inner.InnerInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.PaginationInnerInterceptor;
 import com.github.yulichang.adapter.AdapterHelper;
 import com.github.yulichang.interceptor.MPJInterceptor;
-import com.github.yulichang.interceptor.pagination.PageInnerInterceptor;
+import com.github.yulichang.interceptor.pagination.PageInnerInterceptorWrapper;
 import org.apache.ibatis.logging.Log;
 import org.apache.ibatis.logging.LogFactory;
 import org.apache.ibatis.plugin.Interceptor;
@@ -40,45 +40,12 @@ public class InterceptorList<E extends Interceptor> extends ArrayList<E> {
             super.removeIf(predicate);
             super.add(mpjInterceptor);
         }
-        try {
-            AdapterHelper.getAdapter().checkCollectionPage();
-        } catch (Exception e) {
-            return;
-        }
-        if (this.stream().anyMatch(i -> i instanceof MybatisPlusInterceptor)) {
-            MybatisPlusInterceptor mybatisPlusInterceptor = super.stream().filter(i -> i instanceof MybatisPlusInterceptor)
-                    .map(i -> (MybatisPlusInterceptor) i).findFirst().orElse(null);
-            if (mybatisPlusInterceptor != null) {
-                try {
-                    Field field = MybatisPlusInterceptor.class.getDeclaredField("interceptors");
-                    field.setAccessible(true);
-                    @SuppressWarnings("unchecked")
-                    List<InnerInterceptor> interceptors = (List<InnerInterceptor>) field.get(mybatisPlusInterceptor);
-
-                    Integer index = null;
-                    PaginationInnerInterceptor paginationInnerInterceptor = null;
-                    if (interceptors.stream().noneMatch(i -> i instanceof PageInnerInterceptor)) {
-                        for (int i = 0; i < interceptors.size(); i++) {
-                            InnerInterceptor innerInterceptor = interceptors.get(i);
-                            if (innerInterceptor instanceof PaginationInnerInterceptor) {
-                                paginationInnerInterceptor = (PaginationInnerInterceptor) innerInterceptor;
-                                index = i;
-                                break;
-                            }
-                        }
-                    }
-                    if (index != null) {
-                        interceptors.add(index + 1, new PageInnerInterceptor(paginationInnerInterceptor));
-                    }
-                } catch (Exception e) {
-                    log.error(e.getMessage(), e);
-                }
-            }
-        }
+        this.forEach(this::wrapperInnerPage);
     }
 
     @Override
     public boolean add(E e) {
+        this.wrapperInnerPage(e);
         if (this.isEmpty()) {
             return super.add(e);
         }
@@ -90,5 +57,43 @@ public class InterceptorList<E extends Interceptor> extends ArrayList<E> {
             return super.add(mpjInterceptor);
         }
         return add;
+    }
+
+    @Override
+    public boolean addAll(Collection<? extends E> c) {
+        c.forEach(this::wrapperInnerPage);
+        return super.addAll(c);
+    }
+
+    @Override
+    public boolean addAll(int index, Collection<? extends E> c) {
+        c.forEach(this::wrapperInnerPage);
+        return super.addAll(index, c);
+    }
+
+    private void wrapperInnerPage(Interceptor interceptor) {
+        try {
+            AdapterHelper.getAdapter().checkCollectionPage();
+        } catch (Exception e) {
+            return;
+        }
+        if (interceptor instanceof MybatisPlusInterceptor) {
+            MybatisPlusInterceptor mybatisPlusInterceptor = (MybatisPlusInterceptor) interceptor;
+            try {
+                Field field = MybatisPlusInterceptor.class.getDeclaredField("interceptors");
+                field.setAccessible(true);
+                @SuppressWarnings("unchecked")
+                List<InnerInterceptor> interceptors = (List<InnerInterceptor>) field.get(mybatisPlusInterceptor);
+
+                interceptors.replaceAll(i -> {
+                    if (i instanceof PaginationInnerInterceptor && !(i instanceof PageInnerInterceptorWrapper)) {
+                        return new PageInnerInterceptorWrapper((PaginationInnerInterceptor) i);
+                    }
+                    return i;
+                });
+            } catch (Exception e) {
+                log.error(e.getMessage(), e);
+            }
+        }
     }
 }

@@ -1,4 +1,4 @@
-package com.github.yulichang.apt;
+package com.github.yulichang.extension.apt.matedata;
 
 import lombok.Getter;
 

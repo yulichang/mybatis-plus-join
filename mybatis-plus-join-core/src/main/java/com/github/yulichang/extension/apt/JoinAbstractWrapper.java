@@ -12,7 +12,7 @@ import com.baomidou.mybatisplus.core.toolkit.*;
 import com.baomidou.mybatisplus.core.toolkit.sql.SqlUtils;
 import com.baomidou.mybatisplus.core.toolkit.sql.StringEscape;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
-import com.github.yulichang.apt.Column;
+import com.github.yulichang.extension.apt.matedata.Column;
 import com.github.yulichang.config.ConfigProperties;
 import com.github.yulichang.extension.apt.interfaces.CompareIfExists;
 import com.github.yulichang.extension.apt.interfaces.Func;

@@ -1,6 +1,6 @@
 package com.github.yulichang.extension.apt.interfaces;
 
-import com.github.yulichang.apt.Column;
+import com.github.yulichang.extension.apt.matedata.Column;
 import com.github.yulichang.wrapper.enums.IfExistsSqlKeyWordEnum;
 
 import java.util.function.BiPredicate;

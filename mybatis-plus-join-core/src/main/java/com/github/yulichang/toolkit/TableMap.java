@@ -1,7 +1,7 @@
 package com.github.yulichang.toolkit;
 
 import com.baomidou.mybatisplus.core.toolkit.ExceptionUtils;
-import com.github.yulichang.apt.BaseColumn;
+import com.github.yulichang.extension.apt.matedata.BaseColumn;
 import lombok.Getter;
 import lombok.Setter;
 

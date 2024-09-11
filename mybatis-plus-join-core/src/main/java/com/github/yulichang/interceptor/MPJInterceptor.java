@@ -3,12 +3,14 @@ package com.github.yulichang.interceptor;
 import com.baomidou.mybatisplus.core.MybatisPlusVersion;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.metadata.TableInfo;
-import com.baomidou.mybatisplus.core.toolkit.*;
+import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
+import com.baomidou.mybatisplus.core.toolkit.Constants;
+import com.baomidou.mybatisplus.core.toolkit.StringPool;
+import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.github.yulichang.adapter.AdapterHelper;
 import com.github.yulichang.adapter.base.tookit.VersionUtils;
 import com.github.yulichang.config.ConfigProperties;
 import com.github.yulichang.interfaces.MPJBaseJoin;
-import com.github.yulichang.toolkit.ReflectionKit;
 import com.github.yulichang.toolkit.*;
 import com.github.yulichang.toolkit.support.FieldCache;
 import com.github.yulichang.wrapper.interfaces.SelectWrapper;
@@ -100,16 +102,10 @@ public class MPJInterceptor implements Interceptor {
                 wrapper.selectAll();
             }
             if (wrapper.isResultMapCollection()) {
-                if (map.values().stream().anyMatch(a -> a instanceof IPage)) {
-                    if (wrapper.isPageByMain()) {
-                        AdapterHelper.getAdapter().checkCollectionPage();
-                        IPage<?> page = ParameterUtils.findPage(map).orElse(null);
-                        wrapper.getPageInfo().setInnerPage(page);
-                        map.entrySet().removeIf(entry -> entry.getValue() instanceof IPage);
-                    } else {
-                        // 一对多分页问题警告
-                        log.warn("select one to many and page query will result in errors in the total count statistics, please use xml.");
-                    }
+                if (map.values().stream().anyMatch(a -> a instanceof IPage) && !wrapper.isPageByMain()) {
+                    AdapterHelper.getAdapter().checkCollectionPage();
+                    // 一对多分页问题警告
+                    log.warn("select one to many and page query will result in errors in the total count statistics, please use xml.");
                 }
             }
         }

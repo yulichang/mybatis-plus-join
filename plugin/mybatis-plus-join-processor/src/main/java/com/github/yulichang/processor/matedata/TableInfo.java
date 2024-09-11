@@ -1,6 +1,6 @@
 package com.github.yulichang.processor.matedata;
 
-import com.github.yulichang.apt.OgnlRoot;
+import com.github.yulichang.extension.apt.matedata.OgnlRoot;
 import org.apache.ibatis.builder.BuilderException;
 import org.apache.ibatis.ognl.Ognl;
 import org.apache.ibatis.ognl.OgnlContext;

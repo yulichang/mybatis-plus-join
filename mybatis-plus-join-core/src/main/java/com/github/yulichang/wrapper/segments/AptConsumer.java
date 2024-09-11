@@ -1,6 +1,6 @@
 package com.github.yulichang.wrapper.segments;
 
-import com.github.yulichang.apt.Column;
+import com.github.yulichang.extension.apt.matedata.Column;
 
 import java.io.Serializable;
 

@@ -49,7 +49,7 @@
                         <path>
                             <groupId>com.github.yulichang</groupId>
                             <artifactId>mybatis-plus-join-processor</artifactId>
-                            <version>1.4.13</version>
+                            <version>${revision}</version>
                         </path>
                         <path>
                             <groupId>org.projectlombok</groupId>

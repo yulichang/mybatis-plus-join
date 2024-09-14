@@ -1,6 +1,6 @@
 package com.github.yulichang.test.kt.m
 
-import com.github.yulichang.kt.KtLambdaWrapper
+import com.github.yulichang.extension.kt.KtLambdaWrapper
 import com.github.yulichang.test.kt.entity.UserDO
 import com.github.yulichang.test.kt.mapper.UserMapper
 import com.github.yulichang.test.util.Reset

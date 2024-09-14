@@ -1,24 +1,24 @@
 package com.github.yulichang.test.join.apt.unit;
 
+import com.github.yulichang.extension.apt.AptQueryWrapper;
 import com.github.yulichang.test.join.dto.UserDTO;
 import com.github.yulichang.test.join.entity.apt.AddressDOCol;
 import com.github.yulichang.test.join.entity.apt.UserDOCol;
 import com.github.yulichang.test.join.mapper.UserMapper;
 import com.github.yulichang.test.util.Reset;
 import com.github.yulichang.test.util.ThreadLocalUtils;
-import com.github.yulichang.extension.apt.AptQueryWrapper;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import javax.annotation.Resource;
 import java.util.List;
 
 @SpringBootTest
 public class StringColumTest {
 
-    @Resource
+    @Autowired
     private UserMapper userMapper;
 
     @BeforeEach

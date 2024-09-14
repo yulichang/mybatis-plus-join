@@ -32,7 +32,9 @@ mybatis-plus-join:
 
 ---
 spring:
-  profiles: h2
+  config:
+    activate:
+      on-profile: h2
   datasource:
     driver-class-name: org.h2.Driver
     url: jdbc:h2:mem:test
@@ -40,7 +42,9 @@ spring:
     password: test
 ---
 spring:
-  profiles: mysql
+  config:
+    activate:
+      on-profile: mysql
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://localhost:3306/mpj_test
@@ -48,7 +52,9 @@ spring:
     password: 123456
 ---
 spring:
-  profiles: pgsql
+  config:
+    activate:
+      on-profile: pgsql
   datasource:
     driver-class-name: org.postgresql.Driver
     url: jdbc:postgresql://localhost:5432/mpj_test
@@ -60,7 +66,9 @@ spring:
       data-locations: classpath:db/pgsql/data.sql
 ---
 spring:
-  profiles: oracle
+  config:
+    activate:
+      on-profile: oracle
   datasource:
     driver-class-name: oracle.jdbc.OracleDriver
     url: jdbc:oracle:thin:@//localhost:1521/FREE

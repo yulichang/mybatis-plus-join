@@ -7,9 +7,9 @@ import com.github.yulichang.test.collection.mapper.TableTMapper;
 import com.github.yulichang.wrapper.MPJLambdaWrapper;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import javax.annotation.Resource;
 import java.util.List;
 import java.util.Objects;
 
@@ -24,11 +24,11 @@ import java.util.Objects;
 @SuppressWarnings("unused")
 @SpringBootTest
 class CollectionTest {
-    @Resource
+    @Autowired
     private TableAMapper tableAMapper;
-    @Resource
+    @Autowired
     private TableTMapper tableMapper;
-    @Resource
+    @Autowired
     private SqlSessionFactory sqlSessionFactory;
 
     /**
@@ -100,7 +100,7 @@ class CollectionTest {
     }
 
     @Test
-    void testFree(){
+    void testFree() {
         MPJLambdaWrapper<TableA> wrapper1 = new MPJLambdaWrapper<TableA>()
                 .selectAll(TableA.class)
                 .selectAssociation(TableADTO::getB, b -> b
@@ -122,7 +122,7 @@ class CollectionTest {
                 .selectAll(TableA.class)
                 .selectAssociation(TableADTO::getB, b -> b
                         .id(TableB::getId)
-                        .result(TableD::getName,TableBDTO::getName)
+                        .result(TableD::getName, TableBDTO::getName)
                         .association(TableC.class, TableBDTO::getC, c -> c
                                 .association(TableD.class, TableCDTO::getD, d -> d
                                         .association(TableE.class, TableDDTO::getE, e -> e
@@ -137,7 +137,7 @@ class CollectionTest {
         assert Objects.equals(dtos2.get(0).getB().getName(), "tableD1");
     }
 
-    void test(){
+    void test() {
         MPJLambdaWrapper<TableA> wrapper1 = new MPJLambdaWrapper<TableA>()
                 .selectAll(TableA.class)
                 .selectAssociation(TableB.class, TableADTO::getB, b -> b

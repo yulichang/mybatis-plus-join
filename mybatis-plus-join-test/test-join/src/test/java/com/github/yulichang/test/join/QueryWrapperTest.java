@@ -12,18 +12,18 @@ import com.github.yulichang.test.util.Reset;
 import com.github.yulichang.test.util.ThreadLocalUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import javax.annotation.Resource;
 import java.util.List;
 import java.util.Map;
 
 @SpringBootTest
 class QueryWrapperTest {
-    @Resource
+    @Autowired
     private UserMapper userMapper;
 
-    @Resource
+    @Autowired
     private UserTenantMapper userTenantMapper;
 
 

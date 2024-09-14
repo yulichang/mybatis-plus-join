@@ -1,13 +1,13 @@
 package com.github.yulichang.test.kt.m
 
-import com.github.yulichang.kt.KtLambdaWrapper
+import com.github.yulichang.extension.kt.KtLambdaWrapper
+import com.github.yulichang.extension.kt.toolkit.KtWrappers
 import com.github.yulichang.test.kt.entity.AddressDO
 import com.github.yulichang.test.kt.entity.AreaDO
 import com.github.yulichang.test.kt.entity.UserDO
 import com.github.yulichang.test.kt.mapper.UserMapper
 import com.github.yulichang.test.util.Reset
 import com.github.yulichang.test.util.ThreadLocalUtils
-import com.github.yulichang.toolkit.KtWrappers
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired

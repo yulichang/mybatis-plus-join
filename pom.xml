@@ -46,10 +46,10 @@
         <revision>1.5.0</revision>
         <mpj.mybatis.plus.version>3.5.7</mpj.mybatis.plus.version>
 
-        <jdkVersion>1.8</jdkVersion>
-        <jdkVersion.test>1.8</jdkVersion.test>
-        <maven.compiler.source>1.8</maven.compiler.source>
-        <maven.compiler.target>1.8</maven.compiler.target>
+        <jdkVersion>17</jdkVersion>
+        <jdkVersion.test>17</jdkVersion.test>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
         <github.global.server>github</github.global.server>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>

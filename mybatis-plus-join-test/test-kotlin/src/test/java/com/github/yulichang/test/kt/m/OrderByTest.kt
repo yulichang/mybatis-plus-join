@@ -1,9 +1,9 @@
 package com.github.yulichang.test.kt.m
 
-import com.github.yulichang.kt.KtLambdaWrapper
+import com.github.yulichang.extension.kt.KtLambdaWrapper
+import com.github.yulichang.extension.kt.toolkit.KtWrappers
 import com.github.yulichang.test.kt.entity.UserDO
 import com.github.yulichang.test.util.ThreadLocalUtils
-import com.github.yulichang.toolkit.KtWrappers
 import org.junit.jupiter.api.BeforeEach
 import org.springframework.boot.test.context.SpringBootTest
 import kotlin.reflect.KMutableProperty1

@@ -42,7 +42,7 @@
         <dependency>
             <groupId>com.baomidou</groupId>
             <artifactId>mybatis-plus-core</artifactId>
-            <version>3.5.7</version>
+            <version>3.5.5</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>

@@ -1,0 +1,35 @@
+name: 功能改进
+description: Feature Request
+title: "[功能改进]: 描述"
+labels: [""]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        请说明你希望添加的功能。
+  - type: checkboxes
+    id: confirm
+    attributes:
+      label: 确认
+      description: 在提交 issue 之前，请确认你已经阅读并确认以下内容
+      options:
+        - label: 我的版本是最新版本, 我的版本号与 [version](https://central.sonatype.com/search?q=g:com.github.yulichang%20%20a:mybatis-plus-join-boot-starter&smo=true) 相同, 并且项目里无依赖冲突
+          required: true
+        - label: 我已经在 [issue](https://github.com/yulichang/mybatis-plus-join/issues) 中搜索过, 确认问题没有被提出过
+          required: true
+        - label: 我已经修改标题, 将标题中的 描述 替换为遇到的问题
+          required: true
+  - type: textarea
+    id: feature-request
+    attributes:
+      label: 功能改进
+      description: 请详细描述需要改进或者添加的功能。
+      placeholder: "功能改进"
+    validations:
+      required: true
+  - type: textarea
+    id: references
+    attributes:
+      label: 参考资料
+      description: 可以列举一些参考资料，但是不要引用同类但商业化软件的任何内容。
+      placeholder: "参考资料"

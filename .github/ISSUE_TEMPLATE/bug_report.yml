@@ -1,0 +1,45 @@
+name: 错误报告
+description: File a bug report.
+title: "[错误报告]: 描述"
+labels: [""]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        请确认以下信息：
+        1. 请按此模板提交issues, 不按模板提交的问题将直接关闭
+        2. 如果你的问题与该仓库无关或者可以直接在以往 issue 中找到, 那么你的 issue 将会被直接关闭
+        3. 提交问题务必描述清楚、附上日志, 描述不清导致无法理解和分析的问题会被直接关闭
+  - type: checkboxes
+    id: confirm
+    attributes:
+      label: 确认
+      description: 在提交 issue 之前，请确认你已经阅读并确认以下内容
+      options:
+        - label: 我的版本是最新版本, 我的版本号与 [version](https://central.sonatype.com/search?q=g:com.github.yulichang%20%20a:mybatis-plus-join-boot-starter&smo=true) 相同, 并且项目里无依赖冲突
+          required: true
+        - label: 我已经在 [issue](https://github.com/yulichang/mybatis-plus-join/issues) 中搜索过, 确认问题没有被提出过
+          required: true
+        - label: 我已经修改标题, 将标题中的 描述 替换为遇到的问题
+          required: true
+  - type: input
+    id: version
+    attributes:
+      label: 当前程序版本
+      description: 遇到问题时程序所在的版本号
+    validations:
+      required: true
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: 问题描述
+      description: 请详细描述你碰到的问题
+      placeholder: "问题描述"
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: 详细堆栈日志
+      description: 问题出现时，程序错误堆栈日志。
+      render: bash

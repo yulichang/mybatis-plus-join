@@ -24,7 +24,7 @@ import java.util.List;
  *
  * @since 1.3.12
  */
-@SuppressWarnings("ALL")
+@SuppressWarnings({"unused", "unchecked"})
 public interface FuncStr<Children, R> extends Serializable {
 
     /**
@@ -164,10 +164,10 @@ public interface FuncStr<Children, R> extends Serializable {
      * <p>例1: gtSql("id", "1, 2, 3, 4, 5, 6")</p>
      * <p>例1: gtSql("id", "select id from table where name = 'JunJun'")</p>
      *
-     * @param condition
-     * @param column
-     * @param inValue
-     * @return
+     * @param condition 执行条件
+     * @param column    字段
+     * @param inValue   sql语句
+     * @return children
      */
     Children gtSql(boolean condition, R column, String inValue);
 
@@ -183,10 +183,10 @@ public interface FuncStr<Children, R> extends Serializable {
      * <p>例1: geSql("id", "1, 2, 3, 4, 5, 6")</p>
      * <p>例1: geSql("id", "select id from table where name = 'JunJun'")</p>
      *
-     * @param condition
-     * @param column
-     * @param inValue
-     * @return
+     * @param condition 执行条件
+     * @param column    字段
+     * @param inValue   sql语句
+     * @return children
      */
     Children geSql(boolean condition, R column, String inValue);
 
@@ -202,10 +202,10 @@ public interface FuncStr<Children, R> extends Serializable {
      * <p>例1: ltSql("id", "1, 2, 3, 4, 5, 6")</p>
      * <p>例1: ltSql("id", "select id from table where name = 'JunJun'")</p>
      *
-     * @param condition
-     * @param column
-     * @param inValue
-     * @return
+     * @param condition 执行条件
+     * @param column    字段
+     * @param inValue   sql语句
+     * @return children
      */
     Children ltSql(boolean condition, R column, String inValue);
 
@@ -221,10 +221,10 @@ public interface FuncStr<Children, R> extends Serializable {
      * <p>例1: leSql("id", "1, 2, 3, 4, 5, 6")</p>
      * <p>例1: leSql("id", "select id from table where name = 'JunJun'")</p>
      *
-     * @param condition
-     * @param column
-     * @param inValue
-     * @return
+     * @param condition 执行条件
+     * @param column    字段
+     * @param inValue   sql语句
+     * @return children
      */
     Children leSql(boolean condition, R column, String inValue);
 
@@ -240,10 +240,10 @@ public interface FuncStr<Children, R> extends Serializable {
      * <p>例1: eqSql("id", "1, 2, 3, 4, 5, 6")</p>
      * <p>例1: eqSql("id", "select id from table where name = 'JunJun'")</p>
      *
-     * @param condition
-     * @param column
-     * @param inValue
-     * @return
+     * @param condition 执行条件
+     * @param column    字段
+     * @param inValue   sql语句
+     * @return children
      */
     Children eqSql(boolean condition, R column, String inValue);
 

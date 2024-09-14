@@ -33,14 +33,14 @@ import static java.util.stream.Collectors.joining;
  * @author hcl
  * @since 2016-08-18
  */
-@SuppressWarnings("ALL")
+@SuppressWarnings("unused")
 public final class MPJStringUtils {
 
     /**
      * 判断是否是中文
      */
     public static boolean isChinese(String str) {
-        if(isBlank(str))
+        if (isBlank(str))
             return false;
         char c = str.charAt(0);
         return c >= 0x4E00 && c <= 0x9FA5;
@@ -71,13 +71,6 @@ public final class MPJStringUtils {
     private static final Pattern CAPITAL_MODE = Pattern.compile("^[0-9A-Z/_]+$");
 
     /**
-     * 字符串去除空白内容
-     *
-     * <ul> <li>'"<>&*+=#-; sql注入黑名单</li> <li>\n 回车</li> <li>\t 水平制表符</li> <li>\s 空格</li> <li>\r 换行</li> </ul>
-     */
-    private static final Pattern REPLACE_BLANK = Pattern.compile("'|\"|\\<|\\>|&|\\*|\\+|=|#|-|;|\\s*|\t|\r|\n");
-
-    /**
      * 判断字符串中是否全是空白字符
      *
      * @param cs 需要判断的字符串
@@ -99,7 +92,6 @@ public final class MPJStringUtils {
      * 对象转为字符串去除左右空格
      *
      * @param o 带转换对象
-     * @return
      */
     public static String toStringTrim(Object o) {
         return String.valueOf(o).trim();
@@ -150,7 +142,7 @@ public final class MPJStringUtils {
      * @return 字段名
      */
     public static String getTargetColumn(String column) {
-        if(isChinese(column)){
+        if (isChinese(column)) {
             return column;
         }
         if (isNotColumnName(column)) {
@@ -328,7 +320,7 @@ public final class MPJStringUtils {
         if (isBlank(concatStr)) {
             concatStr = StringPool.EMPTY;
         }
-        if (str == null || str.length() == 0) {
+        if (str == null || str.isEmpty()) {
             return str;
         }
 
@@ -400,33 +392,6 @@ public final class MPJStringUtils {
         return matches(".*[A-Z]+.*", word) && matches(".*[/_]+.*", word);
     }
 
-    /**
-     * 判断是否以某个字符串结尾（区分大小写）
-     * Check if a String ends with a specified suffix.
-     * <p>
-     * <code>null</code>s are handled without exceptions. Two <code>null</code>
-     * references are considered to be equal. The comparison is case sensitive.
-     * </p>
-     * <p>
-     * <pre>
-     * StringUtils.endsWith(null, null)      = true
-     * StringUtils.endsWith(null, "abcdef")  = false
-     * StringUtils.endsWith("def", null)     = false
-     * StringUtils.endsWith("def", "abcdef") = true
-     * StringUtils.endsWith("def", "ABCDEF") = false
-     * </pre>
-     * </p>
-     *
-     * @param str    the String to check, may be null
-     * @param suffix the suffix to find, may be null
-     * @return <code>true</code> if the String ends with the suffix, case
-     * sensitive, or both <code>null</code>
-     * @see String#endsWith(String)
-     * @since 2.4
-     */
-    public static boolean endsWith(String str, String suffix) {
-        return endsWith(str, suffix, false);
-    }
 
     /**
      * Check if a String ends with a specified suffix (optionally case
@@ -469,10 +434,8 @@ public final class MPJStringUtils {
      * @return ignore
      */
     public static String prefixToLower(String rawString, int index) {
-        StringBuilder field = new StringBuilder();
-        field.append(rawString.substring(0, index).toLowerCase());
-        field.append(rawString.substring(index));
-        return field.toString();
+        return rawString.substring(0, index).toLowerCase() +
+                rawString.substring(index);
     }
 
     /**
@@ -595,43 +558,5 @@ public final class MPJStringUtils {
             }
         }
         return true;
-    }
-
-    /**
-     * SQL 注入字符串去除空白内容：
-     * <ul>
-     *     <li>\n 回车</li>
-     *     <li>\t 水平制表符</li>
-     *     <li>\s 空格</li>
-     *     <li>\r 换行</li>
-     * </ul>
-     *
-     * @param str 字符串
-     */
-    public static String sqlInjectionReplaceBlank(String str) {
-        if (MPJSqlInjectionUtils.check(str)) {
-            /**
-             * 过滤sql黑名单字符，存在 SQL 注入，去除空白内容
-             */
-            str = replaceAllBlank(str);
-
-        }
-        return str;
-    }
-
-    /**
-     * 字符串去除空白内容：
-     * <ul>
-     *     <li>\n 回车</li>
-     *     <li>\t 水平制表符</li>
-     *     <li>\s 空格</li>
-     *     <li>\r 换行</li>
-     * </ul>
-     *
-     * @param str 字符串
-     */
-    public static String replaceAllBlank(String str) {
-        Matcher matcher = REPLACE_BLANK.matcher(str);
-        return matcher.replaceAll("");
     }
 }

@@ -1,6 +1,7 @@
 package com.github.yulichang.wrapper.interfaces;
 
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
+import com.github.yulichang.wrapper.segments.FuncConsumer;
 
 import java.io.Serializable;
 
@@ -78,6 +79,12 @@ public interface Update<Children> extends Serializable {
     }
 
     <R> Children setDecrBy(boolean condition, SFunction<R, ?> column, Number val);
+
+    default Children setApply(String applySql, SFunction<FuncConsumer, SFunction<?, ?>[]> consumerFunction, Object... values) {
+        return setApply(true, applySql, consumerFunction, values);
+    }
+
+    Children setApply(boolean condition, String applySql, SFunction<FuncConsumer, SFunction<?, ?>[]> consumerFunction, Object... values);
 
     /**
      * ignore

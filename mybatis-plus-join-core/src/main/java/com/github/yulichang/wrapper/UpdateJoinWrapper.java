@@ -12,14 +12,11 @@ import com.github.yulichang.toolkit.ReflectionKit;
 import com.github.yulichang.toolkit.*;
 import com.github.yulichang.wrapper.interfaces.Update;
 import com.github.yulichang.wrapper.interfaces.UpdateChain;
-import lombok.AllArgsConstructor;
+import com.github.yulichang.wrapper.segments.FuncConsumer;
 import lombok.Data;
 
 import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -111,42 +108,36 @@ public class UpdateJoinWrapper<T> extends JoinAbstractLambdaWrapper<T, UpdateJoi
 
     @Override
     public <R> UpdateJoinWrapper<T> set(boolean condition, SFunction<R, ?> column, Object val, String mapping) {
-        return maybeDo(condition, () -> {
-            if (Objects.isNull(updateSet)) {
-                updateSet = new ArrayList<>();
-            }
-            updateSet.add(new UpdateSet(column, val, mapping, false, null));
-        });
+        return maybeDo(condition, () -> getUpdateSet().add(new UpdateSet(column, val, mapping, false, null)));
     }
 
     @Override
     public <R, V> UpdateJoinWrapper<T> set(boolean condition, SFunction<R, ?> column, SFunction<V, ?> val, String mapping) {
-        return maybeDo(condition, () -> {
-            if (Objects.isNull(updateSet)) {
-                updateSet = new ArrayList<>();
-            }
-            updateSet.add(new UpdateSet(column, val, mapping, false, null));
-        });
+        return maybeDo(condition, () -> getUpdateSet().add(new UpdateSet(column, val, mapping, false, null)));
     }
 
     @Override
     public <R> UpdateJoinWrapper<T> setIncrBy(boolean condition, SFunction<R, ?> column, Number val) {
-        return maybeDo(condition, () -> {
-            if (Objects.isNull(updateSet)) {
-                updateSet = new ArrayList<>();
-            }
-            updateSet.add(new UpdateSet(column, val, null, true, Constant.PLUS));
-        });
+        return maybeDo(condition, () -> getUpdateSet().add(new UpdateSet(column, val, null, true, Constant.PLUS)));
     }
 
     @Override
     public <R> UpdateJoinWrapper<T> setDecrBy(boolean condition, SFunction<R, ?> column, Number val) {
-        return maybeDo(condition, () -> {
-            if (Objects.isNull(updateSet)) {
-                updateSet = new ArrayList<>();
-            }
-            updateSet.add(new UpdateSet(column, val, null, true, Constant.DASH));
-        });
+        return maybeDo(condition, () -> getUpdateSet().add(new UpdateSet(column, val, null, true, Constant.DASH)));
+    }
+
+    @Override
+    public UpdateJoinWrapper<T> setApply(boolean condition, String applySql, SFunction<FuncConsumer, SFunction<?, ?>[]> consumerFunction, Object... values) {
+        if (condition && StringUtils.isNotBlank(applySql)) {
+            SFunction<?, ?>[] arg = consumerFunction.apply(FuncConsumer.func);
+            UpdateSet set = new UpdateSet();
+            set.setApply(true);
+            set.setFormat(applySql);
+            set.setColumns(arg);
+            set.setArgs(values);
+            getUpdateSet().add(set);
+        }
+        return typedThis;
     }
 
     @Override
@@ -168,22 +159,29 @@ public class UpdateJoinWrapper<T> extends JoinAbstractLambdaWrapper<T, UpdateJoi
         }
         StringBuilder set = new StringBuilder(StringPool.EMPTY);
         if (CollectionUtils.isNotEmpty(updateSet)) {
-            set = new StringBuilder(updateSet.stream().map(i -> {
-                        String col = tableList.getPrefixByClass(LambdaUtils.getEntityClass(i.getColumn())) +
-                                Constants.DOT + getCache(i.getColumn()).getColumn();
-                        if (i.incOrDnc) {
-                            return col + Constants.EQUALS + col + i.cal + i.value;
+            String setSql = updateSet.stream().map(i -> {
+                if (i.isApply) {
+                    String col = String.format(i.format, Arrays.stream(i.columns).map(f ->
+                            tableList.getPrefixByClass(LambdaUtils.getEntityClass(f)) +
+                                    Constants.DOT + getCache(f).getColumn()).toArray());
+                    return formatSqlMaybeWithParam(col, null, i.args);
+                } else {
+                    String col = tableList.getPrefixByClass(LambdaUtils.getEntityClass(i.getColumn())) +
+                            Constants.DOT + getCache(i.getColumn()).getColumn();
+                    if (i.incOrDnc) {
+                        return col + Constants.EQUALS + col + i.cal + i.value;
+                    } else {
+                        if (i.value instanceof Function) {
+                            SFunction<?, ?> value = (SFunction<?, ?>) i.getValue();
+                            return col + Constants.EQUALS + tableList.getPrefixByClass(LambdaUtils.getEntityClass(value)) +
+                                    Constants.DOT + getCache(value).getColumn();
                         } else {
-                            if (i.value instanceof Function) {
-                                SFunction<?, ?> value = (SFunction<?, ?>) i.getValue();
-                                return col + Constants.EQUALS + tableList.getPrefixByClass(LambdaUtils.getEntityClass(value)) +
-                                        Constants.DOT + getCache(value).getColumn();
-                            } else {
-                                return col + Constants.EQUALS + formatParam(i.mapping, i.value);
-                            }
+                            return col + Constants.EQUALS + formatParam(i.mapping, i.value);
                         }
-                    })
-                    .collect(Collectors.joining(StringPool.COMMA)) + StringPool.COMMA);
+                    }
+                }
+            }).collect(Collectors.joining(StringPool.COMMA)) + StringPool.COMMA;
+            set.append(setSql);
         }
         if (CollectionUtils.isNotEmpty(sqlSet)) {
             set.append(String.join(StringPool.COMMA, sqlSet)).append(StringPool.COMMA);
@@ -219,13 +217,20 @@ public class UpdateJoinWrapper<T> extends JoinAbstractLambdaWrapper<T, UpdateJoi
                 this.tableList, index, keyWord, joinClass, tableName);
     }
 
+    public List<UpdateSet> getUpdateSet() {
+        if (updateSet == null) {
+            updateSet = new ArrayList<>();
+        }
+        return updateSet;
+    }
+
     /**
      * 不建议直接 new 该实例，使用 JoinWrappers.update(User.class)
      */
     protected UpdateJoinWrapper(T entity, Class<T> entityClass, AtomicInteger paramNameSeq,
-                             Map<String, Object> paramNameValuePairs, MergeSegments mergeSegments,
-                             SharedString lastSql, SharedString sqlComment, SharedString sqlFirst,
-                             TableList tableList, Integer index, String keyWord, Class<?> joinClass, String tableName) {
+                                Map<String, Object> paramNameValuePairs, MergeSegments mergeSegments,
+                                SharedString lastSql, SharedString sqlComment, SharedString sqlFirst,
+                                TableList tableList, Integer index, String keyWord, Class<?> joinClass, String tableName) {
         super.setEntity(entity);
         super.setEntityClass(entityClass);
         this.paramNameSeq = paramNameSeq;
@@ -293,7 +298,6 @@ public class UpdateJoinWrapper<T> extends JoinAbstractLambdaWrapper<T, UpdateJoi
 
 
     @Data
-    @AllArgsConstructor
     public static class UpdateSet {
 
         private SFunction<?, ?> column;
@@ -305,5 +309,24 @@ public class UpdateJoinWrapper<T> extends JoinAbstractLambdaWrapper<T, UpdateJoi
         private boolean incOrDnc;
 
         private String cal;
+
+        private boolean isApply = false;
+
+        private String format;
+
+        private SFunction<?, ?>[] columns;
+
+        private Object[] args;
+
+        public UpdateSet() {
+        }
+
+        public UpdateSet(SFunction<?, ?> column, Object value, String mapping, boolean incOrDnc, String cal) {
+            this.column = column;
+            this.value = value;
+            this.mapping = mapping;
+            this.incOrDnc = incOrDnc;
+            this.cal = cal;
+        }
     }
 }

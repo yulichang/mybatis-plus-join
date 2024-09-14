@@ -103,7 +103,6 @@ public class MPJInterceptor implements Interceptor {
             }
             if (wrapper.isResultMapCollection()) {
                 if (map.values().stream().anyMatch(a -> a instanceof IPage) && !wrapper.isPageByMain()) {
-                    AdapterHelper.getAdapter().checkCollectionPage();
                     // 一对多分页问题警告
                     log.warn("select one to many and page query will result in errors in the total count statistics, please use xml.");
                 }

@@ -1,19 +1,13 @@
 package com.github.yulichang.toolkit;
 
-import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
-import com.baomidou.mybatisplus.extension.plugins.inner.InnerInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.PaginationInnerInterceptor;
 import com.github.yulichang.adapter.AdapterHelper;
 import com.github.yulichang.interceptor.MPJInterceptor;
 import com.github.yulichang.interceptor.pagination.PageInnerInterceptorWrapper;
-import org.apache.ibatis.logging.Log;
-import org.apache.ibatis.logging.LogFactory;
 import org.apache.ibatis.plugin.Interceptor;
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 import java.util.function.Predicate;
 
 /**
@@ -25,8 +19,6 @@ import java.util.function.Predicate;
  * @since 1.3.0
  */
 public class InterceptorList<E extends Interceptor> extends ArrayList<E> {
-
-    private static final Log log = LogFactory.getLog(InterceptorList.class);
 
     public InterceptorList() {
         super();
@@ -72,28 +64,7 @@ public class InterceptorList<E extends Interceptor> extends ArrayList<E> {
     }
 
     private void wrapperInnerPage(Interceptor interceptor) {
-        try {
-            AdapterHelper.getAdapter().checkCollectionPage();
-        } catch (Exception e) {
-            return;
-        }
-        if (interceptor instanceof MybatisPlusInterceptor) {
-            MybatisPlusInterceptor mybatisPlusInterceptor = (MybatisPlusInterceptor) interceptor;
-            try {
-                Field field = MybatisPlusInterceptor.class.getDeclaredField("interceptors");
-                field.setAccessible(true);
-                @SuppressWarnings("unchecked")
-                List<InnerInterceptor> interceptors = (List<InnerInterceptor>) field.get(mybatisPlusInterceptor);
-
-                interceptors.replaceAll(i -> {
-                    if (i instanceof PaginationInnerInterceptor && !(i instanceof PageInnerInterceptorWrapper)) {
-                        return new PageInnerInterceptorWrapper((PaginationInnerInterceptor) i);
-                    }
-                    return i;
-                });
-            } catch (Exception e) {
-                log.error(e.getMessage(), e);
-            }
-        }
+        AdapterHelper.getAdapter().wrapperInnerPage(interceptor, p -> p instanceof PageInnerInterceptorWrapper,
+                p -> new PageInnerInterceptorWrapper((PaginationInnerInterceptor) p));
     }
 }

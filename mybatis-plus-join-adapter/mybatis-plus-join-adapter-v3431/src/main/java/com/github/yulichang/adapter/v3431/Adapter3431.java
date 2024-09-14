@@ -3,7 +3,6 @@ package com.github.yulichang.adapter.v3431;
 import com.baomidou.mybatisplus.core.MybatisPlusVersion;
 import com.baomidou.mybatisplus.core.metadata.TableFieldInfo;
 import com.baomidou.mybatisplus.core.metadata.TableInfo;
-import com.baomidou.mybatisplus.core.toolkit.ExceptionUtils;
 import com.baomidou.mybatisplus.core.toolkit.StringPool;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.github.yulichang.adapter.base.IAdapter;
@@ -11,6 +10,7 @@ import com.github.yulichang.adapter.base.metadata.OrderFieldInfo;
 import com.github.yulichang.adapter.base.tookit.VersionUtils;
 import com.github.yulichang.adapter.jsqlparser.v46.JSqlParserHelperV46;
 import lombok.AllArgsConstructor;
+import org.apache.ibatis.plugin.Interceptor;
 import org.apache.ibatis.session.Configuration;
 import org.apache.ibatis.type.TypeHandler;
 import org.apache.ibatis.type.TypeHandlerRegistry;
@@ -18,6 +18,8 @@ import org.apache.ibatis.type.TypeHandlerRegistry;
 import java.lang.reflect.Field;
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 /**
@@ -63,7 +65,6 @@ public class Adapter3431 implements IAdapter {
     }
 
     @Override
-    public void checkCollectionPage() {
-        throw ExceptionUtils.mpe("page by main need MP version 3.5.6+, current version: " + MybatisPlusVersion.getVersion());
+    public void wrapperInnerPage(Interceptor interceptor, Predicate<Object> predicate, Function<Object, Object> function) {
     }
 }

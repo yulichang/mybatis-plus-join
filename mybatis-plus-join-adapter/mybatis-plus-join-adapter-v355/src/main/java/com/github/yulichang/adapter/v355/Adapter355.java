@@ -1,15 +1,16 @@
 package com.github.yulichang.adapter.v355;
 
-import com.baomidou.mybatisplus.core.MybatisPlusVersion;
-import com.baomidou.mybatisplus.core.toolkit.ExceptionUtils;
 import com.github.yulichang.adapter.base.IAdapter;
 import com.github.yulichang.adapter.jsqlparser.v46.JSqlParserHelperV46;
+import org.apache.ibatis.plugin.Interceptor;
 import org.apache.ibatis.session.Configuration;
 import org.apache.ibatis.type.TypeHandler;
 import org.apache.ibatis.type.TypeHandlerRegistry;
 
 import java.lang.reflect.Field;
 import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.Predicate;
 
 /**
  * @author yulichang
@@ -33,7 +34,6 @@ public class Adapter355 implements IAdapter {
     }
 
     @Override
-    public void checkCollectionPage() {
-        throw ExceptionUtils.mpe("page by main need MP version 3.5.6+, current version: " + MybatisPlusVersion.getVersion());
+    public void wrapperInnerPage(Interceptor interceptor, Predicate<Object> predicate, Function<Object, Object> function) {
     }
 }

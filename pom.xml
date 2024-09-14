@@ -43,7 +43,7 @@
     </modules>
 
     <properties>
-        <revision>1.4.13</revision>
+        <revision>1.5.0</revision>
         <mpj.mybatis.plus.version>3.5.7</mpj.mybatis.plus.version>
 
         <jdkVersion>1.8</jdkVersion>

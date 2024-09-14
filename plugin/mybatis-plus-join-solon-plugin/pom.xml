@@ -13,7 +13,7 @@
     <artifactId>mybatis-plus-join-solon-plugin</artifactId>
 
     <properties>
-        <solon.varrsion>2.8.0</solon.varrsion>
+        <solon.varrsion>2.9.3</solon.varrsion>
     </properties>
 
     <dependencies>

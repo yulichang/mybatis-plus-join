@@ -7,6 +7,7 @@ import com.github.yulichang.interfaces.MPJBaseJoin;
 import com.github.yulichang.toolkit.SqlHelper;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -123,5 +124,46 @@ public interface Chain<T> extends MPJBaseJoin<T> {
      */
     default <R, P extends IPage<R>> P page(P page, Class<R> resultType) {
         return SqlHelper.exec(getEntityClass(), mapper -> mapper.selectJoinPage(page, resultType, this));
+    }
+
+    /**
+     * 链式调用
+     * 构造方法必须传 class 或 entity 否则会报错<br />
+     * new MPJLambdaWrapper(User.class)<br />
+     * JoinWrappers.lambda(User.class)<br />
+     */
+    default Map<String, Object> mapOne() {
+        return SqlHelper.exec(getEntityClass(), mapper -> mapper.selectJoinMap(this));
+    }
+
+    /**
+     * 链式调用
+     * 构造方法必须传 class 或 entity 否则会报错<br />
+     * new MPJLambdaWrapper(User.class)<br />
+     * JoinWrappers.lambda(User.class)<br />
+     */
+    default Map<String, Object> mapFirst() {
+        List<Map<String, Object>> mapList = mapPage(new Page<Map<String, Object>>(1, 1).setSearchCount(false)).getRecords();
+        return Optional.of(mapList).filter(CollectionUtils::isNotEmpty).map(m -> m.get(0)).orElse(null);
+    }
+
+    /**
+     * 链式调用
+     * 构造方法必须传 class 或 entity 否则会报错<br />
+     * new MPJLambdaWrapper(User.class)<br />
+     * JoinWrappers.lambda(User.class)<br />
+     */
+    default List<Map<String, Object>> mapList() {
+        return SqlHelper.exec(getEntityClass(), mapper -> mapper.selectJoinMaps(this));
+    }
+
+    /**
+     * 链式调用
+     * 构造方法必须传 class 或 entity 否则会报错<br />
+     * new MPJLambdaWrapper(User.class)<br />
+     * JoinWrappers.lambda(User.class)<br />
+     */
+    default <P extends IPage<Map<String, Object>>> P mapPage(P page) {
+        return SqlHelper.exec(getEntityClass(), mapper -> mapper.selectJoinMapsPage(page, this));
     }
 }

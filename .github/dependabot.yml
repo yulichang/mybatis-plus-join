@@ -6,14 +6,8 @@
 version: 2
 updates:
   - package-ecosystem: "maven" # See documentation for possible values
-    directories:
-#      - "/mybatis-plus-join-adapter"
-      - "/mybatis-plus-join-boot-starter"
-      - "/mybatis-plus-join-core"
-      - "/mybatis-plus-join-annotation"
-      - "/mybatis-plus-join-extension"
-      - "/mybatis-plus-join-test"
-      - "/plugin/mybatis-plus-join-solon-plugin"
-      - "/plugin/mybatis-plus-join-processor"
+    directory: "/"
     schedule:
       interval: "weekly"
+    ignore:
+      - dependency-name: "com.baomidou:mybatis-plus*"

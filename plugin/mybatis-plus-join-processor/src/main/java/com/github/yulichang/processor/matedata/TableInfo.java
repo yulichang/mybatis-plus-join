@@ -1,12 +1,10 @@
 package com.github.yulichang.processor.matedata;
 
-import com.github.yulichang.extension.apt.matedata.OgnlRoot;
-import org.apache.ibatis.builder.BuilderException;
-import org.apache.ibatis.ognl.Ognl;
-import org.apache.ibatis.ognl.OgnlContext;
-import org.apache.ibatis.ognl.OgnlException;
+import ognl.Ognl;
+import ognl.OgnlContext;
+import ognl.OgnlException;
 
-import java.util.Set;
+import java.util.List;
 
 /**
  * @author yulichang
@@ -28,7 +26,7 @@ public class TableInfo {
 
     private final Conf conf;
 
-    private Set<FieldInfo> fields;
+    private List<FieldInfo> fields;
 
     private String tagClassName;
     private String tagPackageName;
@@ -90,7 +88,7 @@ public class TableInfo {
             try {
                 return Ognl.getValue(ognl, context, context.getRoot()).toString();
             } catch (OgnlException e) {
-                throw new BuilderException("Error evaluating expression '" + ognl + "'. Cause: " + e, e);
+                throw new RuntimeException("Error evaluating expression '" + ognl + "'. Cause: " + e, e);
             }
         } else {
             tag = String.format(expression, source);
@@ -130,11 +128,11 @@ public class TableInfo {
         return this.conf.isCache();
     }
 
-    public Set<FieldInfo> getFields() {
+    public List<FieldInfo> getFields() {
         return fields;
     }
 
-    public void setFields(Set<FieldInfo> fields) {
+    public void setFields(List<FieldInfo> fields) {
         this.fields = fields;
     }
 

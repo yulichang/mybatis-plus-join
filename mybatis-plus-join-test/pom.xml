@@ -50,7 +50,7 @@
 
     <properties>
         <revision>1.5.0</revision>
-        <mpj.mybatis.plus.version>3.5.7</mpj.mybatis.plus.version>
+        <mpj.mybatis.plus.version>3.5.8</mpj.mybatis.plus.version>
 
         <jdkVersion>17</jdkVersion>
         <jdkVersion.test>17</jdkVersion.test>
@@ -113,7 +113,6 @@
                 <artifactId>flatten-maven-plugin</artifactId>
                 <version>1.6.0</version>
                 <configuration>
-                    <!-- 是否更新pom文件，此处还有更高级的用法 -->
                     <updatePomFile>true</updatePomFile>
                     <flattenMode>resolveCiFriendliesOnly</flattenMode>
                 </configuration>

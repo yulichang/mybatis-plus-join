@@ -94,7 +94,7 @@ public class PageInnerInterceptorWrapper extends PaginationInnerInterceptor {
      * 添加分页方言
      */
     @Override
-    public void beforeQuery(Executor executor, MappedStatement ms, Object parameter, RowBounds rowBounds, ResultHandler resultHandler, BoundSql boundSql) throws SQLException {
+    public void beforeQuery(Executor executor, MappedStatement ms, Object parameter, RowBounds rowBounds, ResultHandler resultHandler, BoundSql boundSql) {
         if (unusedPage(parameter)) {
             paginationInnerInterceptor.beforeQuery(executor, ms, parameter, rowBounds, resultHandler, boundSql);
             return;

@@ -9,14 +9,13 @@ import com.baomidou.mybatisplus.core.injector.methods.*;
 import com.baomidou.mybatisplus.core.mapper.Mapper;
 import com.baomidou.mybatisplus.core.metadata.TableInfo;
 import com.baomidou.mybatisplus.core.toolkit.ArrayUtils;
-import com.baomidou.mybatisplus.core.toolkit.ClassUtils;
 import com.baomidou.mybatisplus.core.toolkit.ExceptionUtils;
 import com.github.yulichang.adapter.base.tookit.VersionUtils;
 import com.github.yulichang.adapter.v3431.AbstractMethodV3431;
 import com.github.yulichang.method.*;
 import com.github.yulichang.toolkit.MPJTableMapperHelper;
+import com.github.yulichang.toolkit.ReflectionKit;
 import com.github.yulichang.toolkit.TableHelper;
-import com.github.yulichang.toolkit.reflect.GenericTypeUtils;
 import lombok.Getter;
 import org.apache.ibatis.builder.MapperBuilderAssistant;
 import org.apache.ibatis.session.Configuration;
@@ -173,7 +172,7 @@ public class MPJSqlInjector extends DefaultSqlInjector {
 
     @Override
     public void inspectInject(MapperBuilderAssistant builderAssistant, Class<?> mapperClass) {
-        Class<?> modelClass = getSuperClassGenericType(mapperClass, Mapper.class, 0);
+        Class<?> modelClass = ReflectionKit.getSuperClassGenericType(mapperClass, Mapper.class, 0);
         super.inspectInject(builderAssistant, mapperClass);
         MPJTableMapperHelper.init(modelClass, mapperClass);
         Supplier<Class<?>> supplier = () -> {
@@ -184,11 +183,6 @@ public class MPJSqlInjector extends DefaultSqlInjector {
             }
         };
         TableHelper.init(modelClass, supplier.get());
-    }
-
-    public static Class<?> getSuperClassGenericType(final Class<?> clazz, final Class<?> genericIfc, final int index) {
-        Class<?>[] typeArguments = GenericTypeUtils.resolveTypeArguments(ClassUtils.getUserClass(clazz), genericIfc);
-        return null == typeArguments ? null : typeArguments[index];
     }
 
     @SuppressWarnings("IfStatementWithIdenticalBranches")

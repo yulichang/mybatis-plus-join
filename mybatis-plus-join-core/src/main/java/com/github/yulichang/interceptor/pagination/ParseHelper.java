@@ -1,7 +1,7 @@
 package com.github.yulichang.interceptor.pagination;
 
 import com.baomidou.mybatisplus.core.toolkit.Assert;
-import com.github.yulichang.toolkit.ReflectionKit;
+import com.github.yulichang.toolkit.MPJReflectionKit;
 import org.apache.ibatis.mapping.ParameterMapping;
 import org.apache.ibatis.mapping.SqlSource;
 import org.apache.ibatis.scripting.xmltags.DynamicSqlSource;
@@ -102,8 +102,8 @@ public final class ParseHelper {
     public static String getOriginalSql(Object parameter, DynamicSqlSource sqlSource) {
         Assert.notNull(sqlSource, "sqlSource must not be null");
         SqlSourceWrapper sqlSourceWrapper = SQL_SOURCE_CACHE.computeIfAbsent(sqlSource, key -> {
-            Configuration configuration = ReflectionKit.getFieldValue(sqlSource, "configuration");
-            SqlNode sqlNode = ReflectionKit.getFieldValue(sqlSource, "rootSqlNode");
+            Configuration configuration = MPJReflectionKit.getFieldValue(sqlSource, "configuration");
+            SqlNode sqlNode = MPJReflectionKit.getFieldValue(sqlSource, "rootSqlNode");
             return new SqlSourceWrapper(configuration, sqlNode);
         });
         return ParseHelper.decode(sqlSourceWrapper.getSql(parameter), null, ParseHelper.format.apply(""));

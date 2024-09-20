@@ -19,9 +19,12 @@ import com.baomidou.mybatisplus.core.toolkit.Assert;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.core.toolkit.ExceptionUtils;
 import com.github.yulichang.toolkit.reflect.GenericTypeUtils;
+import com.github.yulichang.toolkit.reflect.TypeParameterResolver;
 
+import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import java.security.AccessController;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
@@ -70,14 +73,19 @@ public final class ReflectionKit {
      * @param entity    实体
      * @param fieldName 字段名称
      * @return 属性值
+     * @deprecated 3.5.4
      */
-    public static <T> T getFieldValue(Object entity, String fieldName) {
+    @Deprecated
+    public static Object getFieldValue(Object entity, String fieldName) {
+        Class<?> cls = entity.getClass();
+        Map<String, Field> fieldMaps = getFieldMap(cls);
         try {
-            Field field = entity.getClass().getDeclaredField(fieldName);
+            Field field = fieldMaps.get(fieldName);
+            Assert.notNull(field, "Error: NoSuchField in %s for %s.  Cause:", cls.getSimpleName(), fieldName);
             field.setAccessible(true);
-            return (T) field.get(entity);
+            return field.get(entity);
         } catch (ReflectiveOperationException e) {
-            throw ExceptionUtils.mpe("Error: Cannot read field in %s.  Cause:", e, entity.getClass().getSimpleName());
+            throw ExceptionUtils.mpe("Error: Cannot read field in %s.  Cause:", e, cls.getSimpleName());
         }
     }
 
@@ -92,9 +100,13 @@ public final class ReflectionKit {
      * @return Class
      */
     public static Class<?> getSuperClassGenericType(final Class<?> clazz, final Class<?> genericIfc, final int index) {
-        //update by noear @2021-09-03
-        Class<?>[] typeArguments = GenericTypeUtils.resolveTypeArguments(ClassUtils.getUserClass(clazz), genericIfc);
-        return null == typeArguments ? null : typeArguments[index];
+        // 这里泛型逻辑提取进行了调整,如果在Spring项目情况或者自定义了泛型提取,那就优先走这里,否则使用框架内置的进行泛型提取.
+        Class<?> userClass = ClassUtils.getUserClass(clazz);
+        if (GenericTypeUtils.hasGenericTypeResolver()) {
+            Class<?>[] typeArguments = GenericTypeUtils.resolveTypeArguments(userClass, genericIfc);
+            return null == typeArguments ? null : typeArguments[index];
+        }
+        return (Class<?>) TypeParameterResolver.resolveClassIndexedParameter(userClass, genericIfc, index);
     }
 
     /**
@@ -120,7 +132,7 @@ public final class ReflectionKit {
         if (Objects.isNull(clazz)) {
             return Collections.emptyList();
         }
-        return computeIfAbsent(CLASS_FIELD_CACHE, clazz, k -> {
+        return CLASS_FIELD_CACHE.computeIfAbsent(clazz, k -> {
             Field[] fields = k.getDeclaredFields();
             List<Field> superFields = new ArrayList<>();
             Class<?> currentClass = k.getSuperclass();
@@ -181,11 +193,17 @@ public final class ReflectionKit {
         return (clazz.isPrimitive() && clazz != void.class ? PRIMITIVE_TYPE_TO_WRAPPER_MAP.get(clazz) : clazz);
     }
 
-    public static <K, V> V computeIfAbsent(Map<K, V> concurrentHashMap, K key, Function<? super K, ? extends V> mappingFunction) {
-        V v = concurrentHashMap.get(key);
-        if (v != null) {
-            return v;
-        }
-        return concurrentHashMap.computeIfAbsent(key, mappingFunction);
+    /**
+     * 设置可访问对象的可访问权限为 true
+     *
+     * @param object 可访问的对象
+     * @param <T>    类型
+     * @return 返回设置后的对象
+     * @deprecated 3.5.4 {@link java.security.AccessController}
+     */
+    @Deprecated
+    public static <T extends AccessibleObject> T setAccessible(T object) {
+        return AccessController.doPrivileged(new SetAccessibleAction<>(object));
     }
+
 }

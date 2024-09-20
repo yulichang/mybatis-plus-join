@@ -31,7 +31,7 @@ public class SelectJoinOne extends MPJAbstractMethod {
         String sql = String.format(sqlMethod.getSql(), sqlFirst(), sqlDistinct(), sqlSelectColumns(tableInfo, true),
                 mpjTableName(tableInfo), sqlAlias(), sqlFrom(), sqlWhereEntityWrapper(true, tableInfo), sqlComment());
         SqlSource sqlSource = languageDriver.createSqlSource(configuration, removeExtraWhitespaces(sql), modelClass);
-        return this.addSelectMappedStatementForOther(mapperClass, sqlMethod.getMethod(), sqlSource, MPJResultType.class);
+        return this.addSelectMappedStatementForOther(mapperClass, sqlMethod.getMethod(), sqlSource, tableInfo.getEntityType());
     }
 
     @Override

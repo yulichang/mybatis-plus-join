@@ -50,6 +50,16 @@ public interface MPJBaseMapper<T> extends BaseMapper<T> {
      * 连表查询返回一条记录
      *
      * @param wrapper joinWrapper
+     * @return T
+     */
+    default T selectJoinOne(@Param(Constants.WRAPPER) MPJBaseJoin<T> wrapper) {
+        return selectJoinOne(null, wrapper);
+    }
+
+    /**
+     * 连表查询返回一条记录
+     *
+     * @param wrapper joinWrapper
      * @param clazz   resultType
      */
     <DTO> DTO selectJoinOne(@Param(Constant.CLAZZ) Class<DTO> clazz,
@@ -69,6 +79,16 @@ public interface MPJBaseMapper<T> extends BaseMapper<T> {
      * 连表查询返回记录集合
      *
      * @param wrapper joinWrapper
+     * @return List&lt;T&gt;
+     */
+    default List<T> selectJoinList(@Param(Constants.WRAPPER) MPJBaseJoin<T> wrapper) {
+        return selectJoinList(null, wrapper);
+    }
+
+    /**
+     * 连表查询返回记录集合
+     *
+     * @param wrapper joinWrapper
      * @param clazz   resultType
      */
     <DTO> List<DTO> selectJoinList(@Param(Constant.CLAZZ) Class<DTO> clazz,
@@ -82,6 +102,15 @@ public interface MPJBaseMapper<T> extends BaseMapper<T> {
     default List<Map<String, Object>> selectJoinMaps(@Param(Constants.WRAPPER) MPJBaseJoin<T> wrapper) {
         //noinspection unchecked
         return (List<Map<String, Object>>) ((Object) selectJoinList(Map.class, wrapper));
+    }
+
+    /**
+     * 连表查询返回记录集合并分页
+     *
+     * @param wrapper joinWrapper
+     */
+    default <P extends IPage<T>> P selectJoinPage(P page, @Param(Constants.WRAPPER) MPJBaseJoin<T> wrapper) {
+        return selectJoinPage(page, null, wrapper);
     }
 
     /**

@@ -66,14 +66,14 @@ public class MPJInterceptor implements Interceptor {
                 if (Objects.nonNull(ew) && ew instanceof MPJBaseJoin) {
                     if (CollectionUtils.isNotEmpty(map)) {
                         Class<?> rt = null;
-                        if (map.containsKey(Constant.CLAZZ)) {
+                        if (map.containsKey(Constant.CLAZZ) && map.get(Constant.CLAZZ) != null) {
                             rt = (Class<?>) map.get(Constant.CLAZZ);
                         } else {
                             if (CollectionUtils.isNotEmpty(ms.getResultMaps())) {
                                 Class<?> entity = MPJTableMapperHelper.getEntity(getMapper(ms.getId(), ms.getResource()));
                                 Class<?> type = ms.getResultMaps().get(0).getType();
                                 if (Objects.nonNull(entity) && Objects.nonNull(type)
-                                        && !MPJReflectionKit.isPrimitiveOrWrapper(type) && entity == type) {
+                                        && !MPJReflectionKit.isPrimitiveOrWrapper(type) && (entity == type)) {
                                     rt = type;
                                 }
                             }

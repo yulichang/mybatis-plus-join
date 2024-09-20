@@ -60,7 +60,10 @@ public interface MPJBaseMapper<T> extends BaseMapper<T> {
      *
      * @param wrapper joinWrapper
      */
-    Map<String, Object> selectJoinMap(@Param(Constants.WRAPPER) MPJBaseJoin<T> wrapper);
+    default Map<String, Object> selectJoinMap(@Param(Constants.WRAPPER) MPJBaseJoin<T> wrapper) {
+        //noinspection unchecked
+        return selectJoinOne(Map.class, wrapper);
+    }
 
     /**
      * 连表查询返回记录集合
@@ -76,7 +79,10 @@ public interface MPJBaseMapper<T> extends BaseMapper<T> {
      *
      * @param wrapper joinWrapper
      */
-    List<Map<String, Object>> selectJoinMaps(@Param(Constants.WRAPPER) MPJBaseJoin<T> wrapper);
+    default List<Map<String, Object>> selectJoinMaps(@Param(Constants.WRAPPER) MPJBaseJoin<T> wrapper) {
+        //noinspection unchecked
+        return (List<Map<String, Object>>) ((Object) selectJoinList(Map.class, wrapper));
+    }
 
     /**
      * 连表查询返回记录集合并分页
@@ -94,6 +100,9 @@ public interface MPJBaseMapper<T> extends BaseMapper<T> {
      *
      * @param wrapper joinWrapper
      */
-    <P extends IPage<Map<String, Object>>> P selectJoinMapsPage(P page,
-                                                                @Param(Constants.WRAPPER) MPJBaseJoin<T> wrapper);
+    default <P extends IPage<Map<String, Object>>> P selectJoinMapsPage(P page,
+                                                                        @Param(Constants.WRAPPER) MPJBaseJoin<T> wrapper) {
+        //noinspection unchecked,rawtypes
+        return (P) selectJoinPage((IPage) page, Map.class, wrapper);
+    }
 }

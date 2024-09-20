@@ -137,9 +137,6 @@ public class MPJSqlInjector extends DefaultSqlInjector {
             list.add(new SelectJoinOne(SqlMethod.SELECT_JOIN_ONE.getMethod()));
             list.add(new SelectJoinList(SqlMethod.SELECT_JOIN_LIST.getMethod()));
             list.add(new SelectJoinPage(SqlMethod.SELECT_JOIN_PAGE.getMethod()));
-            list.add(new SelectJoinMap(SqlMethod.SELECT_JOIN_MAP.getMethod()));
-            list.add(new SelectJoinMaps(SqlMethod.SELECT_JOIN_MAPS.getMethod()));
-            list.add(new SelectJoinMapsPage(SqlMethod.SELECT_JOIN_MAPS_PAGE.getMethod()));
         } else {
             list.add(new DeleteJoin());
             list.add(new UpdateJoin());
@@ -148,9 +145,6 @@ public class MPJSqlInjector extends DefaultSqlInjector {
             list.add(new SelectJoinOne());
             list.add(new SelectJoinList());
             list.add(new SelectJoinPage());
-            list.add(new SelectJoinMap());
-            list.add(new SelectJoinMaps());
-            list.add(new SelectJoinMapsPage());
         }
         return list;
     }

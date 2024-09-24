@@ -50,7 +50,7 @@
 
     <properties>
         <revision>1.5.0</revision>
-        <mpj.mybatis.plus.version>3.5.8</mpj.mybatis.plus.version>
+        <mybatis.plus.version>3.5.8</mybatis.plus.version>
 
         <jdkVersion>17</jdkVersion>
         <jdkVersion.test>17</jdkVersion.test>
@@ -97,7 +97,7 @@
         <dependency>
             <groupId>com.baomidou</groupId>
             <artifactId>mybatis-plus-spring-boot3-starter</artifactId>
-            <version>${mpj.mybatis.plus.version}</version>
+            <version>${mybatis.plus.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>

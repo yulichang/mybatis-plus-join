@@ -122,4 +122,4 @@ MPJLambdaWrapper其他功能
 
 # <a href="https://mybatis-plus-join.github.io" target="_blank">使用文档 wiki</a>
 # 用爱发电
-![捐赠 mybatis-plus-join](https://foruda.gitee.com/images/1717191488951888381/8463cfcd_2020985.png "支持一下mybatis-plus-join")
+![捐赠 mybatis-plus-join](https://mybatis-plus-join.github.io/support.png "支持一下mybatis-plus-join")

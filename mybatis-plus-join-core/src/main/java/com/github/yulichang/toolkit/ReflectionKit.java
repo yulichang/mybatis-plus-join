@@ -21,10 +21,8 @@ import com.baomidou.mybatisplus.core.toolkit.ExceptionUtils;
 import com.github.yulichang.toolkit.reflect.GenericTypeUtils;
 import com.github.yulichang.toolkit.reflect.TypeParameterResolver;
 
-import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
-import java.security.AccessController;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
@@ -192,18 +190,4 @@ public final class ReflectionKit {
     public static Class<?> resolvePrimitiveIfNecessary(Class<?> clazz) {
         return (clazz.isPrimitive() && clazz != void.class ? PRIMITIVE_TYPE_TO_WRAPPER_MAP.get(clazz) : clazz);
     }
-
-    /**
-     * 设置可访问对象的可访问权限为 true
-     *
-     * @param object 可访问的对象
-     * @param <T>    类型
-     * @return 返回设置后的对象
-     * @deprecated 3.5.4 {@link java.security.AccessController}
-     */
-    @Deprecated
-    public static <T extends AccessibleObject> T setAccessible(T object) {
-        return AccessController.doPrivileged(new SetAccessibleAction<>(object));
-    }
-
 }

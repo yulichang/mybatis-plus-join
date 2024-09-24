@@ -39,7 +39,7 @@
         <dependency>
             <groupId>com.baomidou</groupId>
             <artifactId>mybatis-plus-core</artifactId>
-            <version>${mpj.mybatis.plus.version}</version>
+            <version>${mybatis.plus.version}</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>

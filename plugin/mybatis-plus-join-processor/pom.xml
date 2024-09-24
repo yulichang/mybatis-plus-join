@@ -23,7 +23,7 @@
         <dependency>
             <groupId>com.baomidou</groupId>
             <artifactId>mybatis-plus-extension</artifactId>
-            <version>${mpj.mybatis.plus.version}</version>
+            <version>${mybatis.plus.version}</version>
             <optional>true</optional>
         </dependency>
     </dependencies>

@@ -13,7 +13,7 @@
     <artifactId>mybatis-plus-join-solon-plugin</artifactId>
 
     <properties>
-        <solon.varrsion>2.9.3</solon.varrsion>
+        <solon.version>2.9.3</solon.version>
     </properties>
 
     <dependencies>
@@ -25,19 +25,19 @@
         <dependency>
             <groupId>org.noear</groupId>
             <artifactId>solon</artifactId>
-            <version>${solon.varrsion}</version>
+            <version>${solon.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.noear</groupId>
             <artifactId>mybatis-solon-plugin</artifactId>
-            <version>${solon.varrsion}</version>
+            <version>${solon.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.noear</groupId>
             <artifactId>mybatis-plus-extension-solon-plugin</artifactId>
-            <version>${solon.varrsion}</version>
+            <version>${solon.version}</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>

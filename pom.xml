@@ -78,7 +78,7 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-configuration-processor</artifactId>
                 <optional>true</optional>
-                <version>3.3.3</version>
+                <version>3.3.4</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

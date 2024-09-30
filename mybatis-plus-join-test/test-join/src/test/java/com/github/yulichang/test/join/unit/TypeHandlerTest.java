@@ -1,5 +1,6 @@
 package com.github.yulichang.test.join.unit;
 
+import com.github.yulichang.test.join.entity.TableA;
 import com.github.yulichang.test.join.entity.UserDO;
 import com.github.yulichang.test.util.Reset;
 import com.github.yulichang.toolkit.JoinWrappers;
@@ -19,12 +20,25 @@ public class TypeHandlerTest {
     }
 
     @Test
-    void typeHandler(){
+    void typeHandler() {
         MPJLambdaWrapper<UserDO> wrapper = JoinWrappers.lambda(UserDO.class);
 
         List<UserDO> list = wrapper.list();
 
         System.out.println(list.get(0).getJson().get(0).getClass().getName());
+
+        list.forEach(System.out::println);
+    }
+
+    @Test
+    void typeHandler1() {
+        MPJLambdaWrapper<TableA> wrapper = JoinWrappers.lambda(TableA.class);
+
+        List<TableA> list = wrapper.list();
+
+        assert list.get(0).getListCol() != null;
+        assert list.get(0).getEntryCol() != null;
+        assert list.get(0).getMapCol() != null;
 
         list.forEach(System.out::println);
     }

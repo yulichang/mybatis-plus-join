@@ -122,3 +122,15 @@ INSERT INTO user_tenanta (id,user_id, tenant_id, 中文字段) VALUES
 (6, 6, 2, '中文字段6'),
 (7, 7, 2, '中文字段7'),
 (8, 8, 2, '中文字段8');
+
+
+DELETE FROM tablea;
+INSERT INTO tablea (id,map_col, entry_col,list_col) VALUES
+(1, '{"id":1}', '{"name":"Tom"}', '["jerry","Spike"]'),
+(2, '{"id":1}', '{"name":"Tom"}', '["jerry","Spike"]'),
+(3, '{"id":1}', '{"name":"Tom"}', '["jerry","Spike"]'),
+(4, '{"id":1}', '{"name":"Tom"}', '["jerry","Spike"]'),
+(5, '{"id":1}', '{"name":"Tom"}', '["jerry","Spike"]'),
+(6, '{"id":1}', '{"name":"Tom"}', '["jerry","Spike"]'),
+(7, '{"id":1}', '{"name":"Tom"}', '["jerry","Spike"]'),
+(8, '{"id":1}', '{"name":"Tom"}', '["jerry","Spike"]');

@@ -105,14 +105,14 @@ public class SelectCache implements Serializable {
     }
 
     public static class Cache {
-        private static final Map<Class<?>, Map<Class<?>, TypeHandler<?>>> CACHE = new ConcurrentHashMap<>();
+        private static final Map<Class<?>, Map<String, TypeHandler<?>>> CACHE = new ConcurrentHashMap<>();
 
         public static TypeHandler<?> getTypeHandlerCache(Class<?> table, Class<? extends TypeHandler<?>> typeHandler, Class<?> propertyType, String columProperty) {
             if (table == null || typeHandler == null) {
                 return null;
             }
-            Map<Class<?>, TypeHandler<?>> map = CACHE.computeIfAbsent(table, k -> new ConcurrentHashMap<>());
-            return map.computeIfAbsent(typeHandler, k -> {
+            Map<String, TypeHandler<?>> map = CACHE.computeIfAbsent(table, k -> new ConcurrentHashMap<>());
+            return map.computeIfAbsent(columProperty, k -> {
                 TableInfo info = TableHelper.getAssert(table);
                 @SuppressWarnings("OptionalGetWithoutIsPresent")
                 TableFieldInfo fieldInfo = info.getFieldList().stream().filter(f -> f.getProperty().equals(columProperty)).findFirst().get();

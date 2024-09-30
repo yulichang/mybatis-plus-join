@@ -83,3 +83,13 @@ create table user_tenanta
     tenant_id int null,
     中文字段  varchar(255) null
 );
+
+DROP TABLE IF EXISTS tablea;
+create table tablea
+(
+    id        int
+        primary key,
+    map_col   varchar(255) null,
+    entry_col varchar(255) null,
+    list_col varchar(255) null
+);

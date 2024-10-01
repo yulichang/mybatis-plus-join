@@ -57,35 +57,34 @@ public class MPJInterceptor implements Interceptor {
 
     @Override
     public Object intercept(Invocation invocation) throws Throwable {
+        Object ew = null;
         Object[] args = invocation.getArgs();
         if (args[0] instanceof MappedStatement) {
             MappedStatement ms = (MappedStatement) args[0];
             if (args[1] instanceof Map) {
                 Map<String, Object> map = (Map<String, Object>) args[1];
-                Object ew = map.getOrDefault(Constants.WRAPPER, null);
+                ew = map.getOrDefault(Constants.WRAPPER, null);
                 if (Objects.nonNull(ew) && ew instanceof MPJBaseJoin) {
-                    if (CollectionUtils.isNotEmpty(map)) {
-                        Class<?> rt = null;
-                        if (map.containsKey(Constant.CLAZZ) && map.get(Constant.CLAZZ) != null) {
-                            rt = (Class<?>) map.get(Constant.CLAZZ);
-                        } else {
-                            if (CollectionUtils.isNotEmpty(ms.getResultMaps())) {
-                                Class<?> entity = MPJTableMapperHelper.getEntity(getMapper(ms.getId(), ms.getResource()));
-                                Class<?> type = ms.getResultMaps().get(0).getType();
-                                if (Objects.nonNull(entity) && Objects.nonNull(type)
-                                        && !MPJReflectionKit.isPrimitiveOrWrapper(type) && (entity == type)) {
-                                    rt = type;
-                                }
+                    Class<?> rt = null;
+                    if (map.containsKey(Constant.CLAZZ) && map.get(Constant.CLAZZ) != null) {
+                        rt = (Class<?>) map.get(Constant.CLAZZ);
+                    } else {
+                        if (CollectionUtils.isNotEmpty(ms.getResultMaps())) {
+                            Class<?> entity = MPJTableMapperHelper.getEntity(getMapper(ms.getId(), ms.getResource()));
+                            Class<?> type = ms.getResultMaps().get(0).getType();
+                            if (Objects.nonNull(entity) && Objects.nonNull(type)
+                                    && !MPJReflectionKit.isPrimitiveOrWrapper(type) && (entity == type)) {
+                                rt = type;
                             }
                         }
-                        if (Objects.nonNull(rt)) {
-                            args[0] = getMappedStatement(ms, rt, ew, map);
-                        }
+                    }
+                    if (Objects.nonNull(rt)) {
+                        args[0] = getMappedStatement(ms, rt, ew, map);
                     }
                 }
             }
         }
-        return invocation.proceed();
+        return fill(ew, invocation.proceed());
     }
 
 
@@ -360,6 +359,24 @@ public class MPJInterceptor implements Interceptor {
         if (!ms.getConfiguration().hasResultMap(key)) {
             ms.getConfiguration().addResultMap(resultMap);
         }
+    }
+
+    private Object fill(Object ew, Object proceed) {
+        if (Objects.isNull(ew) || !(ew instanceof SelectWrapper<?, ?>) || MPJReflectionKit.isPrimitiveOrWrapper(proceed.getClass())) {
+            return proceed;
+        }
+        if (proceed instanceof List) {
+            List<?> list = (List<?>) proceed;
+            if (!list.isEmpty()) {
+                Object o = list.stream().filter(Objects::nonNull).findFirst().orElse(null);
+                if (o == null || MPJReflectionKit.isPrimitiveOrWrapper(o.getClass())) {
+                    return proceed;
+                }
+            }
+        }
+        SelectWrapper<?, ?> selectWrapper = (SelectWrapper<?, ?>) ew;
+        selectWrapper.doFill(proceed);
+        return proceed;
     }
 
     private Class<?> getMapper(String id, String resource) {

@@ -15,12 +15,18 @@
  */
 package com.github.yulichang.toolkit.support;
 
+import org.apache.ibatis.reflection.property.PropertyNamer;
+
 /**
  * Lambda 信息
  * <p>
  * Created by hcl at 2021/5/14
  */
 public interface LambdaMeta {
+
+    default String getName() {
+        return PropertyNamer.methodToProperty(getImplMethodName());
+    }
 
     /**
      * 获取 lambda 表达式实现方法的名称

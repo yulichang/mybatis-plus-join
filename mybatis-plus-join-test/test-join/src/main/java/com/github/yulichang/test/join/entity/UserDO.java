@@ -70,5 +70,8 @@ public class UserDO extends ID<Integer> implements Serializable {
     private List<AddressDO> addressList;
 
     @TableField(exist = false)
+    private AddressDO address1;
+
+    @TableField(exist = false)
     private List<AddressDO> addressList2;
 }

@@ -27,7 +27,7 @@ import java.util.stream.Collectors;
  * @author yulichang
  */
 @SuppressWarnings({"unused", "DuplicatedCode"})
-public class MPJLambdaWrapper<T> extends JoinAbstractLambdaWrapper<T, MPJLambdaWrapper<T>> implements
+public class MPJLambdaWrapper<T> extends JoinAbstractLambdaWrapper<T, MPJLambdaWrapper<T>> implements Fill<MPJLambdaWrapper<T>>,
         Query<MPJLambdaWrapper<T>>, QueryLabel<MPJLambdaWrapper<T>>, Chain<T>, SelectWrapper<T, MPJLambdaWrapper<T>> {
 
     /**
@@ -64,6 +64,8 @@ public class MPJLambdaWrapper<T> extends JoinAbstractLambdaWrapper<T, MPJLambdaW
      */
     @Getter
     private Map<String, Wrapper<?>> wrapperMap;
+
+    private List<MConsumer<Object>> fill;
 
     /**
      * 推荐使用 带 class 的构造方法
@@ -282,6 +284,21 @@ public class MPJLambdaWrapper<T> extends JoinAbstractLambdaWrapper<T, MPJLambdaW
         return typedThis;
     }
 
+    @Override
+    public MPJLambdaWrapper<T> addFill(MConsumer<Object> consumer) {
+        if (this.fill == null) {
+            this.fill = new ArrayList<>();
+        }
+        this.fill.add(consumer);
+        return typedThis;
+    }
+
+    @Override
+    public void doFill(Object obj) {
+        if (this.fill != null) {
+            this.fill.forEach(c -> c.accept(obj));
+        }
+    }
 
     /**
      * union
@@ -397,5 +414,6 @@ public class MPJLambdaWrapper<T> extends JoinAbstractLambdaWrapper<T, MPJLambdaW
         if (Objects.nonNull(unionSql)) unionSql.toEmpty();
         resultMapMybatisLabel.clear();
         ifExists = ConfigProperties.ifExists;
+        fill = null;
     }
 }

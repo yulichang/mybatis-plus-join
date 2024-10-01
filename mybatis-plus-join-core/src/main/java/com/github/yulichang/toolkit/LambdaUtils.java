@@ -28,6 +28,10 @@ public final class LambdaUtils {
         return (Class<T>) extract(fn).getInstantiatedClass();
     }
 
+    public static <T> LambdaMeta getMeta(SFunction<T, ?> fn) {
+        return extract(fn);
+    }
+
     /**
      * 该缓存可能会在任意不定的时间被清除
      *
@@ -35,7 +39,7 @@ public final class LambdaUtils {
      * @param <T>  类型，被调用的 Function 对象的目标类型
      * @return 返回解析后的结果
      */
-    public static <T> LambdaMeta extract(SFunction<T, ?> func) {
+    private static <T> LambdaMeta extract(SFunction<T, ?> func) {
         // 1. IDEA 调试模式下 lambda 表达式是一个代理
         if (func instanceof Proxy) {
             return new IdeaProxyLambdaMeta((Proxy) func);

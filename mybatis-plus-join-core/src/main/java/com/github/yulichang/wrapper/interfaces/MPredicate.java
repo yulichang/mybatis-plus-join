@@ -7,7 +7,7 @@ import java.util.function.Predicate;
  * on function
  *
  * @author yulichang
- * @since 1.4.14
+ * @since 1.5.0
  */
 @FunctionalInterface
 public interface MPredicate<T> extends Predicate<T>, Serializable {

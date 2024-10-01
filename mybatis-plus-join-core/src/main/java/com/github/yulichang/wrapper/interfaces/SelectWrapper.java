@@ -33,4 +33,7 @@ public interface SelectWrapper<Entity, Children> {
     PageInfo getPageInfo();
 
     boolean isPageByMain();
+
+    default void doFill(Object obj) {
+    }
 }

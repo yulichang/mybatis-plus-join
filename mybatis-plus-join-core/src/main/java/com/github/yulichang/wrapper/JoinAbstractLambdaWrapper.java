@@ -253,7 +253,6 @@ public abstract class JoinAbstractLambdaWrapper<T, Children extends JoinAbstract
         return decode;
     }
 
-
     @Override
     @SafeVarargs
     protected final <X> String columnsToString(Integer index, PrefixEnum prefixEnum, String alias, SFunction<X, ?>... columns) {

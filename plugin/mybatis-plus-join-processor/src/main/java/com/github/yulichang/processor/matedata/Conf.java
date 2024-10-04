@@ -23,6 +23,7 @@ public class Conf {
     private String tablesClassName = "%S";
     private boolean cache = true;
 
+    private boolean enable = true;
     private String scanAnno = "";
     private String scanPackage = "";
 
@@ -37,6 +38,7 @@ public class Conf {
         this.initFlag = conf.initFlag;
         this.cache = conf.cache;
 
+        this.enable = conf.enable;
         this.scanAnno = conf.scanAnno;
         this.scanPackage = conf.scanPackage;
     }
@@ -81,6 +83,7 @@ public class Conf {
         this.tablasClassPackage = properties.getOrDefault("tablasClassPackage", this.tablasClassPackage).toString();
         this.tablesClassName = properties.getOrDefault("tablesClassName", this.tablesClassName).toString();
         this.cache = Boolean.parseBoolean(properties.getOrDefault("cache", this.cache).toString());
+        this.enable = Boolean.parseBoolean(properties.getOrDefault("enable", this.enable).toString());
         this.scanAnno = properties.getOrDefault("scanAnno", this.scanAnno).toString();
         this.scanPackage = properties.getOrDefault("scanPackage", this.scanPackage).toString();
     }
@@ -148,6 +151,10 @@ public class Conf {
 
     public String getScanPackage() {
         return scanPackage;
+    }
+
+    public boolean isEnable() {
+        return enable;
     }
 
     public enum ConfItem {

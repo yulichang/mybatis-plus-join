@@ -56,6 +56,9 @@ public class EntityProcessor extends AbstractProcessor {
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
         if (!roundEnv.processingOver()) {
+            if (!globalConf.isEnable()) {
+                return false;
+            }
             Set<? extends Element> tables = roundEnv.getRootElements().stream().filter(i -> {
                 List<? extends AnnotationMirror> mirrors = i.getAnnotationMirrors();
                 if (mirrors != null && !mirrors.isEmpty()) {

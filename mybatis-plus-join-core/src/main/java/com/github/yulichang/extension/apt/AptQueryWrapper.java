@@ -5,11 +5,11 @@ import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.segments.MergeSegments;
 import com.baomidou.mybatisplus.core.toolkit.*;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
-import com.github.yulichang.extension.apt.matedata.BaseColumn;
-import com.github.yulichang.extension.apt.matedata.Column;
 import com.github.yulichang.config.ConfigProperties;
 import com.github.yulichang.extension.apt.interfaces.Query;
 import com.github.yulichang.extension.apt.interfaces.QueryLabel;
+import com.github.yulichang.extension.apt.matedata.BaseColumn;
+import com.github.yulichang.extension.apt.matedata.Column;
 import com.github.yulichang.extension.apt.toolkit.AptWrapperUtils;
 import com.github.yulichang.extension.apt.toolkit.AptWrappers;
 import com.github.yulichang.toolkit.Constant;
@@ -192,10 +192,14 @@ public class AptQueryWrapper<T> extends AptAbstractWrapper<T, AptQueryWrapper<T>
         return selectAll(getBaseColumn());
     }
 
+    public <E, F> AptQueryWrapper<T> selectSub(BaseColumn<E> baseColumn, Consumer<AptQueryWrapper<E>> consumer, SFunction<F, ?> alias) {
+        return selectSub(baseColumn, consumer, LambdaUtils.getName(alias));
+    }
+
     /**
      * 子查询
      */
-    public <E, F> AptQueryWrapper<T> selectSub(BaseColumn<E> baseColumn, Consumer<AptQueryWrapper<E>> consumer, SFunction<F, ?> alias) {
+    public <E, F> AptQueryWrapper<T> selectSub(BaseColumn<E> baseColumn, Consumer<AptQueryWrapper<E>> consumer, String alias) {
         AptQueryWrapper<E> wrapper = new AptQueryWrapper<E>(null, baseColumn, SharedString.emptyString(),
                 paramNameSeq, paramNameValuePairs, new MergeSegments(), new SharedString(this.paramAlias
                 .getStringValue()), SharedString.emptyString(), SharedString.emptyString(), SharedString.emptyString(),
@@ -209,8 +213,7 @@ public class AptQueryWrapper<T> extends AptAbstractWrapper<T, AptQueryWrapper<T>
         wrapper.subTableAlias = ConfigProperties.subQueryAlias;
         consumer.accept(wrapper);
         addCustomWrapper(wrapper);
-        String name = LambdaUtils.getName(alias);
-        this.selectColumns.add(new SelectSub(() -> AptWrapperUtils.buildSubSqlByWrapper(baseColumn.getColumnClass(), wrapper, name), hasAlias, this.alias, name));
+        this.selectColumns.add(new SelectSub(() -> AptWrapperUtils.buildSubSqlByWrapper(baseColumn.getColumnClass(), wrapper, alias), hasAlias, this.alias, alias));
         return typedThis;
     }
 

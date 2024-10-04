@@ -9,7 +9,9 @@ import com.github.yulichang.extension.kt.interfaces.Query;
 import com.github.yulichang.extension.kt.interfaces.QueryLabel;
 import com.github.yulichang.extension.kt.toolkit.KtWrapperUtils;
 import com.github.yulichang.extension.kt.toolkit.KtWrappers;
-import com.github.yulichang.toolkit.*;
+import com.github.yulichang.toolkit.Constant;
+import com.github.yulichang.toolkit.KtUtils;
+import com.github.yulichang.toolkit.TableList;
 import com.github.yulichang.toolkit.support.ColumnCache;
 import com.github.yulichang.wrapper.interfaces.Chain;
 import com.github.yulichang.wrapper.interfaces.SelectWrapper;
@@ -204,11 +206,16 @@ public class KtLambdaWrapper<T> extends KtAbstractLambdaWrapper<T, KtLambdaWrapp
         return selectSub(clazz, ConfigProperties.subQueryAlias, consumer, alias);
     }
 
+
+    public <E, F> KtLambdaWrapper<T> selectSub(Class<E> clazz, String st, Consumer<KtLambdaWrapper<?>> consumer, KProperty<?> alias) {
+        return selectSub(clazz, st, consumer, alias.getName());
+    }
+
     /**
      * 子查询
      */
     public KtLambdaWrapper<T> selectSub(Class<?> clazz, String st,
-                                        Consumer<KtLambdaWrapper<?>> consumer, KProperty<?> alias) {
+                                        Consumer<KtLambdaWrapper<?>> consumer, String alias) {
         KtLambdaWrapper<?> wrapper = new KtLambdaWrapper(null, clazz, SharedString.emptyString(), paramNameSeq,
                 paramNameValuePairs, new MergeSegments(), new SharedString(this.paramAlias.getStringValue()),
                 SharedString.emptyString(), SharedString.emptyString(), SharedString.emptyString(), new TableList(),
@@ -222,7 +229,7 @@ public class KtLambdaWrapper<T> extends KtAbstractLambdaWrapper<T, KtLambdaWrapp
         consumer.accept(wrapper);
         addCustomWrapper(wrapper);
         this.selectColumns.add(new SelectSub(() -> KtWrapperUtils.buildSubSqlByWrapper(
-                clazz, wrapper, alias.getName()), hasAlias, this.alias, alias.getName()));
+                clazz, wrapper, alias), hasAlias, this.alias, alias));
         return typedThis;
     }
 

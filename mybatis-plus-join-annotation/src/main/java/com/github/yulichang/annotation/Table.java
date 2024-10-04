@@ -18,12 +18,17 @@ import java.lang.annotation.Target;
  *   <li>加APT后缀并且大写 %SAPT</li>
  * </ul>
  * <p>
- * 支持Ognl语法字段说明<br/>
+ * 支持Ognl语法,字段说明<br/>
  * Ognl上下文
  * <ul>
  *   <li>className 类名</li>
  *   <li>classPackage 包名</li>
- *   <li>util 工具类 stringHelper {@link com.github.yulichang.apt.OgnlRoot.StringHelper}</li>
+ *   <li>
+ *      util 工具类 OgnlUtil {@link com.github.yulichang.processor.utils.OgnlUtil} ,
+ *      <a href="https://github.com/yulichang/mybatis-plus-join/tree/master/plugin/mybatis-plus-join-processor/src/main/java/com/github/yulichang/processor/utils/OgnlUtil.java">
+ *          github link
+ *      </a>
+ *   </li>
  * </ul>
  * 指定开头 Ognl# 这不是ognl语法，这是MPJ规定的 用于区分 ognl还是String.format
  * <p>

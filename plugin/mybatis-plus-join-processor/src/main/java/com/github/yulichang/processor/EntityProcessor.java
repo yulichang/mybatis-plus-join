@@ -1,9 +1,5 @@
 package com.github.yulichang.processor;
 
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.github.yulichang.annotation.Table;
-import com.github.yulichang.extension.apt.matedata.BaseColumn;
-import com.github.yulichang.extension.apt.matedata.Column;
 import com.github.yulichang.processor.matedata.Conf;
 import com.github.yulichang.processor.matedata.FieldInfo;
 import com.github.yulichang.processor.matedata.TableInfo;
@@ -31,6 +27,13 @@ import java.util.stream.Collectors;
  */
 public class EntityProcessor extends AbstractProcessor {
 
+    private static final String TABLE = "com.github.yulichang.annotation.Table";
+    private static final String TABLE_FIELD = "com.baomidou.mybatisplus.annotation.TableField";
+    private static final String TABLE_FIELD_EXIST = "exist";
+
+    private static final String BASE_COLUMN = "com.github.yulichang.extension.apt.matedata.BaseColumn";
+    private static final String COLUMN = "com.github.yulichang.extension.apt.matedata.Column";
+
     private Elements elementUtils;
     private Types typeUtils;
     private Messager messager;
@@ -53,13 +56,38 @@ public class EntityProcessor extends AbstractProcessor {
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
         if (!roundEnv.processingOver()) {
-            TypeElement table = annotations.stream().filter(i -> i.toString().equals(Table.class.getName())).findFirst().orElse(null);
-            if (table != null) {
+            if (!globalConf.isEnable()) {
+                return false;
+            }
+            Set<? extends Element> tables = roundEnv.getRootElements().stream().filter(i -> {
+                List<? extends AnnotationMirror> mirrors = i.getAnnotationMirrors();
+                if (mirrors != null && !mirrors.isEmpty()) {
+                    if (mirrors.stream().anyMatch(m -> m.getAnnotationType().toString().equals(TABLE))) {
+                        return true;
+                    }
+                    if (StringUtil.isNotEmpty(globalConf.getScanAnno())) {
+                        if (mirrors.stream().anyMatch(m -> m.getAnnotationType().toString().equals(globalConf.getScanAnno()))) {
+                            return true;
+                        }
+                    }
+                }
+                if (StringUtil.isNotEmpty(globalConf.getScanPackage())) {
+                    if (i.getKind() != ElementKind.CLASS) {
+                        return false;
+                    }
+                    if (i.getModifiers().contains(Modifier.ABSTRACT)) {
+                        return false;
+                    }
+                    String pkg = elementUtils.getPackageOf(i).getQualifiedName().toString();
+                    String[] scanPackages = globalConf.getScanPackage().split(",");
+                    return Arrays.stream(scanPackages).anyMatch(s -> StringUtil.matches(pkg, s));
+                }
+                return false;
+            }).collect(Collectors.toSet());
+            if (!tables.isEmpty()) {
                 note("mybatis plus join processor start");
-                Set<? extends Element> tables = roundEnv.getElementsAnnotatedWith(table);
                 tables.stream().filter(f -> f instanceof TypeElement)
-                        .map(f -> (TypeElement) f).map(this::createColumn)
-                        .filter(Objects::nonNull).filter(TableInfo::isGenTables)
+                        .map(f -> (TypeElement) f).map(this::createColumn).filter(TableInfo::isGenTables)
                         .collect(Collectors.groupingBy(TableInfo::getTagTablesPackageName))
                         .forEach(this::createTables);
             }
@@ -71,7 +99,10 @@ public class EntityProcessor extends AbstractProcessor {
     @Override
     public Set<String> getSupportedAnnotationTypes() {
         Set<String> supportedAnnotationTypes = new HashSet<>();
-        supportedAnnotationTypes.add(Table.class.getCanonicalName());
+        supportedAnnotationTypes.add(TABLE);
+        if (StringUtil.isNotEmpty(globalConf.getScanAnno())) {
+            supportedAnnotationTypes.add(globalConf.getScanAnno());
+        }
         return supportedAnnotationTypes;
     }
 
@@ -85,19 +116,13 @@ public class EntityProcessor extends AbstractProcessor {
      */
     private TableInfo createColumn(TypeElement element) {
         AnnotationMirror tb = element.getAnnotationMirrors().stream().filter(a ->
-                a.getAnnotationType().asElement().toString().equals(Table.class.getName())).findFirst().orElse(null);
-        Table table = element.getAnnotation(Table.class);
-        if (tb == null) {
-            return null;
-        }
-        Set<String> keySet = tb.getElementValues().keySet().stream().map(k ->
-                k.getSimpleName().toString()).collect(Collectors.toSet());
-        Conf conf = Conf.getConf(globalConf, table, keySet);
+                a.getAnnotationType().asElement().toString().equals(TABLE)).findFirst().orElse(null);
+        Conf conf = Optional.ofNullable(tb).map(t -> Conf.getConf(globalConf, t.getElementValues())).orElse(globalConf);
         TableInfo tableInfo = new TableInfo(conf, element.toString(), element.getSimpleName().toString());
         tableInfo.setClassPackage(elementUtils.getPackageOf(element).getQualifiedName().toString());
         tableInfo.setClassComment(elementUtils.getDocComment(element));
 
-        Set<FieldInfo> fieldInfos = new HashSet<>();
+        List<FieldInfo> fieldInfos = new ArrayList<>();
 
         TypeElement currElement = element;
         do {
@@ -106,8 +131,15 @@ public class EntityProcessor extends AbstractProcessor {
                             e.getKind() == ElementKind.FIELD && !e.getModifiers().contains(Modifier.STATIC))
                     .filter(e -> {
                         // 过滤 exist = false 的字段
-                        TableField tableField = e.getAnnotation(TableField.class);
-                        return tableField == null || tableField.exist();
+                        AnnotationMirror tableField = e.getAnnotationMirrors().stream().filter(f ->
+                                TABLE_FIELD.equals(f.getAnnotationType().toString())).findFirst().orElse(null);
+                        if (tableField != null) {
+                            Map<String, Object> propMap = tableField.getElementValues().entrySet().stream()
+                                    .collect(Collectors.toMap(entry -> entry.getKey().getSimpleName().toString(), entry -> entry.getValue().getValue()));
+                            Object exist = propMap.get(TABLE_FIELD_EXIST);
+                            return exist == null || (boolean) exist;
+                        }
+                        return true;
                     })
                     .map(e -> new FieldInfo(e.toString(), elementUtils.getDocComment(e))).collect(Collectors.toList()));
             currElement = (TypeElement) typeUtils.asElement(currElement.getSuperclass());
@@ -118,8 +150,8 @@ public class EntityProcessor extends AbstractProcessor {
         StringBuilderHelper content = new StringBuilderHelper(tableInfo)
                 .addPackage(tableInfo.getTagClassPackage())
                 .newLine()
-                .addImport(true, BaseColumn.class.getName())
-                .addImport(true, Column.class.getName())
+                .addImport(true, BASE_COLUMN)
+                .addImport(true, COLUMN)
                 .addImport(true, tableInfo.getClassName())
                 .newLine(tableInfo.isCache())
                 .addImport(tableInfo.isCache(), Map.class.getName())
@@ -127,7 +159,7 @@ public class EntityProcessor extends AbstractProcessor {
                 .addImport(tableInfo.isCache(), ConcurrentHashMap.class.getName())
                 .newLine()
                 .addClass(tableInfo.getClassComment(), tableInfo.getTagClassName(),
-                        BaseColumn.class.getSimpleName() + "<" + tableInfo.getSimpleClassName() + ">",
+                        StringUtil.getSimpleName(BASE_COLUMN) + "<" + tableInfo.getSimpleClassName() + ">",
                         c -> c
                                 .addConstructor()
                                 .addFields()

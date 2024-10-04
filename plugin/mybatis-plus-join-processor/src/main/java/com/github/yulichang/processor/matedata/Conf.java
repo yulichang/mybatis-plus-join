@@ -1,19 +1,18 @@
 package com.github.yulichang.processor.matedata;
 
-import com.github.yulichang.annotation.Table;
-
 import javax.annotation.processing.Filer;
+import javax.lang.model.element.AnnotationValue;
+import javax.lang.model.element.ExecutableElement;
 import javax.tools.FileObject;
 import javax.tools.StandardLocation;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.Arrays;
-import java.util.Collection;
+import java.util.Map;
 import java.util.Properties;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
-import java.util.function.Function;
 
 public class Conf {
 
@@ -23,6 +22,10 @@ public class Conf {
     private String tablasClassPackage = "%s.tables";
     private String tablesClassName = "%S";
     private boolean cache = true;
+
+    private boolean enable = true;
+    private String scanAnno = "";
+    private String scanPackage = "";
 
     private boolean initFlag = false;
 
@@ -34,6 +37,10 @@ public class Conf {
         this.tablesClassName = conf.tablesClassName;
         this.initFlag = conf.initFlag;
         this.cache = conf.cache;
+
+        this.enable = conf.enable;
+        this.scanAnno = conf.scanAnno;
+        this.scanPackage = conf.scanPackage;
     }
 
 
@@ -76,14 +83,17 @@ public class Conf {
         this.tablasClassPackage = properties.getOrDefault("tablasClassPackage", this.tablasClassPackage).toString();
         this.tablesClassName = properties.getOrDefault("tablesClassName", this.tablesClassName).toString();
         this.cache = Boolean.parseBoolean(properties.getOrDefault("cache", this.cache).toString());
+        this.enable = Boolean.parseBoolean(properties.getOrDefault("enable", this.enable).toString());
+        this.scanAnno = properties.getOrDefault("scanAnno", this.scanAnno).toString();
+        this.scanPackage = properties.getOrDefault("scanPackage", this.scanPackage).toString();
     }
 
-    public static Conf getConf(Conf globalConf, Table table, Collection<String> keys) {
-        if (keys == null || keys.isEmpty()) {
+    public static Conf getConf(Conf globalConf, Map<? extends ExecutableElement, ? extends AnnotationValue> elementMap) {
+        if (elementMap == null || elementMap.isEmpty()) {
             return globalConf;
         }
         Conf conf = new Conf(globalConf);
-        keys.forEach(key -> ConfItem.doIt(conf, key, table));
+        elementMap.forEach((k, v) -> ConfItem.doIt(conf, k.getSimpleName().toString(), v));
         return conf;
     }
 
@@ -135,29 +145,38 @@ public class Conf {
         this.cache = cache;
     }
 
+    public String getScanAnno() {
+        return scanAnno;
+    }
+
+    public String getScanPackage() {
+        return scanPackage;
+    }
+
+    public boolean isEnable() {
+        return enable;
+    }
+
     public enum ConfItem {
-        className("value", Table::value, (c, v) -> c.setClassName(v.toString())),
-        packageName("classPackage", Table::classPackage, (c, v) -> c.setClassPackage(v.toString())),
-        genTables("genTables", Table::genTables, (c, v) -> c.setGenTables((boolean) v)),
-        tablasPackageName("tablesClassPackage", Table::tablesClassPackage, (c, v) -> c.setTablasClassPackage(v.toString())),
-        tablesName("tablesClassName", Table::tablesClassName, (c, v) -> c.setTablesClassName(v.toString())),
-        cache("cache", Table::cache, (c, v) -> c.setCache((boolean) v));
+        className("value", (c, v) -> c.setClassName(v.toString())),
+        packageName("classPackage", (c, v) -> c.setClassPackage(v.toString())),
+        genTables("genTables", (c, v) -> c.setGenTables((boolean) v)),
+        tablasPackageName("tablesClassPackage", (c, v) -> c.setTablasClassPackage(v.toString())),
+        tablesName("tablesClassName", (c, v) -> c.setTablesClassName(v.toString())),
+        cache("cache", (c, v) -> c.setCache((boolean) v));
 
         private final String action;
 
-        private final Function<Table, Object> annoVal;
-
         private final BiConsumer<Conf, Object> doIt;
 
-        ConfItem(String action, Function<Table, Object> annoVal, BiConsumer<Conf, Object> doIt) {
+        ConfItem(String action, BiConsumer<Conf, Object> doIt) {
             this.action = action;
-            this.annoVal = annoVal;
             this.doIt = doIt;
         }
 
-        public static void doIt(Conf tableConf, String act, Table anno) {
-            Arrays.stream(ConfItem.values()).filter(f -> f.action.equals(act)).findFirst()
-                    .ifPresent(item -> item.doIt.accept(tableConf, item.annoVal.apply(anno)));
+        public static void doIt(Conf tableConf, String key, AnnotationValue value) {
+            Arrays.stream(ConfItem.values()).filter(f -> f.action.equals(key)).findFirst()
+                    .ifPresent(item -> item.doIt.accept(tableConf, value.getValue()));
         }
     }
 
@@ -169,6 +188,9 @@ public class Conf {
                 ", genTables=" + genTables +
                 ", tablasClassPackage='" + tablasClassPackage + '\'' +
                 ", tablesClassName='" + tablesClassName + '\'' +
+                ", cache=" + cache +
+                ", scanAnno='" + scanAnno + '\'' +
+                ", scanPackage='" + scanPackage + '\'' +
                 ", initFlag=" + initFlag +
                 '}';
     }

@@ -56,13 +56,35 @@ public class EntityProcessor extends AbstractProcessor {
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
         if (!roundEnv.processingOver()) {
-            TypeElement table = annotations.stream().filter(i -> i.toString().equals(TABLE)).findFirst().orElse(null);
-            if (table != null) {
+            Set<? extends Element> tables = roundEnv.getRootElements().stream().filter(i -> {
+                List<? extends AnnotationMirror> mirrors = i.getAnnotationMirrors();
+                if (mirrors != null && !mirrors.isEmpty()) {
+                    if (mirrors.stream().anyMatch(m -> m.getAnnotationType().toString().equals(TABLE))) {
+                        return true;
+                    }
+                    if (StringUtil.isNotEmpty(globalConf.getScanAnno())) {
+                        if (mirrors.stream().anyMatch(m -> m.getAnnotationType().toString().equals(globalConf.getScanAnno()))) {
+                            return true;
+                        }
+                    }
+                }
+                if (StringUtil.isNotEmpty(globalConf.getScanPackage())) {
+                    if (i.getKind() != ElementKind.CLASS) {
+                        return false;
+                    }
+                    if (i.getModifiers().contains(Modifier.ABSTRACT)) {
+                        return false;
+                    }
+                    String pkg = elementUtils.getPackageOf(i).getQualifiedName().toString();
+                    String[] scanPackages = globalConf.getScanPackage().split(",");
+                    return Arrays.stream(scanPackages).anyMatch(s -> StringUtil.matches(pkg, s));
+                }
+                return false;
+            }).collect(Collectors.toSet());
+            if (!tables.isEmpty()) {
                 note("mybatis plus join processor start");
-                Set<? extends Element> tables = roundEnv.getElementsAnnotatedWith(table);
                 tables.stream().filter(f -> f instanceof TypeElement)
-                        .map(f -> (TypeElement) f).map(this::createColumn)
-                        .filter(Objects::nonNull).filter(TableInfo::isGenTables)
+                        .map(f -> (TypeElement) f).map(this::createColumn).filter(TableInfo::isGenTables)
                         .collect(Collectors.groupingBy(TableInfo::getTagTablesPackageName))
                         .forEach(this::createTables);
             }
@@ -75,6 +97,9 @@ public class EntityProcessor extends AbstractProcessor {
     public Set<String> getSupportedAnnotationTypes() {
         Set<String> supportedAnnotationTypes = new HashSet<>();
         supportedAnnotationTypes.add(TABLE);
+        if (StringUtil.isNotEmpty(globalConf.getScanAnno())) {
+            supportedAnnotationTypes.add(globalConf.getScanAnno());
+        }
         return supportedAnnotationTypes;
     }
 
@@ -89,10 +114,7 @@ public class EntityProcessor extends AbstractProcessor {
     private TableInfo createColumn(TypeElement element) {
         AnnotationMirror tb = element.getAnnotationMirrors().stream().filter(a ->
                 a.getAnnotationType().asElement().toString().equals(TABLE)).findFirst().orElse(null);
-        if (tb == null) {
-            return null;
-        }
-        Conf conf = Conf.getConf(globalConf, tb.getElementValues());
+        Conf conf = Optional.ofNullable(tb).map(t -> Conf.getConf(globalConf, t.getElementValues())).orElse(globalConf);
         TableInfo tableInfo = new TableInfo(conf, element.toString(), element.getSimpleName().toString());
         tableInfo.setClassPackage(elementUtils.getPackageOf(element).getQualifiedName().toString());
         tableInfo.setClassComment(elementUtils.getDocComment(element));

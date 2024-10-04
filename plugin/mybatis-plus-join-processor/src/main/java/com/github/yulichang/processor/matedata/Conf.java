@@ -23,6 +23,9 @@ public class Conf {
     private String tablesClassName = "%S";
     private boolean cache = true;
 
+    private String scanAnno = "";
+    private String scanPackage = "";
+
     private boolean initFlag = false;
 
     private Conf(Conf conf) {
@@ -33,6 +36,9 @@ public class Conf {
         this.tablesClassName = conf.tablesClassName;
         this.initFlag = conf.initFlag;
         this.cache = conf.cache;
+
+        this.scanAnno = conf.scanAnno;
+        this.scanPackage = conf.scanPackage;
     }
 
 
@@ -75,6 +81,8 @@ public class Conf {
         this.tablasClassPackage = properties.getOrDefault("tablasClassPackage", this.tablasClassPackage).toString();
         this.tablesClassName = properties.getOrDefault("tablesClassName", this.tablesClassName).toString();
         this.cache = Boolean.parseBoolean(properties.getOrDefault("cache", this.cache).toString());
+        this.scanAnno = properties.getOrDefault("scanAnno", this.scanAnno).toString();
+        this.scanPackage = properties.getOrDefault("scanPackage", this.scanPackage).toString();
     }
 
     public static Conf getConf(Conf globalConf, Map<? extends ExecutableElement, ? extends AnnotationValue> elementMap) {
@@ -134,6 +142,14 @@ public class Conf {
         this.cache = cache;
     }
 
+    public String getScanAnno() {
+        return scanAnno;
+    }
+
+    public String getScanPackage() {
+        return scanPackage;
+    }
+
     public enum ConfItem {
         className("value", (c, v) -> c.setClassName(v.toString())),
         packageName("classPackage", (c, v) -> c.setClassPackage(v.toString())),
@@ -165,6 +181,9 @@ public class Conf {
                 ", genTables=" + genTables +
                 ", tablasClassPackage='" + tablasClassPackage + '\'' +
                 ", tablesClassName='" + tablesClassName + '\'' +
+                ", cache=" + cache +
+                ", scanAnno='" + scanAnno + '\'' +
+                ", scanPackage='" + scanPackage + '\'' +
                 ", initFlag=" + initFlag +
                 '}';
     }

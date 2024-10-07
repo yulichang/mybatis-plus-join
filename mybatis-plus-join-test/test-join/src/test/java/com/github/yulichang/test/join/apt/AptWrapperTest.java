@@ -1,6 +1,5 @@
 package com.github.yulichang.test.join.apt;
 
-import com.baomidou.mybatisplus.core.MybatisPlusVersion;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
@@ -93,38 +92,39 @@ class AptWrapperTest {
 
     @Test
     void testJoin() {
-        ThreadLocalUtils.set("SELECT t.id,\n" +
-                "       t.pid,\n" +
-                "       t.`name`,\n" +
-                "       t.`json`,\n" +
-                "       t.sex,\n" +
-                "       t.head_img,\n" +
-                "       t.create_time,\n" +
-                "       t.address_id,\n" +
-                "       t.address_id2,\n" +
-                "       t.del,\n" +
-                "       t.create_by,\n" +
-                "       t.update_by,\n" +
-                "       t1.id  AS joina_id,\n" +
-                "       t1.user_id,\n" +
-                "       t1.area_id,\n" +
-                "       t1.tel,\n" +
-                "       t1.address,\n" +
-                "       t1.del AS joina_del,\n" +
-                "       t2.id  AS joinb_id,\n" +
-                "       t2.province,\n" +
-                "       t2.city,\n" +
-                "       t2.area,\n" +
-                "       t2.postcode,\n" +
-                "       t2.del AS joinb_del\n" +
-                "FROM `user` t\n" +
-                "         LEFT JOIN address t1 ON (t1.user_id = t.id)\n" +
-                "         LEFT JOIN area t2 ON (t2.id = t1.area_id)\n" +
-                "WHERE t.del = false\n" +
-                "  AND t1.del = false\n" +
-                "  AND t2.del = false\n" +
-                "  AND (t.id <= ?)\n" +
-                "ORDER BY t.id DESC");
+        ThreadLocalUtils.set("""
+                SELECT t.id,
+                       t.pid,
+                       t.`name`,
+                       t.`json`,
+                       t.sex,
+                       t.head_img,
+                       t.create_time,
+                       t.address_id,
+                       t.address_id2,
+                       t.del,
+                       t.create_by,
+                       t.update_by,
+                       t1.id  AS joina_id,
+                       t1.user_id,
+                       t1.area_id,
+                       t1.tel,
+                       t1.address,
+                       t1.del AS joina_del,
+                       t2.id  AS joinb_id,
+                       t2.province,
+                       t2.city,
+                       t2.area,
+                       t2.postcode,
+                       t2.del AS joinb_del
+                FROM `user` t
+                         LEFT JOIN address t1 ON (t1.user_id = t.id)
+                         LEFT JOIN area t2 ON (t2.id = t1.area_id)
+                WHERE t.del = false
+                  AND t1.del = false
+                  AND t2.del = false
+                  AND (t.id <= ?)
+                ORDER BY t.id DESC""");
 
         UserDOCol u = USERDO;
         AddressDOCol addr = ADDRESSDO;
@@ -152,25 +152,26 @@ class AptWrapperTest {
 
     @Test
     void testJoinField() {
-        ThreadLocalUtils.set("SELECT t.id,\n" +
-                "       t.pid,\n" +
-                "       t.`name`,\n" +
-                "       t.`json`,\n" +
-                "       t.sex,\n" +
-                "       t.head_img,\n" +
-                "       t.create_time,\n" +
-                "       t.address_id,\n" +
-                "       t.address_id2,\n" +
-                "       t.del,\n" +
-                "       t.create_by,\n" +
-                "       t.update_by,\n" +
-                "       t1.id AS joina_id\n" +
-                "FROM `user` t\n" +
-                "         LEFT JOIN address t1 ON (t1.user_id = t.id)\n" +
-                "WHERE t.del = false\n" +
-                "  AND t1.del = false\n" +
-                "  AND (t.id <= ?)\n" +
-                "ORDER BY t.id DESC");
+        ThreadLocalUtils.set("""
+                SELECT t.id,
+                       t.pid,
+                       t.`name`,
+                       t.`json`,
+                       t.sex,
+                       t.head_img,
+                       t.create_time,
+                       t.address_id,
+                       t.address_id2,
+                       t.del,
+                       t.create_by,
+                       t.update_by,
+                       t1.id AS joina_id
+                FROM `user` t
+                         LEFT JOIN address t1 ON (t1.user_id = t.id)
+                WHERE t.del = false
+                  AND t1.del = false
+                  AND (t.id <= ?)
+                ORDER BY t.id DESC""");
 
         UserDOCol u = USERDO;
         AddressDOCol addr = ADDRESSDO;
@@ -192,37 +193,38 @@ class AptWrapperTest {
 
     @Test
     void testJoin1() {
-        ThreadLocalUtils.set("SELECT t.id,\n" +
-                "       t.pid,\n" +
-                "       t.`name`,\n" +
-                "       t.`json`,\n" +
-                "       t.sex,\n" +
-                "       t.head_img,\n" +
-                "       t.create_time,\n" +
-                "       t.address_id,\n" +
-                "       t.address_id2,\n" +
-                "       t.del,\n" +
-                "       t.create_by,\n" +
-                "       t.update_by,\n" +
-                "       t1.id  AS joina_id,\n" +
-                "       t1.user_id,\n" +
-                "       t1.area_id,\n" +
-                "       t1.tel,\n" +
-                "       t1.address,\n" +
-                "       t1.del AS joina_del,\n" +
-                "       t2.id  AS joinb_id,\n" +
-                "       t2.province,\n" +
-                "       t2.city,\n" +
-                "       t2.area,\n" +
-                "       t2.postcode,\n" +
-                "       t2.del AS joinb_del\n" +
-                "FROM `user` t\n" +
-                "         LEFT JOIN address t1 ON (t1.user_id = t.id)\n" +
-                "         LEFT JOIN area t2 ON (t2.id = t1.area_id)\n" +
-                "WHERE t.del = false\n" +
-                "  AND t1.del = false\n" +
-                "  AND t2.del = false\n" +
-                "ORDER BY t.id DESC");
+        ThreadLocalUtils.set("""
+                SELECT t.id,
+                       t.pid,
+                       t.`name`,
+                       t.`json`,
+                       t.sex,
+                       t.head_img,
+                       t.create_time,
+                       t.address_id,
+                       t.address_id2,
+                       t.del,
+                       t.create_by,
+                       t.update_by,
+                       t1.id  AS joina_id,
+                       t1.user_id,
+                       t1.area_id,
+                       t1.tel,
+                       t1.address,
+                       t1.del AS joina_del,
+                       t2.id  AS joinb_id,
+                       t2.province,
+                       t2.city,
+                       t2.area,
+                       t2.postcode,
+                       t2.del AS joinb_del
+                FROM `user` t
+                         LEFT JOIN address t1 ON (t1.user_id = t.id)
+                         LEFT JOIN area t2 ON (t2.id = t1.area_id)
+                WHERE t.del = false
+                  AND t1.del = false
+                  AND t2.del = false
+                ORDER BY t.id DESC""");
 
         UserDOCol u = USERDO;
         AddressDOCol addr = ADDRESSDO;
@@ -246,13 +248,14 @@ class AptWrapperTest {
      */
     @Test
     void testWrapper() {
-        ThreadLocalUtils.set("SELECT t.id\n" +
-                "FROM `user` t\n" +
-                "         LEFT JOIN address t1 ON (t1.user_id = t.id)\n" +
-                "         LEFT JOIN area t2 ON (t2.id = t1.area_id)\n" +
-                "WHERE t.del = false\n" +
-                "  AND t1.del = false\n" +
-                "  AND t2.del = false");
+        ThreadLocalUtils.set("""
+                SELECT t.id
+                FROM `user` t
+                         LEFT JOIN address t1 ON (t1.user_id = t.id)
+                         LEFT JOIN area t2 ON (t2.id = t1.area_id)
+                WHERE t.del = false
+                  AND t1.del = false
+                  AND t2.del = false""");
 
         UserDOCol u = USERDO;
         AddressDOCol addr = ADDRESSDO;
@@ -269,13 +272,14 @@ class AptWrapperTest {
         System.out.println(list);
 
 
-        ThreadLocalUtils.set("SELECT t.create_time\n" +
-                "FROM `user` t\n" +
-                "         LEFT JOIN address t1 ON (t1.user_id = t.id)\n" +
-                "         LEFT JOIN area t2 ON (t2.id = t1.area_id)\n" +
-                "WHERE t.del = false\n" +
-                "  AND t1.del = false\n" +
-                "  AND t2.del = false");
+        ThreadLocalUtils.set("""
+                SELECT t.create_time
+                FROM `user` t
+                         LEFT JOIN address t1 ON (t1.user_id = t.id)
+                         LEFT JOIN area t2 ON (t2.id = t1.area_id)
+                WHERE t.del = false
+                  AND t1.del = false
+                  AND t2.del = false""");
         //java.sql包下的类
         AptQueryWrapper<UserDO> wrapper1 = new AptQueryWrapper<>(u)
                 .select(u.createTime)
@@ -290,23 +294,24 @@ class AptWrapperTest {
 
     @Test
     void testMSCache() {
-        ThreadLocalUtils.set("SELECT t.id,\n" +
-                "       t.pid,\n" +
-                "       t.`name`,\n" +
-                "       t.`json`,\n" +
-                "       t.sex,\n" +
-                "       t.head_img,\n" +
-                "       t.create_time,\n" +
-                "       t.address_id,\n" +
-                "       t.address_id2,\n" +
-                "       t.del,\n" +
-                "       t.create_by,\n" +
-                "       t.update_by\n" +
-                "FROM `user` t\n" +
-                "WHERE t.id = ?\n" +
-                "  AND t.del = false\n" +
-                "  AND (t.id <= ?)\n" +
-                "ORDER BY t.id ASC, t.`name` ASC");
+        ThreadLocalUtils.set("""
+                SELECT t.id,
+                       t.pid,
+                       t.`name`,
+                       t.`json`,
+                       t.sex,
+                       t.head_img,
+                       t.create_time,
+                       t.address_id,
+                       t.address_id2,
+                       t.del,
+                       t.create_by,
+                       t.update_by
+                FROM `user` t
+                WHERE t.id = ?
+                  AND t.del = false
+                  AND (t.id <= ?)
+                ORDER BY t.id ASC, t.`name` ASC""");
 
         UserDOCol u = USERDO;
         AddressDOCol addr = ADDRESSDO;
@@ -325,21 +330,22 @@ class AptWrapperTest {
 
     @Test
     void testTableAliasR() {
-        ThreadLocalUtils.set("SELECT tt.id,\n" +
-                "       tt.user_id,\n" +
-                "       tt.create_by,\n" +
-                "       tt.update_by,\n" +
-                "       ua.`name` AS userName,\n" +
-                "       ub.`name` AS createName,\n" +
-                "       uc.`name` AS updateName\n" +
-                "FROM user_dto tt\n" +
-                "         LEFT JOIN `user` ua ON (ua.id = tt.user_id)\n" +
-                "         LEFT JOIN `user` ub ON (ub.id = tt.create_by)\n" +
-                "         LEFT JOIN `user` uc ON (uc.id = tt.update_by)\n" +
-                "WHERE ua.del = false\n" +
-                "  AND ub.del = false\n" +
-                "  AND uc.del = false\n" +
-                "  AND (ua.id <= ? AND ub.id >= ?)");
+        ThreadLocalUtils.set("""
+                SELECT tt.id,
+                       tt.user_id,
+                       tt.create_by,
+                       tt.update_by,
+                       ua.`name` AS userName,
+                       ub.`name` AS createName,
+                       uc.`name` AS updateName
+                FROM user_dto tt
+                         LEFT JOIN `user` ua ON (ua.id = tt.user_id)
+                         LEFT JOIN `user` ub ON (ub.id = tt.create_by)
+                         LEFT JOIN `user` uc ON (uc.id = tt.update_by)
+                WHERE ua.del = false
+                  AND ub.del = false
+                  AND uc.del = false
+                  AND (ua.id <= ? AND ub.id >= ?)""");
 
         UserDtoCol tt = UserDtoCol.build("tt");
         UserDOCol ua = UserDOCol.build("ua");
@@ -363,29 +369,30 @@ class AptWrapperTest {
         assert StringUtils.isNotBlank(userDtos.get(0).getUpdateName());
 
 
-        ThreadLocalUtils.set("SELECT tt.id,\n" +
-                "       tt.pid,\n" +
-                "       tt.`name`,\n" +
-                "       tt.`json`,\n" +
-                "       tt.sex,\n" +
-                "       tt.head_img,\n" +
-                "       tt.create_time,\n" +
-                "       tt.address_id,\n" +
-                "       tt.address_id2,\n" +
-                "       tt.del,\n" +
-                "       tt.create_by,\n" +
-                "       tt.update_by,\n" +
-                "       ua.id,\n" +
-                "       ub.head_img\n" +
-                "FROM `user` tt\n" +
-                "         LEFT JOIN `user` ua ON (ua.id = tt.pid)\n" +
-                "         LEFT JOIN `user` ub ON (ub.id = tt.create_by)\n" +
-                "         LEFT JOIN `user` uc ON (uc.id = tt.update_by)\n" +
-                "WHERE tt.del = false\n" +
-                "  AND ua.del = false\n" +
-                "  AND ub.del = false\n" +
-                "  AND uc.del = false\n" +
-                "  AND (ua.head_img = tt.`name` AND tt.id = ua.id)");
+        ThreadLocalUtils.set("""
+                SELECT tt.id,
+                       tt.pid,
+                       tt.`name`,
+                       tt.`json`,
+                       tt.sex,
+                       tt.head_img,
+                       tt.create_time,
+                       tt.address_id,
+                       tt.address_id2,
+                       tt.del,
+                       tt.create_by,
+                       tt.update_by,
+                       ua.id,
+                       ub.head_img
+                FROM `user` tt
+                         LEFT JOIN `user` ua ON (ua.id = tt.pid)
+                         LEFT JOIN `user` ub ON (ub.id = tt.create_by)
+                         LEFT JOIN `user` uc ON (uc.id = tt.update_by)
+                WHERE tt.del = false
+                  AND ua.del = false
+                  AND ub.del = false
+                  AND uc.del = false
+                  AND (ua.head_img = tt.`name` AND tt.id = ua.id)""");
 
         UserDOCol ut = UserDOCol.build("tt");
         UserDOCol ua1 = UserDOCol.build("ua");
@@ -411,34 +418,35 @@ class AptWrapperTest {
      */
     @Test
     void testInner() {
-        ThreadLocalUtils.set("SELECT t.id,\n" +
-                "       t.pid,\n" +
-                "       t.`name`,\n" +
-                "       t.`json`,\n" +
-                "       t.sex,\n" +
-                "       t.head_img,\n" +
-                "       t.create_time,\n" +
-                "       t.address_id,\n" +
-                "       t.address_id2,\n" +
-                "       t.del,\n" +
-                "       t.create_by,\n" +
-                "       t.update_by,\n" +
-                "       t1.id          AS joina_id,\n" +
-                "       t1.pid         AS joina_pid,\n" +
-                "       t1.`name`      AS joina_name,\n" +
-                "       t1.`json`      AS joina_json,\n" +
-                "       t1.sex         AS joina_sex,\n" +
-                "       t1.head_img    AS joina_head_img,\n" +
-                "       t1.create_time AS joina_create_time,\n" +
-                "       t1.address_id  AS joina_address_id,\n" +
-                "       t1.address_id2 AS joina_address_id2,\n" +
-                "       t1.del         AS joina_del,\n" +
-                "       t1.create_by   AS joina_create_by,\n" +
-                "       t1.update_by   AS joina_update_by\n" +
-                "FROM `user` t\n" +
-                "         LEFT JOIN `user` t1 ON (t1.pid = t.id)\n" +
-                "WHERE t.del = false\n" +
-                "  AND (t.id > ?)");
+        ThreadLocalUtils.set("""
+                SELECT t.id,
+                       t.pid,
+                       t.`name`,
+                       t.`json`,
+                       t.sex,
+                       t.head_img,
+                       t.create_time,
+                       t.address_id,
+                       t.address_id2,
+                       t.del,
+                       t.create_by,
+                       t.update_by,
+                       t1.id          AS joina_id,
+                       t1.pid         AS joina_pid,
+                       t1.`name`      AS joina_name,
+                       t1.`json`      AS joina_json,
+                       t1.sex         AS joina_sex,
+                       t1.head_img    AS joina_head_img,
+                       t1.create_time AS joina_create_time,
+                       t1.address_id  AS joina_address_id,
+                       t1.address_id2 AS joina_address_id2,
+                       t1.del         AS joina_del,
+                       t1.create_by   AS joina_create_by,
+                       t1.update_by   AS joina_update_by
+                FROM `user` t
+                         LEFT JOIN `user` t1 ON (t1.pid = t.id)
+                WHERE t.del = false
+                  AND (t.id > ?)""");
 
         UserDOCol u = USERDO;
         UserDOCol ua = UserDOCol.build();
@@ -453,24 +461,25 @@ class AptWrapperTest {
         List<UserDO> list = userMapper.selectJoinList(UserDO.class, wrapper);
         System.out.println(list);
 
-        ThreadLocalUtils.set("SELECT t.id,\n" +
-                "       t.pid,\n" +
-                "       t.`name`,\n" +
-                "       t.`json`,\n" +
-                "       t.sex,\n" +
-                "       t.head_img,\n" +
-                "       t.create_time,\n" +
-                "       t.address_id,\n" +
-                "       t.address_id2,\n" +
-                "       t.del,\n" +
-                "       t.create_by,\n" +
-                "       t.update_by,\n" +
-                "       t1.`name` AS createName,\n" +
-                "       t2.`name` AS updateName\n" +
-                "FROM `user` t\n" +
-                "         LEFT JOIN `user` t1 ON (t1.id = t.create_by)\n" +
-                "         LEFT JOIN `user` t2 ON (t2.id = t.update_by)\n" +
-                "WHERE (t2.id = t.update_by AND t.id = t1.id)");
+        ThreadLocalUtils.set("""
+                SELECT t.id,
+                       t.pid,
+                       t.`name`,
+                       t.`json`,
+                       t.sex,
+                       t.head_img,
+                       t.create_time,
+                       t.address_id,
+                       t.address_id2,
+                       t.del,
+                       t.create_by,
+                       t.update_by,
+                       t1.`name` AS createName,
+                       t2.`name` AS updateName
+                FROM `user` t
+                         LEFT JOIN `user` t1 ON (t1.id = t.create_by)
+                         LEFT JOIN `user` t2 ON (t2.id = t.update_by)
+                WHERE (t2.id = t.update_by AND t.id = t1.id)""");
 
         UserDOCol uu = UserDOCol.build();
         UserDOCol uua = UserDOCol.build();
@@ -491,48 +500,49 @@ class AptWrapperTest {
         assert dos.get(0).getCreateName() != null && dos.get(0).getUpdateName() != null;
 
 
-        ThreadLocalUtils.set("SELECT t.id,\n" +
-                "       t.pid,\n" +
-                "       t.`name`,\n" +
-                "       t.`json`,\n" +
-                "       t.sex,\n" +
-                "       t.head_img,\n" +
-                "       t.create_time,\n" +
-                "       t.address_id,\n" +
-                "       t.address_id2,\n" +
-                "       t.del,\n" +
-                "       t.create_by,\n" +
-                "       t.update_by,\n" +
-                "       t1.`name`      AS alias,\n" +
-                "       t1.id          AS joina_id,\n" +
-                "       t1.pid         AS joina_pid,\n" +
-                "       t1.`name`      AS joina_name,\n" +
-                "       t1.`json`      AS joina_json,\n" +
-                "       t1.sex         AS joina_sex,\n" +
-                "       t1.head_img    AS joina_head_img,\n" +
-                "       t1.create_time AS joina_create_time,\n" +
-                "       t1.address_id  AS joina_address_id,\n" +
-                "       t1.address_id2 AS joina_address_id2,\n" +
-                "       t1.del         AS joina_del,\n" +
-                "       t1.create_by   AS joina_create_by,\n" +
-                "       t1.update_by   AS joina_update_by,\n" +
-                "       t2.id          AS joinb_id,\n" +
-                "       t2.pid         AS joinb_pid,\n" +
-                "       t2.`name`      AS joinb_name,\n" +
-                "       t2.`json`      AS joinb_json,\n" +
-                "       t2.sex         AS joinb_sex,\n" +
-                "       t2.head_img    AS joinb_head_img,\n" +
-                "       t2.create_time AS joinb_create_time,\n" +
-                "       t2.address_id  AS joinb_address_id,\n" +
-                "       t2.address_id2 AS joinb_address_id2,\n" +
-                "       t2.del         AS joinb_del,\n" +
-                "       t2.create_by   AS joinb_create_by,\n" +
-                "       t2.update_by   AS joinb_update_by\n" +
-                "FROM `user` t\n" +
-                "         LEFT JOIN `user` t1 ON (t1.pid = t.id)\n" +
-                "         LEFT JOIN `user` t2 ON (t2.pid = t1.id)\n" +
-                "WHERE t.del = false\n" +
-                "  AND (t1.id <= ? AND t.id <= ?)");
+        ThreadLocalUtils.set("""
+                SELECT t.id,
+                       t.pid,
+                       t.`name`,
+                       t.`json`,
+                       t.sex,
+                       t.head_img,
+                       t.create_time,
+                       t.address_id,
+                       t.address_id2,
+                       t.del,
+                       t.create_by,
+                       t.update_by,
+                       t1.`name`      AS alias,
+                       t1.id          AS joina_id,
+                       t1.pid         AS joina_pid,
+                       t1.`name`      AS joina_name,
+                       t1.`json`      AS joina_json,
+                       t1.sex         AS joina_sex,
+                       t1.head_img    AS joina_head_img,
+                       t1.create_time AS joina_create_time,
+                       t1.address_id  AS joina_address_id,
+                       t1.address_id2 AS joina_address_id2,
+                       t1.del         AS joina_del,
+                       t1.create_by   AS joina_create_by,
+                       t1.update_by   AS joina_update_by,
+                       t2.id          AS joinb_id,
+                       t2.pid         AS joinb_pid,
+                       t2.`name`      AS joinb_name,
+                       t2.`json`      AS joinb_json,
+                       t2.sex         AS joinb_sex,
+                       t2.head_img    AS joinb_head_img,
+                       t2.create_time AS joinb_create_time,
+                       t2.address_id  AS joinb_address_id,
+                       t2.address_id2 AS joinb_address_id2,
+                       t2.del         AS joinb_del,
+                       t2.create_by   AS joinb_create_by,
+                       t2.update_by   AS joinb_update_by
+                FROM `user` t
+                         LEFT JOIN `user` t1 ON (t1.pid = t.id)
+                         LEFT JOIN `user` t2 ON (t2.pid = t1.id)
+                WHERE t.del = false
+                  AND (t1.id <= ? AND t.id <= ?)""");
 
         UserDOCol uuu = UserDOCol.build();
         UserDOCol uuua = UserDOCol.build();
@@ -628,28 +638,29 @@ class AptWrapperTest {
 
     @Test
     void testTableAlias() {
-        ThreadLocalUtils.set("SELECT t.id,\n" +
-                "       t.pid,\n" +
-                "       t.`name`,\n" +
-                "       t.`json`,\n" +
-                "       t.sex,\n" +
-                "       t.head_img,\n" +
-                "       t.create_time,\n" +
-                "       t.address_id,\n" +
-                "       t.address_id2,\n" +
-                "       t.del,\n" +
-                "       t.create_by,\n" +
-                "       t.update_by,\n" +
-                "       aa.id,\n" +
-                "       aa.user_id,\n" +
-                "       aa.area_id,\n" +
-                "       aa.tel,\n" +
-                "       aa.address,\n" +
-                "       aa.del\n" +
-                "FROM `user` t\n" +
-                "         LEFT JOIN address aa ON (aa.user_id = t.id)\n" +
-                "WHERE t.del = false\n" +
-                "  AND aa.del = false");
+        ThreadLocalUtils.set("""
+                SELECT t.id,
+                       t.pid,
+                       t.`name`,
+                       t.`json`,
+                       t.sex,
+                       t.head_img,
+                       t.create_time,
+                       t.address_id,
+                       t.address_id2,
+                       t.del,
+                       t.create_by,
+                       t.update_by,
+                       aa.id,
+                       aa.user_id,
+                       aa.area_id,
+                       aa.tel,
+                       aa.address,
+                       aa.del
+                FROM `user` t
+                         LEFT JOIN address aa ON (aa.user_id = t.id)
+                WHERE t.del = false
+                  AND aa.del = false""");
 
         UserDOCol u = UserDOCol.build();
         AddressDOCol addr = AddressDOCol.build("aa");
@@ -711,25 +722,26 @@ class AptWrapperTest {
      */
     @Test
     void test3() {
-        ThreadLocalUtils.set("SELECT t.id,\n" +
-                        "       t.pid,\n" +
-                        "       t.`name`,\n" +
-                        "       t.`json`,\n" +
-                        "       t.sex,\n" +
-                        "       t.head_img,\n" +
-                        "       t.create_time,\n" +
-                        "       t.address_id,\n" +
-                        "       t.address_id2,\n" +
-                        "       t.del,\n" +
-                        "       t.create_by,\n" +
-                        "       t.update_by,\n" +
-                        "       t1.address\n" +
-                        "FROM `user` t\n" +
-                        "         LEFT JOIN address t1 ON (t.id = t1.user_id AND t.id = t1.user_id)\n" +
-                        "WHERE t.del = false\n" +
-                        "  AND t1.del = false\n" +
-                        "  AND (t.id = ? AND (t.head_img = ? OR t1.user_id = ?) AND t.id = ?)\n" +
-                        "LIMIT ?",
+        ThreadLocalUtils.set("""
+                        SELECT t.id,
+                               t.pid,
+                               t.`name`,
+                               t.`json`,
+                               t.sex,
+                               t.head_img,
+                               t.create_time,
+                               t.address_id,
+                               t.address_id2,
+                               t.del,
+                               t.create_by,
+                               t.update_by,
+                               t1.address
+                        FROM `user` t
+                                 LEFT JOIN address t1 ON (t.id = t1.user_id AND t.id = t1.user_id)
+                        WHERE t.del = false
+                          AND t1.del = false
+                          AND (t.id = ? AND (t.head_img = ? OR t1.user_id = ?) AND t.id = ?)
+                        LIMIT ?""",
                 "SELECT * FROM ( SELECT TMP.*, ROWNUM ROW_ID FROM ( SELECT t.id, t.pid, t.`name`, t.`json`, t.sex, t.head_img, " +
                         "t.create_time, t.address_id, t.address_id2, t.del, t.create_by, t.update_by, t1.address FROM `user` t " +
                         "LEFT JOIN address t1 ON (t.id = t1.user_id AND t.id = t1.user_id) WHERE t.del = false AND t1.del = false AND " +
@@ -895,36 +907,38 @@ class AptWrapperTest {
      */
     @Test
     void logicDelType() {
-        ThreadLocalUtils.set("SELECT t.id,\n" +
-                "       t.pid,\n" +
-                "       t.`name`,\n" +
-                "       t.`json`,\n" +
-                "       t.sex,\n" +
-                "       t.head_img,\n" +
-                "       t.create_time,\n" +
-                "       t.address_id,\n" +
-                "       t.address_id2,\n" +
-                "       t.del,\n" +
-                "       t.create_by,\n" +
-                "       t.update_by,\n" +
-                "       t1.id  AS joina_id,\n" +
-                "       t1.user_id,\n" +
-                "       t1.area_id,\n" +
-                "       t1.tel,\n" +
-                "       t1.address,\n" +
-                "       t1.del AS joina_del,\n" +
-                "       t2.id  AS joinb_id,\n" +
-                "       t2.province,\n" +
-                "       t2.city,\n" +
-                "       t2.area,\n" +
-                "       t2.postcode,\n" +
-                "       t2.del AS joinb_del\n" +
-                "FROM `user` t\n" +
-                "         LEFT JOIN address t1 ON (t1.user_id = t.id AND t1.del = false)\n" +
-                "         LEFT JOIN area t2 ON (t2.id = t1.area_id AND t2.del = false)\n" +
-                "WHERE t.del = false\n" +
-                "  AND (t.id <= ?)\n" +
-                "ORDER BY t.id DESC\n");
+        ThreadLocalUtils.set("""
+                SELECT t.id,
+                       t.pid,
+                       t.`name`,
+                       t.`json`,
+                       t.sex,
+                       t.head_img,
+                       t.create_time,
+                       t.address_id,
+                       t.address_id2,
+                       t.del,
+                       t.create_by,
+                       t.update_by,
+                       t1.id  AS joina_id,
+                       t1.user_id,
+                       t1.area_id,
+                       t1.tel,
+                       t1.address,
+                       t1.del AS joina_del,
+                       t2.id  AS joinb_id,
+                       t2.province,
+                       t2.city,
+                       t2.area,
+                       t2.postcode,
+                       t2.del AS joinb_del
+                FROM `user` t
+                         LEFT JOIN address t1 ON (t1.user_id = t.id AND t1.del = false)
+                         LEFT JOIN area t2 ON (t2.id = t1.area_id AND t2.del = false)
+                WHERE t.del = false
+                  AND (t.id <= ?)
+                ORDER BY t.id DESC
+                """);
         UserDOCol u = UserDOCol.build();
         AddressDOCol addr = AddressDOCol.build();
         AreaDOCol ar = AreaDOCol.build();
@@ -948,36 +962,38 @@ class AptWrapperTest {
      */
     @Test
     void joinWrapper() {
-        ThreadLocalUtils.set("SELECT t.id,\n" +
-                "       t.pid,\n" +
-                "       t.`name`,\n" +
-                "       t.`json`,\n" +
-                "       t.sex,\n" +
-                "       t.head_img,\n" +
-                "       t.create_time,\n" +
-                "       t.address_id,\n" +
-                "       t.address_id2,\n" +
-                "       t.del,\n" +
-                "       t.create_by,\n" +
-                "       t.update_by,\n" +
-                "       t1.id  AS joina_id,\n" +
-                "       t1.user_id,\n" +
-                "       t1.area_id,\n" +
-                "       t1.tel,\n" +
-                "       t1.address,\n" +
-                "       t1.del AS joina_del,\n" +
-                "       t2.id  AS joinb_id,\n" +
-                "       t2.province,\n" +
-                "       t2.city,\n" +
-                "       t2.area,\n" +
-                "       t2.postcode,\n" +
-                "       t2.del AS joinb_del\n" +
-                "FROM `user` t\n" +
-                "         LEFT JOIN address t1 ON (t1.user_id = t.id AND t1.del = false)\n" +
-                "         LEFT JOIN area t2 ON (t2.id = t1.area_id AND t2.del = false)\n" +
-                "WHERE t.del = false\n" +
-                "  AND (t.id <= ?)\n" +
-                "ORDER BY t.id DESC\n");
+        ThreadLocalUtils.set("""
+                SELECT t.id,
+                       t.pid,
+                       t.`name`,
+                       t.`json`,
+                       t.sex,
+                       t.head_img,
+                       t.create_time,
+                       t.address_id,
+                       t.address_id2,
+                       t.del,
+                       t.create_by,
+                       t.update_by,
+                       t1.id  AS joina_id,
+                       t1.user_id,
+                       t1.area_id,
+                       t1.tel,
+                       t1.address,
+                       t1.del AS joina_del,
+                       t2.id  AS joinb_id,
+                       t2.province,
+                       t2.city,
+                       t2.area,
+                       t2.postcode,
+                       t2.del AS joinb_del
+                FROM `user` t
+                         LEFT JOIN address t1 ON (t1.user_id = t.id AND t1.del = false)
+                         LEFT JOIN area t2 ON (t2.id = t1.area_id AND t2.del = false)
+                WHERE t.del = false
+                  AND (t.id <= ?)
+                ORDER BY t.id DESC
+                """);
         UserDOCol u = UserDOCol.build();
         AddressDOCol addr = AddressDOCol.build();
         AreaDOCol ar = AreaDOCol.build();
@@ -1077,7 +1093,7 @@ class AptWrapperTest {
      */
     @Test
     void joinOrder() {
-        if (VersionUtils.compare(MybatisPlusVersion.getVersion(), "3.4.3") >= 0) {
+        if (VersionUtils.compare(VersionUtils.getVersion(), "3.4.3") >= 0) {
             ThreadLocalUtils.set("SELECT id,user_id,name FROM order_t t ORDER BY t.name DESC",
                     "SELECT t.id, t.user_id, t.name FROM order_t t ORDER BY t.name DESC",
                     "SELECT id,user_id,name FROM order_t t ORDER BY t.name desc");
@@ -1089,7 +1105,7 @@ class AptWrapperTest {
         AptQueryWrapper<OrderDO> wrapper = AptWrappers.query(o);
         List<OrderDO> list = wrapper.list();
 
-        if (VersionUtils.compare(MybatisPlusVersion.getVersion(), "3.4.3") >= 0) {
+        if (VersionUtils.compare(VersionUtils.getVersion(), "3.4.3") >= 0) {
             ThreadLocalUtils.set("SELECT t.id,t.user_id,t.name,t1.`name` AS userName FROM order_t t LEFT JOIN `user` t1 ON (t1.id = t.user_id) WHERE t1.del=false ORDER BY t.name DESC",
                     "SELECT t.id,t.user_id,t.name,t1.`name` AS userName FROM order_t t LEFT JOIN `user` t1 ON (t1.id = t.user_id) WHERE t1.del=false ORDER BY t.name desc");
         } else {

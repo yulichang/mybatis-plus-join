@@ -1,5 +1,8 @@
 package com.github.yulichang.adapter.base.tookit;
 
+import com.baomidou.mybatisplus.core.MybatisPlusVersion;
+import com.baomidou.mybatisplus.core.toolkit.ExceptionUtils;
+
 /**
  * 版本工具类
  *
@@ -8,8 +11,24 @@ package com.github.yulichang.adapter.base.tookit;
  */
 public class VersionUtils {
 
+    public static String version = MybatisPlusVersion.getVersion();
+
+    @SuppressWarnings("unused")
+    public static void setMybatisPlusVersion(String version) {
+        VersionUtils.version = version;
+    }
+
+    public static String getVersion() {
+        if (version != null) {
+            return version;
+        } else {
+            throw ExceptionUtils.mpe("mybatis-plus version is blank, " +
+                    "please add VersionUtils.setMybatisPlusVersion(?) code before running application");
+        }
+    }
+
     public static int compare(String v1, String v2) {
-        String[] v1s = v1.split("\\.");
+        String[] v1s = v1.split("-")[0].split("\\.");
         String[] v2s = v2.split("\\.");
 
         String[] vs = v1s.length > v2s.length ? v2s : v1s;

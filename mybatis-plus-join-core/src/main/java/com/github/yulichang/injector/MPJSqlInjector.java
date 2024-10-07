@@ -1,6 +1,5 @@
 package com.github.yulichang.injector;
 
-import com.baomidou.mybatisplus.core.MybatisPlusVersion;
 import com.baomidou.mybatisplus.core.injector.AbstractMethod;
 import com.baomidou.mybatisplus.core.injector.AbstractSqlInjector;
 import com.baomidou.mybatisplus.core.injector.DefaultSqlInjector;
@@ -59,7 +58,7 @@ public class MPJSqlInjector extends DefaultSqlInjector {
     @Deprecated
     @SuppressWarnings({"unused", "DeprecatedIsStillUsed"})
     public List<AbstractMethod> getMethodList(Class<?> mapperClass) {
-        if (VersionUtils.compare(MybatisPlusVersion.getVersion(), "3.4.3.2") >= 0) {
+        if (VersionUtils.compare(VersionUtils.getVersion(), "3.4.3.2") >= 0) {
             throw ExceptionUtils.mpe("DefaultSqlInjector 的 getMethodList(Class<?> mapperClass) 方法已在 3.4.3.2+ 改为" +
                     "getMethodList(Class<?> mapperClass, TableInfo tableInfo)\n");
         }
@@ -128,7 +127,7 @@ public class MPJSqlInjector extends DefaultSqlInjector {
 
     private List<AbstractMethod> getJoinMethod() {
         List<AbstractMethod> list = new ArrayList<>();
-        if (VersionUtils.compare(MybatisPlusVersion.getVersion(), "3.5.0") >= 0) {
+        if (VersionUtils.compare(VersionUtils.getVersion(), "3.5.0") >= 0) {
             list.add(new DeleteJoin(SqlMethod.DELETE_JOIN.getMethod()));
             list.add(new UpdateJoin(SqlMethod.UPDATE_JOIN.getMethod()));
             list.add(new UpdateJoinAndNull(SqlMethod.UPDATE_JOIN_AND_NULL.getMethod()));

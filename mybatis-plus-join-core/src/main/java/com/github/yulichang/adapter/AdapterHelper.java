@@ -1,6 +1,5 @@
 package com.github.yulichang.adapter;
 
-import com.baomidou.mybatisplus.core.MybatisPlusVersion;
 import com.baomidou.mybatisplus.core.toolkit.ExceptionUtils;
 import com.github.yulichang.adapter.base.IAdapter;
 import com.github.yulichang.adapter.base.tookit.VersionUtils;
@@ -23,7 +22,7 @@ public class AdapterHelper {
 
     static {
         String lastAdapter = "3.5.8";
-        String version = Optional.ofNullable(MybatisPlusVersion.getVersion()).orElse(lastAdapter);
+        String version = Optional.ofNullable(VersionUtils.getVersion()).orElse(lastAdapter);
 
         if (VersionUtils.compare(version, "3.5.6") >= 0) {
             adapter = new Adapter();

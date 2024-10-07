@@ -1,6 +1,5 @@
 package com.github.yulichang.adapter.v3431;
 
-import com.baomidou.mybatisplus.core.MybatisPlusVersion;
 import com.baomidou.mybatisplus.core.metadata.TableFieldInfo;
 import com.baomidou.mybatisplus.core.metadata.TableInfo;
 import com.baomidou.mybatisplus.core.toolkit.StringPool;
@@ -29,7 +28,7 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 public class Adapter3431 implements IAdapter {
 
-    private static final boolean v = VersionUtils.compare(MybatisPlusVersion.getVersion(), "3.4.3") < 0;
+    private static final boolean v = VersionUtils.compare(VersionUtils.getVersion(), "3.4.3") < 0;
 
     @Override
     public String mpjMapping(TableFieldInfo tableFieldInfo) {

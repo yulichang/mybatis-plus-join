@@ -1,6 +1,5 @@
 package com.github.yulichang.interceptor;
 
-import com.baomidou.mybatisplus.core.MybatisPlusVersion;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.metadata.TableInfo;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
@@ -46,7 +45,7 @@ import java.util.concurrent.ConcurrentHashMap;
 @Intercepts(@Signature(type = Executor.class, method = "query", args = {MappedStatement.class, Object.class, RowBounds.class, ResultHandler.class}))
 public class MPJInterceptor implements Interceptor {
 
-    private static final boolean v = VersionUtils.compare(MybatisPlusVersion.getVersion(), "3.4.3.1") > 0;
+    private static final boolean v = VersionUtils.compare(VersionUtils.getVersion(), "3.4.3.1") > 0;
 
     private static final List<ResultMapping> EMPTY_RESULT_MAPPING = new ArrayList<>(0);
 

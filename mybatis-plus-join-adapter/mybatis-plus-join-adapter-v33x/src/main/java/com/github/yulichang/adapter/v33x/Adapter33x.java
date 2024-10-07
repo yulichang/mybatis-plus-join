@@ -1,6 +1,5 @@
 package com.github.yulichang.adapter.v33x;
 
-import com.baomidou.mybatisplus.core.MybatisPlusVersion;
 import com.baomidou.mybatisplus.core.metadata.TableFieldInfo;
 import com.baomidou.mybatisplus.core.metadata.TableInfo;
 import com.baomidou.mybatisplus.core.toolkit.StringPool;
@@ -28,7 +27,7 @@ import java.util.function.Supplier;
  */
 public class Adapter33x implements IAdapter {
 
-    private static final boolean is330 = VersionUtils.compare(MybatisPlusVersion.getVersion(), "3.3.0") == 0;
+    private static final boolean is330 = VersionUtils.compare(VersionUtils.getVersion(), "3.3.0") == 0;
 
     @Override
     public boolean mpjHasLogic(TableInfo tableInfo) {

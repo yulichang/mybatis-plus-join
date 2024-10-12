@@ -259,8 +259,8 @@ public class MPJLambdaWrapper<T> extends JoinAbstractLambdaWrapper<T, MPJLambdaW
         wrapper.tableList.setParent(this.tableList);
         wrapper.alias = st;
         wrapper.subTableAlias = st;
-        consumer.accept(wrapper);
         addCustomWrapper(wrapper);
+        consumer.accept(wrapper);
         this.selectColumns.add(new SelectSub(() -> WrapperUtils.buildSubSqlByWrapper(clazz, wrapper, alias), hasAlias, this.alias, alias));
         return typedThis;
     }
@@ -334,7 +334,7 @@ public class MPJLambdaWrapper<T> extends JoinAbstractLambdaWrapper<T, MPJLambdaW
             wrapperMap = new HashMap<>();
         }
         String key = "ew" + index;
-        wrapper.setParamAlias(wrapper.getParamAlias() + ".wrapperMap." + key);
+        wrapper.setParamAlias(getParamAlias() + ".wrapperMap." + key);
         wrapperMap.put(key, wrapper);
     }
 

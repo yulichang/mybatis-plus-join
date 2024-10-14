@@ -80,11 +80,11 @@ public interface Update<Children> extends Serializable {
 
     <R> Children setDecrBy(boolean condition, SFunction<R, ?> column, Number val);
 
-    default Children setApply(String applySql, SFunction<FuncConsumer, SFunction<?, ?>[]> consumerFunction, Object... values) {
+    default Children setApply(String applySql, MFunction<FuncConsumer> consumerFunction, Object... values) {
         return setApply(true, applySql, consumerFunction, values);
     }
 
-    Children setApply(boolean condition, String applySql, SFunction<FuncConsumer, SFunction<?, ?>[]> consumerFunction, Object... values);
+    Children setApply(boolean condition, String applySql, MFunction<FuncConsumer> consumerFunction, Object... values);
 
     /**
      * ignore

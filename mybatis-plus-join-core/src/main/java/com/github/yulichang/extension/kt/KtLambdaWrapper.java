@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.core.toolkit.*;
 import com.github.yulichang.config.ConfigProperties;
 import com.github.yulichang.extension.kt.interfaces.Query;
 import com.github.yulichang.extension.kt.interfaces.QueryLabel;
+import com.github.yulichang.extension.kt.segments.FuncArgs;
 import com.github.yulichang.extension.kt.toolkit.KtWrapperUtils;
 import com.github.yulichang.extension.kt.toolkit.KtWrappers;
 import com.github.yulichang.toolkit.Constant;
@@ -14,6 +15,7 @@ import com.github.yulichang.toolkit.KtUtils;
 import com.github.yulichang.toolkit.TableList;
 import com.github.yulichang.toolkit.support.ColumnCache;
 import com.github.yulichang.wrapper.interfaces.Chain;
+import com.github.yulichang.wrapper.interfaces.MFunction;
 import com.github.yulichang.wrapper.interfaces.SelectWrapper;
 import com.github.yulichang.wrapper.resultmap.Label;
 import com.github.yulichang.wrapper.segments.*;
@@ -230,6 +232,20 @@ public class KtLambdaWrapper<T> extends KtAbstractLambdaWrapper<T, KtLambdaWrapp
         addCustomWrapper(wrapper);
         this.selectColumns.add(new SelectSub(() -> KtWrapperUtils.buildSubSqlByWrapper(
                 clazz, wrapper, alias), hasAlias, this.alias, alias));
+        return typedThis;
+    }
+
+    @Override
+    public KtLambdaWrapper<T> selectFunc(String sql, MFunction<FuncArgs> column, String alias) {
+        FuncArgs apply = column.apply(new FuncArgs());
+        String formatSql;
+        if (ArrayUtils.isEmpty(apply.getValues())) {
+            formatSql = sql;
+        } else {
+            formatSql = formatSqlMaybeWithParam(sql, null, apply.getValues());
+        }
+        getSelectColum().add(new SelectFunc(alias, getIndex(), () -> formatSql, apply.getFuncArg(),
+                isHasAlias(), getAlias()));
         return typedThis;
     }
 

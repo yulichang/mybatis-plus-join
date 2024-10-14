@@ -27,7 +27,10 @@ import lombok.Getter;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.*;
+import java.util.function.BiPredicate;
+import java.util.function.Consumer;
+import java.util.function.Predicate;
+import java.util.function.Supplier;
 
 import static com.baomidou.mybatisplus.core.enums.SqlKeyword.*;
 import static com.baomidou.mybatisplus.core.enums.WrapperKeyword.APPLY;
@@ -329,21 +332,24 @@ public abstract class JoinAbstractWrapper<T, Children extends JoinAbstractWrappe
                 () -> formatSqlMaybeWithParam(applySql, null, values)));
     }
 
-    public Children applyFunc(String applySql, SFunction<FuncConsumer, SFunction<?, ?>[]> consumerFunction, Object... values) {
+    public Children applyFunc(String applySql, MFunction<FuncConsumer> consumerFunction, Object... values) {
         return applyFunc(true, applySql, consumerFunction, values);
     }
 
     public Children applyFunc(boolean condition, String applySql,
-                              Function<FuncConsumer, SFunction<?, ?>[]> consumerFunction, Object... values) {
+                              MFunction<FuncConsumer> consumerFunction, Object... values) {
         return maybeDo(condition, () -> appendSqlSegments(APPLY,
-                () -> formatSqlMaybeWithParam(String.format(applySql,
-                        Arrays.stream(consumerFunction.apply(FuncConsumer.func)).map(func -> {
-                            if (func instanceof Fun) {
-                                Fun<?, ?> fun = (Fun<?, ?>) func;
-                                return columnToString(index, fun.getAlias(), fun.getFunc(), false, PrefixEnum.CD_FIRST, false);
-                            }
-                            return columnToString(index, null, func, false, PrefixEnum.CD_FIRST, false);
-                        }).toArray()), null, values)));
+                () -> {
+                    FuncConsumer funcConsumer = consumerFunction.apply(new FuncConsumer());
+                    return formatSqlMaybeWithParam(String.format(applySql,
+                            Arrays.stream(funcConsumer.getArgs()).map(func -> {
+                                if (func instanceof Fun) {
+                                    Fun<?, ?> fun = (Fun<?, ?>) func;
+                                    return columnToString(index, fun.getAlias(), fun.getFunc(), false, PrefixEnum.CD_FIRST, false);
+                                }
+                                return columnToString(index, null, func, false, PrefixEnum.CD_FIRST, false);
+                            }).toArray()), null, ArrayUtils.isEmpty(values) ? funcConsumer.getValues() : values);
+                }));
     }
 
     @Override

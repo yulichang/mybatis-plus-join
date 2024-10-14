@@ -10,6 +10,7 @@ import com.github.yulichang.adapter.AdapterHelper;
 import com.github.yulichang.toolkit.LambdaUtils;
 import com.github.yulichang.toolkit.ReflectionKit;
 import com.github.yulichang.toolkit.*;
+import com.github.yulichang.wrapper.interfaces.MFunction;
 import com.github.yulichang.wrapper.interfaces.Update;
 import com.github.yulichang.wrapper.interfaces.UpdateChain;
 import com.github.yulichang.wrapper.segments.FuncConsumer;
@@ -127,14 +128,14 @@ public class UpdateJoinWrapper<T> extends JoinAbstractLambdaWrapper<T, UpdateJoi
     }
 
     @Override
-    public UpdateJoinWrapper<T> setApply(boolean condition, String applySql, SFunction<FuncConsumer, SFunction<?, ?>[]> consumerFunction, Object... values) {
+    public UpdateJoinWrapper<T> setApply(boolean condition, String applySql, MFunction<FuncConsumer> consumerFunction, Object... values) {
         if (condition && StringUtils.isNotBlank(applySql)) {
-            SFunction<?, ?>[] arg = consumerFunction.apply(FuncConsumer.func);
+            FuncConsumer funcConsumer = consumerFunction.apply(new FuncConsumer());
             UpdateSet set = new UpdateSet();
             set.setApply(true);
             set.setFormat(applySql);
-            set.setColumns(arg);
-            set.setArgs(values);
+            set.setColumns(funcConsumer.getArgs());
+            set.setArgs(ArrayUtils.isNotEmpty(values) ? values : funcConsumer.getValues());
             getUpdateSet().add(set);
         }
         return typedThis;

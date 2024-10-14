@@ -12,11 +12,11 @@ import com.baomidou.mybatisplus.core.toolkit.*;
 import com.baomidou.mybatisplus.core.toolkit.sql.SqlUtils;
 import com.baomidou.mybatisplus.core.toolkit.sql.StringEscape;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
-import com.github.yulichang.extension.apt.matedata.Column;
 import com.github.yulichang.config.ConfigProperties;
 import com.github.yulichang.extension.apt.interfaces.CompareIfExists;
 import com.github.yulichang.extension.apt.interfaces.Func;
 import com.github.yulichang.extension.apt.interfaces.OnCompare;
+import com.github.yulichang.extension.apt.matedata.Column;
 import com.github.yulichang.toolkit.LambdaUtils;
 import com.github.yulichang.toolkit.MPJSqlInjectionUtils;
 import com.github.yulichang.toolkit.Ref;
@@ -283,15 +283,19 @@ public abstract class JoinAbstractWrapper<T, Children extends JoinAbstractWrappe
                 () -> formatSqlMaybeWithParam(applySql, null, values)));
     }
 
-    public Children applyFunc(String applySql, SFunction<AptConsumer, Column[]> consumerFunction, Object... values) {
+    public Children applyFunc(String applySql, MFunction<AptConsumer> consumerFunction, Object... values) {
         return applyFunc(true, applySql, consumerFunction, values);
     }
 
     public Children applyFunc(boolean condition, String applySql,
-                              SFunction<AptConsumer, Column[]> consumerFunction, Object... values) {
+                              MFunction<AptConsumer> consumerFunction, Object... values) {
         return maybeDo(condition, () -> appendSqlSegments(APPLY,
-                () -> formatSqlMaybeWithParam(String.format(applySql,
-                        Arrays.stream(consumerFunction.apply(AptConsumer.func)).map(this::columnToString).toArray()), null, values)));
+                () -> {
+                    AptConsumer apply = consumerFunction.apply(new AptConsumer());
+                    return formatSqlMaybeWithParam(String.format(applySql,
+                                    Arrays.stream(apply.getColumns()).map(this::columnToString).toArray()), null,
+                            ArrayUtils.isNotEmpty(values) ? values : apply.getValues());
+                }));
     }
 
     @Override

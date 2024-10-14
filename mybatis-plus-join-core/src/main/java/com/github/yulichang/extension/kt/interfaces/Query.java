@@ -12,6 +12,7 @@ import com.github.yulichang.toolkit.support.ColumnCache;
 import com.github.yulichang.toolkit.support.FieldCache;
 import com.github.yulichang.wrapper.enums.BaseFuncEnum;
 import com.github.yulichang.wrapper.enums.DefaultFuncEnum;
+import com.github.yulichang.wrapper.interfaces.MFunction;
 import com.github.yulichang.wrapper.segments.*;
 import kotlin.reflect.KProperty;
 
@@ -19,7 +20,6 @@ import java.io.Serializable;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -216,16 +216,10 @@ public interface Query<Children> extends Serializable {
     }
 
 
-    default Children selectFunc(String sql, Function<FuncArgs, SelectFunc.Arg[]> column, String alias) {
-        getSelectColum().add(new SelectFunc(alias, getIndex(), () -> sql, column.apply(new FuncArgs()),
-                isHasAlias(), getAlias()));
-        return getChildren();
-    }
+    Children selectFunc(String sql, MFunction<FuncArgs> column, String alias);
 
-    default Children selectFunc(String sql, Function<FuncArgs, SelectFunc.Arg[]> column, KProperty<?> alias) {
-        getSelectColum().add(new SelectFunc(alias.getName(), getIndex(), () -> sql,
-                column.apply(new FuncArgs()), isHasAlias(), getAlias()));
-        return getChildren();
+    default Children selectFunc(String sql, MFunction<FuncArgs> column, KProperty<?> alias) {
+        return selectFunc(sql, column, alias.getName());
     }
 
     /* 默认聚合函数扩展 */

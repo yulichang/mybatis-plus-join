@@ -1,6 +1,7 @@
 package com.github.yulichang.wrapper.segments;
 
 import com.github.yulichang.extension.apt.matedata.Column;
+import lombok.Data;
 
 import java.io.Serializable;
 
@@ -11,12 +12,22 @@ import java.io.Serializable;
  * @author yulichang
  * @since 1.4.13
  */
+@Data
 public class AptConsumer implements Serializable {
 
-    public static final AptConsumer func = new AptConsumer();
+    private Column[] columns;
 
-    public final Column[] accept(Column... a) {
-        return a;
+    private Object[] values;
+
+
+    public final AptConsumer accept(Column... a) {
+        this.columns = a;
+        return this;
+    }
+
+    public final AptConsumer accept(Object... a) {
+        this.values = a;
+        return this;
     }
 
 }

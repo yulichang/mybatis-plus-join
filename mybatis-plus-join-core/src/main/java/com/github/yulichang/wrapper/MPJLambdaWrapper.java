@@ -234,6 +234,20 @@ public class MPJLambdaWrapper<T> extends JoinAbstractLambdaWrapper<T, MPJLambdaW
         return selectAll(getEntityClass());
     }
 
+    @Override
+    public MPJLambdaWrapper<T> selectFunc(String sql, MFunction<FuncConsumer> column, String alias) {
+        FuncConsumer funcConsumer = column.apply(new FuncConsumer());
+        String formatSql;
+        if (ArrayUtils.isEmpty(funcConsumer.getValues())) {
+            formatSql = sql;
+        } else {
+            formatSql = formatSqlMaybeWithParam(sql, null, funcConsumer.getValues());
+        }
+        getSelectColum().add(new SelectFunc(alias, getIndex(), () -> formatSql,
+                funcConsumer.getArgs(), isHasAlias(), getAlias()));
+        return typedThis;
+    }
+
     /**
      * 子查询
      */

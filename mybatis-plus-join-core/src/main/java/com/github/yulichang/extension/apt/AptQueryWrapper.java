@@ -19,12 +19,10 @@ import com.github.yulichang.toolkit.support.ColumnCache;
 import com.github.yulichang.wrapper.enums.IfExistsSqlKeyWordEnum;
 import com.github.yulichang.wrapper.interfaces.Chain;
 import com.github.yulichang.wrapper.interfaces.MBiPredicate;
+import com.github.yulichang.wrapper.interfaces.MFunction;
 import com.github.yulichang.wrapper.interfaces.SelectWrapper;
 import com.github.yulichang.wrapper.resultmap.Label;
-import com.github.yulichang.wrapper.segments.Select;
-import com.github.yulichang.wrapper.segments.SelectApt;
-import com.github.yulichang.wrapper.segments.SelectCache;
-import com.github.yulichang.wrapper.segments.SelectSub;
+import com.github.yulichang.wrapper.segments.*;
 import lombok.Getter;
 
 import java.util.*;
@@ -190,6 +188,19 @@ public class AptQueryWrapper<T> extends AptAbstractWrapper<T, AptQueryWrapper<T>
     public AptQueryWrapper<T> selectAll() {
         Assert.notNull(getEntityClass(), "使用 AptWrappers.query(clazz) 或者 new JoinAptQueryWrapper<>(BaseColum)");
         return selectAll(getBaseColumn());
+    }
+
+    @Override
+    public AptQueryWrapper<T> selectFunc(String sql, MFunction<AptConsumer> column, String alias) {
+        AptConsumer apply = column.apply(new AptConsumer());
+        String formatSql;
+        if (ArrayUtils.isEmpty(apply.getValues())) {
+            formatSql = sql;
+        } else {
+            formatSql = formatSqlMaybeWithParam(sql, null, apply.getValues());
+        }
+        getSelectColum().add(new SelectApt(apply.getColumns(), () -> formatSql, alias));
+        return typedThis;
     }
 
     public <E, F> AptQueryWrapper<T> selectSub(BaseColumn<E> baseColumn, Consumer<AptQueryWrapper<E>> consumer, SFunction<F, ?> alias) {

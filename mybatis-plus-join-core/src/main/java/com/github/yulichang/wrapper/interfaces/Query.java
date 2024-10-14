@@ -17,7 +17,6 @@ import com.github.yulichang.wrapper.segments.*;
 
 import java.io.Serializable;
 import java.util.*;
-import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -263,16 +262,10 @@ public interface Query<Children> extends Serializable {
     }
 
 
-    default Children selectFunc(String sql, Function<FuncConsumer, SFunction<?, ?>[]> column, String alias) {
-        getSelectColum().add(new SelectFunc(alias, getIndex(), () -> sql, column.apply(FuncConsumer.func),
-                isHasAlias(), getAlias()));
-        return getChildren();
-    }
+    Children selectFunc(String sql, MFunction<FuncConsumer> column, String alias);
 
-    default <S> Children selectFunc(String sql, Function<FuncConsumer, SFunction<?, ?>[]> column, SFunction<S, ?> alias) {
-        getSelectColum().add(new SelectFunc(LambdaUtils.getName(alias), getIndex(), () -> sql,
-                column.apply(FuncConsumer.func), isHasAlias(), getAlias()));
-        return getChildren();
+    default <S> Children selectFunc(String sql, MFunction<FuncConsumer> column, SFunction<S, ?> alias) {
+        return selectFunc(sql, column, LambdaUtils.getName(alias));
     }
 
     /* 默认聚合函数扩展 */

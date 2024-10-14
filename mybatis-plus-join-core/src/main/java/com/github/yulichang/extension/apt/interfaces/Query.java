@@ -13,11 +13,11 @@ import com.github.yulichang.toolkit.support.ColumnCache;
 import com.github.yulichang.toolkit.support.FieldCache;
 import com.github.yulichang.wrapper.enums.BaseFuncEnum;
 import com.github.yulichang.wrapper.enums.DefaultFuncEnum;
+import com.github.yulichang.wrapper.interfaces.MFunction;
 import com.github.yulichang.wrapper.segments.*;
 
 import java.io.Serializable;
 import java.util.*;
-import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -115,7 +115,7 @@ public interface Query<Children> extends Serializable {
     /**
      * 别名查询
      */
-    default <S> Children selectAs(Column column, String alias) {
+    default Children selectAs(Column column, String alias) {
         Map<String, SelectCache> cacheMap = ColumnCache.getMapField(column.getClazz());
         SelectCache cache = cacheMap.get(column.getProperty());
         getSelectColum().add(new SelectApt(cache, column, alias));
@@ -165,27 +165,24 @@ public interface Query<Children> extends Serializable {
      * @param column   函数作用的字段
      * @param alias    别名
      */
-    default <S> Children selectFunc(BaseFuncEnum funcEnum, Column column, String alias) {
+    default Children selectFunc(BaseFuncEnum funcEnum, Column column, String alias) {
         Map<String, SelectCache> cacheMap = ColumnCache.getMapField(column.getClazz());
         getSelectColum().add(new SelectApt(cacheMap.get(column.getProperty()), column, funcEnum, alias));
         return getChildren();
     }
 
-    default <S, X> Children selectFunc(BaseFuncEnum funcEnum, Column column, SFunction<X, ?> alias) {
+    default <X> Children selectFunc(BaseFuncEnum funcEnum, Column column, SFunction<X, ?> alias) {
         return selectFunc(funcEnum, column, LambdaUtils.getName(alias));
     }
 
-    default <S> Children selectFunc(BaseFuncEnum funcEnum, Column column) {
+    default Children selectFunc(BaseFuncEnum funcEnum, Column column) {
         return selectFunc(funcEnum, column, column.getProperty());
     }
 
 
-    default <X> Children selectFunc(String sql, Function<AptConsumer, Column[]> column, String alias) {
-        getSelectColum().add(new SelectApt(column.apply(AptConsumer.func), () -> sql, alias));
-        return getChildren();
-    }
+    Children selectFunc(String sql, MFunction<AptConsumer> column, String alias);
 
-    default <X, S> Children selectFunc(String sql, Function<AptConsumer, Column[]> column, SFunction<S, ?> alias) {
+    default <S> Children selectFunc(String sql, MFunction<AptConsumer> column, SFunction<S, ?> alias) {
         return selectFunc(sql, column, LambdaUtils.getName(alias));
     }
 
@@ -194,90 +191,90 @@ public interface Query<Children> extends Serializable {
     /**
      * SUM()
      */
-    default <S> Children selectSum(Column column) {
+    default Children selectSum(Column column) {
         return selectFunc(DefaultFuncEnum.SUM, column);
     }
 
-    default <S, X> Children selectSum(Column column, SFunction<X, ?> alias) {
+    default <X> Children selectSum(Column column, SFunction<X, ?> alias) {
         return selectFunc(DefaultFuncEnum.SUM, column, alias);
     }
 
-    default <S, X> Children selectSum(Column column, String alias) {
+    default Children selectSum(Column column, String alias) {
         return selectFunc(DefaultFuncEnum.SUM, column, alias);
     }
 
     /**
      * COUNT()
      */
-    default <S> Children selectCount(Column column) {
+    default Children selectCount(Column column) {
         return selectFunc(DefaultFuncEnum.COUNT, column);
     }
 
-    default <S, X> Children selectCount(Column column, SFunction<X, ?> alias) {
+    default <X> Children selectCount(Column column, SFunction<X, ?> alias) {
         return selectFunc(DefaultFuncEnum.COUNT, column, alias);
     }
 
-    default <S, X> Children selectCount(Column column, String alias) {
+    default Children selectCount(Column column, String alias) {
         return selectFunc(DefaultFuncEnum.COUNT, column, alias);
     }
 
     /**
      * MAX()
      */
-    default <S> Children selectMax(Column column) {
+    default Children selectMax(Column column) {
         return selectFunc(DefaultFuncEnum.MAX, column);
     }
 
-    default <S, X> Children selectMax(Column column, SFunction<X, ?> alias) {
+    default <X> Children selectMax(Column column, SFunction<X, ?> alias) {
         return selectFunc(DefaultFuncEnum.MAX, column, alias);
     }
 
-    default <S, X> Children selectMax(Column column, String alias) {
+    default Children selectMax(Column column, String alias) {
         return selectFunc(DefaultFuncEnum.MAX, column, alias);
     }
 
     /**
      * MIN()
      */
-    default <S> Children selectMin(Column column) {
+    default Children selectMin(Column column) {
         return selectFunc(DefaultFuncEnum.MIN, column);
     }
 
-    default <S, X> Children selectMin(Column column, SFunction<X, ?> alias) {
+    default <X> Children selectMin(Column column, SFunction<X, ?> alias) {
         return selectFunc(DefaultFuncEnum.MIN, column, alias);
     }
 
-    default <S, X> Children selectMin(Column column, String alias) {
+    default Children selectMin(Column column, String alias) {
         return selectFunc(DefaultFuncEnum.MIN, column, alias);
     }
 
     /**
      * MIN()
      */
-    default <S> Children selectAvg(Column column) {
+    default Children selectAvg(Column column) {
         return selectFunc(DefaultFuncEnum.AVG, column);
     }
 
-    default <S, X> Children selectAvg(Column column, SFunction<X, ?> alias) {
+    default <X> Children selectAvg(Column column, SFunction<X, ?> alias) {
         return selectFunc(DefaultFuncEnum.AVG, column, alias);
     }
 
-    default <S, X> Children selectAvg(Column column, String alias) {
+    default Children selectAvg(Column column, String alias) {
         return selectFunc(DefaultFuncEnum.AVG, column, alias);
     }
 
     /**
      * LEN()
      */
-    default <S> Children selectLen(Column column) {
+    default Children selectLen(Column column) {
         return selectFunc(DefaultFuncEnum.LEN, column);
     }
 
-    default <S, X> Children selectLen(Column column, SFunction<X, ?> alias) {
+    default <X> Children selectLen(Column column, SFunction<X, ?> alias) {
         return selectFunc(DefaultFuncEnum.LEN, column, alias);
     }
 
-    default <S, X> Children selectLen(Column column, String alias) {
+    default Children selectLen(Column column, String alias) {
         return selectFunc(DefaultFuncEnum.LEN, column, alias);
     }
 }

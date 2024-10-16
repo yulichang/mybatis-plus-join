@@ -24,7 +24,28 @@ public class UnionTest {
 
     @Test
     void unionAll1() {
-        ThreadLocalUtils.set("SELECT t.id FROM `user` t WHERE t.del = false AND (t.id = ?) UNION ALL SELECT t.id FROM address t WHERE (t.id = ?) UNION ALL SELECT (SELECT st.id FROM area st WHERE st.del = false AND (st.id = ? AND (st.id = ?))) AS id FROM area t WHERE t.del = false AND (t.id = ? AND (t.id = ?))");
+        ThreadLocalUtils.set("""
+                SELECT
+                    t.id
+                FROM `user` t
+                WHERE t.del = false
+                    AND (t.id = ?)
+                UNION ALL
+                SELECT
+                    t.id
+                FROM address t
+                WHERE (t.id = ?)
+                UNION ALL
+                SELECT
+                    (SELECT
+                        st.id
+                    FROM area st
+                    WHERE st.del = false
+                        AND (st.id = ? AND (st.id = ?))) AS id
+                FROM area t
+                WHERE t.del = false
+                    AND (t.id = ? AND (t.id = ?))
+                """);
         MPJLambdaWrapper<UserDO> wrapper = JoinWrappers.lambda(UserDO.class)
                 .select(UserDO::getId)
                 .eq(UserDO::getId, 1)

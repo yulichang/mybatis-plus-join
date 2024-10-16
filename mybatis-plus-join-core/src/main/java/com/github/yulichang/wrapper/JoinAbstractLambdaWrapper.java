@@ -14,6 +14,7 @@ import com.github.yulichang.config.enums.LogicDelTypeEnum;
 import com.github.yulichang.toolkit.*;
 import com.github.yulichang.toolkit.support.ColumnCache;
 import com.github.yulichang.wrapper.enums.PrefixEnum;
+import com.github.yulichang.wrapper.interfaces.MConsumer;
 import com.github.yulichang.wrapper.interfaces.MFunction;
 import com.github.yulichang.wrapper.interfaces.QueryJoin;
 import com.github.yulichang.wrapper.segments.PageInfo;
@@ -175,6 +176,12 @@ public abstract class JoinAbstractLambdaWrapper<T, Children extends JoinAbstract
         if (entity != null) {
             tableList.setRootClass(entity.getClass());
         }
+    }
+
+    public Children setAlias(String alias) {
+        this.alias = alias;
+        tableList.setAlias(alias);
+        return typedThis;
     }
 
     /**
@@ -426,11 +433,29 @@ public abstract class JoinAbstractLambdaWrapper<T, Children extends JoinAbstract
      * 内部调用, 不建议使用
      */
     @Override
-    public <R> Children join(String keyWord, Class<R> clazz, String tableAlias, BiConsumer<JoinAbstractLambdaWrapper<T, ?>, Children> consumer) {
+    public <R> Children join(String keyWord, Class<R> clazz, MConsumer<MPJLambdaWrapper<R>> table, String tableAlias, BiConsumer<JoinAbstractLambdaWrapper<T, ?>, Children> consumer) {
+        String tabName;
+        if (table != null) {
+            MPJLambdaWrapper<R> tableWrapper = new MPJLambdaWrapper<R>(null, clazz, SharedString.emptyString(),
+                    paramNameSeq, paramNameValuePairs, new MergeSegments(), new SharedString(this.paramAlias
+                    .getStringValue()), SharedString.emptyString(), SharedString.emptyString(), SharedString.emptyString(),
+                    new TableList(), null, null, null, null, ifExists) {
+            };
+            tableWrapper.tableList.setAlias(ConfigProperties.tableAlias);
+            tableWrapper.tableList.setRootClass(clazz);
+
+            table.accept(tableWrapper);
+            if (MPJStringUtils.isBlank(tableWrapper.getSqlSelect())) {
+                tableWrapper.selectAll();
+            }
+            tabName = "(" + WrapperUtils.buildUnionSqlByWrapper(clazz, tableWrapper) + ")";
+        } else {
+            TableInfo info = TableHelper.getAssert(clazz);
+            tabName = info.getTableName();
+        }
         Integer oldIndex = this.getIndex();
         int newIndex = tableIndex;
-        TableInfo info = TableHelper.getAssert(clazz);
-        Children instance = instance(newIndex, keyWord, clazz, info.getTableName());
+        Children instance = instance(newIndex, keyWord, clazz, tabName);
         instance.isOn = true;
         instance.isMain = false;
         onWrappers.add(instance);

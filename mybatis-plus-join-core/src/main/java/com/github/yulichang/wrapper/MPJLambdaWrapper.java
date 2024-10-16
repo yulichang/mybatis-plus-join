@@ -1,13 +1,14 @@
 package com.github.yulichang.wrapper;
 
 import com.baomidou.mybatisplus.core.conditions.SharedString;
-import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.segments.MergeSegments;
 import com.baomidou.mybatisplus.core.toolkit.*;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.github.yulichang.config.ConfigProperties;
+import com.github.yulichang.toolkit.Constant;
 import com.github.yulichang.toolkit.LambdaUtils;
-import com.github.yulichang.toolkit.*;
+import com.github.yulichang.toolkit.TableList;
+import com.github.yulichang.toolkit.WrapperUtils;
 import com.github.yulichang.toolkit.support.ColumnCache;
 import com.github.yulichang.wrapper.enums.IfExistsSqlKeyWordEnum;
 import com.github.yulichang.wrapper.interfaces.*;
@@ -53,17 +54,6 @@ public class MPJLambdaWrapper<T> extends JoinAbstractLambdaWrapper<T, MPJLambdaW
      * union sql
      */
     private SharedString unionSql;
-
-    /**
-     * 自定义wrapper索引
-     */
-    private AtomicInteger wrapperIndex;
-
-    /**
-     * 自定义wrapper
-     */
-    @Getter
-    private Map<String, Wrapper<?>> wrapperMap;
 
     private List<MConsumer<Object>> fill;
 
@@ -273,7 +263,6 @@ public class MPJLambdaWrapper<T> extends JoinAbstractLambdaWrapper<T, MPJLambdaW
         wrapper.tableList.setParent(this.tableList);
         wrapper.alias = st;
         wrapper.subTableAlias = st;
-        addCustomWrapper(wrapper);
         consumer.accept(wrapper);
         this.selectColumns.add(new SelectSub(() -> WrapperUtils.buildSubSqlByWrapper(clazz, wrapper, alias), hasAlias, this.alias, alias));
         return typedThis;
@@ -288,8 +277,13 @@ public class MPJLambdaWrapper<T> extends JoinAbstractLambdaWrapper<T, MPJLambdaW
      * @since 1.4.8
      */
     public <U> MPJLambdaWrapper<T> union(Class<U> clazz, Consumer<MPJLambdaWrapper<U>> consumer) {
-        MPJLambdaWrapper<U> unionWrapper = JoinWrappers.lambda(clazz);
-        addCustomWrapper(unionWrapper);
+        MPJLambdaWrapper<U> unionWrapper = new MPJLambdaWrapper<U>(null, clazz, SharedString.emptyString(),
+                paramNameSeq, paramNameValuePairs, new MergeSegments(), new SharedString(this.paramAlias
+                .getStringValue()), SharedString.emptyString(), SharedString.emptyString(), SharedString.emptyString(),
+                new TableList(), null, null, null, null, ifExists) {
+        };
+        unionWrapper.tableList.setAlias(ConfigProperties.tableAlias);
+        unionWrapper.tableList.setRootClass(clazz);
         consumer.accept(unionWrapper);
 
         String sb = " UNION " + WrapperUtils.buildUnionSqlByWrapper(clazz, unionWrapper);
@@ -326,8 +320,13 @@ public class MPJLambdaWrapper<T> extends JoinAbstractLambdaWrapper<T, MPJLambdaW
      * @since 1.4.8
      */
     public <U> MPJLambdaWrapper<T> unionAll(Class<U> clazz, Consumer<MPJLambdaWrapper<U>> consumer) {
-        MPJLambdaWrapper<U> unionWrapper = JoinWrappers.lambda(clazz);
-        addCustomWrapper(unionWrapper);
+        MPJLambdaWrapper<U> unionWrapper = new MPJLambdaWrapper<U>(null, clazz, SharedString.emptyString(),
+                paramNameSeq, paramNameValuePairs, new MergeSegments(), new SharedString(this.paramAlias
+                .getStringValue()), SharedString.emptyString(), SharedString.emptyString(), SharedString.emptyString(),
+                new TableList(), null, null, null, null, ifExists) {
+        };
+        unionWrapper.tableList.setAlias(ConfigProperties.tableAlias);
+        unionWrapper.tableList.setRootClass(clazz);
         consumer.accept(unionWrapper);
 
         String sb = " UNION ALL " + WrapperUtils.buildUnionSqlByWrapper(clazz, unionWrapper);
@@ -337,19 +336,6 @@ public class MPJLambdaWrapper<T> extends JoinAbstractLambdaWrapper<T, MPJLambdaW
         }
         unionSql.setStringValue(unionSql.getStringValue() + sb);
         return typedThis;
-    }
-
-    private void addCustomWrapper(MPJLambdaWrapper<?> wrapper) {
-        if (Objects.isNull(wrapperIndex)) {
-            wrapperIndex = new AtomicInteger(0);
-        }
-        int index = wrapperIndex.incrementAndGet();
-        if (Objects.isNull(wrapperMap)) {
-            wrapperMap = new HashMap<>();
-        }
-        String key = "ew" + index;
-        wrapper.setParamAlias(getParamAlias() + ".wrapperMap." + key);
-        wrapperMap.put(key, wrapper);
     }
 
     /**
@@ -426,8 +412,6 @@ public class MPJLambdaWrapper<T> extends JoinAbstractLambdaWrapper<T, MPJLambdaW
         selectDistinct = false;
         sqlSelect.toNull();
         selectColumns.clear();
-        wrapperIndex = new AtomicInteger(0);
-        if (Objects.nonNull(wrapperMap)) wrapperMap.clear();
         if (Objects.nonNull(unionSql)) unionSql.toEmpty();
         resultMapMybatisLabel.clear();
         ifExists = ConfigProperties.ifExists;

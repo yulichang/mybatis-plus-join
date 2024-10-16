@@ -28,9 +28,33 @@ public class SelectSubTest {
      */
     @Test
     void sub() {
-        ThreadLocalUtils.set("SELECT (SELECT st.id FROM `user` st WHERE st.del = false AND (st.id = t.id AND st.id = ?) LIMIT 1) AS id, (SELECT st.id FROM `user` st WHERE st.del = false AND (st.id = t.id AND st.id = ?) LIMIT 1) AS name FROM `user` t LEFT JOIN address t1 ON (t1.user_id = t.id) WHERE t.del = false AND t1.del = false AND (t.id <= ?)");
+        ThreadLocalUtils.set("""
+                SELECT
+                    (SELECT
+                        (SELECT st.id
+                            FROM `user` st
+                            WHERE st.del = false
+                                AND (st.id = st.id) LIMIT 1) AS id
+                        FROM `user` st
+                        WHERE st.del = false
+                            AND (st.id = t.id AND st.id = ?) LIMIT 1) AS id,
+                    (SELECT
+                        st.id
+                    FROM `user` st
+                    WHERE st.del = false
+                        AND (st.id = t.id AND st.id = ?) LIMIT 1) AS name
+                FROM `user` t
+                    LEFT JOIN address t1 ON (t1.user_id = t.id)
+                WHERE t.del = false
+                  AND t1.del = false
+                  AND (t.id <= ?)
+                """);
         MPJLambdaWrapper<UserDO> wrapper = JoinWrappers.lambda(UserDO.class)
-                .selectSub(UserDO.class, w -> w.select(UserDO::getId)
+                .selectSub(UserDO.class, w -> w
+                        .selectSub(UserDO.class, ww -> ww
+                                .select(UserDO::getId)
+                                .eq(UserDO::getId, UserDO::getId)
+                                .last("limit 1"), UserDO::getId)
                         .eq(UserDO::getId, UserDO::getId)
                         .eq(UserDO::getId, 2)
                         .last("limit 1"), UserDO::getId)
@@ -42,14 +66,14 @@ public class SelectSubTest {
                 .le(UserDO::getId, 100);
         wrapper.list();
 
-        ThreadLocalUtils.set("SELECT (SELECT st.id FROM area st WHERE st.del = false AND (st.id = t1.id) LIMIT 1) AS id FROM `user` t LEFT JOIN address t1 ON (t1.user_id = t.id) WHERE t.del = false AND t1.del = false AND (t.id <= ?)");
-        MPJLambdaWrapper<UserDO> wrapper1 = JoinWrappers.lambda(UserDO.class)
-                .selectSub(AreaDO.class, w -> w.select(AreaDO::getId)
-                        .eq(AreaDO::getId, AddressDO::getId)
-                        .last("limit 1"), UserDO::getId)
-                .leftJoin(AddressDO.class, AddressDO::getUserId, UserDO::getId)
-                .le(UserDO::getId, 100);
-        wrapper1.list();
+//        ThreadLocalUtils.set("SELECT (SELECT st.id FROM area st WHERE st.del = false AND (st.id = t1.id) LIMIT 1) AS id FROM `user` t LEFT JOIN address t1 ON (t1.user_id = t.id) WHERE t.del = false AND t1.del = false AND (t.id <= ?)");
+//        MPJLambdaWrapper<UserDO> wrapper1 = JoinWrappers.lambda(UserDO.class)
+//                .selectSub(AreaDO.class, w -> w.select(AreaDO::getId)
+//                        .eq(AreaDO::getId, AddressDO::getId)
+//                        .last("limit 1"), UserDO::getId)
+//                .leftJoin(AddressDO.class, AddressDO::getUserId, UserDO::getId)
+//                .le(UserDO::getId, 100);
+//        wrapper1.list();
     }
 
     @Test

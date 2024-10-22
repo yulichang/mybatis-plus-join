@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.annotation.OrderBy;
 import com.baomidou.mybatisplus.core.conditions.SharedString;
 import com.baomidou.mybatisplus.core.conditions.segments.MergeSegments;
 import com.baomidou.mybatisplus.core.metadata.TableInfo;
+import com.baomidou.mybatisplus.core.toolkit.Assert;
 import com.baomidou.mybatisplus.core.toolkit.Constants;
 import com.baomidou.mybatisplus.core.toolkit.StringPool;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
@@ -282,7 +283,10 @@ public abstract class JoinAbstractLambdaWrapper<T, Children extends JoinAbstract
     protected SelectCache getCache(SFunction<?, ?> fn) {
         Class<?> aClass = LambdaUtils.getEntityClass(fn);
         Map<String, SelectCache> cacheMap = ColumnCache.getMapField(aClass);
-        return cacheMap.get(LambdaUtils.getName(fn));
+        String name = LambdaUtils.getName(fn);
+        SelectCache cache = cacheMap.get(name);
+        Assert.notNull(cache, "column not found " + name);
+        return cache;
     }
 
     /**

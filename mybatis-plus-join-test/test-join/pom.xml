@@ -34,11 +34,6 @@
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-core</artifactId>
         </dependency>
-<!--        <dependency>-->
-<!--            <groupId>com.github.yulichang</groupId>-->
-<!--            <artifactId>mybatis-plus-join-processor</artifactId>-->
-<!--            <version>1.5.0</version>-->
-<!--        </dependency>-->
     </dependencies>
 
 

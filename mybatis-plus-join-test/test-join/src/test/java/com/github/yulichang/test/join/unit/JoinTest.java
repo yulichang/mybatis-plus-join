@@ -99,104 +99,104 @@ public class JoinTest {
         //remove log
         TableInfoHelper.getTableInfo(UserDO.class).getConfiguration().setLogImpl(NoLoggingImpl.class);
         //@formatter:off
-        getWrapper(w -> w.leftJoin(AddressDO.class, AddressDO::getUserId, UserDO::getId));
-        getWrapper(w -> w.leftJoin(AddressDO.class, AddressDO::getUserId, "t", UserDO::getId));
-        getWrapper(w -> w.leftJoin(AddressDO.class, on -> on.eq(AddressDO::getUserId, UserDO::getId)));
-        getWrapper(w -> w.leftJoin(AddressDO.class, AddressDO::getUserId, UserDO::getId, ext -> ext));
-        getWrapper(w -> w.leftJoin(AddressDO.class, (on, ext) -> on.eq(AddressDO::getUserId, UserDO::getId)));
-        getWrapper(w -> w.leftJoin(AddressDO.class, "a", AddressDO::getUserId, UserDO::getId));
-        getWrapper(w -> w.leftJoin(AddressDO.class, "b", AddressDO::getUserId, "t", UserDO::getId));
-        getWrapper(w -> w.leftJoin(AddressDO.class, "c", on -> on.eq(AddressDO::getUserId, UserDO::getId)));
-        getWrapper(w -> w.leftJoin(AddressDO.class, "d", AddressDO::getUserId, UserDO::getId, ext -> ext));
-        getWrapper(w -> w.leftJoin(AddressDO.class, "e", (on, e) -> on.eq(AddressDO::getUserId, UserDO::getId)));
+        w(w -> w.leftJoin(AddressDO.class, AddressDO::getUserId, UserDO::getId));
+        w(w -> w.leftJoin(AddressDO.class, AddressDO::getUserId, "t", UserDO::getId));
+        w(w -> w.leftJoin(AddressDO.class, on -> on.eq(AddressDO::getUserId, UserDO::getId)));
+        w(w -> w.leftJoin(AddressDO.class, AddressDO::getUserId, UserDO::getId, ext -> ext));
+        w(w -> w.leftJoin(AddressDO.class, (on, ext) -> on.eq(AddressDO::getUserId, UserDO::getId)));
+        w(w -> w.leftJoin(AddressDO.class, "a", AddressDO::getUserId, UserDO::getId));
+        w(w -> w.leftJoin(AddressDO.class, "b", AddressDO::getUserId, "t", UserDO::getId));
+        w(w -> w.leftJoin(AddressDO.class, "c", on -> on.eq(AddressDO::getUserId, UserDO::getId)));
+        w(w -> w.leftJoin(AddressDO.class, "d", AddressDO::getUserId, UserDO::getId, ext -> ext));
+        w(w -> w.leftJoin(AddressDO.class, "e", (on, e) -> on.eq(AddressDO::getUserId, UserDO::getId)));
 
-        getWrapper(w -> w.leftJoin(AddressDO.class, t -> {}, AddressDO::getUserId, UserDO::getId));
-        getWrapper(w -> w.leftJoin(AddressDO.class, t -> {}, AddressDO::getUserId, "t", UserDO::getId));
-        getWrapper(w -> w.leftJoin(AddressDO.class, t -> {}, on -> on.eq(AddressDO::getUserId, UserDO::getId)));
-        getWrapper(w -> w.leftJoin(AddressDO.class, t -> {}, AddressDO::getUserId, UserDO::getId, ext -> ext));
-        getWrapper(w -> w.leftJoin(AddressDO.class, t -> {}, (on, ext) -> on.eq(AddressDO::getUserId, UserDO::getId)));
-        getWrapper(w -> w.leftJoin(AddressDO.class, t -> {}, "a", AddressDO::getUserId, UserDO::getId));
-        getWrapper(w -> w.leftJoin(AddressDO.class, t -> {}, "b", AddressDO::getUserId, "t", UserDO::getId));
-        getWrapper(w -> w.leftJoin(AddressDO.class, t -> {}, "c", on -> on.eq(AddressDO::getUserId, UserDO::getId)));
-        getWrapper(w -> w.leftJoin(AddressDO.class, t -> {}, "d", AddressDO::getUserId, UserDO::getId, ext -> ext));
-        getWrapper(w -> w.leftJoin(AddressDO.class, t -> {}, "e", (on, e) -> on.eq(AddressDO::getUserId, UserDO::getId)));
+        w(w -> w.leftJoin(AddressDO.class, t -> {}, AddressDO::getUserId, UserDO::getId));
+        w(w -> w.leftJoin(AddressDO.class, t -> {}, AddressDO::getUserId, "t", UserDO::getId));
+        w(w -> w.leftJoin(AddressDO.class, t -> {}, on -> on.eq(AddressDO::getUserId, UserDO::getId)));
+        w(w -> w.leftJoin(AddressDO.class, t -> {}, AddressDO::getUserId, UserDO::getId, ext -> ext));
+        w(w -> w.leftJoin(AddressDO.class, t -> {}, (on, ext) -> on.eq(AddressDO::getUserId, UserDO::getId)));
+        w(w -> w.leftJoin(AddressDO.class, t -> {}, "a", AddressDO::getUserId, UserDO::getId));
+        w(w -> w.leftJoin(AddressDO.class, t -> {}, "b", AddressDO::getUserId, "t", UserDO::getId));
+        w(w -> w.leftJoin(AddressDO.class, t -> {}, "c", on -> on.eq(AddressDO::getUserId, UserDO::getId)));
+        w(w -> w.leftJoin(AddressDO.class, t -> {}, "d", AddressDO::getUserId, UserDO::getId, ext -> ext));
+        w(w -> w.leftJoin(AddressDO.class, t -> {}, "e", (on, e) -> on.eq(AddressDO::getUserId, UserDO::getId)));
 
-        getWrapper(w -> w.rightJoin(AddressDO.class, AddressDO::getUserId, UserDO::getId));
-        getWrapper(w -> w.rightJoin(AddressDO.class, AddressDO::getUserId, "t", UserDO::getId));
-        getWrapper(w -> w.rightJoin(AddressDO.class, on -> on.eq(AddressDO::getUserId, UserDO::getId)));
-        getWrapper(w -> w.rightJoin(AddressDO.class, AddressDO::getUserId, UserDO::getId, ext -> ext));
-        getWrapper(w -> w.rightJoin(AddressDO.class, (on, ext) -> on.eq(AddressDO::getUserId, UserDO::getId)));
-        getWrapper(w -> w.rightJoin(AddressDO.class, "a", AddressDO::getUserId, UserDO::getId));
-        getWrapper(w -> w.rightJoin(AddressDO.class, "b", AddressDO::getUserId, "t", UserDO::getId));
-        getWrapper(w -> w.rightJoin(AddressDO.class, "c", on -> on.eq(AddressDO::getUserId, UserDO::getId)));
-        getWrapper(w -> w.rightJoin(AddressDO.class, "d", AddressDO::getUserId, UserDO::getId, ext -> ext));
-        getWrapper(w -> w.rightJoin(AddressDO.class, "e", (on, e) -> on.eq(AddressDO::getUserId, UserDO::getId)));
+        w(w -> w.rightJoin(AddressDO.class, AddressDO::getUserId, UserDO::getId));
+        w(w -> w.rightJoin(AddressDO.class, AddressDO::getUserId, "t", UserDO::getId));
+        w(w -> w.rightJoin(AddressDO.class, on -> on.eq(AddressDO::getUserId, UserDO::getId)));
+        w(w -> w.rightJoin(AddressDO.class, AddressDO::getUserId, UserDO::getId, ext -> ext));
+        w(w -> w.rightJoin(AddressDO.class, (on, ext) -> on.eq(AddressDO::getUserId, UserDO::getId)));
+        w(w -> w.rightJoin(AddressDO.class, "a", AddressDO::getUserId, UserDO::getId));
+        w(w -> w.rightJoin(AddressDO.class, "b", AddressDO::getUserId, "t", UserDO::getId));
+        w(w -> w.rightJoin(AddressDO.class, "c", on -> on.eq(AddressDO::getUserId, UserDO::getId)));
+        w(w -> w.rightJoin(AddressDO.class, "d", AddressDO::getUserId, UserDO::getId, ext -> ext));
+        w(w -> w.rightJoin(AddressDO.class, "e", (on, e) -> on.eq(AddressDO::getUserId, UserDO::getId)));
 
-        getWrapper(w -> w.rightJoin(AddressDO.class, t -> {}, AddressDO::getUserId, UserDO::getId));
-        getWrapper(w -> w.rightJoin(AddressDO.class, t -> {}, AddressDO::getUserId, "t", UserDO::getId));
-        getWrapper(w -> w.rightJoin(AddressDO.class, t -> {}, on -> on.eq(AddressDO::getUserId, UserDO::getId)));
-        getWrapper(w -> w.rightJoin(AddressDO.class, t -> {}, AddressDO::getUserId, UserDO::getId, ext -> ext));
-        getWrapper(w -> w.rightJoin(AddressDO.class, t -> {}, (on, ext) -> on.eq(AddressDO::getUserId, UserDO::getId)));
-        getWrapper(w -> w.rightJoin(AddressDO.class, t -> {}, "a", AddressDO::getUserId, UserDO::getId));
-        getWrapper(w -> w.rightJoin(AddressDO.class, t -> {}, "b", AddressDO::getUserId, "t", UserDO::getId));
-        getWrapper(w -> w.rightJoin(AddressDO.class, t -> {}, "c", on -> on.eq(AddressDO::getUserId, UserDO::getId)));
-        getWrapper(w -> w.rightJoin(AddressDO.class, t -> {}, "d", AddressDO::getUserId, UserDO::getId, ext -> ext));
-        getWrapper(w -> w.rightJoin(AddressDO.class, t -> {}, "e", (on, e) -> on.eq(AddressDO::getUserId, UserDO::getId)));
+        w(w -> w.rightJoin(AddressDO.class, t -> {}, AddressDO::getUserId, UserDO::getId));
+        w(w -> w.rightJoin(AddressDO.class, t -> {}, AddressDO::getUserId, "t", UserDO::getId));
+        w(w -> w.rightJoin(AddressDO.class, t -> {}, on -> on.eq(AddressDO::getUserId, UserDO::getId)));
+        w(w -> w.rightJoin(AddressDO.class, t -> {}, AddressDO::getUserId, UserDO::getId, ext -> ext));
+        w(w -> w.rightJoin(AddressDO.class, t -> {}, (on, ext) -> on.eq(AddressDO::getUserId, UserDO::getId)));
+        w(w -> w.rightJoin(AddressDO.class, t -> {}, "a", AddressDO::getUserId, UserDO::getId));
+        w(w -> w.rightJoin(AddressDO.class, t -> {}, "b", AddressDO::getUserId, "t", UserDO::getId));
+        w(w -> w.rightJoin(AddressDO.class, t -> {}, "c", on -> on.eq(AddressDO::getUserId, UserDO::getId)));
+        w(w -> w.rightJoin(AddressDO.class, t -> {}, "d", AddressDO::getUserId, UserDO::getId, ext -> ext));
+        w(w -> w.rightJoin(AddressDO.class, t -> {}, "e", (on, e) -> on.eq(AddressDO::getUserId, UserDO::getId)));
 
-        getWrapper(w -> w.innerJoin(AddressDO.class, AddressDO::getUserId, UserDO::getId));
-        getWrapper(w -> w.innerJoin(AddressDO.class, AddressDO::getUserId, "t", UserDO::getId));
-        getWrapper(w -> w.innerJoin(AddressDO.class, on -> on.eq(AddressDO::getUserId, UserDO::getId)));
-        getWrapper(w -> w.innerJoin(AddressDO.class, AddressDO::getUserId, UserDO::getId, ext -> ext));
-        getWrapper(w -> w.innerJoin(AddressDO.class, (on, ext) -> on.eq(AddressDO::getUserId, UserDO::getId)));
-        getWrapper(w -> w.innerJoin(AddressDO.class, "a", AddressDO::getUserId, UserDO::getId));
-        getWrapper(w -> w.innerJoin(AddressDO.class, "b", AddressDO::getUserId, "t", UserDO::getId));
-        getWrapper(w -> w.innerJoin(AddressDO.class, "c", on -> on.eq(AddressDO::getUserId, UserDO::getId)));
-        getWrapper(w -> w.innerJoin(AddressDO.class, "d", AddressDO::getUserId, UserDO::getId, ext -> ext));
-        getWrapper(w -> w.innerJoin(AddressDO.class, "e", (on, e) -> on.eq(AddressDO::getUserId, UserDO::getId)));
+        w(w -> w.innerJoin(AddressDO.class, AddressDO::getUserId, UserDO::getId));
+        w(w -> w.innerJoin(AddressDO.class, AddressDO::getUserId, "t", UserDO::getId));
+        w(w -> w.innerJoin(AddressDO.class, on -> on.eq(AddressDO::getUserId, UserDO::getId)));
+        w(w -> w.innerJoin(AddressDO.class, AddressDO::getUserId, UserDO::getId, ext -> ext));
+        w(w -> w.innerJoin(AddressDO.class, (on, ext) -> on.eq(AddressDO::getUserId, UserDO::getId)));
+        w(w -> w.innerJoin(AddressDO.class, "a", AddressDO::getUserId, UserDO::getId));
+        w(w -> w.innerJoin(AddressDO.class, "b", AddressDO::getUserId, "t", UserDO::getId));
+        w(w -> w.innerJoin(AddressDO.class, "c", on -> on.eq(AddressDO::getUserId, UserDO::getId)));
+        w(w -> w.innerJoin(AddressDO.class, "d", AddressDO::getUserId, UserDO::getId, ext -> ext));
+        w(w -> w.innerJoin(AddressDO.class, "e", (on, e) -> on.eq(AddressDO::getUserId, UserDO::getId)));
 
-        getWrapper(w -> w.innerJoin(AddressDO.class, t -> {}, AddressDO::getUserId, UserDO::getId));
-        getWrapper(w -> w.innerJoin(AddressDO.class, t -> {}, AddressDO::getUserId, "t", UserDO::getId));
-        getWrapper(w -> w.innerJoin(AddressDO.class, t -> {}, on -> on.eq(AddressDO::getUserId, UserDO::getId)));
-        getWrapper(w -> w.innerJoin(AddressDO.class, t -> {}, AddressDO::getUserId, UserDO::getId, ext -> ext));
-        getWrapper(w -> w.innerJoin(AddressDO.class, t -> {}, (on, ext) -> on.eq(AddressDO::getUserId, UserDO::getId)));
-        getWrapper(w -> w.innerJoin(AddressDO.class, t -> {}, "a", AddressDO::getUserId, UserDO::getId));
-        getWrapper(w -> w.innerJoin(AddressDO.class, t -> {}, "b", AddressDO::getUserId, "t", UserDO::getId));
-        getWrapper(w -> w.innerJoin(AddressDO.class, t -> {}, "c", on -> on.eq(AddressDO::getUserId, UserDO::getId)));
-        getWrapper(w -> w.innerJoin(AddressDO.class, t -> {}, "d", AddressDO::getUserId, UserDO::getId, ext -> ext));
-        getWrapper(w -> w.innerJoin(AddressDO.class, t -> {}, "e", (on, e) -> on.eq(AddressDO::getUserId, UserDO::getId)));
+        w(w -> w.innerJoin(AddressDO.class, t -> {}, AddressDO::getUserId, UserDO::getId));
+        w(w -> w.innerJoin(AddressDO.class, t -> {}, AddressDO::getUserId, "t", UserDO::getId));
+        w(w -> w.innerJoin(AddressDO.class, t -> {}, on -> on.eq(AddressDO::getUserId, UserDO::getId)));
+        w(w -> w.innerJoin(AddressDO.class, t -> {}, AddressDO::getUserId, UserDO::getId, ext -> ext));
+        w(w -> w.innerJoin(AddressDO.class, t -> {}, (on, ext) -> on.eq(AddressDO::getUserId, UserDO::getId)));
+        w(w -> w.innerJoin(AddressDO.class, t -> {}, "a", AddressDO::getUserId, UserDO::getId));
+        w(w -> w.innerJoin(AddressDO.class, t -> {}, "b", AddressDO::getUserId, "t", UserDO::getId));
+        w(w -> w.innerJoin(AddressDO.class, t -> {}, "c", on -> on.eq(AddressDO::getUserId, UserDO::getId)));
+        w(w -> w.innerJoin(AddressDO.class, t -> {}, "d", AddressDO::getUserId, UserDO::getId, ext -> ext));
+        w(w -> w.innerJoin(AddressDO.class, t -> {}, "e", (on, e) -> on.eq(AddressDO::getUserId, UserDO::getId)));
 
-        getWrapperF(w -> w.fullJoin(AddressDO.class, AddressDO::getUserId, UserDO::getId));
-        getWrapperF(w -> w.fullJoin(AddressDO.class, AddressDO::getUserId, "t", UserDO::getId));
-        getWrapperF(w -> w.fullJoin(AddressDO.class, on -> on.eq(AddressDO::getUserId, UserDO::getId)));
-        getWrapperF(w -> w.fullJoin(AddressDO.class, AddressDO::getUserId, UserDO::getId, ext -> ext));
-        getWrapperF(w -> w.fullJoin(AddressDO.class, (on, ext) -> on.eq(AddressDO::getUserId, UserDO::getId)));
-        getWrapperF(w -> w.fullJoin(AddressDO.class, "a", AddressDO::getUserId, UserDO::getId));
-        getWrapperF(w -> w.fullJoin(AddressDO.class, "b", AddressDO::getUserId, "t", UserDO::getId));
-        getWrapperF(w -> w.fullJoin(AddressDO.class, "c", on -> on.eq(AddressDO::getUserId, UserDO::getId)));
-        getWrapperF(w -> w.fullJoin(AddressDO.class, "d", AddressDO::getUserId, UserDO::getId, ext -> ext));
-        getWrapperF(w -> w.fullJoin(AddressDO.class, "e", (on, e) -> on.eq(AddressDO::getUserId, UserDO::getId)));
+        f(w -> w.fullJoin(AddressDO.class, AddressDO::getUserId, UserDO::getId));
+        f(w -> w.fullJoin(AddressDO.class, AddressDO::getUserId, "t", UserDO::getId));
+        f(w -> w.fullJoin(AddressDO.class, on -> on.eq(AddressDO::getUserId, UserDO::getId)));
+        f(w -> w.fullJoin(AddressDO.class, AddressDO::getUserId, UserDO::getId, ext -> ext));
+        f(w -> w.fullJoin(AddressDO.class, (on, ext) -> on.eq(AddressDO::getUserId, UserDO::getId)));
+        f(w -> w.fullJoin(AddressDO.class, "a", AddressDO::getUserId, UserDO::getId));
+        f(w -> w.fullJoin(AddressDO.class, "b", AddressDO::getUserId, "t", UserDO::getId));
+        f(w -> w.fullJoin(AddressDO.class, "c", on -> on.eq(AddressDO::getUserId, UserDO::getId)));
+        f(w -> w.fullJoin(AddressDO.class, "d", AddressDO::getUserId, UserDO::getId, ext -> ext));
+        f(w -> w.fullJoin(AddressDO.class, "e", (on, e) -> on.eq(AddressDO::getUserId, UserDO::getId)));
 
-        getWrapper(w -> w.join("left join", AddressDO.class, AddressDO::getUserId, UserDO::getId));
-        getWrapper(w -> w.join("left join", AddressDO.class, AddressDO::getUserId, "t", UserDO::getId));
-        getWrapper(w -> w.join("left join", AddressDO.class, on -> on.eq(AddressDO::getUserId, UserDO::getId)));
-        getWrapper(w -> w.join("left join", AddressDO.class, AddressDO::getUserId, UserDO::getId, ext -> ext));
-        getWrapper(w -> w.join("left join", AddressDO.class, (on, ext) -> on.eq(AddressDO::getUserId, UserDO::getId)));
-        getWrapper(w -> w.join("left join", AddressDO.class, "a", AddressDO::getUserId, UserDO::getId));
-        getWrapper(w -> w.join("left join", AddressDO.class, "b", AddressDO::getUserId, "t", UserDO::getId));
-        getWrapper(w -> w.join("left join", AddressDO.class, "c", on -> on.eq(AddressDO::getUserId, UserDO::getId)));
-        getWrapper(w -> w.join("left join", AddressDO.class, "d", AddressDO::getUserId, UserDO::getId, ext -> ext));
-        getWrapper(w -> w.join("left join", AddressDO.class, "e", (on, e) -> on.eq(AddressDO::getUserId, UserDO::getId)));
+        w(w -> w.join("left join", AddressDO.class, AddressDO::getUserId, UserDO::getId));
+        w(w -> w.join("left join", AddressDO.class, AddressDO::getUserId, "t", UserDO::getId));
+        w(w -> w.join("left join", AddressDO.class, on -> on.eq(AddressDO::getUserId, UserDO::getId)));
+        w(w -> w.join("left join", AddressDO.class, AddressDO::getUserId, UserDO::getId, ext -> ext));
+        w(w -> w.join("left join", AddressDO.class, (on, ext) -> on.eq(AddressDO::getUserId, UserDO::getId)));
+        w(w -> w.join("left join", AddressDO.class, "a", AddressDO::getUserId, UserDO::getId));
+        w(w -> w.join("left join", AddressDO.class, "b", AddressDO::getUserId, "t", UserDO::getId));
+        w(w -> w.join("left join", AddressDO.class, "c", on -> on.eq(AddressDO::getUserId, UserDO::getId)));
+        w(w -> w.join("left join", AddressDO.class, "d", AddressDO::getUserId, UserDO::getId, ext -> ext));
+        w(w -> w.join("left join", AddressDO.class, "e", (on, e) -> on.eq(AddressDO::getUserId, UserDO::getId)));
 
-        getWrapper(w -> w.join("left join", AddressDO.class, t -> {}, AddressDO::getUserId, UserDO::getId));
-        getWrapper(w -> w.join("left join", AddressDO.class, t -> {}, AddressDO::getUserId, "t", UserDO::getId));
-        getWrapper(w -> w.join("left join", AddressDO.class, t -> {}, on -> on.eq(AddressDO::getUserId, UserDO::getId)));
-        getWrapper(w -> w.join("left join", AddressDO.class, t -> {}, AddressDO::getUserId, UserDO::getId, ext -> ext));
-        getWrapper(w -> w.join("left join", AddressDO.class, t -> {}, (on, ext) -> on.eq(AddressDO::getUserId, UserDO::getId)));
-        getWrapper(w -> w.join("left join", AddressDO.class, t -> {}, "a", AddressDO::getUserId, UserDO::getId));
-        getWrapper(w -> w.join("left join", AddressDO.class, t -> {}, "b", AddressDO::getUserId, "t", UserDO::getId));
-        getWrapper(w -> w.join("left join", AddressDO.class, t -> {}, "c", on -> on.eq(AddressDO::getUserId, UserDO::getId)));
-        getWrapper(w -> w.join("left join", AddressDO.class, t -> {}, "d", AddressDO::getUserId, UserDO::getId, ext -> ext));
-        getWrapper(w -> w.join("left join", AddressDO.class, t -> {}, "e", (on, e) -> on.eq(AddressDO::getUserId, UserDO::getId)));
+        w(w -> w.join("left join", AddressDO.class, t -> {}, AddressDO::getUserId, UserDO::getId));
+        w(w -> w.join("left join", AddressDO.class, t -> {}, AddressDO::getUserId, "t", UserDO::getId));
+        w(w -> w.join("left join", AddressDO.class, t -> {}, on -> on.eq(AddressDO::getUserId, UserDO::getId)));
+        w(w -> w.join("left join", AddressDO.class, t -> {}, AddressDO::getUserId, UserDO::getId, ext -> ext));
+        w(w -> w.join("left join", AddressDO.class, t -> {}, (on, ext) -> on.eq(AddressDO::getUserId, UserDO::getId)));
+        w(w -> w.join("left join", AddressDO.class, t -> {}, "a", AddressDO::getUserId, UserDO::getId));
+        w(w -> w.join("left join", AddressDO.class, t -> {}, "b", AddressDO::getUserId, "t", UserDO::getId));
+        w(w -> w.join("left join", AddressDO.class, t -> {}, "c", on -> on.eq(AddressDO::getUserId, UserDO::getId)));
+        w(w -> w.join("left join", AddressDO.class, t -> {}, "d", AddressDO::getUserId, UserDO::getId, ext -> ext));
+        w(w -> w.join("left join", AddressDO.class, t -> {}, "e", (on, e) -> on.eq(AddressDO::getUserId, UserDO::getId)));
 
         //@formatter:on
         assert set.size() == 90;
@@ -224,11 +224,11 @@ public class JoinTest {
         };
     }
 
-    private void getWrapper(MFunction<MPJLambdaWrapper<UserDO>> consumer) {
+    private void w(MFunction<MPJLambdaWrapper<UserDO>> consumer) {
         consumer.apply(w().selectAll()).list(UserDTO.class);
     }
 
-    private void getWrapperF(MFunction<MPJLambdaWrapper<UserDO>> consumer) {
+    private void f(MFunction<MPJLambdaWrapper<UserDO>> consumer) {
         consumer.apply(w().selectAll());
     }
 }

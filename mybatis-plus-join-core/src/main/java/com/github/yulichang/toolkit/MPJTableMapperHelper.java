@@ -1,6 +1,7 @@
 package com.github.yulichang.toolkit;
 
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
+import com.github.yulichang.base.JoinMapper;
 
 import java.util.Map;
 import java.util.Optional;
@@ -21,9 +22,11 @@ public class MPJTableMapperHelper {
 
     public static void init(Class<?> clazz, Class<?> mapper) {
         if (clazz != null && mapper != null) {
-            CACHE.put(clazz, mapper);
-            CACHE_REVERSE.put(mapper, clazz);
-            CACHE_MAPPER.put(mapper.getName(), mapper);
+            if (!CACHE.containsKey(clazz) || JoinMapper.class.isAssignableFrom(mapper)) {
+                CACHE.put(clazz, mapper);
+                CACHE_REVERSE.put(mapper, clazz);
+                CACHE_MAPPER.put(mapper.getName(), mapper);
+            }
         }
     }
 

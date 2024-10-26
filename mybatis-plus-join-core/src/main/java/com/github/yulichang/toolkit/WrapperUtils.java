@@ -20,36 +20,7 @@ import java.util.Optional;
 public class WrapperUtils {
 
     public static <T> String buildSubSqlByWrapper(Class<T> clazz, MPJLambdaWrapper<T> wrapper, String alias) {
-        TableInfo tableInfo = TableHelper.getAssert(clazz);
-        String first = Optional.ofNullable(wrapper.getSqlFirst()).orElse(StringPool.EMPTY);
-        boolean hasWhere = false;
-        String entityWhere = getEntitySql(tableInfo, wrapper);
-        if (StringUtils.isNotBlank(entityWhere)) {
-            hasWhere = true;
-        }
-        String mainLogic = mainLogic(hasWhere, clazz, wrapper);
-        if (StringUtils.isNotBlank(mainLogic)) {
-            hasWhere = true;
-        }
-        String subLogic = subLogic(hasWhere, wrapper);
-        if (StringUtils.isNotBlank(subLogic)) {
-            hasWhere = true;
-        }
-        String sqlSegment = (wrapper.getSqlSegment() != null && StringUtils.isNotBlank(wrapper.getSqlSegment())) ?
-                ((wrapper.isEmptyOfNormal() ? StringPool.EMPTY : (hasWhere ? " AND " : " WHERE ")) + wrapper.getSqlSegment()) : StringPool.EMPTY;
-
-        String sqlComment = Optional.ofNullable(wrapper.getSqlComment()).orElse(StringPool.EMPTY);
-        return String.format(" (%s SELECT %s FROM %s %s %s %s %s %s %s) AS %s ",
-                first,
-                wrapper.getSqlSelect(),
-                wrapper.getTableName(tableInfo.getTableName()),
-                wrapper.getAlias(),
-                wrapper.getFrom(),
-                mainLogic,
-                subLogic,
-                sqlSegment,
-                sqlComment,
-                alias);
+        return String.format("%s AS %s", buildUnionSqlByWrapper(clazz, wrapper), alias);
     }
 
     public static String buildUnionSqlByWrapper(Class<?> clazz, MPJLambdaWrapper<?> wrapper) {
@@ -72,7 +43,7 @@ public class WrapperUtils {
                 ((wrapper.isEmptyOfNormal() ? StringPool.EMPTY : (hasWhere ? " AND " : " WHERE ")) + wrapper.getSqlSegment()) : StringPool.EMPTY;
 
         String sqlComment = Optional.ofNullable(wrapper.getSqlComment()).orElse(StringPool.EMPTY);
-        return String.format(" %s SELECT %s FROM %s %s %s %s %s %s %s ",
+        return String.format("( %s SELECT %s FROM %s %s %s %s %s %s %s )",
                 first,
                 wrapper.getSqlSelect(),
                 wrapper.getTableName(tableInfo.getTableName()),

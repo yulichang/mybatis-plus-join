@@ -2,7 +2,6 @@ package com.github.yulichang.wrapper.interfaces;
 
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 
-import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
 import java.util.function.Consumer;
@@ -13,7 +12,7 @@ import java.util.function.Consumer;
  * copy {@link com.baomidou.mybatisplus.core.conditions.interfaces.Func}
  */
 @SuppressWarnings({"unchecked", "unused"})
-public interface Func<Children> extends Serializable {
+public interface Func<Children> extends FuncWrapper<Children> {
 
 
     default <R> Children isNull(SFunction<R, ?> column) {
@@ -513,7 +512,6 @@ public interface Func<Children> extends Serializable {
      * @return children
      */
     Children having(boolean condition, String sqlHaving, Object... params);
-
 
     default Children func(Consumer<Children> consumer) {
         return func(true, consumer);

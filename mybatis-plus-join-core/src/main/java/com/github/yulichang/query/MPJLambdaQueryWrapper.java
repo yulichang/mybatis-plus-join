@@ -302,11 +302,9 @@ public class MPJLambdaQueryWrapper<T> extends AbstractLambdaWrapper<T, MPJLambda
 
     /**
      * 动态表名
-     * 如果主表需要动态表名,主表实体必须添加 @DynamicTableName 注解
-     * 关联表则不需要 加不加注解都会生效
      * <p>
-     *
-     * @see com.github.yulichang.annotation.DynamicTableName
+     * 如果主表需要动态表名
+     * <p>
      */
     public MPJLambdaQueryWrapper<T> setTableName(Function<String, String> func) {
         this.tableNameFunc = func;

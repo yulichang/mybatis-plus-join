@@ -10,7 +10,6 @@ import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.core.toolkit.sql.SqlScriptUtils;
 import com.github.yulichang.adapter.AdapterHelper;
 import com.github.yulichang.adapter.base.metadata.OrderFieldInfo;
-import com.github.yulichang.annotation.DynamicTableName;
 import com.github.yulichang.config.ConfigProperties;
 
 import java.io.UnsupportedEncodingException;
@@ -123,6 +122,7 @@ public interface MPJBaseMethod extends Constants {
                 tableFieldInfo.getWhereStrategy());
     }
 
+    @SuppressWarnings({"DuplicatedCode", "deprecation"})
     default String convertIf(TableFieldInfo tableFieldInfo, final String sqlScript, final String property, final FieldStrategy fieldStrategy) {
         if (fieldStrategy == FieldStrategy.NEVER) {
             return null;
@@ -183,10 +183,6 @@ public interface MPJBaseMethod extends Constants {
      * 获取表名
      */
     default String mpjTableName(TableInfo tableInfo) {
-        DynamicTableName dynamicTableName = tableInfo.getEntityType().getAnnotation(DynamicTableName.class);
-        if (Objects.isNull(dynamicTableName)) {
-            return tableInfo.getTableName();
-        }
         String tableName = tableInfo.getTableName(), encode;
         try {
             encode = URLEncoder.encode(tableName, "UTF-8");

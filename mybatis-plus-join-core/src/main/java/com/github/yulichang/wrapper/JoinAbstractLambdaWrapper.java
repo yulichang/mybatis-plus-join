@@ -44,15 +44,6 @@ public abstract class JoinAbstractLambdaWrapper<T, Children extends JoinAbstract
         extends JoinAbstractWrapper<T, Children> implements QueryJoin<Children, T> {
 
     /**
-     * 主表别名
-     */
-    @Getter
-    protected String alias = ConfigProperties.tableAlias;
-    /**
-     * 副表别名
-     */
-    protected String subTableAlias = ConfigProperties.tableAlias;
-    /**
      * 是否存在对一或对多
      */
     @Getter
@@ -229,6 +220,9 @@ public abstract class JoinAbstractLambdaWrapper<T, Children extends JoinAbstract
 
     public String getTableName(String tableName) {
         if (isMain) {
+            if (this.tableName != null) {
+                return this.tableName;
+            }
             if (dynamicTableName) {
                 return tableFunc.apply(tableName);
             }
@@ -239,6 +233,9 @@ public abstract class JoinAbstractLambdaWrapper<T, Children extends JoinAbstract
 
 
     public String getTableNameEnc(String tableName) {
+        if (this.tableName != null) {
+            return this.tableName;
+        }
         Class<T> entityClass = getEntityClass();
         if (entityClass != null) {
             TableInfo tableInfo = TableHelper.get(entityClass);
@@ -433,6 +430,13 @@ public abstract class JoinAbstractLambdaWrapper<T, Children extends JoinAbstract
         });
     }
 
+    public Children from(MFunction<MPJLambdaWrapper<T>> fromWrapper) {
+        Assert.notNull(getEntityClass(), "main table is null please use JoinWrapper.lambda(Class) or new MPJLambdaWrapper(Class)");
+        MPJLambdaWrapper<T> wrapper = fromWrapper.apply(fromInstance(getEntityClass()));
+        this.tableName = WrapperUtils.buildUnionSqlByWrapper(getEntityClass(), wrapper);
+        return typedThis;
+    }
+
     /**
      * 内部调用, 不建议使用
      */
@@ -452,7 +456,7 @@ public abstract class JoinAbstractLambdaWrapper<T, Children extends JoinAbstract
             if (MPJStringUtils.isBlank(tableWrapper.getSqlSelect())) {
                 tableWrapper.selectAll();
             }
-            tabName = "(" + WrapperUtils.buildUnionSqlByWrapper(clazz, tableWrapper) + ")";
+            tabName = WrapperUtils.buildUnionSqlByWrapper(clazz, tableWrapper);
         } else {
             TableInfo info = TableHelper.getAssert(clazz);
             tabName = info.getTableName();

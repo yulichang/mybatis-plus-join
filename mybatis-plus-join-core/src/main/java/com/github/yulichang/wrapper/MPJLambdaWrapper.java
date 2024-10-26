@@ -253,16 +253,7 @@ public class MPJLambdaWrapper<T> extends JoinAbstractLambdaWrapper<T, MPJLambdaW
      * 子查询
      */
     public <E, F> MPJLambdaWrapper<T> selectSub(Class<E> clazz, String st, Consumer<MPJLambdaWrapper<E>> consumer, String alias) {
-        MPJLambdaWrapper<E> wrapper = new MPJLambdaWrapper<E>(null, clazz, SharedString.emptyString(),
-                paramNameSeq, paramNameValuePairs, new MergeSegments(), new SharedString(this.paramAlias
-                .getStringValue()), SharedString.emptyString(), SharedString.emptyString(), SharedString.emptyString(),
-                new TableList(), null, null, null, null, ifExists) {
-        };
-        wrapper.tableList.setAlias(st);
-        wrapper.tableList.setRootClass(clazz);
-        wrapper.tableList.setParent(this.tableList);
-        wrapper.alias = st;
-        wrapper.subTableAlias = st;
+        MPJLambdaWrapper<E> wrapper = subInstance(clazz, st);
         consumer.accept(wrapper);
         this.selectColumns.add(new SelectSub(() -> WrapperUtils.buildSubSqlByWrapper(clazz, wrapper, alias), hasAlias, this.alias, alias));
         return typedThis;
@@ -277,13 +268,7 @@ public class MPJLambdaWrapper<T> extends JoinAbstractLambdaWrapper<T, MPJLambdaW
      * @since 1.4.8
      */
     public <U> MPJLambdaWrapper<T> union(Class<U> clazz, Consumer<MPJLambdaWrapper<U>> consumer) {
-        MPJLambdaWrapper<U> unionWrapper = new MPJLambdaWrapper<U>(null, clazz, SharedString.emptyString(),
-                paramNameSeq, paramNameValuePairs, new MergeSegments(), new SharedString(this.paramAlias
-                .getStringValue()), SharedString.emptyString(), SharedString.emptyString(), SharedString.emptyString(),
-                new TableList(), null, null, null, null, ifExists) {
-        };
-        unionWrapper.tableList.setAlias(ConfigProperties.tableAlias);
-        unionWrapper.tableList.setRootClass(clazz);
+        MPJLambdaWrapper<U> unionWrapper = fromInstance(clazz);
         consumer.accept(unionWrapper);
 
         String sb = " UNION " + WrapperUtils.buildUnionSqlByWrapper(clazz, unionWrapper);
@@ -320,13 +305,7 @@ public class MPJLambdaWrapper<T> extends JoinAbstractLambdaWrapper<T, MPJLambdaW
      * @since 1.4.8
      */
     public <U> MPJLambdaWrapper<T> unionAll(Class<U> clazz, Consumer<MPJLambdaWrapper<U>> consumer) {
-        MPJLambdaWrapper<U> unionWrapper = new MPJLambdaWrapper<U>(null, clazz, SharedString.emptyString(),
-                paramNameSeq, paramNameValuePairs, new MergeSegments(), new SharedString(this.paramAlias
-                .getStringValue()), SharedString.emptyString(), SharedString.emptyString(), SharedString.emptyString(),
-                new TableList(), null, null, null, null, ifExists) {
-        };
-        unionWrapper.tableList.setAlias(ConfigProperties.tableAlias);
-        unionWrapper.tableList.setRootClass(clazz);
+        MPJLambdaWrapper<U> unionWrapper = fromInstance(clazz);
         consumer.accept(unionWrapper);
 
         String sb = " UNION ALL " + WrapperUtils.buildUnionSqlByWrapper(clazz, unionWrapper);
@@ -361,10 +340,15 @@ public class MPJLambdaWrapper<T> extends JoinAbstractLambdaWrapper<T, MPJLambdaW
                         return String.format(i.getFunc().getSql(), str) + Constant.AS + i.getAlias();
                     } else {
                         return String.format(i.getFunc().getSql(), Arrays.stream(args).map(arg -> {
-                            String pf = arg.isHasTableAlias() ? arg.getTableAlias() : tableList.getPrefixByClass(arg.getClazz());
-                            Map<String, SelectCache> mapField = ColumnCache.getMapField(arg.getClazz());
-                            SelectCache cache = mapField.get(arg.getProp());
-                            return pf + StringPool.DOT + cache.getColumn();
+                            if (arg.isSub()) {
+                                Object o = arg.getSubFunc().apply(subInstance(arg.getClazz()));
+                                return WrapperUtils.buildUnionSqlByWrapper(arg.getClazz(), (MPJLambdaWrapper<?>) o);
+                            } else {
+                                String pf = arg.isHasTableAlias() ? arg.getTableAlias() : tableList.getPrefixByClass(arg.getClazz());
+                                Map<String, SelectCache> mapField = ColumnCache.getMapField(arg.getClazz());
+                                SelectCache cache = mapField.get(arg.getProp());
+                                return pf + StringPool.DOT + cache.getColumn();
+                            }
                         }).toArray()) + Constant.AS + i.getAlias();
                     }
                 } else {

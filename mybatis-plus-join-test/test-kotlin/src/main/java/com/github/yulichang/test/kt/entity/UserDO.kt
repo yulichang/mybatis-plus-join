@@ -4,14 +4,12 @@ import com.baomidou.mybatisplus.annotation.TableField
 import com.baomidou.mybatisplus.annotation.TableLogic
 import com.baomidou.mybatisplus.annotation.TableName
 import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler
-import com.github.yulichang.annotation.DynamicTableName
 import com.github.yulichang.test.kt.enums.Sex
 import lombok.experimental.FieldNameConstants
 import java.io.Serializable
 import java.time.LocalDateTime
 
 @Suppress("unused")
-@DynamicTableName
 @FieldNameConstants
 @TableName(value = "`user`", autoResultMap = true)
 open class UserDO : ID<Int?>(), Serializable {

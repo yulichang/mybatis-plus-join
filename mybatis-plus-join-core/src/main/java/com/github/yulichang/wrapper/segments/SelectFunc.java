@@ -4,6 +4,7 @@ package com.github.yulichang.wrapper.segments;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.github.yulichang.toolkit.LambdaUtils;
 import com.github.yulichang.wrapper.enums.BaseFuncEnum;
+import com.github.yulichang.wrapper.interfaces.MFunction;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.apache.ibatis.type.JdbcType;
@@ -72,12 +73,18 @@ public class SelectFunc implements Select {
         this.index = index;
         this.column = null;
         this.args = Arrays.stream(args).map(i -> {
-            boolean ins = i instanceof Fun;
-            if (ins) {
+            if (i instanceof Fun) {
                 Fun<?, ?> f = (Fun<?, ?>) i;
-                return new Arg(LambdaUtils.getEntityClass(f.getFunc()), LambdaUtils.getName(f.getFunc()), true, f.getAlias(), null);
+                if (f.isSub()) {
+                    //noinspection unchecked
+                    return new Arg(f.getClazz(), null, false, null, null, true, (MFunction<Object>) ((Object) f.getSub()));
+                } else {
+                    return new Arg(LambdaUtils.getEntityClass(f.getFunc()), LambdaUtils.getName(f.getFunc()),
+                            true, f.getAlias(), null, false, null);
+                }
             } else {
-                return new Arg(LambdaUtils.getEntityClass(i), LambdaUtils.getName(i), false, null, null);
+                return new Arg(LambdaUtils.getEntityClass(i), LambdaUtils.getName(i), false,
+                        null, null, false, null);
             }
         }).toArray(Arg[]::new);
         this.cache = null;
@@ -170,5 +177,7 @@ public class SelectFunc implements Select {
         private final boolean hasTableAlias;
         private final String tableAlias;
         private final Object property;
+        private final boolean isSub;
+        private final MFunction<Object> subFunc;
     }
 }

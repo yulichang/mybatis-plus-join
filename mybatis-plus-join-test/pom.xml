@@ -22,8 +22,6 @@
         <module>test-join</module>
         <module>test-collection</module>
         <module>test-mapping</module>
-
-        <!-- 以下两个模块需要jdk17+, 使用jdk8会出现编译错误, 如果有安装jdk17+可以打开这两个模块 -->
         <module>test-kotlin</module>
     </modules>
 
@@ -49,7 +47,7 @@
     </scm>
 
     <properties>
-        <revision>1.5.1</revision>
+        <revision>1.5.2</revision>
         <mybatis.plus.version>3.5.8</mybatis.plus.version>
 
         <jdkVersion>17</jdkVersion>

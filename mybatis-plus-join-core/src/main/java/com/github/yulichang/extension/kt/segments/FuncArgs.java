@@ -33,7 +33,7 @@ public class FuncArgs {
 
     public SelectFunc.Arg[] getFuncArg() {
         return Arrays.stream(args).map(i ->
-                        new SelectFunc.Arg(KtUtils.ref(i), i.getName(), false, null, i))
+                        new SelectFunc.Arg(KtUtils.ref(i), i.getName(), false, null, i,false,null))
                 .toArray(SelectFunc.Arg[]::new);
     }
 

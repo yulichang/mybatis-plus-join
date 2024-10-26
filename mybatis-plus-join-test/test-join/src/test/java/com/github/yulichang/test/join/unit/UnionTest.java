@@ -23,7 +23,7 @@ public class UnionTest {
 
 
     @Test
-    void unionAll1() {
+    void unionAll() {
         ThreadLocalUtils.set("""
                 SELECT
                     t.id
@@ -31,12 +31,12 @@ public class UnionTest {
                 WHERE t.del = false
                     AND (t.id = ?)
                 UNION ALL
-                SELECT
+                (SELECT
                     t.id
                 FROM address t
-                WHERE (t.id = ?)
+                WHERE (t.id = ?))
                 UNION ALL
-                SELECT
+                (SELECT
                     (SELECT
                         st.id
                     FROM area st
@@ -44,7 +44,7 @@ public class UnionTest {
                         AND (st.id = ? AND (st.id = ?))) AS id
                 FROM area t
                 WHERE t.del = false
-                    AND (t.id = ? AND (t.id = ?))
+                    AND (t.id = ? AND (t.id = ?)))
                 """);
         MPJLambdaWrapper<UserDO> wrapper = JoinWrappers.lambda(UserDO.class)
                 .select(UserDO::getId)

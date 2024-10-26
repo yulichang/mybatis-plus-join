@@ -4,7 +4,6 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
-import com.github.yulichang.annotation.DynamicTableName;
 import com.github.yulichang.annotation.Table;
 import com.github.yulichang.test.join.dto.UserJson;
 import com.github.yulichang.test.join.enums.Sex;
@@ -23,7 +22,6 @@ import java.util.List;
 @ToString
 @Accessors(chain = true)
 @EqualsAndHashCode(callSuper = true)
-@DynamicTableName
 @FieldNameConstants
 @TableName(value = "`user`", autoResultMap = true)
 public class UserDO extends ID<Integer> implements Serializable {

@@ -314,11 +314,9 @@ public class MPJQueryWrapper<T> extends AbstractWrapper<T, String, MPJQueryWrapp
 
     /**
      * 动态表名
-     * 如果主表需要动态表名,主表实体必须添加 @DynamicTableName 注解
-     * 关联表则不需要 加不加注解都会生效
      * <p>
-     *
-     * @see com.github.yulichang.annotation.DynamicTableName
+     * 如果主表需要动态表名
+     * <p>
      */
     public MPJQueryWrapper<T> setTableName(Function<String, String> func) {
         this.tableNameFunc = func;

@@ -2,7 +2,6 @@ package com.github.yulichang.wrapper.interfaces;
 
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 
-import java.io.Serializable;
 import java.util.Map;
 import java.util.function.BiPredicate;
 
@@ -12,7 +11,7 @@ import java.util.function.BiPredicate;
  * {@link com.baomidou.mybatisplus.core.conditions.interfaces.Compare}
  */
 @SuppressWarnings("unused")
-public interface Compare<Children> extends Serializable {
+public interface Compare<Children> extends CompareWrapper<Children> {
 
 
     default <R, V> Children allEq(Map<SFunction<R, ?>, V> params) {

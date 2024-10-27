@@ -129,7 +129,7 @@ public class UpdateJoinWrapper<T> extends JoinAbstractLambdaWrapper<T, UpdateJoi
 
     @Override
     public UpdateJoinWrapper<T> setApply(boolean condition, String applySql, MFunction<FuncConsumer> consumerFunction, Object... values) {
-        if (condition && StringUtils.isNotBlank(applySql)) {
+        if (condition && StrUtils.isNotBlank(applySql)) {
             FuncConsumer funcConsumer = consumerFunction.apply(new FuncConsumer());
             UpdateSet set = new UpdateSet();
             set.setApply(true);
@@ -143,7 +143,7 @@ public class UpdateJoinWrapper<T> extends JoinAbstractLambdaWrapper<T, UpdateJoi
 
     @Override
     public UpdateJoinWrapper<T> setSql(boolean condition, String sql) {
-        if (condition && StringUtils.isNotBlank(sql)) {
+        if (condition && StrUtils.isNotBlank(sql)) {
             if (Objects.isNull(sqlSet)) {
                 sqlSet = new ArrayList<>();
             }
@@ -155,7 +155,7 @@ public class UpdateJoinWrapper<T> extends JoinAbstractLambdaWrapper<T, UpdateJoi
     @SuppressWarnings("DuplicatedCode")
     @Override
     public String getSqlSet() {
-        if (StringUtils.isNotBlank(sqlSetStr.getStringValue())) {
+        if (StrUtils.isNotBlank(sqlSetStr.getStringValue())) {
             return sqlSetStr.getStringValue();
         }
         StringBuilder set = new StringBuilder(StringPool.EMPTY);

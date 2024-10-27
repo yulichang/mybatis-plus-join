@@ -6,7 +6,6 @@ import com.baomidou.mybatisplus.core.conditions.segments.MergeSegments;
 import com.baomidou.mybatisplus.core.metadata.TableInfo;
 import com.baomidou.mybatisplus.core.toolkit.Constants;
 import com.baomidou.mybatisplus.core.toolkit.StringPool;
-import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.github.yulichang.adapter.AdapterHelper;
 import com.github.yulichang.config.ConfigProperties;
 import com.github.yulichang.config.enums.LogicDelTypeEnum;
@@ -363,10 +362,10 @@ public abstract class KtAbstractLambdaWrapper<T, Children extends KtAbstractLamb
      * 获取连表部分语句
      */
     public String getFrom() {
-        if (StringUtils.isBlank(from.getStringValue())) {
+        if (StrUtils.isBlank(from.getStringValue())) {
             StringBuilder value = new StringBuilder();
             for (Children wrapper : onWrappers) {
-                if (StringUtils.isBlank(wrapper.from.getStringValue())) {
+                if (StrUtils.isBlank(wrapper.from.getStringValue())) {
                     if (this.subLogicSql && this.logicDelType == LogicDelTypeEnum.ON) {
                         TableInfo tableInfo = TableHelper.getAssert(wrapper.getJoinClass());
                         if (AdapterHelper.getAdapter().mpjHasLogic(tableInfo)) {
@@ -408,7 +407,7 @@ public abstract class KtAbstractLambdaWrapper<T, Children extends KtAbstractLamb
         instance.isNo = true;
         instance.isMain = false;
         onWrappers.add(instance);
-        if (StringUtils.isBlank(tableAlias)) {
+        if (StrUtils.isBlank(tableAlias)) {
             tableList.put(oldIndex, clazz, false, subTableAlias, newIndex);
             instance.alias = subTableAlias;
             instance.hasAlias = false;
@@ -453,7 +452,7 @@ public abstract class KtAbstractLambdaWrapper<T, Children extends KtAbstractLamb
      */
     public boolean isUseAnnotationOrderBy() {
         final String _sqlSegment = this.getSqlSegment();
-        if (StringUtils.isBlank(_sqlSegment)) {
+        if (StrUtils.isBlank(_sqlSegment)) {
             return true;
         }
         final String _sqlSegmentToUpperCase = _sqlSegment.toUpperCase();

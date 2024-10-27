@@ -4,10 +4,10 @@ import com.baomidou.mybatisplus.core.metadata.TableFieldInfo;
 import com.baomidou.mybatisplus.core.metadata.TableInfo;
 import com.baomidou.mybatisplus.core.toolkit.Constants;
 import com.baomidou.mybatisplus.core.toolkit.StringPool;
-import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.github.yulichang.adapter.AdapterHelper;
 import com.github.yulichang.extension.kt.KtLambdaWrapper;
 import com.github.yulichang.toolkit.LogicInfoUtils;
+import com.github.yulichang.toolkit.StrUtils;
 import com.github.yulichang.toolkit.TableHelper;
 import com.github.yulichang.toolkit.sql.SqlScriptUtils;
 
@@ -26,18 +26,18 @@ public class KtWrapperUtils {
         String first = Optional.ofNullable(wrapper.getSqlFirst()).orElse(StringPool.EMPTY);
         boolean hasWhere = false;
         String entityWhere = getEntitySql(tableInfo, wrapper);
-        if (StringUtils.isNotBlank(entityWhere)) {
+        if (StrUtils.isNotBlank(entityWhere)) {
             hasWhere = true;
         }
         String mainLogic = mainLogic(hasWhere, clazz, wrapper);
-        if (StringUtils.isNotBlank(mainLogic)) {
+        if (StrUtils.isNotBlank(mainLogic)) {
             hasWhere = true;
         }
         String subLogic = subLogic(hasWhere, wrapper);
-        if (StringUtils.isNotBlank(subLogic)) {
+        if (StrUtils.isNotBlank(subLogic)) {
             hasWhere = true;
         }
-        String sqlSegment = (wrapper.getSqlSegment() != null && StringUtils.isNotBlank(wrapper.getSqlSegment())) ?
+        String sqlSegment = (wrapper.getSqlSegment() != null && StrUtils.isNotBlank(wrapper.getSqlSegment())) ?
                 ((wrapper.isEmptyOfNormal() ? StringPool.EMPTY : (hasWhere ? " AND " : " WHERE ")) + wrapper.getSqlSegment()) : StringPool.EMPTY;
 
         String sqlComment = Optional.ofNullable(wrapper.getSqlComment()).orElse(StringPool.EMPTY);
@@ -59,18 +59,18 @@ public class KtWrapperUtils {
         String first = Optional.ofNullable(wrapper.getSqlFirst()).orElse(StringPool.EMPTY);
         boolean hasWhere = false;
         String entityWhere = getEntitySql(tableInfo, wrapper);
-        if (StringUtils.isNotBlank(entityWhere)) {
+        if (StrUtils.isNotBlank(entityWhere)) {
             hasWhere = true;
         }
         String mainLogic = mainLogic(hasWhere, clazz, wrapper);
-        if (StringUtils.isNotBlank(mainLogic)) {
+        if (StrUtils.isNotBlank(mainLogic)) {
             hasWhere = true;
         }
         String subLogic = subLogic(hasWhere, wrapper);
-        if (StringUtils.isNotBlank(subLogic)) {
+        if (StrUtils.isNotBlank(subLogic)) {
             hasWhere = true;
         }
-        String sqlSegment = (wrapper.getSqlSegment() != null && StringUtils.isNotBlank(wrapper.getSqlSegment())) ?
+        String sqlSegment = (wrapper.getSqlSegment() != null && StrUtils.isNotBlank(wrapper.getSqlSegment())) ?
                 ((wrapper.isEmptyOfNormal() ? StringPool.EMPTY : (hasWhere ? " AND " : " WHERE ")) + wrapper.getSqlSegment()) : StringPool.EMPTY;
 
         String sqlComment = Optional.ofNullable(wrapper.getSqlComment()).orElse(StringPool.EMPTY);
@@ -128,7 +128,7 @@ public class KtWrapperUtils {
             return StringPool.EMPTY;
         }
         String info = LogicInfoUtils.getLogicInfo(null, clazz, true, wrapper.getAlias());
-        if (StringUtils.isNotBlank(info)) {
+        if (StrUtils.isNotBlank(info)) {
             if (hasWhere) {
                 return " AND " + info;
             }
@@ -139,7 +139,7 @@ public class KtWrapperUtils {
 
     private static String subLogic(boolean hasWhere, KtLambdaWrapper<?> wrapper) {
         String sql = wrapper.getSubLogicSql();
-        if (StringUtils.isNotBlank(sql)) {
+        if (StrUtils.isNotBlank(sql)) {
             if (hasWhere) {
                 return sql;
             }

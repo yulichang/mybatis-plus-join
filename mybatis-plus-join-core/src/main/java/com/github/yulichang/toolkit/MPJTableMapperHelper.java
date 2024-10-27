@@ -1,6 +1,5 @@
 package com.github.yulichang.toolkit;
 
-import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.github.yulichang.base.JoinMapper;
 
 import java.util.Map;
@@ -39,7 +38,7 @@ public class MPJTableMapperHelper {
     }
 
     public static Class<?> getMapperForName(String name) {
-        if (StringUtils.isBlank(name)) {
+        if (StrUtils.isBlank(name)) {
             return null;
         }
         return CACHE_MAPPER.get(name);

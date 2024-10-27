@@ -6,11 +6,11 @@ import com.baomidou.mybatisplus.core.metadata.TableInfo;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.core.toolkit.Constants;
 import com.baomidou.mybatisplus.core.toolkit.StringPool;
-import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.core.toolkit.sql.SqlScriptUtils;
 import com.github.yulichang.adapter.AdapterHelper;
 import com.github.yulichang.adapter.base.metadata.OrderFieldInfo;
 import com.github.yulichang.config.ConfigProperties;
+import com.github.yulichang.toolkit.StrUtils;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -102,7 +102,7 @@ public interface MPJBaseMethod extends Constants {
                     return true;
                 })
                 .map(i -> getSqlWhere(i, newPrefix)).filter(Objects::nonNull).collect(joining(NEWLINE));
-        if (!withId || StringUtils.isBlank(tableInfo.getKeyProperty())) {
+        if (!withId || StrUtils.isBlank(tableInfo.getKeyProperty())) {
             return filedSqlScript;
         }
         String newKeyProperty = newPrefix + tableInfo.getKeyProperty();
@@ -138,7 +138,7 @@ public interface MPJBaseMethod extends Constants {
     }
 
     default String convertIfProperty(String prefix, String property) {
-        return StringUtils.isNotBlank(prefix) ? prefix.substring(0, prefix.length() - 1) + "['" + property + "']" : property;
+        return StrUtils.isNotBlank(prefix) ? prefix.substring(0, prefix.length() - 1) + "['" + property + "']" : property;
     }
 
 
@@ -249,7 +249,7 @@ public interface MPJBaseMethod extends Constants {
         final String newPrefix = prefix == null ? EMPTY : prefix;
         // 默认: column=
         String sqlSet = "${ew.alias}." + tableFieldInfo.getColumn() + EQUALS;
-        if (StringUtils.isNotBlank(tableFieldInfo.getUpdate())) {
+        if (StrUtils.isNotBlank(tableFieldInfo.getUpdate())) {
             sqlSet += String.format(tableFieldInfo.getUpdate(), tableFieldInfo.getColumn());
         } else {
             sqlSet += SqlScriptUtils.safeParam(newPrefix + tableFieldInfo.getEl());
@@ -258,7 +258,7 @@ public interface MPJBaseMethod extends Constants {
         if (ignoreIf) {
             return sqlSet;
         }
-        if (tableFieldInfo.isWithUpdateFill()) {
+        if (AdapterHelper.getAdapter().isWithUpdateFill(tableFieldInfo)) {
             // 不进行 if 包裹
             return sqlSet;
         }
@@ -266,7 +266,7 @@ public interface MPJBaseMethod extends Constants {
     }
 
     default String mpjConvertIfProperty(String prefix, String property) {
-        return StringUtils.isNotBlank(prefix) ? prefix.substring(0, prefix.length() - 1) + "['" + property + "']" : property;
+        return StrUtils.isNotBlank(prefix) ? prefix.substring(0, prefix.length() - 1) + "['" + property + "']" : property;
     }
 
     default String mpjConvertIf(TableFieldInfo tableFieldInfo, final String sqlScript, final String property, final FieldStrategy fieldStrategy) {

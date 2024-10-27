@@ -1,7 +1,7 @@
 package com.github.yulichang.extension.kt.resultmap;
 
-import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.github.yulichang.toolkit.KtUtils;
+import com.github.yulichang.toolkit.StrUtils;
 import com.github.yulichang.toolkit.support.ColumnCache;
 import com.github.yulichang.wrapper.resultmap.IResult;
 import com.github.yulichang.wrapper.segments.SelectCache;
@@ -71,7 +71,7 @@ public class Result implements IResult {
             String name = column.getName();
             SelectCache normal = normalMap.get(name);
             result.selectNormal = normal;
-            if (StringUtils.isBlank(result.property)) {
+            if (StrUtils.isBlank(result.property)) {
                 result.property = normal.getColumProperty();
             }
             if (Objects.isNull(result.javaType)) {

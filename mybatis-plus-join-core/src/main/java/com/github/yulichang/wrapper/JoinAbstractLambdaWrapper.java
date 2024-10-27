@@ -7,7 +7,6 @@ import com.baomidou.mybatisplus.core.metadata.TableInfo;
 import com.baomidou.mybatisplus.core.toolkit.Assert;
 import com.baomidou.mybatisplus.core.toolkit.Constants;
 import com.baomidou.mybatisplus.core.toolkit.StringPool;
-import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.github.yulichang.adapter.AdapterHelper;
 import com.github.yulichang.config.ConfigProperties;
@@ -380,10 +379,10 @@ public abstract class JoinAbstractLambdaWrapper<T, Children extends JoinAbstract
      * 获取连表部分语句
      */
     public String getFrom() {
-        if (StringUtils.isBlank(from.getStringValue())) {
+        if (StrUtils.isBlank(from.getStringValue())) {
             StringBuilder value = new StringBuilder();
             for (Children wrapper : onWrappers) {
-                if (StringUtils.isBlank(wrapper.from.getStringValue())) {
+                if (StrUtils.isBlank(wrapper.from.getStringValue())) {
                     if (this.subLogicSql && this.logicDelType == LogicDelTypeEnum.ON) {
                         TableInfo tableInfo = TableHelper.getAssert(wrapper.getJoinClass());
                         if (AdapterHelper.getAdapter().mpjHasLogic(tableInfo)) {
@@ -453,7 +452,7 @@ public abstract class JoinAbstractLambdaWrapper<T, Children extends JoinAbstract
             tableWrapper.tableList.setRootClass(clazz);
 
             table.accept(tableWrapper);
-            if (MPJStringUtils.isBlank(tableWrapper.getSqlSelect())) {
+            if (StrUtils.isBlank(tableWrapper.getSqlSelect())) {
                 tableWrapper.selectAll();
             }
             tabName = WrapperUtils.buildUnionSqlByWrapper(clazz, tableWrapper);
@@ -467,7 +466,7 @@ public abstract class JoinAbstractLambdaWrapper<T, Children extends JoinAbstract
         instance.isOn = true;
         instance.isMain = false;
         onWrappers.add(instance);
-        if (StringUtils.isBlank(tableAlias)) {
+        if (StrUtils.isBlank(tableAlias)) {
             tableList.put(oldIndex, clazz, false, subTableAlias, newIndex);
             instance.alias = subTableAlias;
             instance.hasAlias = false;
@@ -512,7 +511,7 @@ public abstract class JoinAbstractLambdaWrapper<T, Children extends JoinAbstract
      */
     public boolean isUseAnnotationOrderBy() {
         final String _sqlSegment = this.getSqlSegment();
-        if (StringUtils.isBlank(_sqlSegment)) {
+        if (StrUtils.isBlank(_sqlSegment)) {
             return true;
         }
         final String _sqlSegmentToUpperCase = _sqlSegment.toUpperCase();

@@ -11,6 +11,7 @@ import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.github.yulichang.config.ConfigProperties;
 import com.github.yulichang.query.interfaces.CompareIfExists;
 import com.github.yulichang.query.interfaces.StringJoin;
+import com.github.yulichang.toolkit.StrUtils;
 import com.github.yulichang.toolkit.TableHelper;
 import com.github.yulichang.toolkit.ThrowOptional;
 import com.github.yulichang.wrapper.enums.IfExistsSqlKeyWordEnum;
@@ -237,7 +238,7 @@ public class MPJLambdaQueryWrapper<T> extends AbstractLambdaWrapper<T, MPJLambda
 
     @Override
     public String getSqlSelect() {
-        if (StringUtils.isBlank(sqlSelect.getStringValue())) {
+        if (StrUtils.isBlank(sqlSelect.getStringValue())) {
             if (CollectionUtils.isNotEmpty(ignoreColumns)) {
                 selectColumns.removeIf(ignoreColumns::contains);
             }
@@ -260,7 +261,7 @@ public class MPJLambdaQueryWrapper<T> extends AbstractLambdaWrapper<T, MPJLambda
     }
 
     public MPJLambdaQueryWrapper<T> setAlias(String alias) {
-        Assert.isTrue(StringUtils.isNotBlank(alias), "别名不能为空");
+        Assert.isTrue(StrUtils.isNotBlank(alias), "别名不能为空");
         this.alias = alias;
         return typedThis;
     }

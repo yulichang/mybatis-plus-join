@@ -1,4 +1,4 @@
-package com.github.yulichang.adapter.v33x;
+package com.github.yulichang.adapter.v320;
 
 import com.baomidou.mybatisplus.core.metadata.TableFieldInfo;
 import com.baomidou.mybatisplus.core.metadata.TableInfo;
@@ -6,7 +6,6 @@ import com.baomidou.mybatisplus.core.toolkit.StringPool;
 import com.github.yulichang.adapter.base.IAdapter;
 import com.github.yulichang.adapter.base.metadata.OrderFieldInfo;
 import com.github.yulichang.adapter.base.tookit.CharSequenceUtils;
-import com.github.yulichang.adapter.base.tookit.VersionUtils;
 import com.github.yulichang.adapter.jsqlparser.v46.JSqlParserHelperV46;
 import org.apache.ibatis.plugin.Interceptor;
 import org.apache.ibatis.session.Configuration;
@@ -25,9 +24,7 @@ import java.util.function.Supplier;
  * @author yulichang
  * @since 1.4.3
  */
-public class Adapter33x implements IAdapter {
-
-    private static final boolean is330 = VersionUtils.compare(VersionUtils.getVersion(), "3.3.0") == 0;
+public class Adapter320 implements IAdapter {
 
     @Override
     public boolean mpjHasLogic(TableInfo tableInfo) {
@@ -37,6 +34,11 @@ public class Adapter33x implements IAdapter {
     @Override
     public boolean mpjIsPrimitive(TableFieldInfo tableFieldInfo) {
         return tableFieldInfo.getPropertyType().isPrimitive();
+    }
+
+    @Override
+    public boolean isWithUpdateFill(TableFieldInfo tableFieldInfo) {
+        return false;
     }
 
     @Override
@@ -67,7 +69,7 @@ public class Adapter33x implements IAdapter {
 
     @Override
     public Field mpjGetField(TableFieldInfo fieldInfo, Supplier<Field> supplier) {
-        return is330 ? supplier.get() : IAdapter.super.mpjGetField(fieldInfo, null);
+        return supplier.get();
     }
 
     @Override

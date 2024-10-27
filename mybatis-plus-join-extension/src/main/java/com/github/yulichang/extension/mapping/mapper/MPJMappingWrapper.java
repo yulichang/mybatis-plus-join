@@ -3,7 +3,7 @@ package com.github.yulichang.extension.mapping.mapper;
 
 import com.baomidou.mybatisplus.core.enums.SqlKeyword;
 import com.baomidou.mybatisplus.core.toolkit.StringPool;
-import com.baomidou.mybatisplus.core.toolkit.StringUtils;
+import com.github.yulichang.toolkit.StrUtils;
 import com.github.yulichang.toolkit.support.ColumnCache;
 import com.github.yulichang.wrapper.segments.SelectCache;
 import lombok.AllArgsConstructor;
@@ -44,12 +44,12 @@ public class MPJMappingWrapper {
 
     public MPJMappingWrapper(Class<?> joinClass, String first, String select, com.github.yulichang.annotation.Apply[] applyArr,
                              com.github.yulichang.annotation.Condition[] conditions, String last, String[] orderByAsc, String[] orderByDesc) {
-        this.hasFirst = StringUtils.isNotBlank(first);
+        this.hasFirst = StrUtils.isNotBlank(first);
         if (this.hasFirst) {
             this.first = first;
         }
 
-        this.hasSelect = StringUtils.isNotBlank(select);
+        this.hasSelect = StrUtils.isNotBlank(select);
         if (this.hasSelect) {
             this.select = select;
         }
@@ -78,7 +78,7 @@ public class MPJMappingWrapper {
             }
         }
 
-        this.hasLast = StringUtils.isNotBlank(last);
+        this.hasLast = StrUtils.isNotBlank(last);
         if (this.hasLast) {
             this.last = last;
         }
@@ -91,7 +91,7 @@ public class MPJMappingWrapper {
             for (String orderBy : orderByAsc) {
                 allColumns.addAll(Arrays.asList(orderBy.split(StringPool.COMMA)));
             }
-            this.orderByAsc = allColumns.stream().filter(StringUtils::isNotBlank).map(String::trim).map(f ->
+            this.orderByAsc = allColumns.stream().filter(StrUtils::isNotBlank).map(String::trim).map(f ->
                     colSet.contains(f) ? f : listField.stream().filter(s -> s.getColumProperty().equals(f))
                             .findFirst().map(SelectCache::getColumn).orElse(f)).collect(Collectors.toList());
         }
@@ -104,7 +104,7 @@ public class MPJMappingWrapper {
             for (String orderBy : orderByDesc) {
                 allColumns.addAll(Arrays.asList(orderBy.split(StringPool.COMMA)));
             }
-            this.orderByDesc = allColumns.stream().filter(StringUtils::isNotBlank).map(String::trim).map(f ->
+            this.orderByDesc = allColumns.stream().filter(StrUtils::isNotBlank).map(String::trim).map(f ->
                     colSet.contains(f) ? f : listField.stream().filter(s -> s.getColumProperty().equals(f))
                             .findFirst().map(SelectCache::getColumn).orElse(f)).collect(Collectors.toList());
         }

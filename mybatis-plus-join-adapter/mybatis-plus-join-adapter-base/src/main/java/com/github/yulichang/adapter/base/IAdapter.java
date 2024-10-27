@@ -38,6 +38,10 @@ public interface IAdapter {
         return tableFieldInfo.isPrimitive();
     }
 
+    default boolean isWithUpdateFill(TableFieldInfo tableFieldInfo) {
+        return tableFieldInfo.isWithUpdateFill();
+    }
+
     default String mpjMapping(TableFieldInfo tableFieldInfo) {
         return tableFieldInfo.getMapping();
     }

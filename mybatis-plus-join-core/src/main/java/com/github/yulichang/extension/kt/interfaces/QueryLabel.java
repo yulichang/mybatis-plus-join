@@ -1,11 +1,11 @@
 package com.github.yulichang.extension.kt.interfaces;
 
 import com.baomidou.mybatisplus.core.toolkit.Assert;
-import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.github.yulichang.extension.kt.resultmap.MybatisLabel;
 import com.github.yulichang.extension.kt.resultmap.MybatisLabelFree;
 import com.github.yulichang.toolkit.KtUtils;
 import com.github.yulichang.toolkit.MPJReflectionKit;
+import com.github.yulichang.toolkit.StrUtils;
 import com.github.yulichang.toolkit.support.FieldCache;
 import com.github.yulichang.wrapper.interfaces.MFunction;
 import com.github.yulichang.wrapper.resultmap.Label;
@@ -137,7 +137,7 @@ public interface QueryLabel<Children> {
         FieldCache field = fieldMap.get(dtoFieldName);
         Assert.isFalse(Collection.class.isAssignableFrom(field.getType()), "association 不支持集合类");
         MybatisLabel.Builder<?, ?> builder;
-        builder = new MybatisLabel.Builder<>(StringUtils.isBlank(prefix) ? null : prefix,
+        builder = new MybatisLabel.Builder<>(StrUtils.isBlank(prefix) ? null : prefix,
                 dtoFieldName, child, field.getType(), (Class<?>) field.getType(), true);
         addLabel(builder.build(), false);
         return getChildren();
@@ -169,7 +169,7 @@ public interface QueryLabel<Children> {
         String dtoFieldName = dtoField.getName();
         FieldCache field = MPJReflectionKit.getFieldMap(KtUtils.ref(dtoField)).get(dtoFieldName);
         Assert.isFalse(Collection.class.isAssignableFrom(field.getType()), "association 不支持集合类");
-        MybatisLabel.Builder<?, ?> builder = new MybatisLabel.Builder<>(StringUtils.isBlank(prefix) ? null : prefix,
+        MybatisLabel.Builder<?, ?> builder = new MybatisLabel.Builder<>(StrUtils.isBlank(prefix) ? null : prefix,
                 dtoFieldName, child, field.getType(), (Class<?>) field.getType(), false);
         MybatisLabel.Builder<?, ?> cfBuilder = collection.apply(builder);
         addLabel(cfBuilder.build(), false);

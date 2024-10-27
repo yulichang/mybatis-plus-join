@@ -16,10 +16,7 @@ import com.github.yulichang.extension.kt.interfaces.CompareIfExists;
 import com.github.yulichang.extension.kt.interfaces.Func;
 import com.github.yulichang.extension.kt.interfaces.OnCompare;
 import com.github.yulichang.extension.kt.segments.FuncArgs;
-import com.github.yulichang.toolkit.KtUtils;
-import com.github.yulichang.toolkit.MPJSqlInjectionUtils;
-import com.github.yulichang.toolkit.Ref;
-import com.github.yulichang.toolkit.TableList;
+import com.github.yulichang.toolkit.*;
 import com.github.yulichang.toolkit.sql.SqlScriptUtils;
 import com.github.yulichang.wrapper.enums.IfExistsSqlKeyWordEnum;
 import com.github.yulichang.wrapper.enums.PrefixEnum;
@@ -195,7 +192,7 @@ public abstract class KtAbstractWrapper<T, Children extends KtAbstractWrapper<T,
     public Children allEq(boolean condition, Map<KProperty<?>, ?> params, boolean null2IsNull) {
         if (condition && CollectionUtils.isNotEmpty(params)) {
             params.forEach((k, v) -> {
-                if (StringUtils.checkValNotNull(v)) {
+                if (StrUtils.checkValNotNull(v)) {
                     eq(k, v);
                 } else {
                     if (null2IsNull) {
@@ -601,7 +598,7 @@ public abstract class KtAbstractWrapper<T, Children extends KtAbstractWrapper<T,
      */
     @SuppressWarnings("SameParameterValue")
     protected final String formatSqlMaybeWithParam(String sqlStr, String mapping, Object... params) {
-        if (StringUtils.isBlank(sqlStr)) {
+        if (StrUtils.isBlank(sqlStr)) {
             // todo 何时会这样?
             return null;
         }
@@ -703,7 +700,7 @@ public abstract class KtAbstractWrapper<T, Children extends KtAbstractWrapper<T,
 
     @Override
     public String getSqlComment() {
-        if (StringUtils.isNotBlank(sqlComment.getStringValue())) {
+        if (StrUtils.isNotBlank(sqlComment.getStringValue())) {
             return "/*" + StringEscape.escapeRawString(sqlComment.getStringValue()) + "*/";
         }
         return null;
@@ -711,7 +708,7 @@ public abstract class KtAbstractWrapper<T, Children extends KtAbstractWrapper<T,
 
     @Override
     public String getSqlFirst() {
-        if (StringUtils.isNotBlank(sqlFirst.getStringValue())) {
+        if (StrUtils.isNotBlank(sqlFirst.getStringValue())) {
             return StringEscape.escapeRawString(sqlFirst.getStringValue());
         }
         return null;
@@ -839,7 +836,7 @@ public abstract class KtAbstractWrapper<T, Children extends KtAbstractWrapper<T,
     public <V> Children allEqStr(boolean condition, Map<String, V> params, boolean null2IsNull) {
         if (condition && CollectionUtils.isNotEmpty(params)) {
             params.forEach((k, v) -> {
-                if (StringUtils.checkValNotNull(v)) {
+                if (StrUtils.checkValNotNull(v)) {
                     eq(k, v);
                 } else {
                     if (null2IsNull) {
@@ -856,7 +853,7 @@ public abstract class KtAbstractWrapper<T, Children extends KtAbstractWrapper<T,
         if (condition && CollectionUtils.isNotEmpty(params)) {
             params.forEach((k, v) -> {
                 if (filter.test(k, v)) {
-                    if (StringUtils.checkValNotNull(v)) {
+                    if (StrUtils.checkValNotNull(v)) {
                         eq(k, v);
                     } else {
                         if (null2IsNull) {

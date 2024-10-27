@@ -1,6 +1,6 @@
 package com.github.yulichang.config.enums;
 
-import com.github.yulichang.toolkit.MPJStringUtils;
+import com.github.yulichang.toolkit.StrUtils;
 import com.github.yulichang.wrapper.interfaces.MPredicate;
 
 import java.io.Serializable;
@@ -21,11 +21,11 @@ public enum IfExistsEnum implements MPredicate<Object>, Serializable {
     /**
      * 非空字符串   例： "" -> false, " " -> true ...
      */
-    NOT_EMPTY(val -> NOT_NULL.and(v -> !(v instanceof CharSequence) || MPJStringUtils.isNotEmpty((CharSequence) v)).test(val)),
+    NOT_EMPTY(val -> NOT_NULL.and(v -> !(v instanceof CharSequence) || StrUtils.isNotEmpty((CharSequence) v)).test(val)),
     /**
      * NOT_BLANK 非空白字符串  例： "" -> false, " " -> false, "\r" -> false, "abc" -> true ...
      */
-    NOT_BLANK(val -> NOT_NULL.and(v -> !(v instanceof CharSequence) || MPJStringUtils.isNotBlank((CharSequence) v)).test(val));
+    NOT_BLANK(val -> NOT_NULL.and(v -> !(v instanceof CharSequence) || StrUtils.isNotBlank((CharSequence) v)).test(val));
 
     private final MPredicate<Object> predicate;
 

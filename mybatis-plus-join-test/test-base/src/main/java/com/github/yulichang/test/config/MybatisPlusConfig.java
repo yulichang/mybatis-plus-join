@@ -6,7 +6,6 @@ import com.baomidou.mybatisplus.core.injector.ISqlInjector;
 import com.baomidou.mybatisplus.core.metadata.TableInfo;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.core.toolkit.PluginUtils;
-import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.extension.injector.methods.InsertBatchSomeColumn;
 import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.handler.TenantLineHandler;
@@ -16,6 +15,7 @@ import com.baomidou.mybatisplus.extension.plugins.inner.TenantLineInnerIntercept
 import com.baomidou.mybatisplus.extension.toolkit.JdbcUtils;
 import com.github.yulichang.injector.MPJSqlInjector;
 import com.github.yulichang.test.util.ThreadLocalUtils;
+import com.github.yulichang.toolkit.StrUtils;
 import lombok.SneakyThrows;
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.LongValue;
@@ -149,7 +149,7 @@ public class MybatisPlusConfig {
         @SneakyThrows
         public void beforePrepare(StatementHandler sh, Connection connection, Integer transactionTimeout) {
             BoundSql boundSql = sh.getBoundSql();
-            if (boundSql != null && StringUtils.isNotBlank(boundSql.getSql())) {
+            if (boundSql != null && StrUtils.isNotBlank(boundSql.getSql())) {
                 String sql = boundSql.getSql();
                 this.dbType = Optional.ofNullable(this.dbType).orElse(JdbcUtils.getDbType(connection.getMetaData().getURL()));
                 if (P.test(this.dbType)) {
@@ -166,7 +166,7 @@ public class MybatisPlusConfig {
         }
 
         private String formatSql(String sql) {
-            if (StringUtils.isBlank(sql)) {
+            if (StrUtils.isBlank(sql)) {
                 return sql;
             }
             sql = sql.replaceAll("\n", "");

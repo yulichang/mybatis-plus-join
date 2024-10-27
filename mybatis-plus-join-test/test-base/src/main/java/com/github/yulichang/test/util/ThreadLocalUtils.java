@@ -1,9 +1,9 @@
 package com.github.yulichang.test.util;
 
-import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.yulichang.toolkit.StrUtils;
 import lombok.SneakyThrows;
 
 import java.util.Arrays;
@@ -31,13 +31,13 @@ public class ThreadLocalUtils {
     @SneakyThrows
     public static List<String> get() {
         String s = userThreadLocal.get();
-        if (StringUtils.isBlank(s)) {
+        if (StrUtils.isBlank(s)) {
             return null;
         }
         ObjectMapper mapper = new ObjectMapper();
-        List<String> sqlList = mapper.readValue(s, new TypeReference<List<String>>() {
+        List<String> sqlList = mapper.readValue(s, new TypeReference<>() {
         });
-        sqlList.removeIf(StringUtils::isBlank);
+        sqlList.removeIf(StrUtils::isBlank);
         set("");
         return sqlList;
     }

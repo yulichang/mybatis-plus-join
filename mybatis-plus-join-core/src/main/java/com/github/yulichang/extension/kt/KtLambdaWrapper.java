@@ -12,6 +12,7 @@ import com.github.yulichang.extension.kt.toolkit.KtWrapperUtils;
 import com.github.yulichang.extension.kt.toolkit.KtWrappers;
 import com.github.yulichang.toolkit.Constant;
 import com.github.yulichang.toolkit.KtUtils;
+import com.github.yulichang.toolkit.StrUtils;
 import com.github.yulichang.toolkit.TableList;
 import com.github.yulichang.toolkit.support.ColumnCache;
 import com.github.yulichang.wrapper.interfaces.Chain;
@@ -363,7 +364,7 @@ public class KtLambdaWrapper<T> extends KtAbstractLambdaWrapper<T, KtLambdaWrapp
      */
     @Override
     public String getSqlSelect() {
-        if (StringUtils.isBlank(sqlSelect.getStringValue()) && CollectionUtils.isNotEmpty(selectColumns)) {
+        if (StrUtils.isBlank(sqlSelect.getStringValue()) && CollectionUtils.isNotEmpty(selectColumns)) {
             String s = selectColumns.stream().map(i -> {
                 if (i.isStr()) {
                     return i.getColumn();

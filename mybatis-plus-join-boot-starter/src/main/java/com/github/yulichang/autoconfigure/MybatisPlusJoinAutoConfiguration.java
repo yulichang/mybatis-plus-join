@@ -1,6 +1,5 @@
 package com.github.yulichang.autoconfigure;
 
-import com.baomidou.mybatisplus.autoconfigure.MybatisPlusLanguageDriverAutoConfiguration;
 import com.baomidou.mybatisplus.core.injector.ISqlInjector;
 import com.github.yulichang.autoconfigure.conditional.JoinSqlInjectorCondition;
 import com.github.yulichang.autoconfigure.consumer.MybatisPlusJoinIfExistsConsumer;
@@ -54,7 +53,7 @@ import java.util.Optional;
 @ConditionalOnClass({SqlSessionFactory.class, SqlSessionFactoryBean.class})
 @ConditionalOnSingleCandidate(DataSource.class)
 @EnableConfigurationProperties(MybatisPlusJoinProperties.class)
-@AutoConfigureAfter({DataSourceAutoConfiguration.class, MybatisPlusLanguageDriverAutoConfiguration.class})
+@AutoConfigureAfter(DataSourceAutoConfiguration.class)
 public class MybatisPlusJoinAutoConfiguration {
 
     private static final Logger logger = LoggerFactory.getLogger(MybatisPlusJoinAutoConfiguration.class);

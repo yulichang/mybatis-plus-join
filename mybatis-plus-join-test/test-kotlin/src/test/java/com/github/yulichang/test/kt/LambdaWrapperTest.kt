@@ -1,7 +1,6 @@
 package com.github.yulichang.test.kt
 
 import com.baomidou.mybatisplus.core.metadata.IPage
-import com.baomidou.mybatisplus.core.toolkit.StringUtils
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page
 import com.github.yulichang.extension.kt.KtDeleteJoinWrapper
 import com.github.yulichang.extension.kt.KtLambdaWrapper
@@ -16,6 +15,7 @@ import com.github.yulichang.test.kt.mapper.UserDTOMapper
 import com.github.yulichang.test.kt.mapper.UserMapper
 import com.github.yulichang.test.util.Reset
 import com.github.yulichang.test.util.ThreadLocalUtils
+import com.github.yulichang.toolkit.StrUtils
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -295,9 +295,9 @@ class LambdaWrapperTest {
                 ext.selectAs(UserDO::name, UserDto::updateName)
             }
         val userDtos: List<UserDto> = userDTOMapper!!.selectJoinList(UserDto::class.java, wrapper)
-        assert(StringUtils.isNotBlank(userDtos[0].userName))
-        assert(StringUtils.isNotBlank(userDtos[0].createName))
-        assert(StringUtils.isNotBlank(userDtos[0].updateName))
+        assert(StrUtils.isNotBlank(userDtos[0].userName))
+        assert(StrUtils.isNotBlank(userDtos[0].createName))
+        assert(StrUtils.isNotBlank(userDtos[0].updateName))
 
 
         ThreadLocalUtils.set(

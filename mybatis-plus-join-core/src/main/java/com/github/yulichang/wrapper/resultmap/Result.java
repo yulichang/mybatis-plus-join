@@ -1,8 +1,8 @@
 package com.github.yulichang.wrapper.resultmap;
 
-import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.github.yulichang.toolkit.LambdaUtils;
+import com.github.yulichang.toolkit.StrUtils;
 import com.github.yulichang.toolkit.support.ColumnCache;
 import com.github.yulichang.wrapper.segments.SelectCache;
 import lombok.AccessLevel;
@@ -71,7 +71,7 @@ public class Result implements IResult {
             String name = LambdaUtils.getName(column);
             SelectCache normal = normalMap.get(name);
             result.selectNormal = normal;
-            if (StringUtils.isBlank(result.property)) {
+            if (StrUtils.isBlank(result.property)) {
                 result.property = normal.getColumProperty();
             }
             if (Objects.isNull(result.javaType)) {

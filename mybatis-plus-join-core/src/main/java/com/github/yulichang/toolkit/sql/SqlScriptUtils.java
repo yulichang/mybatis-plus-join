@@ -1,7 +1,7 @@
 package com.github.yulichang.toolkit.sql;
 
 import com.baomidou.mybatisplus.core.toolkit.Constants;
-import com.baomidou.mybatisplus.core.toolkit.StringUtils;
+import com.github.yulichang.toolkit.StrUtils;
 import org.apache.ibatis.type.JdbcType;
 import org.apache.ibatis.type.TypeHandler;
 
@@ -42,16 +42,16 @@ public abstract class SqlScriptUtils implements Constants {
     public static String convertTrim(final String sqlScript, final String prefix, final String suffix,
                                      final String prefixOverrides, final String suffixOverrides) {
         StringBuilder sb = new StringBuilder("<trim");
-        if (StringUtils.isNotBlank(prefix)) {
+        if (StrUtils.isNotBlank(prefix)) {
             sb.append(" prefix=\"").append(prefix).append(QUOTE);
         }
-        if (StringUtils.isNotBlank(suffix)) {
+        if (StrUtils.isNotBlank(suffix)) {
             sb.append(" suffix=\"").append(suffix).append(QUOTE);
         }
-        if (StringUtils.isNotBlank(prefixOverrides)) {
+        if (StrUtils.isNotBlank(prefixOverrides)) {
             sb.append(" prefixOverrides=\"").append(prefixOverrides).append(QUOTE);
         }
-        if (StringUtils.isNotBlank(suffixOverrides)) {
+        if (StrUtils.isNotBlank(suffixOverrides)) {
             sb.append(" suffixOverrides=\"").append(suffixOverrides).append(QUOTE);
         }
         return sb.append(RIGHT_CHEV).append(NEWLINE).append(sqlScript).append(NEWLINE).append("</trim>").toString();
@@ -89,16 +89,16 @@ public abstract class SqlScriptUtils implements Constants {
     public static String convertForeach(final String sqlScript, final String collection, final String index,
                                         final String item, final String separator) {
         StringBuilder sb = new StringBuilder("<foreach");
-        if (StringUtils.isNotBlank(collection)) {
+        if (StrUtils.isNotBlank(collection)) {
             sb.append(" collection=\"").append(collection).append(QUOTE);
         }
-        if (StringUtils.isNotBlank(index)) {
+        if (StrUtils.isNotBlank(index)) {
             sb.append(" index=\"").append(index).append(QUOTE);
         }
-        if (StringUtils.isNotBlank(item)) {
+        if (StrUtils.isNotBlank(item)) {
             sb.append(" item=\"").append(item).append(QUOTE);
         }
-        if (StringUtils.isNotBlank(separator)) {
+        if (StrUtils.isNotBlank(separator)) {
             sb.append(" separator=\"").append(separator).append(QUOTE);
         }
         return sb.append(RIGHT_CHEV).append(NEWLINE).append(sqlScript).append(NEWLINE).append("</foreach>").toString();
@@ -151,7 +151,7 @@ public abstract class SqlScriptUtils implements Constants {
      */
     public static String safeParam(final String param, final String mapping) {
         String target = HASH_LEFT_BRACE + param;
-        if (StringUtils.isBlank(mapping)) {
+        if (StrUtils.isBlank(mapping)) {
             return target + RIGHT_BRACE;
         }
         return target + COMMA + mapping + RIGHT_BRACE;

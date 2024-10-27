@@ -2,7 +2,6 @@ package com.github.yulichang.adapter.jsqlparser;
 
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.core.toolkit.ExceptionUtils;
-import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import net.sf.jsqlparser.parser.CCJSqlParserUtil;
 import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.statement.Statement;
@@ -38,7 +37,7 @@ public class JSqlParserHelper {
                         } else {
                             col = item.getAlias().getName();
                         }
-                        if (StringUtils.isNotBlank(col)) {
+                        if (isNotBlank(col)) {
                             columConsumer.accept(col);
                         }
                     }
@@ -50,5 +49,9 @@ public class JSqlParserHelper {
         } catch (Throwable throwable) {
             throw new RuntimeException(throwable);
         }
+    }
+
+    public static boolean isNotBlank(String str) {
+        return str != null && !str.trim().isEmpty();
     }
 }

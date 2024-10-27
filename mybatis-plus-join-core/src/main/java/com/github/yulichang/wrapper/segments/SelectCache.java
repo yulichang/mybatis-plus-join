@@ -4,7 +4,7 @@ import com.baomidou.mybatisplus.core.metadata.TableFieldInfo;
 import com.baomidou.mybatisplus.core.metadata.TableInfo;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.github.yulichang.adapter.AdapterHelper;
-import com.github.yulichang.toolkit.MPJStringUtils;
+import com.github.yulichang.toolkit.StrUtils;
 import com.github.yulichang.toolkit.ReflectionKit;
 import com.github.yulichang.toolkit.TableHelper;
 import lombok.Getter;
@@ -82,7 +82,7 @@ public class SelectCache implements Serializable {
         this.column = column;
         this.columnType = columnType;
         this.columProperty = columProperty;
-        this.tagColumn = MPJStringUtils.getTargetColumn(column);
+        this.tagColumn = StrUtils.getTargetColumn(column);
         this.isSelect = isSelect;
         if (Objects.isNull(tableFieldInfo)) {
             this.hasTypeHandle = false;

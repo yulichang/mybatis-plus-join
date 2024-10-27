@@ -5,7 +5,6 @@ import com.baomidou.mybatisplus.core.metadata.TableInfo;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.core.toolkit.Constants;
 import com.baomidou.mybatisplus.core.toolkit.StringPool;
-import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.github.yulichang.adapter.AdapterHelper;
 import com.github.yulichang.adapter.base.tookit.VersionUtils;
 import com.github.yulichang.config.ConfigProperties;
@@ -167,7 +166,7 @@ public class MPJInterceptor implements Interceptor {
                 }
             } else {
                 FieldCache field = fieldMap.get(i.getColumProperty());
-                if (StringUtils.isNotBlank(i.getTagColumn())) {
+                if (StrUtils.isNotBlank(i.getTagColumn())) {
                     columnSet.add(i.getTagColumn());
                     if (Objects.nonNull(field)) {
                         ResultMapping.Builder builder = new ResultMapping.Builder(ms.getConfiguration(), i.getColumProperty(),
@@ -176,7 +175,7 @@ public class MPJInterceptor implements Interceptor {
                     }
                 } else if (wrapper.isResultMap()) {
                     AdapterHelper.getAdapter().parserColum(wrapper.getAlias(), wrapper.getFrom(), i.getColumn(), col -> {
-                        String tagCol = MPJStringUtils.getTargetColumn(col);
+                        String tagCol = StrUtils.getTargetColumn(col);
                         FieldCache strField = fieldMap.get(tagCol);
                         columnSet.add(tagCol);
                         if (Objects.nonNull(strField)) {
@@ -240,10 +239,10 @@ public class MPJInterceptor implements Interceptor {
             String index = r.getIndex();
             if (columnSet.contains(columnName)) {
                 columnName = getColumn(columnSet, columnName, 0);
-                label = new SelectLabel(r.getSelectNormal(), null, mybatisLabel.getOfType(), columnName, StringUtils.isNotBlank(index), index, r.getBaseColumn());
+                label = new SelectLabel(r.getSelectNormal(), null, mybatisLabel.getOfType(), columnName, StrUtils.isNotBlank(index), index, r.getBaseColumn());
             } else {
                 columnSet.add(columnName);
-                label = new SelectLabel(r.getSelectNormal(), null, mybatisLabel.getOfType(), StringUtils.isNotBlank(index), index, r.getBaseColumn());
+                label = new SelectLabel(r.getSelectNormal(), null, mybatisLabel.getOfType(), StrUtils.isNotBlank(index), index, r.getBaseColumn());
             }
             columnList.add(label);
             ResultMapping.Builder builder = new ResultMapping.Builder(ms.getConfiguration(), r.getProperty(), columnName, r.getJavaType());

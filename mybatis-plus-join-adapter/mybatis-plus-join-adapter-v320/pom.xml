@@ -1,27 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--suppress ALL -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.github.yulichang</groupId>
-        <artifactId>mybatis-plus-join-root</artifactId>
+        <artifactId>mybatis-plus-join-adapter</artifactId>
         <version>${revision}</version>
     </parent>
-    <packaging>pom</packaging>
+    <artifactId>mybatis-plus-join-adapter-v320</artifactId>
     <version>${revision}</version>
-    <artifactId>mybatis-plus-join-adapter</artifactId>
-    <name>mybatis-plus-join-adapter</name>
-
-    <modules>
-        <module>mybatis-plus-join-adapter-base</module>
-        <module>mybatis-plus-join-adapter-v320</module>
-        <module>mybatis-plus-join-adapter-v33x</module>
-        <module>mybatis-plus-join-adapter-v3431</module>
-        <module>mybatis-plus-join-adapter-v352</module>
-        <module>mybatis-plus-join-adapter-v355</module>
-        <module>jsqlparser/mybatis-plus-join-adapter-jsqlparser</module>
-        <module>jsqlparser/mybatis-plus-join-adapter-jsqlparser-v46</module>
-    </modules>
+    <name>mybatis-plus-join-adapter-v320</name>
 
     <description>An enhanced toolkit of Mybatis-Plus to simplify development.</description>
     <url>https://github.com/yulichang/mybatis-plus-join</url>
@@ -46,8 +35,14 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
+            <groupId>com.github.yulichang</groupId>
+            <artifactId>mybatis-plus-join-adapter-base</artifactId>
+            <version>${revision}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.baomidou</groupId>
+            <artifactId>mybatis-plus-boot-starter</artifactId>
+            <version>3.2.0</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>

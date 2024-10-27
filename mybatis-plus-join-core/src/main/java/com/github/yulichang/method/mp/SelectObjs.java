@@ -3,9 +3,9 @@ package com.github.yulichang.method.mp;
 import com.baomidou.mybatisplus.core.metadata.TableInfo;
 import com.baomidou.mybatisplus.core.toolkit.Constants;
 import com.baomidou.mybatisplus.core.toolkit.StringPool;
-import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.core.toolkit.sql.SqlScriptUtils;
 import com.github.yulichang.interfaces.MPJBaseJoin;
+import com.github.yulichang.toolkit.StrUtils;
 import org.apache.ibatis.mapping.MappedStatement;
 
 /**
@@ -52,7 +52,7 @@ public class SelectObjs extends com.baomidou.mybatisplus.core.injector.methods.S
     @Override
     protected String sqlOrderBy(TableInfo table) {
         String orderBy = super.sqlOrderBy(table);
-        if (StringUtils.isBlank(orderBy)) {
+        if (StrUtils.isBlank(orderBy)) {
             return orderBy;
         }
         return SqlScriptUtils.convertChoose(String.format("%s == null or !(%s instanceof %s)", Constants.WRAPPER, Constants.WRAPPER, MPJBaseJoin.class.getName()),

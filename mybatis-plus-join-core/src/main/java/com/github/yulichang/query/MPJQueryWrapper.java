@@ -14,6 +14,7 @@ import com.github.yulichang.config.ConfigProperties;
 import com.github.yulichang.query.interfaces.CompareIfExists;
 import com.github.yulichang.query.interfaces.StringJoin;
 import com.github.yulichang.toolkit.MPJSqlInjectionUtils;
+import com.github.yulichang.toolkit.StrUtils;
 import com.github.yulichang.toolkit.TableHelper;
 import com.github.yulichang.toolkit.ThrowOptional;
 import com.github.yulichang.wrapper.enums.IfExistsSqlKeyWordEnum;
@@ -249,7 +250,7 @@ public class MPJQueryWrapper<T> extends AbstractWrapper<T, String, MPJQueryWrapp
 
     @Override
     public String getSqlSelect() {
-        if (StringUtils.isBlank(sqlSelect.getStringValue())) {
+        if (StrUtils.isBlank(sqlSelect.getStringValue())) {
             if (CollectionUtils.isNotEmpty(ignoreColumns)) {
                 selectColumns.removeIf(ignoreColumns::contains);
             }
@@ -277,7 +278,7 @@ public class MPJQueryWrapper<T> extends AbstractWrapper<T, String, MPJQueryWrapp
      * @param alias 主表别名
      */
     public MPJQueryWrapper<T> setAlias(String alias) {
-        Assert.isTrue(StringUtils.isNotBlank(alias), "别名不能为空");
+        Assert.isTrue(StrUtils.isNotBlank(alias), "别名不能为空");
         this.alias = alias;
         return this;
     }

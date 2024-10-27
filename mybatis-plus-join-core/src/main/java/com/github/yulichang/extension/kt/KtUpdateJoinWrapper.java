@@ -7,11 +7,8 @@ import com.baomidou.mybatisplus.core.metadata.TableInfo;
 import com.baomidou.mybatisplus.core.toolkit.*;
 import com.github.yulichang.adapter.AdapterHelper;
 import com.github.yulichang.extension.kt.interfaces.Update;
-import com.github.yulichang.toolkit.Constant;
-import com.github.yulichang.toolkit.KtUtils;
+import com.github.yulichang.toolkit.*;
 import com.github.yulichang.toolkit.ReflectionKit;
-import com.github.yulichang.toolkit.TableHelper;
-import com.github.yulichang.toolkit.TableList;
 import com.github.yulichang.wrapper.interfaces.UpdateChain;
 import kotlin.reflect.KProperty;
 import lombok.AllArgsConstructor;
@@ -142,7 +139,7 @@ public class KtUpdateJoinWrapper<T> extends KtAbstractLambdaWrapper<T, KtUpdateJ
 
     @Override
     public KtUpdateJoinWrapper<T> setSql(boolean condition, String sql) {
-        if (condition && StringUtils.isNotBlank(sql)) {
+        if (condition && StrUtils.isNotBlank(sql)) {
             if (Objects.isNull(sqlSet)) {
                 sqlSet = new ArrayList<>();
             }
@@ -153,7 +150,7 @@ public class KtUpdateJoinWrapper<T> extends KtAbstractLambdaWrapper<T, KtUpdateJ
 
     @Override
     public String getSqlSet() {
-        if (StringUtils.isNotBlank(sqlSetStr.getStringValue())) {
+        if (StrUtils.isNotBlank(sqlSetStr.getStringValue())) {
             return sqlSetStr.getStringValue();
         }
         StringBuilder set = new StringBuilder(StringPool.EMPTY);

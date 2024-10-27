@@ -3,12 +3,16 @@ package com.github.yulichang.extension.mapping.mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.TableFieldInfo;
 import com.baomidou.mybatisplus.core.metadata.TableInfo;
-import com.baomidou.mybatisplus.core.toolkit.*;
+import com.baomidou.mybatisplus.core.toolkit.Assert;
+import com.baomidou.mybatisplus.core.toolkit.ClassUtils;
+import com.baomidou.mybatisplus.core.toolkit.ExceptionUtils;
+import com.baomidou.mybatisplus.core.toolkit.StringPool;
 import com.github.yulichang.adapter.AdapterHelper;
 import com.github.yulichang.annotation.EntityMapping;
 import com.github.yulichang.annotation.FieldMapping;
 import com.github.yulichang.toolkit.ReflectionKit;
 import com.github.yulichang.toolkit.SpringContentUtils;
+import com.github.yulichang.toolkit.StrUtils;
 import com.github.yulichang.toolkit.TableHelper;
 import com.github.yulichang.toolkit.support.ColumnCache;
 import com.github.yulichang.wrapper.segments.SelectCache;
@@ -178,7 +182,7 @@ public class MPJTableFieldInfo {
     }
 
     private void initJoinField(String joinField) {
-        if (StringUtils.isNotBlank(joinField)) {
+        if (StrUtils.isNotBlank(joinField)) {
             this.joinProperty = joinField;
         } else {
             TableInfo info = getTableInfo(this.joinClass);
@@ -200,14 +204,14 @@ public class MPJTableFieldInfo {
             this.joinField = getField(this.joinClass, joinFieldInfo);
         }
         Assert.notNull(this.joinField, "注解属性joinField不存在 %s , %s", this.joinClass.getName(),
-                StringUtils.isBlank(this.joinProperty) ? "主键" : this.joinProperty);
+                StrUtils.isBlank(this.joinProperty) ? "主键" : this.joinProperty);
         Assert.notNull(this.joinColumn, "注解属性joinField不存在 %s , %s", this.joinClass.getName(),
-                StringUtils.isBlank(this.joinProperty) ? "主键" : this.joinProperty);
+                StrUtils.isBlank(this.joinProperty) ? "主键" : this.joinProperty);
         this.joinField.setAccessible(true);
     }
 
     private void initThisField(String thisField) {
-        if (StringUtils.isNotBlank(thisField)) {
+        if (StrUtils.isNotBlank(thisField)) {
             this.thisProperty = thisField;
         } else {
             TableInfo info = getTableInfo(this.entityType);
@@ -220,13 +224,13 @@ public class MPJTableFieldInfo {
             this.thisField = ReflectionKit.getFieldList(ClassUtils.getUserClass(entityType)).stream().filter(f ->
                     f.getName().equals(tableInfo.getKeyProperty())).findFirst().orElse(null);
             Assert.notNull(this.thisField, "注解属性thisField不存在 %s , %s", entityType.getName(),
-                    StringUtils.isBlank(this.thisProperty) ? "主键" : this.thisProperty);
+                    StrUtils.isBlank(this.thisProperty) ? "主键" : this.thisProperty);
             this.thisColumn = tableInfo.getKeyColumn();
         } else {
             TableFieldInfo fieldInfo = tableInfo.getFieldList().stream().filter(f ->
                     f.getProperty().equals(this.thisProperty)).findFirst().orElse(null);
             Assert.notNull(fieldInfo, "注解属性thisField不存在 %s , %s", entityType.getName(),
-                    StringUtils.isBlank(this.thisProperty) ? "主键" : this.thisProperty);
+                    StrUtils.isBlank(this.thisProperty) ? "主键" : this.thisProperty);
             this.thisField = getField(this.entityType, fieldInfo);
             this.thisColumn = fieldInfo.getColumn();
         }
@@ -269,20 +273,20 @@ public class MPJTableFieldInfo {
         if (Objects.isNull(arr) || arr.length == 0) {
             return false;
         }
-        return Arrays.stream(arr).anyMatch(StringUtils::isNotBlank);
+        return Arrays.stream(arr).anyMatch(StrUtils::isNotBlank);
     }
 
     private String propToColumn(Class<?> tag, String[] arr, String joinC) {
         Map<String, SelectCache> mapField = ColumnCache.getMapField(tag);
         List<String> args = null;
         if (checkArr(arr)) {
-            args = Arrays.stream(arr).filter(StringUtils::isNotBlank).map(c -> {
+            args = Arrays.stream(arr).filter(StrUtils::isNotBlank).map(c -> {
                 if (mapField.containsKey(c)) {
                     return mapField.get(c).getColumn();
                 }
                 return c;
             }).collect(Collectors.toList());
-            if (StringUtils.isNotBlank(joinC)) {
+            if (StrUtils.isNotBlank(joinC)) {
                 if (mapField.containsKey(joinC)) {
                     args.add(mapField.get(joinC).getColumn());
                 }

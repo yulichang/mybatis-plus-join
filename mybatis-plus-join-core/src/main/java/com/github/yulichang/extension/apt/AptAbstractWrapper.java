@@ -6,18 +6,14 @@ import com.baomidou.mybatisplus.core.conditions.segments.MergeSegments;
 import com.baomidou.mybatisplus.core.metadata.TableInfo;
 import com.baomidou.mybatisplus.core.toolkit.Constants;
 import com.baomidou.mybatisplus.core.toolkit.StringPool;
-import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.github.yulichang.adapter.AdapterHelper;
-import com.github.yulichang.extension.apt.matedata.BaseColumn;
-import com.github.yulichang.extension.apt.matedata.Column;
 import com.github.yulichang.config.ConfigProperties;
 import com.github.yulichang.config.enums.LogicDelTypeEnum;
 import com.github.yulichang.extension.apt.interfaces.QueryJoin;
-import com.github.yulichang.toolkit.Constant;
-import com.github.yulichang.toolkit.LogicInfoUtils;
-import com.github.yulichang.toolkit.TableHelper;
-import com.github.yulichang.toolkit.TableMap;
+import com.github.yulichang.extension.apt.matedata.BaseColumn;
+import com.github.yulichang.extension.apt.matedata.Column;
+import com.github.yulichang.toolkit.*;
 import com.github.yulichang.toolkit.support.ColumnCache;
 import com.github.yulichang.wrapper.interfaces.MFunction;
 import com.github.yulichang.wrapper.segments.PageInfo;
@@ -124,7 +120,7 @@ public abstract class AptAbstractWrapper<T, Children extends AptAbstractWrapper<
      * 构造方法
      */
     protected AptAbstractWrapper(BaseColumn<T> baseColumn) {
-        this.alias = StringUtils.isNotBlank(baseColumn.getAlias()) ? baseColumn.getAlias() : this.alias;
+        this.alias = StrUtils.isNotBlank(baseColumn.getAlias()) ? baseColumn.getAlias() : this.alias;
         setEntityClass(baseColumn.getColumnClass());
         this.baseColumn = baseColumn;
         initNeed();
@@ -136,7 +132,7 @@ public abstract class AptAbstractWrapper<T, Children extends AptAbstractWrapper<
      * @param entity 主表实体类
      */
     protected AptAbstractWrapper(BaseColumn<T> baseColumn, T entity) {
-        this.alias = StringUtils.isNotBlank(baseColumn.getAlias()) ? baseColumn.getAlias() : this.alias;
+        this.alias = StrUtils.isNotBlank(baseColumn.getAlias()) ? baseColumn.getAlias() : this.alias;
         setEntity(entity);
         this.baseColumn = baseColumn;
         initNeed();
@@ -310,10 +306,10 @@ public abstract class AptAbstractWrapper<T, Children extends AptAbstractWrapper<
      * 获取连表部分语句
      */
     public String getFrom() {
-        if (StringUtils.isBlank(from.getStringValue())) {
+        if (StrUtils.isBlank(from.getStringValue())) {
             StringBuilder value = new StringBuilder();
             for (Children wrapper : onWrappers) {
-                if (StringUtils.isBlank(wrapper.from.getStringValue())) {
+                if (StrUtils.isBlank(wrapper.from.getStringValue())) {
                     if (this.subLogicSql && this.logicDelType == LogicDelTypeEnum.ON) {
                         TableInfo tableInfo = TableHelper.getAssert(wrapper.getJoinClass());
                         if (AdapterHelper.getAdapter().mpjHasLogic(tableInfo)) {
@@ -371,7 +367,7 @@ public abstract class AptAbstractWrapper<T, Children extends AptAbstractWrapper<
         Children instance = instance(newIndex, keyWord, baseColumn.getColumnClass(), info.getTableName());
         instance.isMain = false;
         onWrappers.add(instance);
-        if (StringUtils.isBlank(baseColumn.getAlias())) {
+        if (StrUtils.isBlank(baseColumn.getAlias())) {
             aptIndex.put(baseColumn, subTableAlias + newIndex);
             instance.alias = subTableAlias;
             instance.hasAlias = false;
@@ -410,7 +406,7 @@ public abstract class AptAbstractWrapper<T, Children extends AptAbstractWrapper<
      */
     public boolean isUseAnnotationOrderBy() {
         final String _sqlSegment = this.getSqlSegment();
-        if (StringUtils.isBlank(_sqlSegment)) {
+        if (StrUtils.isBlank(_sqlSegment)) {
             return true;
         }
         final String _sqlSegmentToUpperCase = _sqlSegment.toUpperCase();

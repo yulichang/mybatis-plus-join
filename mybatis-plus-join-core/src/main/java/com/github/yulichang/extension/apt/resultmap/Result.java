@@ -1,10 +1,10 @@
 package com.github.yulichang.extension.apt.resultmap;
 
-import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.github.yulichang.extension.apt.matedata.BaseColumn;
 import com.github.yulichang.extension.apt.matedata.Column;
 import com.github.yulichang.toolkit.LambdaUtils;
+import com.github.yulichang.toolkit.StrUtils;
 import com.github.yulichang.toolkit.support.ColumnCache;
 import com.github.yulichang.wrapper.resultmap.IResult;
 import com.github.yulichang.wrapper.segments.SelectCache;
@@ -93,7 +93,7 @@ public class Result implements IResult {
             SelectCache normal = normalMap.get(column.getProperty());
             result.selectNormal = normal;
             result.column = column;
-            if (StringUtils.isBlank(result.property)) {
+            if (StrUtils.isBlank(result.property)) {
                 result.property = normal.getColumProperty();
             }
             if (Objects.isNull(result.javaType)) {

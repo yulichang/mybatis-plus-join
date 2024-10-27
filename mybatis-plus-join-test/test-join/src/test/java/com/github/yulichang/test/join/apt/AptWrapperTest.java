@@ -2,7 +2,6 @@ package com.github.yulichang.test.join.apt;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.github.yulichang.adapter.base.tookit.VersionUtils;
 import com.github.yulichang.extension.apt.AptQueryWrapper;
@@ -16,6 +15,7 @@ import com.github.yulichang.test.join.entity.apt.*;
 import com.github.yulichang.test.join.mapper.*;
 import com.github.yulichang.test.util.Reset;
 import com.github.yulichang.test.util.ThreadLocalUtils;
+import com.github.yulichang.toolkit.StrUtils;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -364,9 +364,9 @@ class AptWrapperTest {
                 .ge(ub.id, 0);
 
         List<UserDto> userDtos = userDTOMapper.selectJoinList(UserDto.class, wrapper);
-        assert StringUtils.isNotBlank(userDtos.get(0).getUserName());
-        assert StringUtils.isNotBlank(userDtos.get(0).getCreateName());
-        assert StringUtils.isNotBlank(userDtos.get(0).getUpdateName());
+        assert StrUtils.isNotBlank(userDtos.get(0).getUserName());
+        assert StrUtils.isNotBlank(userDtos.get(0).getCreateName());
+        assert StrUtils.isNotBlank(userDtos.get(0).getUpdateName());
 
 
         ThreadLocalUtils.set("""

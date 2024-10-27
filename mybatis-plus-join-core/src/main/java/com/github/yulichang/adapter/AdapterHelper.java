@@ -3,6 +3,7 @@ package com.github.yulichang.adapter;
 import com.baomidou.mybatisplus.core.toolkit.ExceptionUtils;
 import com.github.yulichang.adapter.base.IAdapter;
 import com.github.yulichang.adapter.base.tookit.VersionUtils;
+import com.github.yulichang.adapter.v320.Adapter320;
 import com.github.yulichang.adapter.v33x.Adapter33x;
 import com.github.yulichang.adapter.v3431.Adapter3431;
 import com.github.yulichang.adapter.v355.Adapter355;
@@ -21,7 +22,7 @@ public class AdapterHelper {
 
 
     static {
-        String lastAdapter = "3.5.8";
+        String lastAdapter = "3.5.9";
         String version = Optional.ofNullable(VersionUtils.getVersion()).orElse(lastAdapter);
 
         if (VersionUtils.compare(version, "3.5.6") >= 0) {
@@ -32,8 +33,10 @@ public class AdapterHelper {
             adapter = new Adapter3431();
         } else if (VersionUtils.compare(version, "3.3.0") >= 0) {
             adapter = new Adapter33x();
+        } else if (VersionUtils.compare(version, "3.2.0") >= 0) {
+            adapter = new Adapter320();
         } else {
-            throw ExceptionUtils.mpe("MPJ需要MP版本3.3.0+，当前MP版本%s", version);
+            throw ExceptionUtils.mpe("MPJ需要MP版本3.2.0+，当前MP版本%s", version);
         }
     }
 

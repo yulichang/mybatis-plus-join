@@ -34,7 +34,7 @@ import static java.util.stream.Collectors.joining;
  * @since 2016-08-18
  */
 @SuppressWarnings("unused")
-public final class MPJStringUtils {
+public final class StrUtils {
 
     /**
      * 判断是否是中文
@@ -237,7 +237,7 @@ public final class MPJStringUtils {
      * @param args    填充参数
      */
     public static String sqlArgsFill(String content, Object... args) {
-        if (MPJStringUtils.isNotBlank(content) && ArrayUtils.isNotEmpty(args)) {
+        if (StrUtils.isNotBlank(content) && ArrayUtils.isNotEmpty(args)) {
             // 索引不能使用，因为 SQL 中的占位符数字与索引不相同
             BiIntFunction<Matcher, CharSequence> handler = (m, i) -> sqlParam(args[Integer.parseInt(m.group("idx"))]);
             return replace(content, MP_SQL_PLACE_HOLDER, handler).toString();
@@ -280,9 +280,9 @@ public final class MPJStringUtils {
     public static String sqlParam(Object obj) {
         String repStr;
         if (obj instanceof Collection) {
-            repStr = MPJStringUtils.quotaMarkList((Collection<?>) obj);
+            repStr = StrUtils.quotaMarkList((Collection<?>) obj);
         } else {
-            repStr = MPJStringUtils.quotaMark(obj);
+            repStr = StrUtils.quotaMark(obj);
         }
         return repStr;
     }
@@ -309,7 +309,7 @@ public final class MPJStringUtils {
      * @return 单引号包含的原字符串的集合形式
      */
     public static String quotaMarkList(Collection<?> coll) {
-        return coll.stream().map(MPJStringUtils::quotaMark)
+        return coll.stream().map(StrUtils::quotaMark)
                 .collect(joining(StringPool.COMMA, StringPool.LEFT_BRACKET, StringPool.RIGHT_BRACKET));
     }
 
@@ -440,8 +440,8 @@ public final class MPJStringUtils {
 
     /**
      * 删除字符前缀之后,首字母小写,之后字符大小写的不变
-     * <p>StringUtils.removePrefixAfterPrefixToLower( "isUser", 2 )     = user</p>
-     * <p>StringUtils.removePrefixAfterPrefixToLower( "isUserInfo", 2 ) = userInfo</p>
+     * <p>StrUtils.removePrefixAfterPrefixToLower( "isUser", 2 )     = user</p>
+     * <p>StrUtils.removePrefixAfterPrefixToLower( "isUserInfo", 2 ) = userInfo</p>
      *
      * @param rawString 需要处理的字符串
      * @param index     删除多少个字符(从左至右)
@@ -453,7 +453,7 @@ public final class MPJStringUtils {
 
     /**
      * 驼峰转连字符
-     * <p>StringUtils.camelToHyphen( "managerAdminUserService" ) = manager-admin-user-service</p>
+     * <p>StrUtils.camelToHyphen( "managerAdminUserService" ) = manager-admin-user-service</p>
      *
      * @param input ignore
      * @return 以'-'分隔
@@ -525,11 +525,11 @@ public final class MPJStringUtils {
      * <p>对字符串大小写敏感</p>
      *
      * <pre>
-     * StringUtils.equals(null, null)   = true
-     * StringUtils.equals(null, "abc")  = false
-     * StringUtils.equals("abc", null)  = false
-     * StringUtils.equals("abc", "abc") = true
-     * StringUtils.equals("abc", "ABC") = false
+     * StrUtils.equals(null, null)   = true
+     * StrUtils.equals(null, "abc")  = false
+     * StrUtils.equals("abc", null)  = false
+     * StrUtils.equals("abc", "abc") = true
+     * StrUtils.equals("abc", "ABC") = false
      * </pre>
      *
      * @param cs1 第一个字符串, 可为 {@code null}

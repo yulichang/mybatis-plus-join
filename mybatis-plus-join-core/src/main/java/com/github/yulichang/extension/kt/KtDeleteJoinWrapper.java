@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.core.metadata.TableInfo;
 import com.baomidou.mybatisplus.core.toolkit.*;
 import com.github.yulichang.adapter.AdapterHelper;
 import com.github.yulichang.toolkit.LogicInfoUtils;
+import com.github.yulichang.toolkit.StrUtils;
 import com.github.yulichang.toolkit.TableHelper;
 import com.github.yulichang.toolkit.TableList;
 import com.github.yulichang.wrapper.interfaces.DeleteChain;
@@ -71,7 +72,7 @@ public class KtDeleteJoinWrapper<T> extends KtAbstractLambdaWrapper<T, KtDeleteJ
      */
     @Override
     public String getDeleteSql() {
-        if (StringUtils.isNotBlank(this.deleteSql.getStringValue())) {
+        if (StrUtils.isNotBlank(this.deleteSql.getStringValue())) {
             return this.deleteSql.getStringValue();
         }
         String delete = null;
@@ -89,7 +90,7 @@ public class KtDeleteJoinWrapper<T> extends KtAbstractLambdaWrapper<T, KtDeleteJ
         if (CollectionUtils.isNotEmpty(deleteTableName)) {
             delete = delete + StringPool.COMMA + String.join(StringPool.COMMA, deleteTableName);
         }
-        if (StringUtils.isBlank(delete)) {
+        if (StrUtils.isBlank(delete)) {
             delete = this.alias;
         }
         deleteSql.setStringValue(delete);
@@ -101,7 +102,7 @@ public class KtDeleteJoinWrapper<T> extends KtAbstractLambdaWrapper<T, KtDeleteJ
      */
     @Override
     public String getDeleteLogicSql() {
-        if (StringUtils.isNotBlank(this.deleteSql.getStringValue())) {
+        if (StrUtils.isNotBlank(this.deleteSql.getStringValue())) {
             return this.deleteSql.getStringValue();
         }
         String delete = null;
@@ -119,7 +120,7 @@ public class KtDeleteJoinWrapper<T> extends KtAbstractLambdaWrapper<T, KtDeleteJ
         if (CollectionUtils.isNotEmpty(deleteTableName)) {
             delete = delete + StringPool.COMMA + String.join(StringPool.COMMA, deleteTableName);
         }
-        if (StringUtils.isNotBlank(delete)) {
+        if (StrUtils.isNotBlank(delete)) {
             delete = StringPool.COMMA + delete;
         } else {
             delete = StringPool.EMPTY;

@@ -1,5 +1,6 @@
 package com.github.yulichang.test.join.dto;
 
+import com.github.yulichang.test.join.entity.AddressDO;
 import com.github.yulichang.test.join.entity.UserDO;
 import com.github.yulichang.test.join.enums.Sex;
 import lombok.Data;
@@ -41,6 +42,8 @@ public class UserDTO {
     private Map<String, String> area;
 
     private List<AddressDTO> addressList;
+
+    private List<AddressDO> addressList11;
 
     private AddressDTO addressDTO;
 

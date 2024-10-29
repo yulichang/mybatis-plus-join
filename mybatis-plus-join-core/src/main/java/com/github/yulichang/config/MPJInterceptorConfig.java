@@ -30,7 +30,7 @@ public class MPJInterceptorConfig {
             System.out.println(" _ _   |_  _ _|_. ___ _ |    _  .  _  .  _  \n" +
                     "| | |\\/|_)(_| | |_\\  |_)||_|_\\  | (_) | | | \n" +
                     "     /               |          /\n" +
-                    "                                    1.5.1");
+                    "                                    1.5.2-SNAPSHOT");
         }
     }
 

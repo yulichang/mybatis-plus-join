@@ -34,7 +34,7 @@ public class PageByMainTest {
                 "LEFT JOIN address t1 ON (t1.user_id = t.id AND t1.user_id >= ? AND t1.del = false)");
         MPJLambdaWrapper<UserDO> wrapper = JoinWrappers.lambda(UserDO.class)
                 .selectAll()
-                .selectCollection(AddressDO.class, UserDTO::getAddressList)
+                .selectCollection(AddressDO.class, UserDTO::getAddressList11)
                 .leftJoin(AddressDO.class, on -> on
                         .eq(AddressDO::getUserId, UserDO::getId)
                         .ge(AddressDO::getUserId, 0))
@@ -45,6 +45,7 @@ public class PageByMainTest {
         Page<UserDTO> page = wrapper.page(new Page<>(1, 8), UserDTO.class);
         page.getRecords().forEach(System.out::println);
         assert page.getRecords().size() == 8;
+        assert !page.getRecords().get(0).getAddressList11().isEmpty();
     }
 
     @Test

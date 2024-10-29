@@ -443,14 +443,7 @@ public abstract class JoinAbstractLambdaWrapper<T, Children extends JoinAbstract
     public <R> Children join(String keyWord, Class<R> clazz, MConsumer<MPJLambdaWrapper<R>> table, String tableAlias, BiConsumer<JoinAbstractLambdaWrapper<T, ?>, Children> consumer) {
         String tabName;
         if (table != null) {
-            MPJLambdaWrapper<R> tableWrapper = new MPJLambdaWrapper<R>(null, clazz, SharedString.emptyString(),
-                    paramNameSeq, paramNameValuePairs, new MergeSegments(), new SharedString(this.paramAlias
-                    .getStringValue()), SharedString.emptyString(), SharedString.emptyString(), SharedString.emptyString(),
-                    new TableList(), null, null, null, null, ifExists) {
-            };
-            tableWrapper.tableList.setAlias(ConfigProperties.tableAlias);
-            tableWrapper.tableList.setRootClass(clazz);
-
+            MPJLambdaWrapper<R> tableWrapper = fromInstance(clazz);
             table.accept(tableWrapper);
             if (StrUtils.isBlank(tableWrapper.getSqlSelect())) {
                 tableWrapper.selectAll();

@@ -3,7 +3,6 @@ package com.github.yulichang.wrapper;
 import com.baomidou.mybatisplus.core.conditions.ISqlSegment;
 import com.baomidou.mybatisplus.core.conditions.SharedString;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
-import com.baomidou.mybatisplus.core.conditions.interfaces.Nested;
 import com.baomidou.mybatisplus.core.conditions.segments.MergeSegments;
 import com.baomidou.mybatisplus.core.enums.SqlKeyword;
 import com.baomidou.mybatisplus.core.enums.SqlLike;
@@ -182,9 +181,9 @@ public abstract class JoinAbstractWrapper<T, Children extends JoinAbstractWrappe
                 .getStringValue()), SharedString.emptyString(), SharedString.emptyString(), SharedString.emptyString(),
                 new TableList(), null, null, null, null, ifExists) {
         };
-        wrapper.tableList.setAlias(this.alias);
+        wrapper.tableList.setAlias(ConfigProperties.tableAlias);
         wrapper.tableList.setRootClass(clazz);
-        wrapper.alias = this.alias;
+        wrapper.alias = ConfigProperties.tableAlias;
         return wrapper;
     }
 

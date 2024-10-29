@@ -14,7 +14,7 @@
 
     <modules>
         <module>mybatis-plus-join-adapter-base</module>
-        <module>mybatis-plus-join-adapter-v320</module>
+        <module>mybatis-plus-join-adapter-v312</module>
         <module>mybatis-plus-join-adapter-v33x</module>
         <module>mybatis-plus-join-adapter-v3431</module>
         <module>mybatis-plus-join-adapter-v352</module>

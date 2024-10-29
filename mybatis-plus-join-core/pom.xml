@@ -41,7 +41,7 @@
         </dependency>
         <dependency>
             <groupId>com.github.yulichang</groupId>
-            <artifactId>mybatis-plus-join-adapter-v320</artifactId>
+            <artifactId>mybatis-plus-join-adapter-v312</artifactId>
             <version>${revision}</version>
         </dependency>
         <dependency>

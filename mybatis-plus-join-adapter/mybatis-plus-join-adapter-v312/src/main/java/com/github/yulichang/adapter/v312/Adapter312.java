@@ -1,4 +1,4 @@
-package com.github.yulichang.adapter.v320;
+package com.github.yulichang.adapter.v312;
 
 import com.baomidou.mybatisplus.core.metadata.TableFieldInfo;
 import com.baomidou.mybatisplus.core.metadata.TableInfo;
@@ -24,7 +24,7 @@ import java.util.function.Supplier;
  * @author yulichang
  * @since 1.4.3
  */
-public class Adapter320 implements IAdapter {
+public class Adapter312 implements IAdapter {
 
     @Override
     public boolean mpjHasLogic(TableInfo tableInfo) {

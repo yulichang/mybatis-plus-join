@@ -350,7 +350,8 @@ public class MPJQueryWrapper<T> extends AbstractWrapper<T, String, MPJQueryWrapp
      */
     public MPJLambdaQueryWrapper<T> lambda() {
         return new MPJLambdaQueryWrapper<>(getEntity(), getEntityClass(), from, sqlSelect, paramNameSeq, paramNameValuePairs,
-                expression, lastSql, sqlComment, getSqlFirstField(), selectColumns, ignoreColumns, selectDistinct, ifExists);
+                expression, lastSql, sqlComment, getSqlFirstField(), selectColumns, ignoreColumns, selectDistinct, ifExists)
+                .setAlias(this.alias);
     }
 
     @Override

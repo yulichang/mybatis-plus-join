@@ -14,6 +14,7 @@ import com.github.yulichang.config.enums.LogicDelTypeEnum;
 import com.github.yulichang.toolkit.*;
 import com.github.yulichang.toolkit.support.ColumnCache;
 import com.github.yulichang.wrapper.enums.PrefixEnum;
+import com.github.yulichang.wrapper.ext.Ext;
 import com.github.yulichang.wrapper.interfaces.MConsumer;
 import com.github.yulichang.wrapper.interfaces.MFunction;
 import com.github.yulichang.wrapper.interfaces.QueryJoin;
@@ -40,7 +41,7 @@ import static java.util.stream.Collectors.joining;
  */
 @SuppressWarnings({"DuplicatedCode", "unused"})
 public abstract class JoinAbstractLambdaWrapper<T, Children extends JoinAbstractLambdaWrapper<T, Children>>
-        extends JoinAbstractWrapper<T, Children> implements QueryJoin<Children, T> {
+        extends JoinAbstractWrapper<T, Children> implements QueryJoin<Children, T>, Ext<Children> {
 
     /**
      * 是否存在对一或对多

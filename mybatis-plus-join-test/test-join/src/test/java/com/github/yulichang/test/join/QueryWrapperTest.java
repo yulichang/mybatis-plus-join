@@ -128,4 +128,17 @@ class QueryWrapperTest {
         System.out.println(userDO);
     }
 
+    @Test
+    void test7() {
+        ThreadLocalUtils.set("SELECT tt.id AS idea, tt.user_id AS uuid, tt.tenant_id FROM user_tenant tt WHERE (tt.id <= ?) AND tt.tenant_id = 1");
+        MPJQueryWrapper<UserTenantDO> wrapper = new MPJQueryWrapper<UserTenantDO>()
+                .setAlias("tt")
+                .selectAll(UserTenantDO.class,"tt")
+                .le("tt.id ", 10);
+        System.out.println(wrapper.getAlias());
+        List<UserTenantDO> userDO = userTenantMapper.selectJoinList(UserTenantDO.class, wrapper.lambda());
+        System.out.println(wrapper.getAlias());
+        System.out.println(userDO);
+    }
+
 }

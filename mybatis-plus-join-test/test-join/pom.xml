@@ -15,6 +15,17 @@
     <dependencies>
         <dependency>
             <groupId>com.github.yulichang</groupId>
+            <artifactId>mybatis-plus-join-boot-starter</artifactId>
+            <version>${revision}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.github.yulichang</groupId>
+                    <artifactId>mybatis-plus-join-wrapper-ext</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>com.github.yulichang</groupId>
             <artifactId>test-base</artifactId>
             <version>${revision}</version>
         </dependency>
@@ -38,6 +49,14 @@
             <groupId>com.github.yulichang</groupId>
             <artifactId>mybatis-plus-join-processor</artifactId>
             <version>${revision}</version>
+        </dependency>
+        <dependency>
+            <groupId>ognl</groupId>
+            <artifactId>ognl</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.javassist</groupId>
+            <artifactId>javassist</artifactId>
         </dependency>
     </dependencies>
 </project>

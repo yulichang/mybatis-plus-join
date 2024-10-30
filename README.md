@@ -10,7 +10,10 @@
 </p>
 <p align="center">
   <a href="https://central.sonatype.com/artifact/com.github.yulichang/mybatis-plus-join-boot-starter">
-    <img alt="maven" src="https://img.shields.io/maven-central/v/com.github.yulichang/mybatis-plus-join-boot-starter.svg?style=flat-square">
+    <img alt="Maven central" src="https://img.shields.io/maven-central/v/com.github.yulichang/mybatis-plus-join-boot-starter.svg?style=flat-square">
+  </a>
+  <a href="https://oss.sonatype.org/content/repositories/snapshots/com/github/yulichang/mybatis-plus-join-boot-starter/">
+    <img alt="Sonatype Nexus (Snapshots)" src="https://img.shields.io/nexus/s/https/oss.sonatype.org/com.github.yulichang/mybatis-plus-join-boot-starter.svg">
   </a>
   <a href="https://www.apache.org/licenses/LICENSE-2.0">
     <img alt="code style" src="https://img.shields.io/badge/license-Apache%202-4EB1BA.svg?style=flat-square">

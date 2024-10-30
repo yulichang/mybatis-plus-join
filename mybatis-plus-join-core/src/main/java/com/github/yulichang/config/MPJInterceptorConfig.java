@@ -3,6 +3,7 @@ package com.github.yulichang.config;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.github.yulichang.interceptor.MPJInterceptor;
 import com.github.yulichang.toolkit.InterceptorList;
+import com.github.yulichang.toolkit.MybatisJoinPlusVersion;
 import org.apache.ibatis.logging.Log;
 import org.apache.ibatis.logging.LogFactory;
 import org.apache.ibatis.plugin.Interceptor;
@@ -30,7 +31,7 @@ public class MPJInterceptorConfig {
             System.out.println(" _ _   |_  _ _|_. ___ _ |    _  .  _  .  _  \n" +
                     "| | |\\/|_)(_| | |_\\  |_)||_|_\\  | (_) | | | \n" +
                     "     /               |          /\n" +
-                    "                                    1.5.2-SNAPSHOT");
+                    "                                    " + MybatisJoinPlusVersion.getVersion());
         }
     }
 

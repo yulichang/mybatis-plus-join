@@ -9,6 +9,7 @@
         <version>${revision}</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
+    <version>${revision}</version>
 
     <artifactId>mybatis-plus-join-solon-plugin</artifactId>
 

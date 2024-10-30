@@ -44,8 +44,7 @@
     </modules>
 
     <properties>
-        <version>1.5.2</version>
-        <revision>${version}</revision>
+        <revision>1.5.2</revision>
         <mybatis.plus.version>3.5.9</mybatis.plus.version>
 
         <jdkVersion>17</jdkVersion>
@@ -84,9 +83,23 @@
     <profiles>
         <profile>
             <id>snapshot</id>
-            <properties>
-                <revision>${version}-SNAPSHOT</revision>
-            </properties>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>com.github.yulichang</groupId>
+                        <artifactId>pom-maven-plugin</artifactId>
+                        <version>1.0</version>
+                        <configuration>
+                            <args>
+                                <arg>
+                                    <xpath>project/properties/revision</xpath>
+                                    <format>%s-SNAPSHOT</format>
+                                </arg>
+                            </args>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
         </profile>
         <profile>
             <id>release</id>

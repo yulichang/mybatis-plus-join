@@ -3,7 +3,7 @@ name: Maven Package
 on:
   push:
     tags:
-      - *
+      - '*'
 
 jobs:
   build:

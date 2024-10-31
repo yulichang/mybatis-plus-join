@@ -198,7 +198,7 @@ public class AptQueryWrapper<T> extends AptAbstractWrapper<T, AptQueryWrapper<T>
         if (ArrayUtils.isEmpty(apply.getValues())) {
             formatSql = sql;
         } else {
-            formatSql = formatSqlMaybeWithParam(sql, null, apply.getValues());
+            formatSql = formatSqlMaybeWithParam(sql, apply.getValues());
         }
         getSelectColum().add(new SelectApt(apply.getColumns(), () -> formatSql, alias));
         return typedThis;

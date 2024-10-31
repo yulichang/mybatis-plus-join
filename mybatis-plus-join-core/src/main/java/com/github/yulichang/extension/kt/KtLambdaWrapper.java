@@ -243,7 +243,7 @@ public class KtLambdaWrapper<T> extends KtAbstractLambdaWrapper<T, KtLambdaWrapp
         if (ArrayUtils.isEmpty(apply.getValues())) {
             formatSql = sql;
         } else {
-            formatSql = formatSqlMaybeWithParam(sql, null, apply.getValues());
+            formatSql = formatSqlMaybeWithParam(sql, apply.getValues());
         }
         getSelectColum().add(new SelectFunc(alias, getIndex(), () -> formatSql, apply.getFuncArg(),
                 isHasAlias(), getAlias()));

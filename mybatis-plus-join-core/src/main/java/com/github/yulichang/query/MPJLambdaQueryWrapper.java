@@ -24,6 +24,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiPredicate;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 /**
@@ -391,10 +393,33 @@ public class MPJLambdaQueryWrapper<T> extends AbstractLambdaWrapper<T, MPJLambda
     }
 
     @Override
-    public MPJLambdaQueryWrapper<T> join(String keyWord, boolean condition, String joinSql) {
+    public MPJLambdaQueryWrapper<T> join(String keyWord, boolean condition, String joinSql, Object... args) {
         if (condition) {
-            from.setStringValue(from.getStringValue() + keyWord + joinSql);
+            from.setStringValue(from.getStringValue() + keyWord + mpjFormatSqlMaybeWithParam(joinSql, args));
         }
         return typedThis;
+    }
+
+    @SuppressWarnings("DuplicatedCode")
+    protected final String mpjFormatSqlMaybeWithParam(String sqlStr, Object... params) {
+        if (StrUtils.isBlank(sqlStr)) {
+            return null;
+        }
+        if (ArrayUtils.isNotEmpty(params)) {
+            for (int i = 0; i < params.length; ++i) {
+                String target = Constants.LEFT_BRACE + i + Constants.RIGHT_BRACE;
+                if (sqlStr.contains(target)) {
+                    sqlStr = sqlStr.replace(target, formatParam(null, params[i]));
+                } else {
+                    Matcher matcher = Pattern.compile("[{]" + i + ",[a-zA-Z0-9.,=]+}").matcher(sqlStr);
+                    if (!matcher.find()) {
+                        throw ExceptionUtils.mpe("Please check the syntax correctness! sql not contains: \"%s\"", target);
+                    }
+                    String group = matcher.group();
+                    sqlStr = sqlStr.replace(group, formatParam(group.substring(target.length(), group.length() - 1), params[i]));
+                }
+            }
+        }
+        return sqlStr;
     }
 }

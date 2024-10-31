@@ -488,10 +488,10 @@ public abstract class JoinAbstractLambdaWrapper<T, Children extends JoinAbstract
      * @param joinSql   sql
      */
     @Override
-    public Children join(String keyWord, boolean condition, String joinSql) {
+    public Children join(String keyWord, boolean condition, String joinSql, Object... args) {
         if (condition) {
             Children wrapper = instanceEmpty();
-            wrapper.from.setStringValue(joinSql);
+            wrapper.from.setStringValue(formatSqlMaybeWithParam(joinSql, args));
             wrapper.keyWord = keyWord;
             onWrappers.add(wrapper);
         }

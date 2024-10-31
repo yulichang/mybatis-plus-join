@@ -165,7 +165,7 @@ public class UpdateJoinWrapper<T> extends JoinAbstractLambdaWrapper<T, UpdateJoi
                     String col = String.format(i.format, Arrays.stream(i.columns).map(f ->
                             tableList.getPrefixByClass(LambdaUtils.getEntityClass(f)) +
                                     Constants.DOT + getCache(f).getColumn()).toArray());
-                    return formatSqlMaybeWithParam(col, null, i.args);
+                    return formatSqlMaybeWithParam(col, i.args);
                 } else {
                     String col = tableList.getPrefixByClass(LambdaUtils.getEntityClass(i.getColumn())) +
                             Constants.DOT + getCache(i.getColumn()).getColumn();

@@ -389,10 +389,10 @@ public abstract class AptAbstractWrapper<T, Children extends AptAbstractWrapper<
      * @param joinSql   sql
      */
     @Override
-    public Children join(String keyWord, boolean condition, String joinSql) {
+    public Children join(String keyWord, boolean condition, String joinSql, Object... objects) {
         if (condition) {
             Children wrapper = instanceEmpty();
-            wrapper.from.setStringValue(joinSql);
+            wrapper.from.setStringValue(formatSqlMaybeWithParam(joinSql, objects));
             wrapper.keyWord = keyWord;
             onWrappers.add(wrapper);
         }

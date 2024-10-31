@@ -231,7 +231,7 @@ public class MPJLambdaWrapper<T> extends JoinAbstractLambdaWrapper<T, MPJLambdaW
         if (ArrayUtils.isEmpty(funcConsumer.getValues())) {
             formatSql = sql;
         } else {
-            formatSql = formatSqlMaybeWithParam(sql, null, funcConsumer.getValues());
+            formatSql = formatSqlMaybeWithParam(sql, funcConsumer.getValues());
         }
         getSelectColum().add(new SelectFunc(alias, getIndex(), () -> formatSql,
                 funcConsumer.getArgs(), isHasAlias(), getAlias()));

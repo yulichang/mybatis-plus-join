@@ -92,6 +92,38 @@ public class JoinTest {
                 .list(UserDTO.class);
     }
 
+    @Test
+    void joinTest2() {
+        ThreadLocalUtils.set("""
+                SELECT
+                    t.id, t.pid, t.`name`, t.`json`, t.sex, t.head_img, t.create_time,
+                    t.address_id, t.address_id2, t.del, t.create_by, t.update_by
+                FROM `user` t
+                LEFT JOIN address t1 ON t1.id > ?
+                WHERE t.del = false AND (t.id <= ?)
+                """);
+        JoinWrappers.lambda(UserDO.class)
+                .selectAll()
+                .leftJoin("address t1 on t1.id > {0}", 0)
+                .le(AddressDO::getId, 10000)
+                .list(UserDTO.class);
+
+        ThreadLocalUtils.set("""
+                SELECT
+                    t.id, t.pid, t.`name`, t.`json`, t.sex, t.head_img, t.create_time,
+                    t.address_id, t.address_id2, t.del, t.create_by, t.update_by
+                FROM `user` t
+                LEFT JOIN address t1 ON t1.id > 0
+                WHERE t.del = false AND (t.id <= ?)
+                """);
+        JoinWrappers.lambda(UserDO.class)
+                .selectAll()
+                .leftJoin("address t1 on t1.id > 0")
+                .le(AddressDO::getId, 10000)
+                .list(UserDTO.class);
+    }
+
+
 
     @Test
     @SuppressWarnings("deprecation")

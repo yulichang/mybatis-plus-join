@@ -106,6 +106,21 @@
             <build>
                 <plugins>
                     <plugin>
+                        <groupId>com.github.yulichang</groupId>
+                        <artifactId>pom-maven-plugin</artifactId>
+                        <version>1.0</version>
+                        <configuration>
+                            <args>
+                                <arg>
+                                    <type>remove</type>
+                                    <project>mybatis-plus-join-root</project>
+                                    <xpath>project/modules/module</xpath>
+                                    <contentMatches>\S*-test</contentMatches>
+                                </arg>
+                            </args>
+                        </configuration>
+                    </plugin>
+                    <plugin>
                         <groupId>org.sonatype.plugins</groupId>
                         <artifactId>nexus-staging-maven-plugin</artifactId>
                         <extensions>true</extensions>

@@ -1,7 +1,9 @@
 name: Maven Package
 
 on:
-  push: tags
+  push:
+    tags:
+      - *
 
 jobs:
   build:

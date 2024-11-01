@@ -57,4 +57,26 @@ public class ApplyFuncTest {
         list1.forEach(System.out::println);
     }
 
+    @Test
+    void applyFunc1() {
+        ThreadLocalUtils.set("""
+                SELECT
+                    t.pid, t.`name`, t.`json`, t.sex, t.head_img, t.create_time, t.address_id,
+                    t.address_id2, t.del, t.create_by, t.update_by
+                FROM `user` t
+                    LEFT JOIN address t1 ON (t1.user_id = t.id)
+                WHERE t.del = false
+                    AND t1.del = false
+                    AND (concat(t.id, t.id, (SELECT st.id, st.id FROM `user` st WHERE st.del = false AND (st.id = ? AND st.id = ?)), ?) IS NOT NULL)
+                """);
+        JoinWrappers.lambda(UserDO.class)
+                .selectAll(UserDO.class, UserDO::getId)
+                .leftJoin(AddressDO.class, AddressDO::getUserId, UserDO::getId)
+                .applyFunc("concat(%s, %s, %s, {0}) is not null", arg -> arg.accept(
+                        UserDO::getId,
+                        Fun.f("t", UserDO::getId),
+                        Fun.f(UserDO.class, user -> user.select(UserDO::getId).eq(UserDO::getId, 1))
+                ), "12")
+                .list();
+    }
 }

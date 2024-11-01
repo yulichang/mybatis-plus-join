@@ -44,7 +44,7 @@
     </modules>
 
     <properties>
-        <revision>1.5.2</revision>
+        <revision>1.5.3</revision>
         <mybatis.plus.version>3.5.9</mybatis.plus.version>
 
         <jdkVersion>17</jdkVersion>

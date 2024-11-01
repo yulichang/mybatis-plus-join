@@ -414,6 +414,12 @@ public abstract class JoinAbstractWrapper<T, Children extends JoinAbstractWrappe
                             Arrays.stream(funcConsumer.getArgs()).map(func -> {
                                 if (func instanceof Fun) {
                                     Fun<?, ?> fun = (Fun<?, ?>) func;
+                                    if (fun.isSub()) {
+                                        @SuppressWarnings("rawtypes")
+                                        MPJLambdaWrapper wrapper = fun.getSub().apply((MPJLambdaWrapper) subInstance(fun.getClazz()));
+                                        return WrapperUtils.buildUnionSqlByWrapper(fun.getClazz(),
+                                                fun.getSub().apply(wrapper));
+                                    }
                                     return columnToString(index, fun.getAlias(), fun.getFunc(), false, PrefixEnum.CD_FIRST, false);
                                 }
                                 return columnToString(index, null, func, false, PrefixEnum.CD_FIRST, false);

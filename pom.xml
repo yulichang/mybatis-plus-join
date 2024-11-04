@@ -78,7 +78,7 @@
                     <plugin>
                         <groupId>com.github.yulichang</groupId>
                         <artifactId>pom-maven-plugin</artifactId>
-                        <version>1.0</version>
+                        <version>1.3</version>
                         <configuration>
                             <args>
                                 <arg>
@@ -98,7 +98,7 @@
                     <plugin>
                         <groupId>com.github.yulichang</groupId>
                         <artifactId>pom-maven-plugin</artifactId>
-                        <version>1.0</version>
+                        <version>1.3</version>
                         <configuration>
                             <args>
                                 <arg>

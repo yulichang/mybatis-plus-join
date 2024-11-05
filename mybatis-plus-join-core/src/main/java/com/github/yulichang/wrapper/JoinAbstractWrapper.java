@@ -27,7 +27,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiPredicate;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
-import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -192,21 +191,6 @@ public abstract class JoinAbstractWrapper<T, Children extends JoinAbstractWrappe
 
     protected <E> MPJLambdaWrapper<E> subInstance(Class<E> clazz) {
         return subInstance(clazz, ConfigProperties.subQueryAlias);
-    }
-
-    /**
-     * 转为子类，方便自定义继承扩展
-     */
-    public <C extends Children> C toChildren(Ref<C> children) {
-        return (C) this;
-    }
-
-    /**
-     * 转为子类，方便自定义继承扩展
-     * 需要子类自定义字段
-     */
-    public <C extends Children> C toChildren(Supplier<C> s) {
-        return (C) this;
     }
 
     /**

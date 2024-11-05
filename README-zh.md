@@ -114,17 +114,7 @@ WHERE (
     AND t.id > ?)
 ```
 
-MPJLambdaWrapper其他功能
-
-* <a href="https://mybatis-plus-join.github.io/pages/core/lambda/select/selectCollection.html" target="_blank">
-  一对一，一对多使用</a>
-* <a href="https://mybatis-plus-join.github.io/pages/core/lambda/select/selectFunc.html" target="_blank">
-  简单的SQL函数使用</a>
-* <a href="https://mybatis-plus-join.github.io/pages/core/lambda/join/leftJoin.html" target="_blank">
-  ON语句多条件支持</a>
-* <a href="https://mybatis-plus-join.github.io" target="_blank">其他全部功能请参考使用文档</a>
-
-# <a href="https://mybatis-plus-join.github.io" target="_blank">使用文档 wiki</a>
+# <a href="https://mybatis-plus-join.github.io" target="_blank">完整使用文档 wiki</a>
 
 # 用爱发电
 

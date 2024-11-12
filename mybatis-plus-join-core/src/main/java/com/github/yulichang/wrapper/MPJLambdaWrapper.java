@@ -259,6 +259,10 @@ public class MPJLambdaWrapper<T> extends JoinAbstractLambdaWrapper<T, MPJLambdaW
         return typedThis;
     }
 
+    public <U> MPJLambdaWrapper<T> union(Class<U> clazz, Consumer<MPJLambdaWrapper<U>> consumer) {
+        return union(clazz, true, consumer);
+    }
+
     /**
      * union
      * <p>
@@ -267,12 +271,10 @@ public class MPJLambdaWrapper<T> extends JoinAbstractLambdaWrapper<T, MPJLambdaW
      * @param clazz union语句的主表类型
      * @since 1.4.8
      */
-    public <U> MPJLambdaWrapper<T> union(Class<U> clazz, Consumer<MPJLambdaWrapper<U>> consumer) {
+    public <U> MPJLambdaWrapper<T> union(Class<U> clazz, boolean brackets, Consumer<MPJLambdaWrapper<U>> consumer) {
         MPJLambdaWrapper<U> unionWrapper = fromInstance(clazz);
         consumer.accept(unionWrapper);
-
         String sb = " UNION " + WrapperUtils.buildUnionSqlByWrapper(clazz, unionWrapper);
-
         if (Objects.isNull(unionSql)) {
             unionSql = SharedString.emptyString();
         }
@@ -296,6 +298,10 @@ public class MPJLambdaWrapper<T> extends JoinAbstractLambdaWrapper<T, MPJLambdaW
         }
     }
 
+    public <U> MPJLambdaWrapper<T> unionAll(Class<U> clazz, Consumer<MPJLambdaWrapper<U>> consumer) {
+        return unionAll(clazz, true, consumer);
+    }
+
     /**
      * union
      * <p>
@@ -304,12 +310,10 @@ public class MPJLambdaWrapper<T> extends JoinAbstractLambdaWrapper<T, MPJLambdaW
      * @param clazz union语句的主表类型
      * @since 1.4.8
      */
-    public <U> MPJLambdaWrapper<T> unionAll(Class<U> clazz, Consumer<MPJLambdaWrapper<U>> consumer) {
+    public <U> MPJLambdaWrapper<T> unionAll(Class<U> clazz, boolean brackets, Consumer<MPJLambdaWrapper<U>> consumer) {
         MPJLambdaWrapper<U> unionWrapper = fromInstance(clazz);
         consumer.accept(unionWrapper);
-
-        String sb = " UNION ALL " + WrapperUtils.buildUnionSqlByWrapper(clazz, unionWrapper);
-
+        String sb = " UNION ALL " + WrapperUtils.buildUnionSqlByWrapper(clazz, brackets, unionWrapper);
         if (Objects.isNull(unionSql)) {
             unionSql = SharedString.emptyString();
         }

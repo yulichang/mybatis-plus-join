@@ -16,15 +16,19 @@ import java.util.Optional;
  * @since 1.4.5
  */
 @SuppressWarnings("DuplicatedCode")
-public class WrapperUtils {
+public class WrapperUtils implements StringPool {
 
     public static <T> String buildSubSqlByWrapper(Class<T> clazz, MPJLambdaWrapper<T> wrapper, String alias) {
         return String.format("%s AS %s", buildUnionSqlByWrapper(clazz, wrapper), alias);
     }
 
     public static String buildUnionSqlByWrapper(Class<?> clazz, MPJLambdaWrapper<?> wrapper) {
+        return buildUnionSqlByWrapper(clazz, true, wrapper);
+    }
+
+    public static String buildUnionSqlByWrapper(Class<?> clazz, boolean brackets, MPJLambdaWrapper<?> wrapper) {
         TableInfo tableInfo = TableHelper.getAssert(clazz);
-        String first = Optional.ofNullable(wrapper.getSqlFirst()).orElse(StringPool.EMPTY);
+        String first = Optional.ofNullable(wrapper.getSqlFirst()).orElse(EMPTY);
         boolean hasWhere = false;
         String entityWhere = getEntitySql(tableInfo, wrapper);
         if (StrUtils.isNotBlank(entityWhere)) {
@@ -39,19 +43,31 @@ public class WrapperUtils {
             hasWhere = true;
         }
         String sqlSegment = (wrapper.getSqlSegment() != null && StrUtils.isNotBlank(wrapper.getSqlSegment())) ?
-                ((wrapper.isEmptyOfNormal() ? StringPool.EMPTY : (hasWhere ? " AND " : " WHERE ")) + wrapper.getSqlSegment()) : StringPool.EMPTY;
-
-        String sqlComment = Optional.ofNullable(wrapper.getSqlComment()).orElse(StringPool.EMPTY);
-        return String.format("( %s SELECT %s FROM %s %s %s %s %s %s %s )",
-                first,
-                wrapper.getSqlSelect(),
-                wrapper.getTableName(tableInfo.getTableName()),
-                wrapper.getAlias(),
-                wrapper.getFrom(),
-                mainLogic,
-                subLogic,
-                sqlSegment,
-                sqlComment);
+                ((wrapper.isEmptyOfNormal() ? EMPTY : (hasWhere ? " AND " : " WHERE ")) + wrapper.getSqlSegment()) : EMPTY;
+        String sqlComment = Optional.ofNullable(wrapper.getSqlComment()).orElse(EMPTY);
+        StringBuilder sb = new StringBuilder(SPACE)
+                .append(first)
+                .append(" SELECT ")
+                .append(wrapper.getSqlSelect())
+                .append(" FROM ")
+                .append(wrapper.getTableName(tableInfo.getTableName()))
+                .append(SPACE)
+                .append(wrapper.getAlias())
+                .append(SPACE)
+                .append(wrapper.getFrom())
+                .append(SPACE)
+                .append(mainLogic)
+                .append(SPACE)
+                .append(subLogic)
+                .append(SPACE)
+                .append(sqlSegment)
+                .append(SPACE)
+                .append(sqlComment)
+                .append(SPACE);
+        if (brackets) {
+            sb.insert(0, "(").append(")");
+        }
+        return sb.toString();
     }
 
     private static <T> String formatParam(MPJLambdaWrapper<T> wrapper, Object param) {

@@ -9,7 +9,7 @@
 ```
 
 #### Tips:
-[solon 2.8.0 需要添加如下配置（此问题会在 MPJ 1.4.13+ 解决)](https://gitee.com/best_handsome/mybatis-plus-join/issues/I9RN5N)
+如果出现 `Invalid bound statement (not found)` 添加如下配置
 ```yml
 mybatis.db1:
     globalConfig:
@@ -23,28 +23,6 @@ import com.github.yulichang.base.MPJBaseMapper;
 
 @Mapper
 public interface UserMapper extends MPJBaseMapper<UserDO> {
-
-}
-```
-
-### (可选)service继承MPJBaseService
-
-```java
-import com.github.yulichang.mybatisplusjoin.solon.plugin.base.MPJBaseService;
-
-public interface UserService extends MPJBaseService<UserDO> {
-
-}
-```
-
-### (可选)serviceImpl继承MPJBaseServiceImpl
-
-```java
-import com.github.yulichang.mybatisplusjoin.solon.plugin.base.MPJBaseServiceImpl;
-import org.noear.solon.annotation.Component;
-
-@Component
-public class UserServiceImpl extends MPJBaseServiceImpl<UserMapper, UserDO> implements UserService {
 
 }
 ```

@@ -43,4 +43,32 @@ public class FromTest {
                         .ge(UserDO::getId, 0));
         wrapper.list();
     }
+
+    @Test
+    void from1() {
+        ThreadLocalUtils.set("""
+                SELECT
+                    t.id, t.pid, t.`name`, t.`json`, t.sex, t.head_img, t.create_time,
+                    t.address_id, t.address_id2, t.del, t.create_by, t.update_by
+                FROM (SELECT
+                        t.id, t.pid, t.`name`, t.`json`, t.sex, t.head_img, t.create_time,
+                        t.address_id, t.address_id2, t.del, t.create_by, t.update_by
+                    FROM `user` t
+                    WHERE t.del = false AND (t.id >= ?)
+                    UNION ALL
+                    (SELECT
+                        t.id, t.pid, t.`name`, t.`json`, t.sex, t.head_img, t.create_time,
+                        t.address_id, t.address_id2, t.del, t.create_by, t.update_by
+                    FROM `user` t
+                    WHERE t.del = false)) t
+                WHERE t.del = false
+                """);
+        MPJLambdaWrapper<UserDO> wrapper = JoinWrappers.lambda(UserDO.class)
+                .selectAll()
+                .from(from -> from
+                        .selectAll()
+                        .ge(UserDO::getId, 0)
+                        .unionAll(UserDO.class, MPJLambdaWrapper::selectAll));
+        wrapper.list();
+    }
 }

@@ -45,6 +45,7 @@ public class WrapperUtils implements StringPool {
         String sqlSegment = (wrapper.getSqlSegment() != null && StrUtils.isNotBlank(wrapper.getSqlSegment())) ?
                 ((wrapper.isEmptyOfNormal() ? EMPTY : (hasWhere ? " AND " : " WHERE ")) + wrapper.getSqlSegment()) : EMPTY;
         String sqlComment = Optional.ofNullable(wrapper.getSqlComment()).orElse(EMPTY);
+        String sqlUnion = wrapper.getUnionSql();
         StringBuilder sb = new StringBuilder(SPACE)
                 .append(first)
                 .append(" SELECT ")
@@ -63,6 +64,8 @@ public class WrapperUtils implements StringPool {
                 .append(sqlSegment)
                 .append(SPACE)
                 .append(sqlComment)
+                .append(SPACE)
+                .append(sqlUnion)
                 .append(SPACE);
         if (brackets) {
             sb.insert(0, "(").append(")");

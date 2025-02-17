@@ -9,8 +9,6 @@ import com.github.yulichang.adapter.v3431.Adapter3431;
 import com.github.yulichang.adapter.v355.Adapter355;
 import lombok.Getter;
 
-import java.util.Optional;
-
 /**
  * @author yulichang
  * @since 1.4.3
@@ -22,9 +20,7 @@ public class AdapterHelper {
 
 
     static {
-        String lastAdapter = "3.5.9";
-        String version = Optional.ofNullable(VersionUtils.getVersion()).orElse(lastAdapter);
-
+        String version = VersionUtils.getVersion();
         if (VersionUtils.compare(version, "3.5.6") >= 0) {
             adapter = new Adapter();
         } else if (VersionUtils.compare(version, "3.5.4") >= 0) {

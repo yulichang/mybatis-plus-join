@@ -18,7 +18,7 @@ import org.springframework.test.context.junit.jupiter.EnabledIf;
  * 由于不同数据库函数支持情况不同
  * 此类用于测试 mysql 专属语法或函数
  */
-@SpringBootTest("spring.profiles.active=mysql")
+@SpringBootTest
 @EnabledIf(value = EnabledIfConfig.runWithMysql, loadContext = true)
 public class MysqlTest {
 

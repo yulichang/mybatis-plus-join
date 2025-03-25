@@ -59,12 +59,14 @@ public class UpdateJoin extends MPJAbstractMethod {
      * @param fieldStrategy 验证策略
      * @return if 脚本片段
      */
+    @SuppressWarnings("DuplicatedCode")
     @Override
     public String mpjConvertIf(TableFieldInfo tableFieldInfo, final String sqlScript, final String property, final FieldStrategy fieldStrategy) {
         if (fieldStrategy == FieldStrategy.NEVER) {
             return null;
         }
-        if (AdapterHelper.getAdapter().mpjIsPrimitive(tableFieldInfo) || fieldStrategy == FieldStrategy.IGNORED) {
+        if (AdapterHelper.getAdapter().mpjIsPrimitive(tableFieldInfo) || fieldStrategy == FieldStrategy.ALWAYS ||
+                fieldStrategy.name().equalsIgnoreCase("IGNORED")) {
             return sqlScript;
         }
         if (fieldStrategy == FieldStrategy.NOT_EMPTY && tableFieldInfo.isCharSequence()) {

@@ -122,12 +122,13 @@ public interface MPJBaseMethod extends Constants {
                 tableFieldInfo.getWhereStrategy());
     }
 
-    @SuppressWarnings({"DuplicatedCode", "deprecation"})
+    @SuppressWarnings("DuplicatedCode")
     default String convertIf(TableFieldInfo tableFieldInfo, final String sqlScript, final String property, final FieldStrategy fieldStrategy) {
         if (fieldStrategy == FieldStrategy.NEVER) {
             return null;
         }
-        if (AdapterHelper.getAdapter().mpjIsPrimitive(tableFieldInfo) || fieldStrategy == FieldStrategy.IGNORED) {
+        if (AdapterHelper.getAdapter().mpjIsPrimitive(tableFieldInfo) || fieldStrategy == FieldStrategy.ALWAYS
+                || fieldStrategy.name().equalsIgnoreCase("IGNORED")) {
             return sqlScript;
         }
         if (fieldStrategy == FieldStrategy.NOT_EMPTY && tableFieldInfo.isCharSequence()) {

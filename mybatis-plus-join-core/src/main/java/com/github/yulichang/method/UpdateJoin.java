@@ -65,8 +65,9 @@ public class UpdateJoin extends MPJAbstractMethod {
         if (fieldStrategy == FieldStrategy.NEVER) {
             return null;
         }
-        if (AdapterHelper.getAdapter().mpjIsPrimitive(tableFieldInfo) || fieldStrategy == FieldStrategy.ALWAYS ||
-                fieldStrategy.name().equalsIgnoreCase("IGNORED")) {
+        if (AdapterHelper.getAdapter().mpjIsPrimitive(tableFieldInfo)
+                || fieldStrategy.name().equalsIgnoreCase("ALWAYS")
+                || fieldStrategy.name().equalsIgnoreCase("IGNORED")) {
             return sqlScript;
         }
         if (fieldStrategy == FieldStrategy.NOT_EMPTY && tableFieldInfo.isCharSequence()) {

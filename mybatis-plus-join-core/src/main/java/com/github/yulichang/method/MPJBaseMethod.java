@@ -127,7 +127,8 @@ public interface MPJBaseMethod extends Constants {
         if (fieldStrategy == FieldStrategy.NEVER) {
             return null;
         }
-        if (AdapterHelper.getAdapter().mpjIsPrimitive(tableFieldInfo) || fieldStrategy == FieldStrategy.ALWAYS
+        if (AdapterHelper.getAdapter().mpjIsPrimitive(tableFieldInfo)
+                || fieldStrategy.name().equalsIgnoreCase("ALWAYS")
                 || fieldStrategy.name().equalsIgnoreCase("IGNORED")) {
             return sqlScript;
         }

@@ -33,7 +33,6 @@
 </p>
 
 <p align="center">
-QQ群:680016987  或者 
 <a href="https://gitee.com/best_handsome/mybatis-plus-join/issues/I65N2M" target="_blank">添加作者微信，备注MPJ，加入微信群</a>  
 <br/>
 <img width="200px" height="200px" src="https://foruda.gitee.com/images/1714756135330585984/bcc86eb0_2020985.png"  alt="添加作者微信，备注MPJ，加入微信群"/>

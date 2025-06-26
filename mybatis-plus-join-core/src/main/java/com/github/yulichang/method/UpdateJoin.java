@@ -8,6 +8,8 @@ import com.github.yulichang.adapter.AdapterHelper;
 import org.apache.ibatis.mapping.MappedStatement;
 import org.apache.ibatis.mapping.SqlSource;
 
+import java.util.Optional;
+
 /**
  * copy {@link com.baomidou.mybatisplus.core.injector.methods.Update}
  *
@@ -65,9 +67,10 @@ public class UpdateJoin extends MPJAbstractMethod {
         if (fieldStrategy == FieldStrategy.NEVER) {
             return null;
         }
+        FieldStrategy strategy = Optional.ofNullable(fieldStrategy).orElse(FieldStrategy.DEFAULT);
         if (AdapterHelper.getAdapter().mpjIsPrimitive(tableFieldInfo)
-                || fieldStrategy.name().equalsIgnoreCase("ALWAYS")
-                || fieldStrategy.name().equalsIgnoreCase("IGNORED")) {
+                || strategy.name().equalsIgnoreCase("ALWAYS")
+                || strategy.name().equalsIgnoreCase("IGNORED")) {
             return sqlScript;
         }
         if (fieldStrategy == FieldStrategy.NOT_EMPTY && tableFieldInfo.isCharSequence()) {

@@ -17,6 +17,7 @@ import java.net.URLEncoder;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 import static java.util.stream.Collectors.joining;
 
@@ -127,9 +128,10 @@ public interface MPJBaseMethod extends Constants {
         if (fieldStrategy == FieldStrategy.NEVER) {
             return null;
         }
+        FieldStrategy strategy = Optional.ofNullable(fieldStrategy).orElse(FieldStrategy.DEFAULT);
         if (AdapterHelper.getAdapter().mpjIsPrimitive(tableFieldInfo)
-                || fieldStrategy.name().equalsIgnoreCase("ALWAYS")
-                || fieldStrategy.name().equalsIgnoreCase("IGNORED")) {
+                || strategy.name().equalsIgnoreCase("ALWAYS")
+                || strategy.name().equalsIgnoreCase("IGNORED")) {
             return sqlScript;
         }
         if (fieldStrategy == FieldStrategy.NOT_EMPTY && tableFieldInfo.isCharSequence()) {

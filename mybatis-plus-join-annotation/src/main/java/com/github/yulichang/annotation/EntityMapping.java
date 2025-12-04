@@ -43,19 +43,19 @@ public @interface EntityMapping {
     /**
      * 注意!!! 填 属性名
      * 映射表查询条件之 select<br/>
-     * 等效于 Wrappers.<T>query().select(xxx);
+     * 等效于 Wrappers.&lt;T&gt;query().select(xxx);
      */
     String[] select() default "";
 
     /**
      * 映射表查询条件之 first<br/>
-     * 等效于 Wrappers.<T>query().first(xxx);
+     * 等效于 Wrappers.&lt;T&gt;query().first(xxx);
      */
     String first() default "";
 
     /**
      * 映射表查询条件之 apply<br/>
-     * 等效于 Wrappers.<T>query().apply(xxx);
+     * 等效于 Wrappers.&lt;T&gt;query().apply(xxx);
      */
     Apply[] apply() default {};
 
@@ -66,20 +66,20 @@ public @interface EntityMapping {
 
     /**
      * 映射表查询条件之 orderBy<br/>
-     * 等效于 Wrappers.<T>query().orderByAsc(xxx);
+     * 等效于 Wrappers.&lt;T&gt;query().orderByAsc(xxx);
      */
     String[] orderByAsc() default "";
 
     /**
      * 映射表查询条件之 orderByDesc<br/>
-     * 等效于 Wrappers.<T>query().orderByDesc(xxx);
+     * 等效于 Wrappers.&lt;T&gt;query().orderByDesc(xxx);
      */
     String[] orderByDesc() default "";
 
     /**
      * 映射表查询条件之 last<br/>
      * 建议不要在这使用分页语句，会导致关联查的时候查询不全<br/>
-     * 等效于 Wrappers.<T>query().last(xxx);
+     * 等效于 Wrappers.&lt;T&gt;query().last(xxx);
      */
     String last() default "";
 }

@@ -1,5 +1,6 @@
 package com.github.yulichang.autoconfigure;
 
+import com.baomidou.mybatisplus.autoconfigure.MybatisPlusAutoConfiguration;
 import com.baomidou.mybatisplus.core.injector.ISqlInjector;
 import com.github.yulichang.autoconfigure.conditional.JoinSqlInjectorCondition;
 import com.github.yulichang.autoconfigure.consumer.MybatisPlusJoinIfExistsConsumer;
@@ -27,7 +28,6 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnSingleCandidate;
-import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.ApplicationContext;
@@ -49,11 +49,12 @@ import java.util.Optional;
  * @author yulichang
  * @since 1.3.7
  */
+@SuppressWarnings("unused")
 @Configuration(proxyBeanMethods = false)
 @ConditionalOnClass({SqlSessionFactory.class, SqlSessionFactoryBean.class})
 @ConditionalOnSingleCandidate(DataSource.class)
 @EnableConfigurationProperties(MybatisPlusJoinProperties.class)
-@AutoConfigureAfter(DataSourceAutoConfiguration.class)
+@AutoConfigureAfter(MybatisPlusAutoConfiguration.class)
 public class MybatisPlusJoinAutoConfiguration {
 
     private static final Logger logger = LoggerFactory.getLogger(MybatisPlusJoinAutoConfiguration.class);
@@ -126,11 +127,11 @@ public class MybatisPlusJoinAutoConfiguration {
 
     @Configuration
     @Order(Ordered.HIGHEST_PRECEDENCE)
+    @SuppressWarnings("NullableProblems")
     @ConditionalOnClass({SqlSessionFactory.class, SqlSessionFactoryBean.class})
     public static class MPJMappingConfig implements ApplicationListener<ApplicationReadyEvent> {
 
         @Override
-        @SuppressWarnings("NullableProblems")
         public void onApplicationEvent(ApplicationReadyEvent applicationReadyEvent) {
             MappingConfig.init();
         }

@@ -26,7 +26,7 @@ create table `user`
     `address_id2` int           null,
     sex           tinyint       null,
     head_img      varchar(255)  null,
-    create_time   datetime      null,
+    create_time   timestamp      null,
     create_by     int           null,
     update_by     int           null,
     del           bit

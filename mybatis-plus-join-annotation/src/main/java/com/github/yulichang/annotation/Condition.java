@@ -14,7 +14,7 @@ public @interface Condition {
 
     /**
      * 条件枚举
-     * 目前只实现了 = != > >= < <=
+     * 目前只实现了 EQ、NE、GT、GE、LT、LE
      * 其他的暂未实现 TODO
      *
      * @see SqlKeyword

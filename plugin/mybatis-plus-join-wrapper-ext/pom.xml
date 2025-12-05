@@ -11,6 +11,6 @@
     </parent>
     <version>${revision}</version>
 
+    <name>mybatis-plus-join-wrapper-ext</name>
     <artifactId>mybatis-plus-join-wrapper-ext</artifactId>
-
 </project>

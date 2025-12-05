@@ -10,6 +10,7 @@
         <relativePath>../../pom.xml</relativePath>
     </parent>
 
+    <name>mybatis-plus-join-processor</name>
     <artifactId>mybatis-plus-join-processor</artifactId>
     <version>${revision}</version>
     <packaging>jar</packaging>

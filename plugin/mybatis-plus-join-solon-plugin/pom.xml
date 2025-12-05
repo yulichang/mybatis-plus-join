@@ -11,6 +11,7 @@
     </parent>
     <version>${revision}</version>
 
+    <name>mybatis-plus-join-solon-plugin</name>
     <artifactId>mybatis-plus-join-solon-plugin</artifactId>
 
     <dependencyManagement>

@@ -1,5 +1,6 @@
 package com.github.yulichang.wrapper.interfaces;
 
+import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 
 import java.util.Collection;
@@ -7,8 +8,6 @@ import java.util.List;
 import java.util.function.Consumer;
 
 /**
- * 将原来的泛型R改成SFunction<R, ?>
- * <p>
  * copy {@link com.baomidou.mybatisplus.core.conditions.interfaces.Func}
  */
 @SuppressWarnings({"unchecked", "unused"})
@@ -114,6 +113,30 @@ public interface Func<Children> extends FuncWrapper<Children> {
      */
     <R> Children in(boolean condition, String alias, SFunction<R, ?> column, Object... values);
 
+    /**
+     * 仅在集合非空的情况下添加条件
+     * <li> 注意！仅对集合做非空判断，不对集合元素做判断</li>
+     *
+     * @param column 字段
+     * @param coll   数据集合
+     * @return children
+     */
+    default <R> Children inIfNotEmpty(SFunction<R, ?> column, Collection<?> coll) {
+        return in(CollectionUtils.isNotEmpty(coll), null, column, coll);
+    }
+
+    /**
+     * 仅在集合非空的情况下添加条件
+     * <li> 注意！仅对集合做非空判断，不对集合元素做判断</li>
+     *
+     * @param alias  字段表名
+     * @param column 字段
+     * @param coll   数据集合
+     * @return children
+     */
+    default <R> Children inIfNotEmpty(String alias, SFunction<R, ?> column, Collection<?> coll) {
+        return in(CollectionUtils.isNotEmpty(coll), alias, column, coll);
+    }
 
     default <R> Children notIn(SFunction<R, ?> column, Collection<?> coll) {
         return notIn(true, null, column, coll);
@@ -162,6 +185,30 @@ public interface Func<Children> extends FuncWrapper<Children> {
      */
     <R> Children notIn(boolean condition, String alias, SFunction<R, ?> column, Object... values);
 
+    /**
+     * 仅在集合非空的情况下添加条件
+     * <li> 注意！仅对集合做非空判断，不对集合元素做判断</li>
+     *
+     * @param column 字段
+     * @param coll   数据集合
+     * @return children
+     */
+    default <R> Children notInIfNotEmpty(SFunction<R, ?> column, Collection<?> coll) {
+        return notIn(CollectionUtils.isNotEmpty(coll), null, column, coll);
+    }
+
+    /**
+     * 仅在集合非空的情况下添加条件
+     * <li> 注意！仅对集合做非空判断，不对集合元素做判断</li>
+     *
+     * @param alias  字段表名
+     * @param column 字段
+     * @param coll   数据集合
+     * @return children
+     */
+    default <R> Children notInIfNotEmpty(String alias, SFunction<R, ?> column, Collection<?> coll) {
+        return notIn(CollectionUtils.isNotEmpty(coll), alias, column, coll);
+    }
 
     default <R> Children inSql(SFunction<R, ?> column, String inValue) {
         return inSql(true, null, column, inValue);

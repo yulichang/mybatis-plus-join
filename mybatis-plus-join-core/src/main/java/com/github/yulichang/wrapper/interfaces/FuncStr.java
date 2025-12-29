@@ -15,6 +15,8 @@
  */
 package com.github.yulichang.wrapper.interfaces;
 
+import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
+
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
@@ -24,13 +26,13 @@ import java.util.List;
  *
  * @since 1.3.12
  */
-@SuppressWarnings({"unused", "unchecked"})
-public interface FuncStr<Children, R> extends Serializable {
+@SuppressWarnings("unused")
+public interface FuncStr<Children> extends Serializable {
 
     /**
      * ignore
      */
-    default Children isNull(R column) {
+    default Children isNull(String column) {
         return isNull(true, column);
     }
 
@@ -42,12 +44,12 @@ public interface FuncStr<Children, R> extends Serializable {
      * @param column    字段
      * @return children
      */
-    Children isNull(boolean condition, R column);
+    Children isNull(boolean condition, String column);
 
     /**
      * ignore
      */
-    default Children isNotNull(R column) {
+    default Children isNotNull(String column) {
         return isNotNull(true, column);
     }
 
@@ -59,12 +61,12 @@ public interface FuncStr<Children, R> extends Serializable {
      * @param column    字段
      * @return children
      */
-    Children isNotNull(boolean condition, R column);
+    Children isNotNull(boolean condition, String column);
 
     /**
      * ignore
      */
-    default Children in(R column, Collection<?> coll) {
+    default Children in(String column, Collection<?> coll) {
         return in(true, column, coll);
     }
 
@@ -80,12 +82,12 @@ public interface FuncStr<Children, R> extends Serializable {
      * @param coll      数据集合
      * @return children
      */
-    Children in(boolean condition, R column, Collection<?> coll);
+    Children in(boolean condition, String column, Collection<?> coll);
 
     /**
      * ignore
      */
-    default Children in(R column, Object... values) {
+    default Children in(String column, Object... values) {
         return in(true, column, values);
     }
 
@@ -101,12 +103,26 @@ public interface FuncStr<Children, R> extends Serializable {
      * @param values    数据数组
      * @return children
      */
-    Children in(boolean condition, R column, Object... values);
+    Children in(boolean condition, String column, Object... values);
+
+
+    /**
+     * 仅在集合非空的情况下添加条件
+     * <li> 注意！仅对集合做非空判断，不对集合元素做判断</li>
+     *
+     * @param column 字段
+     * @param coll   数据集合
+     * @return children
+     */
+    default Children inIfNotEmpty(String column, Collection<?> coll) {
+        return in(CollectionUtils.isNotEmpty(coll), column, coll);
+    }
+
 
     /**
      * ignore
      */
-    default Children notIn(R column, Collection<?> coll) {
+    default Children notIn(String column, Collection<?> coll) {
         return notIn(true, column, coll);
     }
 
@@ -119,12 +135,12 @@ public interface FuncStr<Children, R> extends Serializable {
      * @param coll      数据集合
      * @return children
      */
-    Children notIn(boolean condition, R column, Collection<?> coll);
+    Children notIn(boolean condition, String column, Collection<?> coll);
 
     /**
      * ignore
      */
-    default Children notIn(R column, Object... value) {
+    default Children notIn(String column, Object... value) {
         return notIn(true, column, value);
     }
 
@@ -137,12 +153,25 @@ public interface FuncStr<Children, R> extends Serializable {
      * @param values    数据数组
      * @return children
      */
-    Children notIn(boolean condition, R column, Object... values);
+    Children notIn(boolean condition, String column, Object... values);
+
+
+    /**
+     * 仅在集合非空的情况下添加条件
+     * <li> 注意！仅对集合做非空判断，不对集合元素做判断</li>
+     *
+     * @param column 字段
+     * @param coll   数据集合
+     * @return children
+     */
+    default Children notInIfNotEmpty(String column, Collection<?> coll) {
+        return notIn(CollectionUtils.isNotEmpty(coll), column, coll);
+    }
 
     /**
      * ignore
      */
-    default Children inSql(R column, String inValue) {
+    default Children inSql(String column, String inValue) {
         return inSql(true, column, inValue);
     }
 
@@ -157,7 +186,7 @@ public interface FuncStr<Children, R> extends Serializable {
      * @param inValue   sql语句
      * @return children
      */
-    Children inSql(boolean condition, R column, String inValue);
+    Children inSql(boolean condition, String column, String inValue);
 
     /**
      * 字段 &gt; ( sql语句 )
@@ -169,12 +198,12 @@ public interface FuncStr<Children, R> extends Serializable {
      * @param inValue   sql语句
      * @return children
      */
-    Children gtSql(boolean condition, R column, String inValue);
+    Children gtSql(boolean condition, String column, String inValue);
 
     /**
      * ignore
      */
-    default Children gtSql(R column, String inValue) {
+    default Children gtSql(String column, String inValue) {
         return gtSql(true, column, inValue);
     }
 
@@ -188,12 +217,12 @@ public interface FuncStr<Children, R> extends Serializable {
      * @param inValue   sql语句
      * @return children
      */
-    Children geSql(boolean condition, R column, String inValue);
+    Children geSql(boolean condition, String column, String inValue);
 
     /**
      * ignore
      */
-    default Children geSql(R column, String inValue) {
+    default Children geSql(String column, String inValue) {
         return geSql(true, column, inValue);
     }
 
@@ -207,12 +236,12 @@ public interface FuncStr<Children, R> extends Serializable {
      * @param inValue   sql语句
      * @return children
      */
-    Children ltSql(boolean condition, R column, String inValue);
+    Children ltSql(boolean condition, String column, String inValue);
 
     /**
      * ignore
      */
-    default Children ltSql(R column, String inValue) {
+    default Children ltSql(String column, String inValue) {
         return ltSql(true, column, inValue);
     }
 
@@ -226,12 +255,12 @@ public interface FuncStr<Children, R> extends Serializable {
      * @param inValue   sql语句
      * @return children
      */
-    Children leSql(boolean condition, R column, String inValue);
+    Children leSql(boolean condition, String column, String inValue);
 
     /**
      * ignore
      */
-    default Children eqSql(R column, String inValue) {
+    default Children eqSql(String column, String inValue) {
         return eqSql(true, column, inValue);
     }
 
@@ -245,19 +274,19 @@ public interface FuncStr<Children, R> extends Serializable {
      * @param inValue   sql语句
      * @return children
      */
-    Children eqSql(boolean condition, R column, String inValue);
+    Children eqSql(boolean condition, String column, String inValue);
 
     /**
      * ignore
      */
-    default Children leSql(R column, String inValue) {
+    default Children leSql(String column, String inValue) {
         return leSql(true, column, inValue);
     }
 
     /**
      * ignore
      */
-    default Children notInSql(R column, String inValue) {
+    default Children notInSql(String column, String inValue) {
         return notInSql(true, column, inValue);
     }
 
@@ -272,7 +301,7 @@ public interface FuncStr<Children, R> extends Serializable {
      * @param inValue   sql语句 ---&gt; 1,2,3,4,5,6 或者 select id from table where id &lt; 3
      * @return children
      */
-    Children notInSql(boolean condition, R column, String inValue);
+    Children notInSql(boolean condition, String column, String inValue);
 
     /**
      * 分组：GROUP BY 字段, ...
@@ -282,9 +311,9 @@ public interface FuncStr<Children, R> extends Serializable {
      * @param column    单个字段
      * @return children
      */
-    Children groupBy(boolean condition, R column);
+    Children groupBy(boolean condition, String column);
 
-    default Children groupBy(R column) {
+    default Children groupBy(String column) {
         return groupBy(true, column);
     }
 
@@ -296,20 +325,20 @@ public interface FuncStr<Children, R> extends Serializable {
      * @param columns   字段数组
      * @return children
      */
-    Children groupByStr(boolean condition, List<R> columns);
+    Children groupByStr(boolean condition, List<String> columns);
 
-    default Children groupByStr(List<R> columns) {
+    default Children groupByStr(List<String> columns) {
         return groupByStr(true, columns);
     }
 
-    default Children groupBy(R column, R... columns) {
+    default Children groupBy(String column, String... columns) {
         return groupBy(true, column, columns);
     }
 
     /**
      * 分组：GROUP BY 字段, ...
      */
-    Children groupBy(boolean condition, R column, R... columns);
+    Children groupBy(boolean condition, String column, String... columns);
 
     /**
      * 排序：ORDER BY 字段, ... ASC
@@ -319,11 +348,11 @@ public interface FuncStr<Children, R> extends Serializable {
      * @param column    单个字段
      * @return children
      */
-    default Children orderByAsc(boolean condition, R column) {
+    default Children orderByAsc(boolean condition, String column) {
         return orderBy(condition, true, column);
     }
 
-    default Children orderByAsc(R column) {
+    default Children orderByAsc(String column) {
         return orderByAsc(true, column);
     }
 
@@ -335,22 +364,22 @@ public interface FuncStr<Children, R> extends Serializable {
      * @param columns   字段数组
      * @return children
      */
-    default Children orderByAscStr(boolean condition, List<R> columns) {
+    default Children orderByAscStr(boolean condition, List<String> columns) {
         return orderByStr(condition, true, columns);
     }
 
-    default Children orderByAscStr(List<R> columns) {
+    default Children orderByAscStr(List<String> columns) {
         return orderByAscStr(true, columns);
     }
 
-    default Children orderByAsc(R column, R... columns) {
+    default Children orderByAsc(String column, String... columns) {
         return orderByAsc(true, column, columns);
     }
 
     /**
      * 排序：ORDER BY 字段, ... ASC
      */
-    default Children orderByAsc(boolean condition, R column, R... columns) {
+    default Children orderByAsc(boolean condition, String column, String... columns) {
         return orderBy(condition, true, column, columns);
     }
 
@@ -362,11 +391,11 @@ public interface FuncStr<Children, R> extends Serializable {
      * @param column    字段
      * @return children
      */
-    default Children orderByDesc(boolean condition, R column) {
+    default Children orderByDesc(boolean condition, String column) {
         return orderBy(condition, false, column);
     }
 
-    default Children orderByDesc(R column) {
+    default Children orderByDesc(String column) {
         return orderByDesc(true, column);
     }
 
@@ -378,22 +407,22 @@ public interface FuncStr<Children, R> extends Serializable {
      * @param columns   字段列表
      * @return children
      */
-    default Children orderByDescStr(boolean condition, List<R> columns) {
+    default Children orderByDescStr(boolean condition, List<String> columns) {
         return orderByStr(condition, false, columns);
     }
 
-    default Children orderByDescStr(List<R> columns) {
+    default Children orderByDescStr(List<String> columns) {
         return orderByDescStr(true, columns);
     }
 
-    default Children orderByDesc(R column, R... columns) {
+    default Children orderByDesc(String column, String... columns) {
         return orderByDesc(true, column, columns);
     }
 
     /**
      * 排序：ORDER BY 字段, ... DESC
      */
-    default Children orderByDesc(boolean condition, R column, R... columns) {
+    default Children orderByDesc(boolean condition, String column, String... columns) {
         return orderBy(condition, false, column, columns);
     }
 
@@ -406,7 +435,7 @@ public interface FuncStr<Children, R> extends Serializable {
      * @param column    单个字段
      * @return children
      */
-    Children orderBy(boolean condition, boolean isAsc, R column);
+    Children orderBy(boolean condition, boolean isAsc, String column);
 
     /**
      * 排序：ORDER BY 字段, ...
@@ -417,11 +446,11 @@ public interface FuncStr<Children, R> extends Serializable {
      * @param columns   字段列表
      * @return children
      */
-    Children orderByStr(boolean condition, boolean isAsc, List<R> columns);
+    Children orderByStr(boolean condition, boolean isAsc, List<String> columns);
 
     /**
      * 排序：ORDER BY 字段, ...
      */
-    Children orderBy(boolean condition, boolean isAsc, R column, R... columns);
+    Children orderBy(boolean condition, boolean isAsc, String column, String... columns);
 
 }

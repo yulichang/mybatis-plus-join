@@ -111,4 +111,24 @@ public interface CompareIfExists<Children> extends Compare<Children> {
     default <R> Children notLikeRightIfExists(String alias, SFunction<R, ?> column, Object val) {
         return notLikeRight(getIfExists().test(val, IfExistsSqlKeyWordEnum.NOT_LIKE_RIGHT), alias, column, val);
     }
+
+    default <R> Children betweenIfExists(SFunction<R, ?> column, Object val1, Object val2) {
+        return between(getIfExists().test(val1, IfExistsSqlKeyWordEnum.BETWEEN_FIRST) &&
+                getIfExists().test(val2, IfExistsSqlKeyWordEnum.BETWEEN_SECOND), column, val1, val2);
+    }
+
+    default <R> Children betweenIfExists(String alias, SFunction<R, ?> column, Object val1, Object val2) {
+        return between(getIfExists().test(val1, IfExistsSqlKeyWordEnum.BETWEEN_FIRST) &&
+                getIfExists().test(val2, IfExistsSqlKeyWordEnum.BETWEEN_SECOND), alias, column, val1, val2);
+    }
+
+    default <R> Children notBetweenIfExists(SFunction<R, ?> column, Object val1, Object val2) {
+        return between(getIfExists().test(val1, IfExistsSqlKeyWordEnum.NOT_BETWEEN_FIRST) &&
+                getIfExists().test(val2, IfExistsSqlKeyWordEnum.NOT_BETWEEN_SECOND), column, val1, val2);
+    }
+
+    default <R> Children notBetweenIfExists(String alias, SFunction<R, ?> column, Object val1, Object val2) {
+        return between(getIfExists().test(val1, IfExistsSqlKeyWordEnum.NOT_BETWEEN_FIRST) &&
+                getIfExists().test(val2, IfExistsSqlKeyWordEnum.NOT_BETWEEN_SECOND), alias, column, val1, val2);
+    }
 }

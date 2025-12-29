@@ -47,7 +47,7 @@ import static java.util.stream.Collectors.joining;
 @SuppressWarnings({"unused", "unchecked", "DuplicatedCode"})
 public abstract class KtAbstractWrapper<T, Children extends KtAbstractWrapper<T, Children>> extends Wrapper<T>
         implements CompareIfExists<Children>, Nested<Children, Children>, Join<Children>, Func<Children>, OnCompare<Children>,
-        CompareStrIfExists<Children, String>, FuncStr<Children, String> {
+        CompareStrIfExists<Children>, FuncStr<Children> {
 
     /**
      * 占位符

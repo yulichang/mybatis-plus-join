@@ -25,19 +25,19 @@ import java.util.function.BiPredicate;
  * @since 1.3.12
  */
 @SuppressWarnings("ALL")
-public interface CompareStr<Children, R> extends Serializable {
+public interface CompareStr<Children> extends Serializable {
 
     /**
      * ignore
      */
-    default <V> Children allEqStr(Map<R, V> params) {
+    default <V> Children allEqStr(Map<String, V> params) {
         return allEqStr(params, true);
     }
 
     /**
      * ignore
      */
-    default <V> Children allEqStr(Map<R, V> params, boolean null2IsNull) {
+    default <V> Children allEqStr(Map<String, V> params, boolean null2IsNull) {
         return allEqStr(true, params, null2IsNull);
     }
 
@@ -49,19 +49,19 @@ public interface CompareStr<Children, R> extends Serializable {
      * @param null2IsNull 是否参数为 null 自动执行 isNull 方法, false 则忽略这个字段\
      * @return children
      */
-    <V> Children allEqStr(boolean condition, Map<R, V> params, boolean null2IsNull);
+    <V> Children allEqStr(boolean condition, Map<String, V> params, boolean null2IsNull);
 
     /**
      * ignore
      */
-    default <V> Children allEqStr(BiPredicate<R, V> filter, Map<R, V> params) {
+    default <V> Children allEqStr(BiPredicate<String, V> filter, Map<String, V> params) {
         return allEqStr(filter, params, true);
     }
 
     /**
      * ignore
      */
-    default <V> Children allEqStr(BiPredicate<R, V> filter, Map<R, V> params, boolean null2IsNull) {
+    default <V> Children allEqStr(BiPredicate<String, V> filter, Map<String, V> params, boolean null2IsNull) {
         return allEqStr(true, filter, params, null2IsNull);
     }
 
@@ -74,12 +74,12 @@ public interface CompareStr<Children, R> extends Serializable {
      * @param null2IsNull 是否参数为 null 自动执行 isNull 方法, false 则忽略这个字段
      * @return children
      */
-    <V> Children allEqStr(boolean condition, BiPredicate<R, V> filter, Map<R, V> params, boolean null2IsNull);
+    <V> Children allEqStr(boolean condition, BiPredicate<String, V> filter, Map<String, V> params, boolean null2IsNull);
 
     /**
      * ignore
      */
-    default Children eq(R column, Object val) {
+    default Children eq(String column, Object val) {
         return eq(true, column, val);
     }
 
@@ -91,12 +91,12 @@ public interface CompareStr<Children, R> extends Serializable {
      * @param val       值
      * @return children
      */
-    Children eq(boolean condition, R column, Object val);
+    Children eq(boolean condition, String column, Object val);
 
     /**
      * ignore
      */
-    default Children ne(R column, Object val) {
+    default Children ne(String column, Object val) {
         return ne(true, column, val);
     }
 
@@ -108,12 +108,12 @@ public interface CompareStr<Children, R> extends Serializable {
      * @param val       值
      * @return children
      */
-    Children ne(boolean condition, R column, Object val);
+    Children ne(boolean condition, String column, Object val);
 
     /**
      * ignore
      */
-    default Children gt(R column, Object val) {
+    default Children gt(String column, Object val) {
         return gt(true, column, val);
     }
 
@@ -125,12 +125,12 @@ public interface CompareStr<Children, R> extends Serializable {
      * @param val       值
      * @return children
      */
-    Children gt(boolean condition, R column, Object val);
+    Children gt(boolean condition, String column, Object val);
 
     /**
      * ignore
      */
-    default Children ge(R column, Object val) {
+    default Children ge(String column, Object val) {
         return ge(true, column, val);
     }
 
@@ -142,12 +142,12 @@ public interface CompareStr<Children, R> extends Serializable {
      * @param val       值
      * @return children
      */
-    Children ge(boolean condition, R column, Object val);
+    Children ge(boolean condition, String column, Object val);
 
     /**
      * ignore
      */
-    default Children lt(R column, Object val) {
+    default Children lt(String column, Object val) {
         return lt(true, column, val);
     }
 
@@ -159,12 +159,12 @@ public interface CompareStr<Children, R> extends Serializable {
      * @param val       值
      * @return children
      */
-    Children lt(boolean condition, R column, Object val);
+    Children lt(boolean condition, String column, Object val);
 
     /**
      * ignore
      */
-    default Children le(R column, Object val) {
+    default Children le(String column, Object val) {
         return le(true, column, val);
     }
 
@@ -176,12 +176,12 @@ public interface CompareStr<Children, R> extends Serializable {
      * @param val       值
      * @return children
      */
-    Children le(boolean condition, R column, Object val);
+    Children le(boolean condition, String column, Object val);
 
     /**
      * ignore
      */
-    default Children between(R column, Object val1, Object val2) {
+    default Children between(String column, Object val1, Object val2) {
         return between(true, column, val1, val2);
     }
 
@@ -194,12 +194,12 @@ public interface CompareStr<Children, R> extends Serializable {
      * @param val2      值2
      * @return children
      */
-    Children between(boolean condition, R column, Object val1, Object val2);
+    Children between(boolean condition, String column, Object val1, Object val2);
 
     /**
      * ignore
      */
-    default Children notBetween(R column, Object val1, Object val2) {
+    default Children notBetween(String column, Object val1, Object val2) {
         return notBetween(true, column, val1, val2);
     }
 
@@ -212,12 +212,12 @@ public interface CompareStr<Children, R> extends Serializable {
      * @param val2      值2
      * @return children
      */
-    Children notBetween(boolean condition, R column, Object val1, Object val2);
+    Children notBetween(boolean condition, String column, Object val1, Object val2);
 
     /**
      * ignore
      */
-    default Children like(R column, Object val) {
+    default Children like(String column, Object val) {
         return like(true, column, val);
     }
 
@@ -229,12 +229,12 @@ public interface CompareStr<Children, R> extends Serializable {
      * @param val       值
      * @return children
      */
-    Children like(boolean condition, R column, Object val);
+    Children like(boolean condition, String column, Object val);
 
     /**
      * ignore
      */
-    default Children notLike(R column, Object val) {
+    default Children notLike(String column, Object val) {
         return notLike(true, column, val);
     }
 
@@ -246,12 +246,12 @@ public interface CompareStr<Children, R> extends Serializable {
      * @param val       值
      * @return children
      */
-    Children notLike(boolean condition, R column, Object val);
+    Children notLike(boolean condition, String column, Object val);
 
     /**
      * ignore
      */
-    default Children likeLeft(R column, Object val) {
+    default Children likeLeft(String column, Object val) {
         return likeLeft(true, column, val);
     }
 
@@ -263,12 +263,12 @@ public interface CompareStr<Children, R> extends Serializable {
      * @param val       值
      * @return children
      */
-    Children likeLeft(boolean condition, R column, Object val);
+    Children likeLeft(boolean condition, String column, Object val);
 
     /**
      * ignore
      */
-    default Children notLikeLeft(R column, Object val) {
+    default Children notLikeLeft(String column, Object val) {
         return notLikeLeft(true, column, val);
     }
 
@@ -280,12 +280,12 @@ public interface CompareStr<Children, R> extends Serializable {
      * @param val       值
      * @return children
      */
-    Children notLikeLeft(boolean condition, R column, Object val);
+    Children notLikeLeft(boolean condition, String column, Object val);
 
     /**
      * ignore
      */
-    default Children likeRight(R column, Object val) {
+    default Children likeRight(String column, Object val) {
         return likeRight(true, column, val);
     }
 
@@ -297,13 +297,13 @@ public interface CompareStr<Children, R> extends Serializable {
      * @param val       值
      * @return children
      */
-    Children likeRight(boolean condition, R column, Object val);
+    Children likeRight(boolean condition, String column, Object val);
 
 
     /**
      * ignore
      */
-    default Children notLikeRight(R column, Object val) {
+    default Children notLikeRight(String column, Object val) {
         return notLikeRight(true, column, val);
     }
 
@@ -315,5 +315,5 @@ public interface CompareStr<Children, R> extends Serializable {
      * @param val       值
      * @return children
      */
-    Children notLikeRight(boolean condition, R column, Object val);
+    Children notLikeRight(boolean condition, String column, Object val);
 }

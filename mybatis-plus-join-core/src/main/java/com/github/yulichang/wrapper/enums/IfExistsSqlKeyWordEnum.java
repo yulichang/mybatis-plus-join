@@ -20,5 +20,9 @@ public enum IfExistsSqlKeyWordEnum implements Serializable {
     LIKE_RIGHT,
     NOT_LIKE_RIGHT,
     LIKE_LEFT,
-    NOT_LIKE_LEFT
+    NOT_LIKE_LEFT,
+    BETWEEN_FIRST,
+    BETWEEN_SECOND,
+    NOT_BETWEEN_FIRST,
+    NOT_BETWEEN_SECOND
 }

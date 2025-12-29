@@ -10,6 +10,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 @SpringBootTest
@@ -79,5 +81,21 @@ public class IfExistsTest {
                 .eqIfExists(UserDO::getName, "张三 1");
         List<UserDO> list2 = wrapper2.list();
         list2.forEach(System.out::println);
+    }
+
+    @Test
+    void ifExists1() {
+        ThreadLocalUtils.set("SELECT t.id, t.pid, t.`name`, t.`json`, t.sex, t.head_img, t.create_time, " +
+                "t.address_id, t.address_id2, t.del, t.create_by, t.update_by FROM `user` t " +
+                "WHERE t.del = false AND (t.id IN (?, ?) AND t.head_img IN (?, ?) AND t.address_id BETWEEN ? AND ?)");
+        MPJLambdaWrapper<UserDO> wrapper2 = JoinWrappers.lambda(UserDO.class)
+                .inIfNotEmpty("t.name", Collections.emptyList())
+                .inIfNotEmpty("t.id", Arrays.asList(1, 2))
+                .inIfNotEmpty(UserDO::getPid, Collections.emptyList())
+                .inIfNotEmpty(UserDO::getImg, Arrays.asList("https://url-01", "https://url-02"))
+                .betweenIfExists("t.address_id", 1, 2)
+                .betweenIfExists("t.address_id2", "", 2);
+
+        wrapper2.list().forEach(System.out::println);
     }
 }

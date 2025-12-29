@@ -19,8 +19,8 @@ import com.github.yulichang.extension.apt.interfaces.OnCompare;
 import com.github.yulichang.extension.apt.matedata.Column;
 import com.github.yulichang.toolkit.LambdaUtils;
 import com.github.yulichang.toolkit.MPJSqlInjectionUtils;
-import com.github.yulichang.toolkit.StrUtils;
 import com.github.yulichang.toolkit.Ref;
+import com.github.yulichang.toolkit.StrUtils;
 import com.github.yulichang.toolkit.sql.SqlScriptUtils;
 import com.github.yulichang.wrapper.enums.IfExistsSqlKeyWordEnum;
 import com.github.yulichang.wrapper.interfaces.*;
@@ -50,7 +50,7 @@ import static java.util.stream.Collectors.joining;
 @SuppressWarnings({"unchecked", "unused", "DuplicatedCode"})
 public abstract class JoinAbstractWrapper<T, Children extends JoinAbstractWrapper<T, Children>> extends Wrapper<T>
         implements CompareIfExists<Children>, Nested<Children, Children>, Join<Children>, Func<Children>, OnCompare<Children>,
-        CompareStrIfExists<Children, String>, FuncStr<Children, String> {
+        CompareStrIfExists<Children>, FuncStr<Children> {
 
     /**
      * 占位符

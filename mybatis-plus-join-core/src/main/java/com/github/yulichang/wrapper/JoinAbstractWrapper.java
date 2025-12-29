@@ -43,7 +43,7 @@ import static java.util.stream.Collectors.joining;
 @SuppressWarnings({"unchecked", "unused", "DuplicatedCode"})
 public abstract class JoinAbstractWrapper<T, Children extends JoinAbstractWrapper<T, Children>> extends Wrapper<T>
         implements CompareIfExists<Children>, Nested<Children, Children>, Join<Children>, Func<Children>, OnCompare<Children>,
-        CompareStrIfExists<Children, String>, FuncStr<Children, String> {
+        CompareStrIfExists<Children>, FuncStr<Children> {
 
     /**
      * 主表别名

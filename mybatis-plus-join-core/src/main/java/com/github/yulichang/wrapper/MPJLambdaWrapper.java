@@ -274,7 +274,7 @@ public class MPJLambdaWrapper<T> extends JoinAbstractLambdaWrapper<T, MPJLambdaW
     public <U> MPJLambdaWrapper<T> union(Class<U> clazz, boolean brackets, Consumer<MPJLambdaWrapper<U>> consumer) {
         MPJLambdaWrapper<U> unionWrapper = fromInstance(clazz);
         consumer.accept(unionWrapper);
-        String sb = " UNION " + WrapperUtils.buildUnionSqlByWrapper(clazz, unionWrapper);
+        String sb = " UNION " + WrapperUtils.buildUnionSqlByWrapper(clazz, brackets, unionWrapper);
         if (Objects.isNull(unionSql)) {
             unionSql = SharedString.emptyString();
         }

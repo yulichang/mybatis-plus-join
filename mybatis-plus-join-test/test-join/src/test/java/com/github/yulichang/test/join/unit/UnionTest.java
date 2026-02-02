@@ -63,4 +63,46 @@ public class UnionTest {
         List<UserDO> list = wrapper.list();
         assert list.size() == 2 && list.get(0).getId() != null;
     }
+
+    @Test
+    void unionAll1() {
+        ThreadLocalUtils.set("""
+                SELECT
+                    t.id
+                FROM `user` t
+                WHERE t.del = false
+                    AND (t.id = ?)
+                UNION
+                (SELECT
+                    t.id
+                FROM address t
+                WHERE (t.id = ?))
+                UNION
+                (SELECT
+                    (SELECT
+                        st.id
+                    FROM area st
+                    WHERE st.del = false
+                        AND (st.id = ? AND (st.id = ?))) AS id
+                FROM area t
+                WHERE t.del = false
+                    AND (t.id = ? AND (t.id = ?)))
+                """);
+        MPJLambdaWrapper<UserDO> wrapper = JoinWrappers.lambda(UserDO.class)
+                .select(UserDO::getId)
+                .eq(UserDO::getId, 1)
+                .union(AddressDO.class, union -> union
+                        .select(AddressDO::getId)
+                        .disableLogicDel()
+                        .eq(AddressDO::getId, 2))
+                .union(AreaDO.class, union -> union
+                        .selectSub(AreaDO.class, sub -> sub
+                                .select(AreaDO::getId)
+                                .eq(AreaDO::getId, 3)
+                                .and(and -> and.eq(AreaDO::getId, 4)), AreaDO::getId)
+                        .eq(AreaDO::getId, 5)
+                        .and(and -> and.eq(AreaDO::getId, 6)));
+        List<UserDO> list = wrapper.list();
+        assert list.size() == 2 && list.get(0).getId() != null;
+    }
 }

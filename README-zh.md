@@ -21,6 +21,9 @@
   <a href="https://gitee.com/best_handsome/mybatis-plus-join" target="_blank">
     <img src="https://gitee.com/best_handsome/mybatis-plus-join/badge/star.svg?theme=dark" alt=""/>
   </a>
+  <a href="https://gitcode.com/mpj/mybatis-plus-join" target="_blank">
+    <img src="https://gitcode.com/mpj/mybatis-plus-join/star/badge.svg" alt=""/>
+  </a>
 </p>
 <p align="center">
 对 <a href="https://gitee.com/baomidou/mybatis-plus" target="_blank">MyBatis-Plus</a> 多表查询的扩展 |
@@ -46,12 +49,12 @@
   <dependency>
       <groupId>com.github.yulichang</groupId>
       <artifactId>mybatis-plus-join-boot-starter</artifactId>
-      <version>1.5.6</version>
+      <version>1.5.7</version>
   </dependency>
   ```
 - Gradle
   ```
-   implementation 'com.github.yulichang:mybatis-plus-join-boot-starter:1.5.6'
+   implementation 'com.github.yulichang:mybatis-plus-join-boot-starter:1.5.7'
   ```
   或者clone代码到本地执行 `mvn install`, 再引入以上依赖  
   <br>

@@ -331,7 +331,7 @@ public class MPJInterceptor implements Interceptor {
             //补充不全的属性 并且是基础数据类型及其包装类
             ResultMap resultMap = ms.getConfiguration().getResultMap(tableInfo.getResultMap());
             List<ResultMapping> resultMappings = resultMap.getResultMappings();
-            List<Field> fieldList = ReflectionKit.getFieldList(resultType);
+            List<Field> fieldList = new ArrayList<>(ReflectionKit.getFieldList(resultType));
             fieldList.removeIf(i -> resultMappings.stream().anyMatch(r -> i.getName().equals(r.getProperty())));
             if (CollectionUtils.isNotEmpty(fieldList)) {
                 //复制已有的resultMapping

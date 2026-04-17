@@ -21,8 +21,8 @@
   <a href="https://gitee.com/best_handsome/mybatis-plus-join" target="_blank">
     <img src="https://gitee.com/best_handsome/mybatis-plus-join/badge/star.svg?theme=dark" alt=""/>
   </a>
-  <a href="https://gitcode.com/mpj/mybatis-plus-join" target="_blank">
-    <img src="https://gitcode.com/mpj/mybatis-plus-join/star/badge.svg" alt=""/>
+  <a href="https://gitcode.com/yulichang/mybatis-plus-join" target="_blank">
+    <img src="https://gitcode.com/yulichang/mybatis-plus-join/star/badge.svg" alt=""/>
   </a>
 </p>
 <p align="center">

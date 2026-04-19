@@ -18,8 +18,8 @@
   <a href="https://github.com/yulichang/mybatis-plus-join" target="_blank">
     <img src="https://img.shields.io/github/stars/yulichang/mybatis-plus-join.svg?style=social&label=Stars" alt=""/>
   </a>
-  <a href="https://gitee.com/best_handsome/mybatis-plus-join" target="_blank">
-    <img src="https://gitee.com/best_handsome/mybatis-plus-join/badge/star.svg?theme=dark" alt=""/>
+  <a href="https://gitee.com/yulichang/mybatis-plus-join" target="_blank">
+    <img src="https://gitee.com/yulichang/mybatis-plus-join/badge/star.svg?theme=dark" alt=""/>
   </a>
   <a href="https://gitcode.com/yulichang/mybatis-plus-join" target="_blank">
     <img src="https://gitcode.com/yulichang/mybatis-plus-join/star/badge.svg" alt=""/>

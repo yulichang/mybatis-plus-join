@@ -116,7 +116,7 @@ public class SelectCache implements Serializable {
                 TableInfo info = TableHelper.getAssert(table);
                 @SuppressWarnings("OptionalGetWithoutIsPresent")
                 TableFieldInfo fieldInfo = info.getFieldList().stream().filter(f -> f.getProperty().equals(columProperty)).findFirst().get();
-                Field field = AdapterHelper.getAdapter().mpjGetField(fieldInfo, () -> ReflectionKit.getFieldMap(table).get(columProperty));
+                Field field = AdapterHelper.getAdapter().mpjGetField(fieldInfo);
                 return AdapterHelper.getAdapter().getTypeHandler(AdapterHelper.getAdapter().mpjGetConfiguration(info), propertyType, typeHandler, field);
             });
         }

@@ -50,7 +50,7 @@ public interface IAdapter {
         return tableInfo.getConfiguration();
     }
 
-    default Field mpjGetField(TableFieldInfo fieldInfo, Supplier<Field> supplier) {
+    default Field mpjGetField(TableFieldInfo fieldInfo) {
         return fieldInfo.getField();
     }
 

@@ -31,7 +31,6 @@
 
     <modules>
         <module>mybatis-plus-join-boot-starter</module>
-        <module>mybatis-plus-join-adapter</module>
         <module>mybatis-plus-join-core</module>
         <module>mybatis-plus-join-annotation</module>
         <module>mybatis-plus-join-extension</module>
@@ -44,7 +43,7 @@
     </modules>
 
     <properties>
-        <revision>1.5.7</revision>
+        <revision>2.0.0</revision>
         <mybatis.plus.version>3.5.16</mybatis.plus.version>
 
         <jdkVersion>17</jdkVersion>

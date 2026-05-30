@@ -19,7 +19,7 @@ public class MapperTest {
 
     @Test
     void mapper() {
-        JoinWrappers.lambda(AddressDO.class).list();
+        JoinWrappers.query(AddressDO.class).list();
     }
 
 }

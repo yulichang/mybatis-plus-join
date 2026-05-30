@@ -91,7 +91,7 @@ public class AptQueryWrapper<T> extends AptAbstractWrapper<T, AptQueryWrapper<T>
 
 
     /**
-     * 不建议直接 new 该实例，使用 JoinWrappers.lambda(UserDO.class)
+     * 不建议直接 new 该实例，使用 JoinWrappers.query(UserDO.class)
      */
     protected AptQueryWrapper(T entity, BaseColumn<T> baseColumn, SharedString sqlSelect, AtomicInteger paramNameSeq,
                               Map<String, Object> paramNameValuePairs, MergeSegments mergeSegments, SharedString paramAlias,
@@ -181,7 +181,7 @@ public class AptQueryWrapper<T> extends AptAbstractWrapper<T, AptQueryWrapper<T>
     /**
      * 查询主表全部字段
      * <p>
-     * 需要使用 使用 JoinWrappers.lambda(clazz) 或者 new MPJLambdaQueryWrapper&lt;&lt;(clazz) 构造
+     * 需要使用 使用 JoinWrappers.query(clazz) 或者 new MPJLambdaQueryWrapper&lt;&lt;(clazz) 构造
      *
      * @return children
      */

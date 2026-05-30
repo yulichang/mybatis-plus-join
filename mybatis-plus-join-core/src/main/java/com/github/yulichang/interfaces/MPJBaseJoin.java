@@ -16,7 +16,7 @@ public interface MPJBaseJoin<T> {
         return StringPool.EMPTY;
     }
 
-    default String getUnionSql(){
+    default String getUnionSql() {
         return StringPool.EMPTY;
     }
 }

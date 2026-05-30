@@ -3,7 +3,7 @@ package com.github.yulichang.test.join.unit;
 import com.github.yulichang.test.join.entity.UserDO;
 import com.github.yulichang.test.util.Reset;
 import com.github.yulichang.toolkit.JoinWrappers;
-import com.github.yulichang.wrapper.MPJLambdaWrapper;
+import com.github.yulichang.wrapper.JoinQueryWrapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -23,7 +23,7 @@ public class FillTest {
 
     @Test
     void fill() {
-        MPJLambdaWrapper<UserDO> wrapper = JoinWrappers.lambda(UserDO.class).selectAll(UserDO.class);
+        JoinQueryWrapper<UserDO> wrapper = JoinWrappers.query(UserDO.class).selectAll(UserDO.class);
 
         wrapper.fill(UserDO::getAddressId, UserDO::getAddressList);
 
@@ -35,7 +35,7 @@ public class FillTest {
 
     @Test
     void fill1() {
-        MPJLambdaWrapper<UserDO> wrapper = JoinWrappers.lambda(UserDO.class).selectAll(UserDO.class)
+        JoinQueryWrapper<UserDO> wrapper = JoinWrappers.query(UserDO.class).selectAll(UserDO.class)
                 .eq(UserDO::getId, 1);
 
 

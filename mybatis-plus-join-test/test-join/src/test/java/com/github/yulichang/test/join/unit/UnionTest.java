@@ -6,7 +6,7 @@ import com.github.yulichang.test.join.entity.UserDO;
 import com.github.yulichang.test.util.Reset;
 import com.github.yulichang.test.util.ThreadLocalUtils;
 import com.github.yulichang.toolkit.JoinWrappers;
-import com.github.yulichang.wrapper.MPJLambdaWrapper;
+import com.github.yulichang.wrapper.JoinQueryWrapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -46,7 +46,7 @@ public class UnionTest {
                 WHERE t.del = false
                     AND (t.id = ? AND (t.id = ?)))
                 """);
-        MPJLambdaWrapper<UserDO> wrapper = JoinWrappers.lambda(UserDO.class)
+        JoinQueryWrapper<UserDO> wrapper = JoinWrappers.query(UserDO.class)
                 .select(UserDO::getId)
                 .eq(UserDO::getId, 1)
                 .unionAll(AddressDO.class, union -> union
@@ -88,7 +88,7 @@ public class UnionTest {
                 WHERE t.del = false
                     AND (t.id = ? AND (t.id = ?)))
                 """);
-        MPJLambdaWrapper<UserDO> wrapper = JoinWrappers.lambda(UserDO.class)
+        JoinQueryWrapper<UserDO> wrapper = JoinWrappers.query(UserDO.class)
                 .select(UserDO::getId)
                 .eq(UserDO::getId, 1)
                 .union(AddressDO.class, union -> union

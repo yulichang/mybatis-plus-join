@@ -7,7 +7,7 @@ import com.github.yulichang.test.join.entity.UserDO;
 import com.github.yulichang.test.join.mapper.AreaMapper;
 import com.github.yulichang.test.util.ThreadLocalUtils;
 import com.github.yulichang.toolkit.JoinWrappers;
-import com.github.yulichang.wrapper.MPJLambdaWrapper;
+import com.github.yulichang.wrapper.JoinQueryWrapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -32,7 +32,7 @@ public class PageByMainTest {
                 "t.address_id2, t.del, t.create_by, t.update_by, t1.id AS joina_id, t1.user_id, t1.area_id, t1.tel, " +
                 "t1.address, t1.del AS joina_del FROM (SELECT * FROM `user` t WHERE t.del = false AND (t.id <= ?) LIMIT ?) t " +
                 "LEFT JOIN address t1 ON (t1.user_id = t.id AND t1.user_id >= ? AND t1.del = false)");
-        MPJLambdaWrapper<UserDO> wrapper = JoinWrappers.lambda(UserDO.class)
+        JoinQueryWrapper<UserDO> wrapper = JoinWrappers.query(UserDO.class)
                 .selectAll()
                 .selectCollection(AddressDO.class, UserDTO::getAddressList11)
                 .leftJoin(AddressDO.class, on -> on
@@ -54,7 +54,7 @@ public class PageByMainTest {
                 " t.del, t.create_by, t.update_by, concat('?', t.id) AS sdafsdfsdfsd, t1.id AS joina_id, t1.user_id, " +
                 "t1.area_id, t1.tel, t1.address, t1.del AS joina_del FROM (SELECT * FROM `user` t WHERE t.del = false " +
                 "AND (t.id <= ?) LIMIT ?) t LEFT JOIN address t1 ON (t1.user_id = t.id AND t1.user_id >= ? AND t1.del = false)");
-        MPJLambdaWrapper<UserDO> wrapper = JoinWrappers.lambda(UserDO.class)
+        JoinQueryWrapper<UserDO> wrapper = JoinWrappers.query(UserDO.class)
                 .selectAll()
                 .selectFunc(() -> "concat('?',%s)", UserDO::getId, "sdafsdfsdfsd")
                 .selectCollection(AddressDO.class, UserDTO::getAddressList)
@@ -78,7 +78,7 @@ public class PageByMainTest {
                 "t1.user_id, t1.area_id, t1.tel, t1.address, t1.del AS joina_del FROM (SELECT * FROM `user` t " +
                 "WHERE t.del = false AND (t.id <= ?) GROUP BY t.id ORDER BY t.id DESC LIMIT ?) t LEFT JOIN address t1 ON " +
                 "(t1.user_id = t.id AND t1.user_id >= ? AND t1.del = false)");
-        MPJLambdaWrapper<UserDO> wrapper = JoinWrappers.lambda(UserDO.class)
+        JoinQueryWrapper<UserDO> wrapper = JoinWrappers.query(UserDO.class)
                 .selectAll()
                 .selectFunc(() -> "concat('?',%s)", UserDO::getId, "sdafsdfsdfsd")
                 .selectCollection(AddressDO.class, UserDTO::getAddressList)
@@ -103,7 +103,7 @@ public class PageByMainTest {
                 "t1.user_id, t1.area_id, t1.tel, t1.address, t1.del AS joina_del FROM (SELECT * FROM `user` t " +
                 "WHERE t.del = false AND (t.id <= ?) GROUP BY t.id ORDER BY t.id DESC LIMIT ?) t LEFT JOIN address t1 ON " +
                 "(t1.user_id = t.id AND t1.user_id >= ? AND t1.del = false)");
-        MPJLambdaWrapper<UserDO> wrapper = JoinWrappers.lambda(UserDO.class)
+        JoinQueryWrapper<UserDO> wrapper = JoinWrappers.query(UserDO.class)
                 .selectAll()
                 .selectFunc(() -> "concat('?',%s)", UserDO::getId, "sdafsdfsdfsd")
                 .selectCollection(AddressDO.class, UserDTO::getAddressList)

@@ -33,7 +33,7 @@
 </p>
 
 <p align="center">
-<a href="https://gitee.com/best_handsome/mybatis-plus-join/issues/I65N2M" target="_blank">添加作者微信，备注MPJ，加入微信群</a>  
+<a href="https://gitee.com/best_handsome/mybatis-plus-join/issues/I65N2M" target="_blank">可添加作者微信，咨询问题或者提意见与建议</a>  
 <br/>
 <img width="200px" height="200px" src="https://foruda.gitee.com/images/1714756135330585984/bcc86eb0_2020985.png"  alt="添加作者微信，备注MPJ，加入微信群"/>
 </p>
@@ -49,16 +49,16 @@
   <dependency>
       <groupId>com.github.yulichang</groupId>
       <artifactId>mybatis-plus-join-boot-starter</artifactId>
-      <version>1.5.7</version>
+      <version>2.0.0</version>
   </dependency>
   ```
 - Gradle
   ```
-   implementation 'com.github.yulichang:mybatis-plus-join-boot-starter:1.5.7'
+   implementation 'com.github.yulichang:mybatis-plus-join-boot-starter:2.0.0'
   ```
   或者clone代码到本地执行 `mvn install`, 再引入以上依赖  
   <br>
-  注意: MyBatis Plus版本需要3.1.2+
+  注意: MyBatis Plus版本需要3.5.16+
   <br>
 
 ### 使用
@@ -75,23 +75,17 @@ class test {
     private UserMapper userMapper;
 
     void testJoin() {
-        //和Mybatis plus一致，MPJLambdaWrapper的泛型必须是主表的泛型，并且要用主表的Mapper来调用
-        MPJLambdaWrapper<UserDO> wrapper = JoinWrappers.lambda(UserDO.class)
-                .selectAll(UserDO.class)//查询user表全部字段
-                .select(UserAddressDO::getTel)//查询user_address tel 字段
-                .selectAs(UserAddressDO::getAddress, UserDTO::getUserAddress)//别名
-                .select(AreaDO::getProvince, AreaDO::getCity)
-                .leftJoin(UserAddressDO.class, UserAddressDO::getUserId, UserDO::getId)
-                .leftJoin(AreaDO.class, AreaDO::getId, UserAddressDO::getAreaId)
-                .eq(UserDO::getId, 1)
-                .like(UserAddressDO::getTel, "1")
-                .gt(UserDO::getId, 5);
+        MPJLambdaWrapper<UserDO> wrapper = JoinWrappers.query(UserDO.class)
+                .selectAll(UserDO.class)
+                .select(AddressDO::getAddress)
+                .leftJoin(AddressDO.class, AddressDO::getUserId, UserDO::getId)
+                .eq(UserDO::getId, 1);
 
         //连表查询 返回自定义ResultType
-        List<UserDTO> list = userMapper.selectJoinList(UserDTO.class, wrapper);
+        List<UserDTO> list = userMapper.selectList(UserDTO.class, wrapper);
 
         //分页查询 （需要启用 mybatis plus 分页插件）
-        Page<UserDTO> listPage = userMapper.selectJoinPage(new Page<>(2, 10), UserDTO.class, wrapper);
+        Page<UserDTO> listPage = userMapper.selectPage(new Page<>(2, 10), UserDTO.class, wrapper);
     }
 }
 ```
@@ -101,16 +95,11 @@ class test {
 ```
 SELECT  
     t.id, t.name, t.sex, t.head_img, 
-    t1.tel, t1.address AS userAddress,
-    t2.province, t2.city 
+    t1.tel, t1.address
 FROM 
     user t 
-    LEFT JOIN user_address t1 ON t1.user_id = t.id 
-    LEFT JOIN area t2 ON t2.id = t1.area_id 
-WHERE (
-    t.id = ? 
-    AND t1.tel LIKE ? 
-    AND t.id > ?)
+    LEFT JOIN user_address t1 ON t1.user_id = t.id
+WHERE (t.id = ?)
 ```
 
 # <a href="https://mybatis-plus-join.github.io" target="_blank">完整使用文档 wiki</a>

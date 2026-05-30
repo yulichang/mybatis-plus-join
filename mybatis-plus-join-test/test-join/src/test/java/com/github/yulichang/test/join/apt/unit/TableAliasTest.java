@@ -50,7 +50,7 @@ public class TableAliasTest {
                 .leftJoin(area1, area1.id, addr1.areaId)
                 .groupBy(u.id);
 
-        List<UserDO> dos = userMapper.selectJoinList(UserDO.class, wrapper);
+        List<UserDO> dos = userMapper.selectList(UserDO.class, wrapper);
         dos.forEach(System.out::println);
     }
 
@@ -77,7 +77,7 @@ public class TableAliasTest {
                 .groupBy(addr1.id)
                 .orderByDesc(addr1.id);
 
-        List<UserDO> dos = userMapper.selectJoinList(UserDO.class, wrapper);
+        List<UserDO> dos = userMapper.selectList(UserDO.class, wrapper);
         dos.forEach(System.out::println);
     }
 
@@ -104,7 +104,7 @@ public class TableAliasTest {
                 .eq(addr2.id, 2)
                 .eq(addr1.id, 3);
 
-        List<UserDO> dos = userMapper.selectJoinList(UserDO.class, wrapper);
+        List<UserDO> dos = userMapper.selectList(UserDO.class, wrapper);
         dos.forEach(System.out::println);
     }
 

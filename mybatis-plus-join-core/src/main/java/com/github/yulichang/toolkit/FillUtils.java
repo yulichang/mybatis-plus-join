@@ -7,7 +7,7 @@ import com.baomidou.mybatisplus.core.toolkit.StringPool;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.github.yulichang.toolkit.support.FieldCache;
 import com.github.yulichang.toolkit.support.LambdaMeta;
-import com.github.yulichang.wrapper.MPJLambdaWrapper;
+import com.github.yulichang.wrapper.JoinQueryWrapper;
 import com.github.yulichang.wrapper.interfaces.MConsumer;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -19,17 +19,17 @@ import java.util.stream.Collectors;
 /**
  * 填充
  *
- * @auther yulichang
+ * @author yulichang
  * @since 1.5.1
  */
 @SuppressWarnings({"unchecked", "unused"})
 public final class FillUtils {
 
     public static void fill(Object data, SFunction<?, ?> field, SFunction<?, ?> tagField) {
-        fill(data, field, tagField, (MConsumer<MPJLambdaWrapper<?>>) null);
+        fill(data, field, tagField, (MConsumer<JoinQueryWrapper<?>>) null);
     }
 
-    public static void fill(Object data, SFunction<?, ?> field, SFunction<?, ?> tagField, MConsumer<MPJLambdaWrapper<?>> consumer) {
+    public static void fill(Object data, SFunction<?, ?> field, SFunction<?, ?> tagField, MConsumer<JoinQueryWrapper<?>> consumer) {
         LambdaMeta meta = LambdaUtils.getMeta(tagField);
         FieldCache fieldCache = MPJReflectionKit.getFieldMap(meta.getInstantiatedClass()).get(meta.getName());
         fill(data, field, getTagClass(fieldCache.getField()), tagField, consumer);
@@ -39,7 +39,7 @@ public final class FillUtils {
         fill(data, field, oneClass, tagField, null);
     }
 
-    public static void fill(Object data, SFunction<?, ?> field, Class<?> oneClass, SFunction<?, ?> tagField, MConsumer<MPJLambdaWrapper<?>> consumer) {
+    public static void fill(Object data, SFunction<?, ?> field, Class<?> oneClass, SFunction<?, ?> tagField, MConsumer<JoinQueryWrapper<?>> consumer) {
         TableInfo tableInfo = TableHelper.getAssert(oneClass);
         Assert.notNull(tableInfo.getKeyProperty(), "not found key property by class %s", oneClass.getName());
         fill(data, field, new SF(oneClass, tableInfo.getKeyProperty()), tagField, consumer);
@@ -49,11 +49,11 @@ public final class FillUtils {
         fill(data, field, oneField, tagField, null);
     }
 
-    public static void fill(Object data, SFunction<?, ?> field, SFunction<?, ?> oneField, SFunction<?, ?> tagField, MConsumer<MPJLambdaWrapper<?>> consumer) {
+    public static void fill(Object data, SFunction<?, ?> field, SFunction<?, ?> oneField, SFunction<?, ?> tagField, MConsumer<JoinQueryWrapper<?>> consumer) {
         doFill(data, field, oneField, tagField, consumer);
     }
 
-    private static <W> void doFill(Object data, SFunction<?, ?> field, SFunction<?, ?> oneField, SFunction<?, ?> tagField, MConsumer<MPJLambdaWrapper<?>> consumer) {
+    private static <W> void doFill(Object data, SFunction<?, ?> field, SFunction<?, ?> oneField, SFunction<?, ?> tagField, MConsumer<JoinQueryWrapper<?>> consumer) {
         if (data == null || field == null || oneField == null || tagField == null) {
             return;
         }
@@ -84,10 +84,10 @@ public final class FillUtils {
         }
 
         Class<?> wrapperClass = (oneField instanceof SF) ? ((SF) oneField).clazz : LambdaUtils.getEntityClass(oneField);
-        MPJLambdaWrapper<W> wrapper = new MPJLambdaWrapper<W>((Class<W>) wrapperClass) {
+        JoinQueryWrapper<W> wrapper = new JoinQueryWrapper<W>((Class<W>) wrapperClass) {
 
             @Override
-            public <R> MPJLambdaWrapper<W> in(SFunction<R, ?> column, Collection<?> coll) {
+            public <R> JoinQueryWrapper<W> in(SFunction<R, ?> column, Collection<?> coll) {
                 if (column instanceof SF) {
                     SF sf = (SF) column;
                     TableInfo tableInfo = TableHelper.getAssert(sf.getClazz());
@@ -97,7 +97,7 @@ public final class FillUtils {
             }
 
             @Override
-            public <R> MPJLambdaWrapper<W> eq(SFunction<R, ?> column, Object val) {
+            public <R> JoinQueryWrapper<W> eq(SFunction<R, ?> column, Object val) {
                 if (column instanceof SF) {
                     SF sf = (SF) column;
                     TableInfo tableInfo = TableHelper.getAssert(sf.getClazz());

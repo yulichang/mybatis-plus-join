@@ -12,7 +12,7 @@ public class ChineseFieldTest {
 
     @Test
     void chineseField() {
-        List<UserTenantaDO> list = JoinWrappers.lambda(UserTenantaDO.class).list();
+        List<UserTenantaDO> list = JoinWrappers.query(UserTenantaDO.class).list();
         assert list.get(0).getDetail() != null;
         list.forEach(System.out::println);
     }

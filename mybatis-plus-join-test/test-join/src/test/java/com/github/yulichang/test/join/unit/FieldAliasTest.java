@@ -8,7 +8,7 @@ import com.github.yulichang.test.join.mapper.UserMapper;
 import com.github.yulichang.test.join.mapper.UserTenantMapper;
 import com.github.yulichang.test.util.Reset;
 import com.github.yulichang.toolkit.JoinWrappers;
-import com.github.yulichang.wrapper.MPJLambdaWrapper;
+import com.github.yulichang.wrapper.JoinQueryWrapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,7 +33,7 @@ public class FieldAliasTest {
 
     @Test
     void fieldAlias() {
-        List<UserDO> list = userMapper.selectList(JoinWrappers.lambda(UserDO.class)
+        List<UserDO> list = userMapper.selectList(JoinWrappers.query(UserDO.class)
                 .selectAll(UserDO.class)
                 .leftJoin(AddressDO.class, AddressDO::getUserId, UserDO::getId));
 
@@ -45,7 +45,7 @@ public class FieldAliasTest {
 
     @Test
     void fieldAlias1() {
-        MPJLambdaWrapper<UserTenantDO> wrapper = JoinWrappers.lambda(UserTenantDO.class)
+        JoinQueryWrapper<UserTenantDO> wrapper = JoinWrappers.query(UserTenantDO.class)
                 .selectAll(UserTenantDO.class)
                 .leftJoin(UserDO.class, UserDO::getId, UserTenantDO::getUuid);
         List<UserTenantDO> list = userTenantMapper.selectList(wrapper);

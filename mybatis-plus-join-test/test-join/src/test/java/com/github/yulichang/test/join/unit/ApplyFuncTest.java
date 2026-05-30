@@ -29,7 +29,7 @@ public class ApplyFuncTest {
                 "LEFT JOIN address t1 ON (t1.user_id = t.id) WHERE t.del = false AND t1.del = false " +
                 "AND (concat(t.id, t1.user_id, ?) IS NOT NULL " +
                 "AND concat(t.id, t1.user_id, ?) IS NOT NULL)");
-        List<UserDO> list = JoinWrappers.lambda(UserDO.class)
+        List<UserDO> list = JoinWrappers.query(UserDO.class)
                 .selectAll(UserDO.class)
                 .leftJoin(AddressDO.class, AddressDO::getUserId, UserDO::getId)
                 .applyFunc("concat(%s,%s,{0}) is not null", arg -> arg.accept(UserDO::getId, AddressDO::getUserId), "12")
@@ -45,7 +45,7 @@ public class ApplyFuncTest {
                 "LEFT JOIN address t1 ON (t1.user_id = t.id) WHERE t.del = false AND t1.del = false " +
                 "AND (concat(t.id, t1.user_id, ?) IS NOT NULL " +
                 "AND concat(t.id, t1.user_id, ?) IS NOT NULL)");
-        List<UserDO> list1 = JoinWrappers.lambda(UserDO.class)
+        List<UserDO> list1 = JoinWrappers.query(UserDO.class)
                 .selectAll(UserDO.class, UserDO::getId)
                 .leftJoin(AddressDO.class, AddressDO::getUserId, UserDO::getId)
                 .applyFunc("concat(%s,%s,{0}) is not null", arg -> arg.accept(UserDO::getId, AddressDO::getUserId), "12")
@@ -69,7 +69,7 @@ public class ApplyFuncTest {
                     AND t1.del = false
                     AND (concat(t.id, t.id, (SELECT st.id, st.id FROM `user` st WHERE st.del = false AND (st.id = ? AND st.id = ?)), ?) IS NOT NULL)
                 """);
-        JoinWrappers.lambda(UserDO.class)
+        JoinWrappers.query(UserDO.class)
                 .selectAll(UserDO.class, UserDO::getId)
                 .leftJoin(AddressDO.class, AddressDO::getUserId, UserDO::getId)
                 .applyFunc("concat(%s, %s, %s, {0}) is not null", arg -> arg.accept(

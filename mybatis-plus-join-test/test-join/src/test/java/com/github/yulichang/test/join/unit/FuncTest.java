@@ -23,7 +23,7 @@ public class FuncTest {
     @Test
     void func() {
         ThreadLocalUtils.set("SELECT t.`json` FROM `user` t WHERE t.del = false");
-        List<UserDO> list = JoinWrappers.lambda(UserDO.class)
+        List<UserDO> list = JoinWrappers.query(UserDO.class)
                 .func(false, w -> w.select(UserDO::getId))
                 .select(UserDO::getJson)
                 .list();
@@ -31,14 +31,14 @@ public class FuncTest {
         list.forEach(System.out::println);
 
         ThreadLocalUtils.set("SELECT t.id FROM `user` t WHERE t.del = false");
-        List<UserDO> list1 = JoinWrappers.lambda(UserDO.class)
+        List<UserDO> list1 = JoinWrappers.query(UserDO.class)
                 .func(true, w -> w.select(UserDO::getId), w -> w.select(UserDO::getName))
                 .list();
         assert list1.get(0).getId() != null && list1.get(0).getName() == null;
         list1.forEach(System.out::println);
 
         ThreadLocalUtils.set("SELECT t.`name` FROM `user` t WHERE t.del = false");
-        List<UserDO> list2 = JoinWrappers.lambda(UserDO.class)
+        List<UserDO> list2 = JoinWrappers.query(UserDO.class)
                 .func(false, w -> w.select(UserDO::getId), w -> w.select(UserDO::getName))
                 .list();
         assert list2.get(0).getName() != null && list2.get(0).getId() == null;

@@ -6,7 +6,7 @@ import com.baomidou.mybatisplus.core.toolkit.Constants;
 import com.baomidou.mybatisplus.core.toolkit.StringPool;
 import com.github.yulichang.adapter.AdapterHelper;
 import com.github.yulichang.toolkit.sql.SqlScriptUtils;
-import com.github.yulichang.wrapper.MPJLambdaWrapper;
+import com.github.yulichang.wrapper.JoinQueryWrapper;
 
 import java.util.Objects;
 import java.util.Optional;
@@ -18,15 +18,15 @@ import java.util.Optional;
 @SuppressWarnings("DuplicatedCode")
 public class WrapperUtils implements StringPool {
 
-    public static <T> String buildSubSqlByWrapper(Class<T> clazz, MPJLambdaWrapper<T> wrapper, String alias) {
+    public static <T> String buildSubSqlByWrapper(Class<T> clazz, JoinQueryWrapper<T> wrapper, String alias) {
         return String.format("%s AS %s", buildUnionSqlByWrapper(clazz, wrapper), alias);
     }
 
-    public static String buildUnionSqlByWrapper(Class<?> clazz, MPJLambdaWrapper<?> wrapper) {
+    public static String buildUnionSqlByWrapper(Class<?> clazz, JoinQueryWrapper<?> wrapper) {
         return buildUnionSqlByWrapper(clazz, true, wrapper);
     }
 
-    public static String buildUnionSqlByWrapper(Class<?> clazz, boolean brackets, MPJLambdaWrapper<?> wrapper) {
+    public static String buildUnionSqlByWrapper(Class<?> clazz, boolean brackets, JoinQueryWrapper<?> wrapper) {
         TableInfo tableInfo = TableHelper.getAssert(clazz);
         String first = Optional.ofNullable(wrapper.getSqlFirst()).orElse(EMPTY);
         boolean hasWhere = false;
@@ -73,14 +73,14 @@ public class WrapperUtils implements StringPool {
         return sb.toString();
     }
 
-    private static <T> String formatParam(MPJLambdaWrapper<T> wrapper, Object param) {
+    private static <T> String formatParam(JoinQueryWrapper<T> wrapper, Object param) {
         final String genParamName = Constants.WRAPPER_PARAM + wrapper.getParamNameSeq().incrementAndGet();
         final String paramStr = wrapper.getParamAlias() + ".paramNameValuePairs." + genParamName;
         wrapper.getParamNameValuePairs().put(genParamName, param);
         return SqlScriptUtils.safeParam(paramStr, null);
     }
 
-    private static String getEntitySql(TableInfo tableInfo, MPJLambdaWrapper<?> wrapper) {
+    private static String getEntitySql(TableInfo tableInfo, JoinQueryWrapper<?> wrapper) {
         Object obj = wrapper.getEntity();
         if (Objects.isNull(obj)) {
             return StringPool.EMPTY;
@@ -110,7 +110,7 @@ public class WrapperUtils implements StringPool {
         return sb.toString();
     }
 
-    private static String mainLogic(boolean hasWhere, Class<?> clazz, MPJLambdaWrapper<?> wrapper) {
+    private static String mainLogic(boolean hasWhere, Class<?> clazz, JoinQueryWrapper<?> wrapper) {
         if (!wrapper.getLogicSql()) {
             return StringPool.EMPTY;
         }
@@ -124,7 +124,7 @@ public class WrapperUtils implements StringPool {
         return StringPool.EMPTY;
     }
 
-    private static String subLogic(boolean hasWhere, MPJLambdaWrapper<?> wrapper) {
+    private static String subLogic(boolean hasWhere, JoinQueryWrapper<?> wrapper) {
         String sql = wrapper.getSubLogicSql();
         if (StrUtils.isNotBlank(sql)) {
             if (hasWhere) {

@@ -4,7 +4,7 @@ import com.github.yulichang.test.join.entity.TableA;
 import com.github.yulichang.test.join.entity.UserDO;
 import com.github.yulichang.test.util.Reset;
 import com.github.yulichang.toolkit.JoinWrappers;
-import com.github.yulichang.wrapper.MPJLambdaWrapper;
+import com.github.yulichang.wrapper.JoinQueryWrapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -21,7 +21,7 @@ public class TypeHandlerTest {
 
     @Test
     void typeHandler() {
-        MPJLambdaWrapper<UserDO> wrapper = JoinWrappers.lambda(UserDO.class);
+        JoinQueryWrapper<UserDO> wrapper = JoinWrappers.query(UserDO.class);
 
         List<UserDO> list = wrapper.list();
 
@@ -32,7 +32,7 @@ public class TypeHandlerTest {
 
     @Test
     void typeHandler1() {
-        MPJLambdaWrapper<TableA> wrapper = JoinWrappers.lambda(TableA.class);
+        JoinQueryWrapper<TableA> wrapper = JoinWrappers.query(TableA.class);
 
         List<TableA> list = wrapper.list();
 

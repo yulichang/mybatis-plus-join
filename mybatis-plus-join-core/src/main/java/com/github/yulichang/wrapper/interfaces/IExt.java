@@ -1,13 +1,13 @@
 package com.github.yulichang.wrapper.interfaces;
 
-import com.github.yulichang.wrapper.MPJLambdaWrapper;
+import com.github.yulichang.wrapper.JoinQueryWrapper;
 
 /**
  * @param <Children> wrapper
- * @auther yulichang
+ * @author yulichang
  * @since 1.5.2
  */
-public interface IExt<Children extends MPJLambdaWrapper<?>> {
+public interface IExt<Children extends JoinQueryWrapper<?>> {
 
     Children getChildren();
 }

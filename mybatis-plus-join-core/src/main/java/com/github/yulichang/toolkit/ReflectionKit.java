@@ -49,8 +49,6 @@ public final class ReflectionKit {
     @SuppressWarnings("DeprecatedIsStillUsed")
     private static final Map<Class<?>, Class<?>> PRIMITIVE_WRAPPER_TYPE_MAP = new IdentityHashMap<>(8);
 
-    private static final Map<Class<?>, Class<?>> PRIMITIVE_TYPE_TO_WRAPPER_MAP = new IdentityHashMap<>(8);
-
     static {
         PRIMITIVE_WRAPPER_TYPE_MAP.put(Boolean.class, boolean.class);
         PRIMITIVE_WRAPPER_TYPE_MAP.put(Byte.class, byte.class);
@@ -60,9 +58,6 @@ public final class ReflectionKit {
         PRIMITIVE_WRAPPER_TYPE_MAP.put(Integer.class, int.class);
         PRIMITIVE_WRAPPER_TYPE_MAP.put(Long.class, long.class);
         PRIMITIVE_WRAPPER_TYPE_MAP.put(Short.class, short.class);
-        for (Map.Entry<Class<?>, Class<?>> entry : PRIMITIVE_WRAPPER_TYPE_MAP.entrySet()) {
-            PRIMITIVE_TYPE_TO_WRAPPER_MAP.put(entry.getValue(), entry.getKey());
-        }
     }
 
     /**

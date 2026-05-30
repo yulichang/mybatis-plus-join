@@ -159,7 +159,7 @@ public class MPJTableFieldInfo {
         TableInfo info = TableHelper.getAssert(this.joinClass);
         //根据属性名查询
         Field field = info.getFieldList().stream().filter(i -> i.getProperty().equals(bindName))
-                .findFirst().map(f -> getField(this.joinClass, f)).orElse(null);
+                .findFirst().map(this::getField).orElse(null);
         if (field == null && bindName.equals(info.getKeyProperty())) {
             field = ReflectionKit.getFieldList(joinClass).stream().filter(f ->
                     f.getName().equals(info.getKeyProperty())).findFirst().orElse(null);
@@ -168,7 +168,7 @@ public class MPJTableFieldInfo {
             //根据字段查询
             field = info.getFieldList().stream()
                     .filter(i -> i.getColumn().equals(bindName))
-                    .map(f -> getField(this.joinClass, f)).findFirst().orElse(null);
+                    .map(this::getField).findFirst().orElse(null);
             if (field == null && bindName.equals(info.getKeyColumn())) {
                 field = ReflectionKit.getFieldList(joinClass).stream().filter(f ->
                         f.getName().equals(info.getKeyProperty())).findFirst().orElse(null);
@@ -201,7 +201,7 @@ public class MPJTableFieldInfo {
             }
         } else {
             this.joinColumn = joinFieldInfo.getColumn();
-            this.joinField = getField(this.joinClass, joinFieldInfo);
+            this.joinField = getField(joinFieldInfo);
         }
         Assert.notNull(this.joinField, "注解属性joinField不存在 %s , %s", this.joinClass.getName(),
                 StrUtils.isBlank(this.joinProperty) ? "主键" : this.joinProperty);
@@ -231,7 +231,7 @@ public class MPJTableFieldInfo {
                     f.getProperty().equals(this.thisProperty)).findFirst().orElse(null);
             Assert.notNull(fieldInfo, "注解属性thisField不存在 %s , %s", entityType.getName(),
                     StrUtils.isBlank(this.thisProperty) ? "主键" : this.thisProperty);
-            this.thisField = getField(this.entityType, fieldInfo);
+            this.thisField = getField(fieldInfo);
             this.thisColumn = fieldInfo.getColumn();
         }
         this.thisField.setAccessible(true);
@@ -310,7 +310,7 @@ public class MPJTableFieldInfo {
         return TableHelper.getAssert(clazz);
     }
 
-    private Field getField(Class<?> table, TableFieldInfo tableFieldInfo) {
+    private Field getField(TableFieldInfo tableFieldInfo) {
         return AdapterHelper.getAdapter().mpjGetField(tableFieldInfo);
     }
 

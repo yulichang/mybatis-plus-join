@@ -30,7 +30,7 @@
     </scm>
 
     <modules>
-        <module>mybatis-plus-join-boot-starter</module>
+        <module>mybatis-plus-join-spring-boot-starter</module>
         <module>mybatis-plus-join-core</module>
         <module>mybatis-plus-join-annotation</module>
         <module>mybatis-plus-join-extension</module>

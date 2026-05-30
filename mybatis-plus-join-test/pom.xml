@@ -78,7 +78,7 @@
         </dependency>
         <dependency>
             <groupId>com.github.yulichang</groupId>
-            <artifactId>mybatis-plus-join-boot-starter</artifactId>
+            <artifactId>mybatis-plus-join-spring-boot-starter</artifactId>
             <version>${revision}</version>
         </dependency>
         <dependency>

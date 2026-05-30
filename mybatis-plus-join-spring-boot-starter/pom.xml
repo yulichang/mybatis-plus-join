@@ -9,8 +9,8 @@
         <version>${revision}</version>
     </parent>
     <version>${revision}</version>
-    <artifactId>mybatis-plus-join-boot-starter</artifactId>
-    <name>mybatis-plus-join-boot-starter</name>
+    <artifactId>mybatis-plus-join-spring-boot-starter</artifactId>
+    <name>mybatis-plus-join-spring-boot-starter</name>
 
     <description>An enhanced toolkit of Mybatis-Plus to simplify development.</description>
     <url>https://github.com/yulichang/mybatis-plus-join</url>

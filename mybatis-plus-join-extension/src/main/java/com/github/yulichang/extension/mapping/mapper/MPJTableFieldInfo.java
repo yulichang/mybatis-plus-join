@@ -311,7 +311,8 @@ public class MPJTableFieldInfo {
     }
 
     private Field getField(Class<?> table, TableFieldInfo tableFieldInfo) {
-        return AdapterHelper.getAdapter().mpjGetField(tableFieldInfo);
+        return AdapterHelper.getAdapter().mpjGetField(tableFieldInfo, () ->
+                ReflectionKit.getFieldMap(table).get(tableFieldInfo.getProperty()));
     }
 
     public void fieldSet(Object o, Object val) {

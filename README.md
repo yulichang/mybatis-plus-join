@@ -9,8 +9,8 @@
   为简化开发工作、提高生产率而生
 </p>
 <p align="center">
-  <a href="https://central.sonatype.com/artifact/com.github.yulichang/mybatis-plus-join-spring-boot-starter">
-    <img alt="Maven central" src="https://img.shields.io/maven-central/v/com.github.yulichang/mybatis-plus-join-spring-boot-starter.svg?style=flat-square">
+  <a href="https://central.sonatype.com/artifact/com.github.yulichang/mybatis-plus-join-boot-starter">
+    <img alt="Maven central" src="https://img.shields.io/maven-central/v/com.github.yulichang/mybatis-plus-join-boot-starter.svg?style=flat-square">
   </a>
   <a href="https://www.apache.org/licenses/LICENSE-2.0">
     <img alt="code style" src="https://img.shields.io/badge/license-Apache%202-4EB1BA.svg?style=flat-square">
@@ -48,13 +48,13 @@
   ```xml
   <dependency>
       <groupId>com.github.yulichang</groupId>
-      <artifactId>mybatis-plus-join-spring-boot-starter</artifactId>
+      <artifactId>mybatis-plus-join-boot-starter</artifactId>
       <version>2.0.0</version>
   </dependency>
   ```
 - Gradle
   ```
-   implementation 'com.github.yulichang:mybatis-plus-join-spring-boot-starter:2.0.0'
+   implementation 'com.github.yulichang:mybatis-plus-join-boot-starter:2.0.0'
   ```
   或者clone代码到本地执行 `mvn install`, 再引入以上依赖  
   <br>
@@ -65,7 +65,7 @@
 
 * mapper继承MPJBaseMapper 
 
-### Lambda形式用法（JoinQueryWrapper）
+### Lambda形式用法（MPJLambdaWrapper）
 
 #### 简单的连表查询
 

@@ -6,7 +6,7 @@ import com.github.yulichang.test.join.entity.UserDO;
 import com.github.yulichang.test.util.Reset;
 import com.github.yulichang.test.util.ThreadLocalUtils;
 import com.github.yulichang.toolkit.JoinWrappers;
-import com.github.yulichang.wrapper.JoinQueryWrapper;
+import com.github.yulichang.wrapper.MPJLambdaWrapper;
 import com.github.yulichang.wrapper.segments.Fun;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -35,7 +35,7 @@ public class SelectFuncTest {
                 WHERE t.del = false AND t1.del = false
                     AND (concat(t.id, t1.user_id, ?) IS NOT NULL AND t.id >= ?)
                 """);
-        List<UserDTO> list = JoinWrappers.query(UserDO.class)
+        List<UserDTO> list = JoinWrappers.lambda(UserDO.class)
                 .selectAll(UserDO.class)
                 .selectFunc("concat(%s,%s,{0},{1})",
                         arg -> arg
@@ -71,7 +71,7 @@ public class SelectFuncTest {
                     AND t1.del = false
                     AND (t.id = (SELECT sst.id FROM `user` sst WHERE sst.del = false AND (sst.id = t.id AND sst.id >= ? AND sst.id <= ?)))
                 """);
-        JoinQueryWrapper<UserDO> wrapper1 = JoinWrappers.query(UserDO.class)
+        MPJLambdaWrapper<UserDO> wrapper1 = JoinWrappers.lambda(UserDO.class)
                 .selectAll()
                 .selectFunc("%s", arg -> arg.accept(
                                 Fun.f(UserDO.class, u -> u

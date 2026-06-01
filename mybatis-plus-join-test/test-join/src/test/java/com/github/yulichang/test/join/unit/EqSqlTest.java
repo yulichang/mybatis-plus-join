@@ -21,11 +21,11 @@ public class EqSqlTest {
     void eqSql() {
         ThreadLocalUtils.set("SELECT t.id, t.pid, t.`name`, t.`json`, t.sex, t.head_img, t.create_time, t.address_id, " +
                 "t.address_id2, t.del, t.create_by, t.update_by FROM `user` t WHERE t.del = false AND (t.id = (SELECT id FROM `user` WHERE id = 1))");
-        JoinWrappers.query(UserDO.class).eqSql(UserDO::getId, "select id from `user` where id = 1").list();
+        JoinWrappers.lambda(UserDO.class).eqSql(UserDO::getId, "select id from `user` where id = 1").list();
 
         ThreadLocalUtils.set("SELECT t.id, t.pid, t.`name`, t.`json`, t.sex, t.head_img, t.create_time, t.address_id, " +
                 "t.address_id2, t.del, t.create_by, t.update_by FROM `user` t WHERE t.del = false AND (t.id = (SELECT id FROM `user` WHERE id = 1))");
-        JoinWrappers.query(UserDO.class).eqSql("t.id", "select id from `user` where id = 1").list();
+        JoinWrappers.lambda(UserDO.class).eqSql("t.id", "select id from `user` where id = 1").list();
     }
 
 }

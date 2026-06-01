@@ -4,7 +4,7 @@ import com.github.yulichang.test.collection.dto.*;
 import com.github.yulichang.test.collection.entity.*;
 import com.github.yulichang.test.collection.mapper.TableAMapper;
 import com.github.yulichang.test.collection.mapper.TableTMapper;
-import com.github.yulichang.wrapper.JoinQueryWrapper;
+import com.github.yulichang.wrapper.MPJLambdaWrapper;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,7 +38,7 @@ class CollectionTest {
     void testJoinCollection() {
         testAA();
         //4层嵌套  a对多b  b对多c  c对多d  d对多e
-        JoinQueryWrapper<TableA> wrapper1 = new JoinQueryWrapper<TableA>()
+        MPJLambdaWrapper<TableA> wrapper1 = new MPJLambdaWrapper<TableA>()
                 .selectAll(TableA.class)
                 .selectCollection(TableB.class, TableADTO::getBList, b -> b
                         .collection(TableC.class, TableBDTO::getCList, c -> c
@@ -49,9 +49,9 @@ class CollectionTest {
                 .leftJoin(TableC.class, TableC::getBid, TableB::getId)
                 .leftJoin(TableD.class, TableD::getCid, TableC::getId)
                 .leftJoin(TableE.class, TableE::getDid, TableD::getId);
-        List<TableADTO> dtos1 = tableAMapper.selectList(TableADTO.class, wrapper1);
+        List<TableADTO> dtos1 = tableAMapper.selectJoinList(TableADTO.class, wrapper1);
 
-        JoinQueryWrapper<TableA> wrapper = new JoinQueryWrapper<TableA>()
+        MPJLambdaWrapper<TableA> wrapper = new MPJLambdaWrapper<TableA>()
                 .selectAll(TableA.class)
                 .selectCollection(TableB.class, TableADTO::getBList, b -> b
                         .collection(TableC.class, TableBDTO::getCList, c -> c
@@ -61,14 +61,14 @@ class CollectionTest {
                 .leftJoin(TableC.class, TableC::getBid, TableB::getId)
                 .leftJoin(TableD.class, TableD::getCid, TableC::getId)
                 .leftJoin(TableE.class, TableE::getDid, TableD::getId);
-        List<TableADTO> dtos = tableAMapper.selectList(TableADTO.class, wrapper);
+        List<TableADTO> dtos = tableAMapper.selectJoinList(TableADTO.class, wrapper);
 
         assert dtos.get(0).getBList().get(0).getCList().get(0).getDList().get(0).getEList().get(0).getName() != null;
     }
 
     @Test
     void testAA() {
-        JoinQueryWrapper<TableA> wrapper1 = new JoinQueryWrapper<TableA>()
+        MPJLambdaWrapper<TableA> wrapper1 = new MPJLambdaWrapper<TableA>()
                 .selectAll(TableA.class)
                 .selectAssociation(TableB.class, TableADTO::getB, b -> b
                         .association(TableC.class, TableBDTO::getC, c -> c
@@ -80,7 +80,7 @@ class CollectionTest {
                 .leftJoin(TableD.class, TableD::getCid, TableC::getId)
                 .leftJoin(TableE.class, TableE::getDid, TableD::getId)
                 .last("LIMIT 1");
-        List<TableADTO> dtos1 = tableAMapper.selectList(TableADTO.class, wrapper1);
+        List<TableADTO> dtos1 = tableAMapper.selectJoinList(TableADTO.class, wrapper1);
         assert dtos1.get(0).getB().getC().getD().getE().getId() != null;
     }
 
@@ -89,19 +89,19 @@ class CollectionTest {
      */
     @Test
     void testRepeat() {
-        JoinQueryWrapper<TableT> wrapper = new JoinQueryWrapper<TableT>()
+        MPJLambdaWrapper<TableT> wrapper = new MPJLambdaWrapper<TableT>()
                 .selectAll(TableT.class)
                 .selectAssociation("t1", TableA.class, TableDTO::getTable1)
                 .selectAssociation("t2", TableA.class, TableDTO::getTable2)
                 .leftJoin(TableA.class, TableA::getId, TableT::getAid1)
                 .leftJoin(TableA.class, TableA::getId, TableT::getAid2);
-        List<TableDTO> dtos = tableMapper.selectList(TableDTO.class, wrapper);
+        List<TableDTO> dtos = tableMapper.selectJoinList(TableDTO.class, wrapper);
         System.out.println(1);
     }
 
     @Test
     void testFree() {
-        JoinQueryWrapper<TableA> wrapper1 = new JoinQueryWrapper<TableA>()
+        MPJLambdaWrapper<TableA> wrapper1 = new MPJLambdaWrapper<TableA>()
                 .selectAll(TableA.class)
                 .selectAssociation(TableADTO::getB, b -> b
                         .all(TableB.class)
@@ -114,11 +114,11 @@ class CollectionTest {
                 .leftJoin(TableD.class, TableD::getCid, TableC::getId)
                 .leftJoin(TableE.class, TableE::getDid, TableD::getId)
                 .last("LIMIT 1");
-        List<TableADTO> dtos1 = tableAMapper.selectList(TableADTO.class, wrapper1);
+        List<TableADTO> dtos1 = tableAMapper.selectJoinList(TableADTO.class, wrapper1);
         assert dtos1.get(0).getB().getC().getD().getE().getId() != null;
 
 
-        JoinQueryWrapper<TableA> wrapper2 = new JoinQueryWrapper<TableA>()
+        MPJLambdaWrapper<TableA> wrapper2 = new MPJLambdaWrapper<TableA>()
                 .selectAll(TableA.class)
                 .selectAssociation(TableADTO::getB, b -> b
                         .id(TableB::getId)
@@ -132,13 +132,13 @@ class CollectionTest {
                 .leftJoin(TableD.class, TableD::getCid, TableC::getId)
                 .leftJoin(TableE.class, TableE::getDid, TableD::getId)
                 .last("LIMIT 1");
-        List<TableADTO> dtos2 = tableAMapper.selectList(TableADTO.class, wrapper2);
+        List<TableADTO> dtos2 = tableAMapper.selectJoinList(TableADTO.class, wrapper2);
         assert dtos2.get(0).getB().getC().getD().getE().getId() != null;
         assert Objects.equals(dtos2.get(0).getB().getName(), "tableD1");
     }
 
     void test() {
-        JoinQueryWrapper<TableA> wrapper1 = new JoinQueryWrapper<TableA>()
+        MPJLambdaWrapper<TableA> wrapper1 = new MPJLambdaWrapper<TableA>()
                 .selectAll(TableA.class)
                 .selectAssociation(TableB.class, TableADTO::getB, b -> b
                         .collection(TableC.class, TableBDTO::getCList))
@@ -146,7 +146,7 @@ class CollectionTest {
                 .leftJoin(TableC.class, TableC::getBid, TableB::getId)
                 .leftJoin(TableD.class, TableD::getCid, TableC::getId)
                 .leftJoin(TableE.class, TableE::getDid, TableD::getId);
-        List<TableADTO> dtos1 = tableAMapper.selectList(TableADTO.class, wrapper1);
+        List<TableADTO> dtos1 = tableAMapper.selectJoinList(TableADTO.class, wrapper1);
 
 
     }

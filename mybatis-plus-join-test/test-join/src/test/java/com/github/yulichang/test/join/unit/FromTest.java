@@ -5,7 +5,7 @@ import com.github.yulichang.test.util.EnabledIfConfig;
 import com.github.yulichang.test.util.Reset;
 import com.github.yulichang.test.util.ThreadLocalUtils;
 import com.github.yulichang.toolkit.JoinWrappers;
-import com.github.yulichang.wrapper.JoinQueryWrapper;
+import com.github.yulichang.wrapper.MPJLambdaWrapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -36,7 +36,7 @@ public class FromTest {
                     FROM `user` t WHERE t.del = false AND (t.id >= ?)) t
                 WHERE t.del = false
                 """);
-        JoinQueryWrapper<UserDO> wrapper = JoinWrappers.query(UserDO.class)
+        MPJLambdaWrapper<UserDO> wrapper = JoinWrappers.lambda(UserDO.class)
                 .selectAll()
                 .from(from -> from
                         .selectAll()
@@ -63,12 +63,12 @@ public class FromTest {
                     WHERE t.del = false)) t
                 WHERE t.del = false
                 """);
-        JoinQueryWrapper<UserDO> wrapper = JoinWrappers.query(UserDO.class)
+        MPJLambdaWrapper<UserDO> wrapper = JoinWrappers.lambda(UserDO.class)
                 .selectAll()
                 .from(from -> from
                         .selectAll()
                         .ge(UserDO::getId, 0)
-                        .unionAll(UserDO.class, JoinQueryWrapper::selectAll));
+                        .unionAll(UserDO.class, MPJLambdaWrapper::selectAll));
         wrapper.list();
     }
 }

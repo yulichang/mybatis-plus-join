@@ -6,7 +6,7 @@ import com.github.yulichang.test.mapping.entity.AddressDO;
 import com.github.yulichang.test.mapping.entity.UserDO;
 import com.github.yulichang.test.mapping.service.AddressService;
 import com.github.yulichang.test.mapping.service.UserService;
-import com.github.yulichang.wrapper.JoinQueryWrapper;
+import com.github.yulichang.wrapper.MPJLambdaWrapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -48,7 +48,7 @@ class MappingTest {
 
     @Test
     public void testJoin() {
-        JoinQueryWrapper<UserDO> wrapper = new JoinQueryWrapper<UserDO>()
+        MPJLambdaWrapper<UserDO> wrapper = new MPJLambdaWrapper<UserDO>()
                 .selectAll(UserDO.class)
                 .leftJoin(AddressDO.class, AddressDO::getId, UserDO::getAddressId);
         List<UserDO> dos = userService.listDeep(wrapper, conf -> conf.loop(false));

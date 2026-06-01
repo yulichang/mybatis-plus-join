@@ -1,18 +1,17 @@
 package com.github.yulichang.method.mp;
 
-import com.baomidou.mybatisplus.core.enums.SqlMethod;
 import com.baomidou.mybatisplus.core.metadata.TableInfo;
+import com.baomidou.mybatisplus.core.toolkit.Constants;
+import com.baomidou.mybatisplus.core.toolkit.StringPool;
 import com.baomidou.mybatisplus.core.toolkit.sql.SqlScriptUtils;
 import com.github.yulichang.interfaces.MPJBaseJoin;
-import com.github.yulichang.method.SelectJoinPage;
+import com.github.yulichang.toolkit.StrUtils;
 import org.apache.ibatis.mapping.MappedStatement;
-import org.apache.ibatis.mapping.SqlSource;
 
 /**
  * SelectPage 兼容MP原生方法
  */
-@SuppressWarnings("deprecation")
-public class SelectPage extends com.baomidou.mybatisplus.core.injector.methods.SelectPage implements BaseMethod {
+public class SelectPage extends com.baomidou.mybatisplus.core.injector.methods.SelectPage implements TableAlias {
 
     public SelectPage() {
         super();
@@ -25,14 +24,36 @@ public class SelectPage extends com.baomidou.mybatisplus.core.injector.methods.S
 
     @Override
     public MappedStatement injectMappedStatement(Class<?> mapperClass, Class<?> modelClass, TableInfo tableInfo) {
-        SqlMethod sqlMethod = SqlMethod.SELECT_PAGE;
-        String MP_sql = String.format(sqlMethod.getSql(), sqlFirst(), sqlSelectColumns(tableInfo, true),
-                tableInfo.getTableName(), sqlWhereEntityWrapper(true, tableInfo), sqlOrderBy(tableInfo), sqlComment());
-        String MPJ_sql = new SelectJoinPage(sqlMethod.getMethod()).getSql(tableInfo);
-        String sql = SqlScriptUtils.convertChoose(String.format("%s != null and (%s instanceof %s)", WRAPPER, WRAPPER, MPJBaseJoin.class.getName()),
-                removeScript(MPJ_sql), removeScript(MP_sql));
-        SqlSource sqlSource = super.createSqlSource(configuration, addScript(sql), modelClass);
-        return this.addSelectMappedStatementForTable(mapperClass, methodName, sqlSource, tableInfo);
+        return super.injectMappedStatement(mapperClass, modelClass,
+                copyAndSetTableName(tableInfo, getTableName(tableInfo)));
     }
 
+    @Override
+    protected String sqlWhereEntityWrapper(boolean newLine, TableInfo table) {
+        return SqlScriptUtils.convertChoose(String.format("%s == null or !(%s instanceof %s)", Constants.WRAPPER, Constants.WRAPPER, MPJBaseJoin.class.getName()),
+                super.sqlWhereEntityWrapper(newLine, table), mpjSqlWhereEntityWrapper(newLine, table));
+    }
+
+    @Override
+    protected String sqlOrderBy(TableInfo table) {
+        String orderBy = super.sqlOrderBy(table);
+        if (StrUtils.isBlank(orderBy)) {
+            return orderBy;
+        }
+        return SqlScriptUtils.convertChoose(String.format("%s == null or !(%s instanceof %s)", Constants.WRAPPER, Constants.WRAPPER, MPJBaseJoin.class.getName()),
+                super.sqlOrderBy(table), mpjSqlOrderBy(table));
+    }
+
+    @Override
+    protected String sqlSelectColumns(TableInfo table, boolean queryWrapper) {
+        String selectColumns = super.sqlSelectColumns(table, queryWrapper);
+        return SqlScriptUtils.convertChoose(String.format("%s == null or !(%s instanceof %s)", Constants.WRAPPER, Constants.WRAPPER, MPJBaseJoin.class.getName()),
+                selectColumns, mpjSqlSelectColumns() + StringPool.SPACE + selectColumns);
+    }
+
+    @Override
+    protected String sqlComment() {
+        return super.sqlComment() + StringPool.NEWLINE + SqlScriptUtils.convertIf("${ew.unionSql}", String.format("%s != null and (%s instanceof %s)",
+                Constants.WRAPPER, Constants.WRAPPER, MPJBaseJoin.class.getName()), true);
+    }
 }

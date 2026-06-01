@@ -9,7 +9,7 @@ import com.github.yulichang.test.util.Reset;
 import com.github.yulichang.test.util.ThreadLocalUtils;
 import com.github.yulichang.toolkit.JoinWrappers;
 import com.github.yulichang.wrapper.JoinAbstractLambdaWrapper;
-import com.github.yulichang.wrapper.JoinQueryWrapper;
+import com.github.yulichang.wrapper.MPJLambdaWrapper;
 import com.github.yulichang.wrapper.interfaces.MConsumer;
 import com.github.yulichang.wrapper.interfaces.MFunction;
 import com.github.yulichang.wrapper.interfaces.QueryJoin;
@@ -79,7 +79,7 @@ public class JoinTest {
                     AND t1.del = false
                     AND (t1.id <= ?)
                 """);
-        JoinWrappers.query(UserDO.class)
+        JoinWrappers.lambda(UserDO.class)
                 .selectAll()
                 .leftJoin(AddressDO.class, t -> t
                         .setAlias("tt")
@@ -102,7 +102,7 @@ public class JoinTest {
                 LEFT JOIN address t1 ON t1.id > ?
                 WHERE t.del = false AND (t.id <= ?)
                 """);
-        JoinWrappers.query(UserDO.class)
+        JoinWrappers.lambda(UserDO.class)
                 .selectAll()
                 .leftJoin("address t1 on t1.id > {0}", 0)
                 .le(AddressDO::getId, 10000)
@@ -116,7 +116,7 @@ public class JoinTest {
                 LEFT JOIN address t1 ON t1.id > 0
                 WHERE t.del = false AND (t.id <= ?)
                 """);
-        JoinWrappers.query(UserDO.class)
+        JoinWrappers.lambda(UserDO.class)
                 .selectAll()
                 .leftJoin("address t1 on t1.id > 0")
                 .le(AddressDO::getId, 10000)
@@ -238,11 +238,11 @@ public class JoinTest {
 
     private final Set<String> set = new TreeSet<>();
 
-    private JoinQueryWrapper<UserDO> w() {
-        return new JoinQueryWrapper<>(UserDO.class) {
+    private MPJLambdaWrapper<UserDO> w() {
+        return new MPJLambdaWrapper<>(UserDO.class) {
             @Override
-            public <R> JoinQueryWrapper<UserDO> join(String keyWord, Class<R> clazz, MConsumer<JoinQueryWrapper<R>> table, String tableAlias,
-                                                     BiConsumer<JoinAbstractLambdaWrapper<UserDO, ?>, JoinQueryWrapper<UserDO>> consumer) {
+            public <R> MPJLambdaWrapper<UserDO> join(String keyWord, Class<R> clazz, MConsumer<MPJLambdaWrapper<R>> table, String tableAlias,
+                                                     BiConsumer<JoinAbstractLambdaWrapper<UserDO, ?>, MPJLambdaWrapper<UserDO>> consumer) {
                 String line = Arrays.stream(Thread.getAllStackTraces().get(Thread.currentThread()))
                         .filter(f -> Objects.equals(QueryJoin.class.getName(), f.getClassName()))
                         .map(f -> f.getLineNumber() + "")
@@ -256,11 +256,11 @@ public class JoinTest {
         };
     }
 
-    private void w(MFunction<JoinQueryWrapper<UserDO>> consumer) {
+    private void w(MFunction<MPJLambdaWrapper<UserDO>> consumer) {
         consumer.apply(w().selectAll()).list(UserDTO.class);
     }
 
-    private void f(MFunction<JoinQueryWrapper<UserDO>> consumer) {
+    private void f(MFunction<MPJLambdaWrapper<UserDO>> consumer) {
         consumer.apply(w().selectAll());
     }
 }

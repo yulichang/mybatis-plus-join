@@ -2,7 +2,9 @@ package com.github.yulichang.test.kt
 
 import com.baomidou.mybatisplus.core.metadata.IPage
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page
+import com.github.yulichang.extension.kt.KtDeleteJoinWrapper
 import com.github.yulichang.extension.kt.KtLambdaWrapper
+import com.github.yulichang.extension.kt.KtUpdateJoinWrapper
 import com.github.yulichang.extension.kt.toolkit.KtWrappers
 import com.github.yulichang.test.kt.dto.AddressDTO
 import com.github.yulichang.test.kt.dto.UserDTO
@@ -95,7 +97,7 @@ class LambdaWrapperTest {
             .leftJoin(AreaDO::class.java, AreaDO::id, AddressDO::areaId)
             .le(UserDO::id, 10000)
             .orderByDesc(UserDO::id)
-        val list = userMapper!!.selectList(UserDTO::class.java, wrapper)
+        val list = userMapper!!.selectJoinList(UserDTO::class.java, wrapper)
         assert(list[0].addressList != null && list[0]!!.addressList!![0].id != null)
         list.forEach(System.out::println)
     }
@@ -131,7 +133,7 @@ class LambdaWrapperTest {
             .leftJoin(AddressDO::class.java, AddressDO::userId, UserDO::id)
             .le(UserDO::id, 10000)
             .orderByDesc(UserDO::id)
-        val list = userMapper!!.selectList(UserDTO::class.java, wrapper)
+        val list = userMapper!!.selectJoinList(UserDTO::class.java, wrapper)
         assert(list[0].addressIds != null)
         list.forEach(System.out::println)
     }
@@ -180,7 +182,7 @@ class LambdaWrapperTest {
             .leftJoin(AddressDO::class.java, AddressDO::userId, UserDO::id)
             .leftJoin(AreaDO::class.java, AreaDO::id, AddressDO::areaId)
             .orderByDesc(UserDO::id)
-        val list = userMapper!!.selectList(UserDTO::class.java, wrapper)
+        val list = userMapper!!.selectJoinList(UserDTO::class.java, wrapper)
         assert(list[0]!!.addressList!![0].id != null)
         list.forEach(System.out::println)
     }
@@ -205,7 +207,7 @@ class LambdaWrapperTest {
             .select(UserDO::id)
             .leftJoin(AddressDO::class.java, AddressDO::userId, UserDO::id)
             .leftJoin(AreaDO::class.java, AreaDO::id, AddressDO::areaId)
-        val list: List<Integer> = userMapper!!.selectList(Integer::class.java, wrapper)
+        val list: List<Integer> = userMapper!!.selectJoinList(Integer::class.java, wrapper)
         println(list)
 
 
@@ -223,7 +225,7 @@ class LambdaWrapperTest {
             .select(UserDO::createTime)
             .leftJoin(AddressDO::class.java, AddressDO::userId, UserDO::id)
             .leftJoin(AreaDO::class.java, AreaDO::id, AddressDO::areaId)
-        val list1: List<Timestamp> = userMapper.selectList(Timestamp::class.java, wrapper1)
+        val list1: List<Timestamp> = userMapper.selectJoinList(Timestamp::class.java, wrapper1)
         println(list1)
     }
 
@@ -292,7 +294,7 @@ class LambdaWrapperTest {
             .leftJoin(UserDO::class.java, "uc", UserDO::id, UserDto::updateBy) { ext ->
                 ext.selectAs(UserDO::name, UserDto::updateName)
             }
-        val userDtos: List<UserDto> = userDTOMapper!!.selectList(UserDto::class.java, wrapper)
+        val userDtos: List<UserDto> = userDTOMapper!!.selectJoinList(UserDto::class.java, wrapper)
         assert(StrUtils.isNotBlank(userDtos[0].userName))
         assert(StrUtils.isNotBlank(userDtos[0].createName))
         assert(StrUtils.isNotBlank(userDtos[0].updateName))
@@ -334,7 +336,7 @@ class LambdaWrapperTest {
             }
             .leftJoin(UserDO::class.java, "uc", UserDO::id, UserDO::updateBy)
             .eq(UserDO::id, UserDO::id)
-        userMapper!!.selectList(UserDO::class.java, w)
+        userMapper!!.selectJoinList(UserDO::class.java, w)
         println(1)
     }
 
@@ -380,7 +382,7 @@ class LambdaWrapperTest {
             .selectCollection(UserDO::class.java, UserDO::children)
             .leftJoin(UserDO::class.java, UserDO::pid, UserDO::id)
             .gt(UserDO::id, 0)
-        val list: List<UserDO> = userMapper!!.selectList(UserDO::class.java, wrapper)
+        val list: List<UserDO> = userMapper!!.selectJoinList(UserDO::class.java, wrapper)
         println(list)
 
         ThreadLocalUtils.set(
@@ -417,7 +419,7 @@ class LambdaWrapperTest {
                     .eq(UserDO::id, UserDO::updateBy)
             }
             .eq(UserDO::id, UserDO::id)
-        val dos: List<UserDO> = userMapper.selectList(UserDO::class.java, wrapper1)
+        val dos: List<UserDO> = userMapper.selectJoinList(UserDO::class.java, wrapper1)
         assert(dos[0].createName != null && dos[0].updateName != null)
 
 
@@ -477,7 +479,7 @@ class LambdaWrapperTest {
                     .le(UserDO::id, 5)
             }
             .le(UserDO::id, 4)
-        val list1: List<UserDO> = userMapper.selectList(UserDO::class.java, wrapper2)
+        val list1: List<UserDO> = userMapper.selectJoinList(UserDO::class.java, wrapper2)
         println(list1)
     }
 
@@ -486,10 +488,10 @@ class LambdaWrapperTest {
      */
     @Test
     fun testLogicDel() {
-        val l1: List<UserDTO> = userMapper!!.selectList(UserDTO::class.java, KtWrappers.query(UserDO::class.java))
+        val l1: List<UserDTO> = userMapper!!.selectJoinList(UserDTO::class.java, KtWrappers.query(UserDO::class.java))
         assert(l1.size == 14)
 
-        val l2: List<UserDTO> = userMapper.selectList(
+        val l2: List<UserDTO> = userMapper.selectJoinList(
             UserDTO::class.java, KtWrappers.query(UserDO::class.java)
                 .selectAll(UserDO::class.java)
                 .select(AddressDO::address)
@@ -497,7 +499,7 @@ class LambdaWrapperTest {
         )
         assert(l2.size == 10)
 
-        val l3: List<UserDTO> = userMapper.selectList(
+        val l3: List<UserDTO> = userMapper.selectJoinList(
             UserDTO::class.java, KtWrappers.query(UserDO::class.java)
                 .disableSubLogicDel()
                 .selectAll(UserDO::class.java)
@@ -506,7 +508,7 @@ class LambdaWrapperTest {
         )
         assert(l3.size == 14 && l3[0].addressList!!.size == 9)
 
-        val l4: List<UserDTO> = userMapper.selectList(
+        val l4: List<UserDTO> = userMapper.selectJoinList(
             UserDTO::class.java,
             KtWrappers.query(UserDO::class.java)
                 .disableSubLogicDel()
@@ -530,7 +532,7 @@ class LambdaWrapperTest {
             .selectAll(UserDO::class.java)
             .selectCollection(UserDO::class.java, UserDO::children)
             .leftJoin(UserDO::class.java, UserDO::pid, UserDO::id)
-        val list: List<UserDO> = userMapper!!.selectList(UserDO::class.java, wrapper)
+        val list: List<UserDO> = userMapper!!.selectJoinList(UserDO::class.java, wrapper)
         assert(list[0].name != null && list[0].children!![0].name != null)
         assert(list[0].img != null && list[0].children!![0].img != null)
         println(list)
@@ -566,7 +568,7 @@ class LambdaWrapperTest {
             .selectAll(UserDO::class.java)
             .selectAll(AddressDO::class.java, "aa")
             .leftJoin(AddressDO::class.java, "aa", AddressDO::userId, UserDO::id)
-        val list: List<UserDO> = userMapper!!.selectList(UserDO::class.java, wrapper)
+        val list: List<UserDO> = userMapper!!.selectJoinList(UserDO::class.java, wrapper)
         println(list)
     }
 
@@ -579,7 +581,7 @@ class LambdaWrapperTest {
             .selectCollection("t2", AddressDO::class.java, UserDO::addressList2)
             .leftJoin(AddressDO::class.java, AddressDO::id, UserDO::addressId)
             .leftJoin(AddressDO::class.java, AddressDO::id, UserDO::addressId2)
-        val list: List<UserDO> = userMapper!!.selectList(UserDO::class.java, wrapper)
+        val list: List<UserDO> = userMapper!!.selectJoinList(UserDO::class.java, wrapper)
 
         assert(list[0].addressList!![0].address != null)
         assert(list[0].addressList2!![0].address != null)
@@ -594,7 +596,7 @@ class LambdaWrapperTest {
     fun test1() {
         val page: Page<UserDTO> = Page(1, 10)
         page.setSearchCount(false)
-        val iPage: IPage<UserDTO> = userMapper!!.selectPage(
+        val iPage: IPage<UserDTO> = userMapper!!.selectJoinPage(
             page, UserDTO::class.java,
             KtWrappers.query(UserDO::class.java)
                 .selectAll(
@@ -635,7 +637,7 @@ class LambdaWrapperTest {
                     "  AND (t.id = ? AND (t.head_img = ? OR t1.user_id = ?) AND t.id = ?)\n" +
                     "LIMIT ?"
         )
-        val page: IPage<UserDTO> = userMapper!!.selectPage(
+        val page: IPage<UserDTO> = userMapper!!.selectJoinPage(
             Page(1, 10), UserDTO::class.java,
             KtWrappers.query(UserDO::class.java)
                 .selectAll(UserDO::class.java)
@@ -660,7 +662,7 @@ class LambdaWrapperTest {
      */
     @Test
     fun test4() {
-        val one: UserDTO = userMapper!!.selectOne(
+        val one: UserDTO = userMapper!!.selectJoinOne(
             UserDTO::class.java, KtWrappers.query(UserDO::class.java)
                 .selectSum(UserDO::id)
                 .selectMax(UserDO::id, UserDTO::headImg)
@@ -680,7 +682,7 @@ class LambdaWrapperTest {
             .selectFilter(AddressDO::class.java) { true }
             .leftJoin(AddressDO::class.java, AddressDO::userId, UserDO::id)
             .eq(UserDO::id, 1)
-        val page: IPage<UserDTO> = userMapper!!.selectPage(Page(1, 10), UserDTO::class.java, wrapper)
+        val page: IPage<UserDTO> = userMapper!!.selectJoinPage(Page(1, 10), UserDTO::class.java, wrapper)
         assert(page.records[0].address != null)
         page.records.forEach(System.out::println)
     }
@@ -699,7 +701,7 @@ class LambdaWrapperTest {
             val arr = ArrayList<UserDO>()
             arr.add(UserDO())
             userMapper.insertBatchSomeColumn(arr)
-        } catch (_: BadSqlGrammarException) {
+        } catch (ignored: BadSqlGrammarException) {
         }
     }
 
@@ -709,7 +711,7 @@ class LambdaWrapperTest {
      */
     @Test
     fun test7() {
-        val list: List<Map<String, Any>> = userMapper!!.selectMaps(
+        val list: List<Map<String, Any>> = userMapper!!.selectJoinMaps(
             KtWrappers.query(UserDO::class.java)
                 .selectAll(UserDO::class.java)
                 .select(AddressDO::address)
@@ -757,7 +759,7 @@ class LambdaWrapperTest {
             .leftJoin(AddressDO::class.java, AddressDO::userId, UserDO::id)
 
         try {
-            userMapper!!.selectList(UserDO::class.java, wrapper)
+            userMapper!!.selectJoinList(UserDO::class.java, wrapper)
         } catch (_: BadSqlGrammarException) {
         }
     }
@@ -771,7 +773,7 @@ class LambdaWrapperTest {
             .selectAll(AddressDO::class.java)
             .le(AddressDO::id, 10000)
             .orderByDesc(AddressDO::id)
-        val list: List<AddressDTO> = addressMapper!!.selectList(AddressDTO::class.java, wrapper)
+        val list: List<AddressDTO> = addressMapper!!.selectJoinList(AddressDTO::class.java, wrapper)
         assert(
             Objects.equals(
                 "[AddressDTO(id=22, userId=22, areaId=10022, tel=10000000022, address=朝阳22, del=false, areaList=null, area=null), AddressDTO(id=21, userId=21, areaId=10021, tel=10000000021, address=朝阳21, del=false, areaList=null, area=null), AddressDTO(id=20, userId=20, areaId=10020, tel=10000000020, address=朝阳20, del=false, areaList=null, area=null), AddressDTO(id=19, userId=19, areaId=10019, tel=10000000019, address=朝阳19, del=false, areaList=null, area=null), AddressDTO(id=18, userId=18, areaId=10018, tel=10000000018, address=朝阳18, del=false, areaList=null, area=null), AddressDTO(id=17, userId=17, areaId=10017, tel=10000000017, address=朝阳17, del=false, areaList=null, area=null), AddressDTO(id=16, userId=16, areaId=10016, tel=10000000016, address=朝阳16, del=false, areaList=null, area=null), AddressDTO(id=15, userId=15, areaId=10015, tel=10000000015, address=朝阳15, del=false, areaList=null, area=null), AddressDTO(id=14, userId=14, areaId=10014, tel=10000000014, address=朝阳14, del=false, areaList=null, area=null), AddressDTO(id=13, userId=13, areaId=10013, tel=10000000013, address=朝阳13, del=false, areaList=null, area=null), AddressDTO(id=12, userId=12, areaId=10012, tel=10000000012, address=朝阳12, del=false, areaList=null, area=null), AddressDTO(id=11, userId=11, areaId=10011, tel=10000000011, address=朝阳11, del=false, areaList=null, area=null), AddressDTO(id=10, userId=10, areaId=10010, tel=10000000010, address=朝阳10, del=false, areaList=null, area=null), AddressDTO(id=5, userId=1, areaId=10005, tel=10000000005, address=朝阳05, del=false, areaList=null, area=null), AddressDTO(id=4, userId=1, areaId=10004, tel=10000000004, address=朝阳04, del=false, areaList=null, area=null), AddressDTO(id=3, userId=1, areaId=10003, tel=10000000003, address=朝阳03, del=false, areaList=null, area=null), AddressDTO(id=2, userId=1, areaId=10002, tel=10000000002, address=朝阳02, del=false, areaList=null, area=null), AddressDTO(id=1, userId=1, areaId=10001, tel=10000000001, address=朝阳01, del=false, areaList=null, area=null)]",
@@ -799,7 +801,7 @@ class LambdaWrapperTest {
         val wrapper1: KtLambdaWrapper<UserDO> = KtWrappers.query(UserDO::class.java)
             .leftJoin(AddressDO::class.java, AddressDO::userId, UserDO::id)
             .leftJoin(AreaDO::class.java, AreaDO::id, AddressDO::areaId)
-        userMapper.selectCount(wrapper1)
+        userMapper.selectJoinCount(wrapper1)
     }
 
 
@@ -825,7 +827,7 @@ class LambdaWrapperTest {
             .orderByDesc(UserDO::id)
             .setTableName { name -> String.format("(select * from %s)", name) }
         try {
-            userMapper!!.selectList(UserDTO::class.java, wrapper)
+            userMapper!!.selectJoinList(UserDTO::class.java, wrapper)
         } catch (a: Exception) {
             if (a.message!!.contains("sql error"))
                 throw a
@@ -881,7 +883,7 @@ class LambdaWrapperTest {
             .le(UserDO::id, 10000)
             .orderByDesc(UserDO::id)
         println(wrapper.from)
-        val list = userMapper!!.selectList(UserDTO::class.java, wrapper)
+        val list = userMapper!!.selectJoinList(UserDTO::class.java, wrapper)
 
         assert(list[0].addressList != null && list[0].addressList!![0].id != null)
         list.forEach(System.out::println)
@@ -1028,5 +1030,75 @@ class LambdaWrapperTest {
             .leftJoin(UserDO::class.java, UserDO::id, OrderDO::userId)
         println(wrapper.from)
         w.list()
+    }
+
+    /**
+     * 同一个类字段比较
+     */
+    @Test
+    fun delete() {
+        //物理删除
+        ThreadLocalUtils.set("DELETE t FROM order_t t LEFT JOIN user_dto t1 ON (t1.id = t.user_id) WHERE (t.id = ?)")
+        val w: KtDeleteJoinWrapper<OrderDO> = KtWrappers.delete(OrderDO::class.java)
+            .leftJoin(UserDto::class.java, UserDto::id, OrderDO::userId)
+            .eq(OrderDO::id, 1)
+        try {
+            orderMapper!!.deleteJoin(w)
+        } catch (_: BadSqlGrammarException) {
+            //忽略异常 h2不支持连表删除
+        }
+        //逻辑删除
+        ThreadLocalUtils.set("UPDATE `user` t LEFT JOIN address t1 ON (t1.user_id = t.id) LEFT JOIN area t2 ON (t2.id = t1.area_id) SET t.del=true ,t1.del=true,t2.del=true WHERE t.del=false AND t1.del=false AND t2.del=false AND (t.id = ?)")
+        val wrapper: KtDeleteJoinWrapper<UserDO> = KtWrappers.delete(UserDO::class.java)
+            .deleteAll()
+            .leftJoin(AddressDO::class.java, AddressDO::userId, UserDO::id)
+            .leftJoin(AreaDO::class.java, AreaDO::id, AddressDO::areaId)
+            .eq(OrderDO::id, 1)
+        try {
+            userMapper!!.deleteJoin(wrapper)
+        } catch (_: BadSqlGrammarException) {
+            //忽略异常 h2不支持连表删除
+        }
+    }
+
+    @Test
+    fun update() {
+        val address = AddressDO()
+        address.address = "sadf"
+        address.tel = "qqqqqqqq"
+
+        val user = UserDO()
+        user.name = "sadf"
+        user.updateBy = 1
+
+        val address1 = AddressDO()
+
+        val user1 = UserDO()
+        user1.updateBy = 123123
+
+        ThreadLocalUtils.set("UPDATE `user` t LEFT JOIN address t1 ON (t1.user_id = t.id) SET t.update_by=?, t.`name`=?,t1.address=?,t1.tel=?,t1.address=?,t.`name`=?,t.update_by=?,t1.user_id=?,t1.area_id=?,t1.tel=?,t1.address=? WHERE t.del=false AND t1.del=false AND (t.id = ?)")
+        val update: KtUpdateJoinWrapper<UserDO> = KtWrappers.update(UserDO::class.java)
+            .set(UserDO::name, "aaaaaa")
+            .set(AddressDO::address, "bbbbb")
+            .setUpdateEntity(address, user)
+            .setUpdateEntityAndNull(address1)
+            .leftJoin(AddressDO::class.java, AddressDO::userId, UserDO::id)
+            .eq(OrderDO::id, 1)
+        try {
+            userMapper!!.updateJoin(user1, update)
+        } catch (_: BadSqlGrammarException) {
+            //忽略异常 h2不支持连表删除
+        }
+
+
+        ThreadLocalUtils.set("UPDATE `user` t LEFT JOIN address t1 ON (t1.user_id = t.id) SET t.pid=?, t.`name`=?, t.`json`=?, t.sex=?, t.head_img=?, t.create_time=?, t.address_id=?, t.address_id2=?, t.create_by=?, t.update_by=? WHERE t.del=false AND t1.del=false AND (t.id = ?)")
+        val update1: KtUpdateJoinWrapper<UserDO> = KtWrappers.update(UserDO::class.java)
+            .leftJoin(AddressDO::class.java, AddressDO::userId, UserDO::id)
+            .eq(OrderDO::id, 1)
+        try {
+            userMapper!!.updateJoinAndNull(UserDO(), update1)
+        } catch (_: BadSqlGrammarException) {
+            //忽略异常 h2不支持连表删除
+        }
     }
 }

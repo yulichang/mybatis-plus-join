@@ -6,7 +6,7 @@ import com.github.yulichang.test.join.mapper.UserMapper;
 import com.github.yulichang.test.util.EnabledIfConfig;
 import com.github.yulichang.test.util.Reset;
 import com.github.yulichang.test.util.ThreadLocalUtils;
-import com.github.yulichang.wrapper.JoinQueryWrapper;
+import com.github.yulichang.wrapper.MPJLambdaWrapper;
 import com.github.yulichang.wrapper.segments.Fun;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -37,10 +37,10 @@ public class MysqlTest {
     @Test
     void testFunc() {
         ThreadLocalUtils.set("SELECT if(t1.user_id < 5,t1.user_id,t1.user_id + 100) AS id FROM `user` t LEFT JOIN address t1 ON (t1.user_id = t.id) WHERE t.del=false AND t1.del=false");
-        JoinQueryWrapper<UserDO> wrapper = new JoinQueryWrapper<UserDO>()
+        MPJLambdaWrapper<UserDO> wrapper = new MPJLambdaWrapper<UserDO>()
                 .selectFunc("if(%s < 5,%s,%s + 100)", arg -> arg.accept(AddressDO::getUserId, AddressDO::getUserId, AddressDO::getUserId), UserDO::getId)
                 .leftJoin(AddressDO.class, AddressDO::getUserId, UserDO::getId);
-        userMapper.selectList(UserDO.class, wrapper);
+        userMapper.selectJoinList(UserDO.class, wrapper);
     }
 
     @Test
@@ -50,7 +50,7 @@ public class MysqlTest {
                 "if(ad.user_id < 5, addr.user_id, ad.user_id + 100) AS id FROM `user` t " +
                 "LEFT JOIN address ad ON (ad.user_id = t.id) LEFT JOIN address addr ON (addr.user_id = t.id) " +
                 "WHERE t.del = false AND ad.del = false AND addr.del = false GROUP BY t.id");
-        JoinQueryWrapper<UserDO> wrapper = new JoinQueryWrapper<UserDO>()
+        MPJLambdaWrapper<UserDO> wrapper = new MPJLambdaWrapper<UserDO>()
                 .selectAll(UserDO.class)
                 .selectFunc(() -> "count(%s)", "ad", AddressDO::getId)
                 .selectFunc(() -> "count(%s)", "addr", AddressDO::getId)
@@ -62,7 +62,7 @@ public class MysqlTest {
                 .leftJoin(AddressDO.class, "addr", AddressDO::getUserId, UserDO::getId)
                 .groupBy(UserDO::getId);
 
-        userMapper.selectList(UserDO.class, wrapper);
+        userMapper.selectJoinList(UserDO.class, wrapper);
     }
 
 }

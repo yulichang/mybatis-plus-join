@@ -23,7 +23,7 @@ class FieldNameTest {
 
     @Test
     fun testFieldName() {
-        val list = areaMapper?.selectList(
+        val list = areaMapper?.selectJoinList(
             AreaDO::class.java, KtWrappers.query(AreaDO::class.java)
                 .select(AreaDO::Postcode)
                 .leftJoin(UserDto::class.java, UserDto::id, AreaDO::id)
@@ -34,7 +34,7 @@ class FieldNameTest {
 
     @Test
     fun testFieldName1() {
-        val list = areaMapper?.selectList(
+        val list = areaMapper?.selectJoinList(
             AreaDTO::class.java, KtWrappers.query(AreaDO::class.java)
                 .selectAs(AreaDO::Postcode, AreaDTO::postcode)
                 .leftJoin(UserDto::class.java, UserDto::id, AreaDO::id)

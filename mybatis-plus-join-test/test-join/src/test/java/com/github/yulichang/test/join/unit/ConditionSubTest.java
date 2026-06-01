@@ -6,7 +6,7 @@ import com.github.yulichang.test.util.EnabledIfConfig;
 import com.github.yulichang.test.util.Reset;
 import com.github.yulichang.test.util.ThreadLocalUtils;
 import com.github.yulichang.toolkit.JoinWrappers;
-import com.github.yulichang.wrapper.JoinQueryWrapper;
+import com.github.yulichang.wrapper.MPJLambdaWrapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -49,7 +49,7 @@ public class ConditionSubTest {
                          t.id = (SELECT st.id FROM `user` st WHERE st.del = false AND (st.id = t.id AND st.id >= ? AND st.id <= ?))
                     AND t.id >= ? AND t.id <= ?)
                 """);
-        JoinQueryWrapper<UserDO> wrapper = JoinWrappers.query(UserDO.class)
+        MPJLambdaWrapper<UserDO> wrapper = JoinWrappers.lambda(UserDO.class)
                 .selectAll()
                 .leftJoin(AddressDO.class, AddressDO::getUserId, UserDO::getId)
                 .ge(UserDO::getId, -2)
@@ -84,7 +84,7 @@ public class ConditionSubTest {
                     AND t1.del = false
                     AND (t.id = (SELECT sst.id FROM `user` sst WHERE sst.del = false AND (sst.id = t.id AND sst.id >= ? AND sst.id <= ?)))
                 """);
-        JoinQueryWrapper<UserDO> wrapper1 = JoinWrappers.query(UserDO.class)
+        MPJLambdaWrapper<UserDO> wrapper1 = JoinWrappers.lambda(UserDO.class)
                 .selectAll()
                 .leftJoin(AddressDO.class, AddressDO::getUserId, UserDO::getId)
                 .eq(UserDO::getId, UserDO.class, w -> w
@@ -119,7 +119,7 @@ public class ConditionSubTest {
                        t.id IN (SELECT t.id FROM `user` t WHERE t.del = false AND (t.id >= ? AND t.id <= ?)) AND t.id >= ? AND
                        t.id <= ?)
                 """);
-        JoinQueryWrapper<UserDO> wrapper1 = JoinWrappers.query(UserDO.class)
+        MPJLambdaWrapper<UserDO> wrapper1 = JoinWrappers.lambda(UserDO.class)
                 .selectAll()
                 .leftJoin(AddressDO.class, AddressDO::getUserId, UserDO::getId)
                 .ge(UserDO::getId, -2)
@@ -156,7 +156,7 @@ public class ConditionSubTest {
                        EXISTS (SELECT st.id FROM `user` st WHERE st.del = false AND (st.id >= ? AND st.id <= ?)) AND t.id >= ? AND
                        t.id <= ?)
                 """);
-        JoinQueryWrapper<UserDO> wrapper1 = JoinWrappers.query(UserDO.class)
+        MPJLambdaWrapper<UserDO> wrapper1 = JoinWrappers.lambda(UserDO.class)
                 .selectAll()
                 .leftJoin(AddressDO.class, AddressDO::getUserId, UserDO::getId)
                 .ge(UserDO::getId, -2)
@@ -193,7 +193,7 @@ public class ConditionSubTest {
                        NOT EXISTS (SELECT st.id FROM `user` st WHERE st.del = false AND (st.id >= ? AND st.id <= ?)) AND t.id >= ? AND
                        t.id <= ?)
                 """);
-        JoinQueryWrapper<UserDO> wrapper1 = JoinWrappers.query(UserDO.class)
+        MPJLambdaWrapper<UserDO> wrapper1 = JoinWrappers.lambda(UserDO.class)
                 .selectAll()
                 .leftJoin(AddressDO.class, AddressDO::getUserId, UserDO::getId)
                 .ge(UserDO::getId, -2)
@@ -230,7 +230,7 @@ public class ConditionSubTest {
                        t.id = (SELECT st.id FROM `user` st WHERE st.del = false AND (st.id = t1.id AND st.id >= ? AND st.id <= ?)) AND
                        t.id >= ? AND t.id <= ?)
                 """);
-        JoinQueryWrapper<UserDO> wrapper1 = JoinWrappers.query(UserDO.class)
+        MPJLambdaWrapper<UserDO> wrapper1 = JoinWrappers.lambda(UserDO.class)
                 .selectAll()
                 .leftJoin(AddressDO.class, AddressDO::getUserId, UserDO::getId)
                 .ge(UserDO::getId, -2)

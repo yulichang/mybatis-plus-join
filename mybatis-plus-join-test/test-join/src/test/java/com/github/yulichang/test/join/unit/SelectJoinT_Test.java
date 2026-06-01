@@ -27,18 +27,18 @@ public class SelectJoinT_Test {
 
     @Test
     void selectJoinT() {
-        UserDO userDO = userMapper.selectOne(JoinWrappers.<UserDO>query().eq(UserDO::getId, 1));
+        UserDO userDO = userMapper.selectJoinOne(JoinWrappers.<UserDO>lambda().eq(UserDO::getId, 1));
         assert userDO != null;
         System.out.println(userDO);
 
-        List<UserDO> list = userMapper.selectList(JoinWrappers.query());
+        List<UserDO> list = userMapper.selectJoinList(JoinWrappers.lambda());
         assert !list.isEmpty();
         list.forEach(i -> {
             assert i != null;
             System.out.println(i);
         });
 
-        Page<UserDO> page = userMapper.selectPage(new Page<>(1, 10), JoinWrappers.query());
+        Page<UserDO> page = userMapper.selectJoinPage(new Page<>(1, 10), JoinWrappers.lambda());
         assert !page.getRecords().isEmpty();
         page.getRecords().forEach(i -> {
             assert i != null;

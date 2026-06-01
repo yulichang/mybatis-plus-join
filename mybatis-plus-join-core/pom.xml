@@ -41,6 +41,31 @@
         </dependency>
         <dependency>
             <groupId>com.github.yulichang</groupId>
+            <artifactId>mybatis-plus-join-adapter-v312</artifactId>
+            <version>${revision}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.yulichang</groupId>
+            <artifactId>mybatis-plus-join-adapter-v33x</artifactId>
+            <version>${revision}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.yulichang</groupId>
+            <artifactId>mybatis-plus-join-adapter-v3431</artifactId>
+            <version>${revision}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.yulichang</groupId>
+            <artifactId>mybatis-plus-join-adapter-v352</artifactId>
+            <version>${revision}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.yulichang</groupId>
+            <artifactId>mybatis-plus-join-adapter-v355</artifactId>
+            <version>${revision}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.yulichang</groupId>
             <artifactId>mybatis-plus-join-wrapper-ext</artifactId>
             <version>${revision}</version>
         </dependency>

@@ -40,7 +40,7 @@ class TableAliasTest {
             .leftJoin(AddressDO::class.java, "addr2", AddressDO::id, UserDO::addressId2)
             .leftJoin(AreaDO::class.java, "area1", AreaDO::id, "addr1", AddressDO::areaId)
             .groupBy(UserDO::id)
-        val dos: List<UserDO> = userMapper!!.selectList(UserDO::class.java, wrapper)
+        val dos: List<UserDO> = userMapper!!.selectJoinList(UserDO::class.java, wrapper)
         dos.forEach(System.out::println)
     }
 
@@ -61,7 +61,7 @@ class TableAliasTest {
             .leftJoin(AreaDO::class.java, "area1", AreaDO::id, "addr2", AddressDO::areaId)
             .groupBy(UserDO::id)
             .orderByDesc("addr1", AddressDO::id)
-        val dos: List<UserDO> = userMapper!!.selectList(UserDO::class.java, wrapper)
+        val dos: List<UserDO> = userMapper!!.selectJoinList(UserDO::class.java, wrapper)
         dos.forEach(System.out::println)
     }
 
@@ -82,7 +82,7 @@ class TableAliasTest {
             .eq("addr1", AddressDO::id, 1)
             .eq("addr2", AddressDO::id, 2)
             .eq("addr1", AddressDO::id, 3)
-        val dos: List<UserDO> = userMapper!!.selectList(UserDO::class.java, wrapper)
+        val dos: List<UserDO> = userMapper!!.selectJoinList(UserDO::class.java, wrapper)
         dos.forEach(System.out::println)
     }
 }

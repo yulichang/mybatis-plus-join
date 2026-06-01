@@ -126,7 +126,7 @@ public class KtLambdaWrapper<T> extends KtAbstractLambdaWrapper<T, KtLambdaWrapp
     }
 
     /**
-     * 不建议直接 new 该实例，使用 JoinWrappers.query(UserDO.class)
+     * 不建议直接 new 该实例，使用 JoinWrappers.lambda(UserDO.class)
      */
     KtLambdaWrapper(T entity, Class<T> entityClass, SharedString sqlSelect, AtomicInteger paramNameSeq,
                     Map<String, Object> paramNameValuePairs, MergeSegments mergeSegments, SharedString paramAlias,
@@ -266,7 +266,7 @@ public class KtLambdaWrapper<T> extends KtAbstractLambdaWrapper<T, KtLambdaWrapp
         for (KtLambdaWrapper<?> wrapper : wrappers) {
             addCustomWrapper(wrapper);
             Class<?> entityClass = wrapper.getEntityClass();
-            Assert.notNull(entityClass, "请使用 new MPJLambdaWrapper(主表.class) 或 JoinWrappers.query(主表.class) 构造方法");
+            Assert.notNull(entityClass, "请使用 new MPJLambdaWrapper(主表.class) 或 JoinWrappers.lambda(主表.class) 构造方法");
             sb.append(" UNION ").append(KtWrapperUtils.buildUnionSqlByWrapper(entityClass, wrapper));
         }
         if (Objects.isNull(unionSql)) {
@@ -314,7 +314,7 @@ public class KtLambdaWrapper<T> extends KtAbstractLambdaWrapper<T, KtLambdaWrapp
         for (KtLambdaWrapper<?> wrapper : wrappers) {
             addCustomWrapper(wrapper);
             Class<?> entityClass = wrapper.getEntityClass();
-            Assert.notNull(entityClass, "请使用 new MPJLambdaWrapper(主表.class) 或 JoinWrappers.query(主表.class) 构造方法");
+            Assert.notNull(entityClass, "请使用 new MPJLambdaWrapper(主表.class) 或 JoinWrappers.lambda(主表.class) 构造方法");
             sb.append(" UNION ALL ").append(KtWrapperUtils.buildUnionSqlByWrapper(entityClass, wrapper));
         }
         if (Objects.isNull(unionSql)) {

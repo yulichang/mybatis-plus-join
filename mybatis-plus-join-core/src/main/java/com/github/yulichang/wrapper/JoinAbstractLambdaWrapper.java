@@ -430,9 +430,9 @@ public abstract class JoinAbstractLambdaWrapper<T, Children extends JoinAbstract
         });
     }
 
-    public Children from(MFunction<JoinQueryWrapper<T>> fromWrapper) {
+    public Children from(MFunction<MPJLambdaWrapper<T>> fromWrapper) {
         Assert.notNull(getEntityClass(), "main table is null please use JoinWrapper.lambda(Class) or new MPJLambdaWrapper(Class)");
-        JoinQueryWrapper<T> wrapper = fromWrapper.apply(fromInstance(getEntityClass()));
+        MPJLambdaWrapper<T> wrapper = fromWrapper.apply(fromInstance(getEntityClass()));
         this.tableName = WrapperUtils.buildUnionSqlByWrapper(getEntityClass(), wrapper);
         return typedThis;
     }
@@ -441,10 +441,10 @@ public abstract class JoinAbstractLambdaWrapper<T, Children extends JoinAbstract
      * 内部调用, 不建议使用
      */
     @Override
-    public <R> Children join(String keyWord, Class<R> clazz, MConsumer<JoinQueryWrapper<R>> table, String tableAlias, BiConsumer<JoinAbstractLambdaWrapper<T, ?>, Children> consumer) {
+    public <R> Children join(String keyWord, Class<R> clazz, MConsumer<MPJLambdaWrapper<R>> table, String tableAlias, BiConsumer<JoinAbstractLambdaWrapper<T, ?>, Children> consumer) {
         String tabName;
         if (table != null) {
-            JoinQueryWrapper<R> tableWrapper = fromInstance(clazz);
+            MPJLambdaWrapper<R> tableWrapper = fromInstance(clazz);
             table.accept(tableWrapper);
             if (StrUtils.isBlank(tableWrapper.getSqlSelect())) {
                 tableWrapper.selectAll();

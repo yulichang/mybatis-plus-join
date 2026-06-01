@@ -162,8 +162,8 @@ public abstract class JoinAbstractWrapper<T, Children extends JoinAbstractWrappe
         return typedThis;
     }
 
-    protected <E> JoinQueryWrapper<E> subInstance(Class<E> clazz, String st) {
-        JoinQueryWrapper<E> wrapper = new JoinQueryWrapper<E>(null, clazz, SharedString.emptyString(),
+    protected <E> MPJLambdaWrapper<E> subInstance(Class<E> clazz, String st) {
+        MPJLambdaWrapper<E> wrapper = new MPJLambdaWrapper<E>(null, clazz, SharedString.emptyString(),
                 paramNameSeq, paramNameValuePairs, new MergeSegments(), new SharedString(this.paramAlias
                 .getStringValue()), SharedString.emptyString(), SharedString.emptyString(), SharedString.emptyString(),
                 new TableList(), null, null, null, null, ifExists) {
@@ -176,8 +176,8 @@ public abstract class JoinAbstractWrapper<T, Children extends JoinAbstractWrappe
         return wrapper;
     }
 
-    protected <E> JoinQueryWrapper<E> fromInstance(Class<E> clazz) {
-        JoinQueryWrapper<E> wrapper = new JoinQueryWrapper<E>(null, clazz, SharedString.emptyString(),
+    protected <E> MPJLambdaWrapper<E> fromInstance(Class<E> clazz) {
+        MPJLambdaWrapper<E> wrapper = new MPJLambdaWrapper<E>(null, clazz, SharedString.emptyString(),
                 paramNameSeq, paramNameValuePairs, new MergeSegments(), new SharedString(this.paramAlias
                 .getStringValue()), SharedString.emptyString(), SharedString.emptyString(), SharedString.emptyString(),
                 new TableList(), null, null, null, null, ifExists) {
@@ -189,7 +189,7 @@ public abstract class JoinAbstractWrapper<T, Children extends JoinAbstractWrappe
     }
 
 
-    protected <E> JoinQueryWrapper<E> subInstance(Class<E> clazz) {
+    protected <E> MPJLambdaWrapper<E> subInstance(Class<E> clazz) {
         return subInstance(clazz, ConfigProperties.subQueryAlias);
     }
 
@@ -258,7 +258,7 @@ public abstract class JoinAbstractWrapper<T, Children extends JoinAbstractWrappe
     }
 
     @Override
-    public <X, Y> Children eq(boolean condition, String alias, SFunction<X, ?> column, Class<Y> clazz, MFunction<JoinQueryWrapper<Y>> wrapper) {
+    public <X, Y> Children eq(boolean condition, String alias, SFunction<X, ?> column, Class<Y> clazz, MFunction<MPJLambdaWrapper<Y>> wrapper) {
         return addCondition(condition, alias, column, EQ, clazz, wrapper.apply(subInstance(clazz)));
     }
 
@@ -268,7 +268,7 @@ public abstract class JoinAbstractWrapper<T, Children extends JoinAbstractWrappe
     }
 
     @Override
-    public <X, Y> Children ne(boolean condition, String alias, SFunction<X, ?> column, Class<Y> clazz, MFunction<JoinQueryWrapper<Y>> wrapper) {
+    public <X, Y> Children ne(boolean condition, String alias, SFunction<X, ?> column, Class<Y> clazz, MFunction<MPJLambdaWrapper<Y>> wrapper) {
         return addCondition(condition, alias, column, NE, clazz, wrapper.apply(subInstance(clazz)));
     }
 
@@ -278,7 +278,7 @@ public abstract class JoinAbstractWrapper<T, Children extends JoinAbstractWrappe
     }
 
     @Override
-    public <X, Y> Children gt(boolean condition, String alias, SFunction<X, ?> column, Class<Y> clazz, MFunction<JoinQueryWrapper<Y>> wrapper) {
+    public <X, Y> Children gt(boolean condition, String alias, SFunction<X, ?> column, Class<Y> clazz, MFunction<MPJLambdaWrapper<Y>> wrapper) {
         return addCondition(condition, alias, column, GT, clazz, wrapper.apply(subInstance(clazz)));
     }
 
@@ -288,7 +288,7 @@ public abstract class JoinAbstractWrapper<T, Children extends JoinAbstractWrappe
     }
 
     @Override
-    public <X, Y> Children ge(boolean condition, String alias, SFunction<X, ?> column, Class<Y> clazz, MFunction<JoinQueryWrapper<Y>> wrapper) {
+    public <X, Y> Children ge(boolean condition, String alias, SFunction<X, ?> column, Class<Y> clazz, MFunction<MPJLambdaWrapper<Y>> wrapper) {
         return addCondition(condition, alias, column, GE, clazz, wrapper.apply(subInstance(clazz)));
     }
 
@@ -298,7 +298,7 @@ public abstract class JoinAbstractWrapper<T, Children extends JoinAbstractWrappe
     }
 
     @Override
-    public <X, Y> Children lt(boolean condition, String alias, SFunction<X, ?> column, Class<Y> clazz, MFunction<JoinQueryWrapper<Y>> wrapper) {
+    public <X, Y> Children lt(boolean condition, String alias, SFunction<X, ?> column, Class<Y> clazz, MFunction<MPJLambdaWrapper<Y>> wrapper) {
         return addCondition(condition, alias, column, LT, clazz, wrapper.apply(subInstance(clazz)));
     }
 
@@ -308,7 +308,7 @@ public abstract class JoinAbstractWrapper<T, Children extends JoinAbstractWrappe
     }
 
     @Override
-    public <X, Y> Children le(boolean condition, String alias, SFunction<X, ?> column, Class<Y> clazz, MFunction<JoinQueryWrapper<Y>> wrapper) {
+    public <X, Y> Children le(boolean condition, String alias, SFunction<X, ?> column, Class<Y> clazz, MFunction<MPJLambdaWrapper<Y>> wrapper) {
         return addCondition(condition, alias, column, LE, clazz, wrapper.apply(subInstance(clazz)));
     }
 
@@ -400,7 +400,7 @@ public abstract class JoinAbstractWrapper<T, Children extends JoinAbstractWrappe
                                     Fun<?, ?> fun = (Fun<?, ?>) func;
                                     if (fun.isSub()) {
                                         @SuppressWarnings("rawtypes")
-                                        JoinQueryWrapper wrapper = fun.getSub().apply((JoinQueryWrapper) subInstance(fun.getClazz()));
+                                        MPJLambdaWrapper wrapper = fun.getSub().apply((MPJLambdaWrapper) subInstance(fun.getClazz()));
                                         return WrapperUtils.buildUnionSqlByWrapper(fun.getClazz(),
                                                 fun.getSub().apply(wrapper));
                                     }
@@ -449,7 +449,7 @@ public abstract class JoinAbstractWrapper<T, Children extends JoinAbstractWrappe
     }
 
     @Override
-    public <X> Children exists(boolean condition, Class<X> clazz, MFunction<JoinQueryWrapper<X>> wrapper) {
+    public <X> Children exists(boolean condition, Class<X> clazz, MFunction<MPJLambdaWrapper<X>> wrapper) {
         return maybeDo(condition, () -> appendSqlSegments(EXISTS,
                 () -> WrapperUtils.buildUnionSqlByWrapper(clazz, wrapper.apply(subInstance(clazz)))));
     }
@@ -460,7 +460,7 @@ public abstract class JoinAbstractWrapper<T, Children extends JoinAbstractWrappe
     }
 
     @Override
-    public <X> Children notExists(boolean condition, Class<X> clazz, MFunction<JoinQueryWrapper<X>> wrapper) {
+    public <X> Children notExists(boolean condition, Class<X> clazz, MFunction<MPJLambdaWrapper<X>> wrapper) {
         return not(condition).exists(condition, clazz, wrapper);
     }
 
@@ -470,7 +470,7 @@ public abstract class JoinAbstractWrapper<T, Children extends JoinAbstractWrappe
     }
 
     @Override
-    public <X> Children isNull(boolean condition, String alias, Class<X> clazz, MFunction<JoinQueryWrapper<X>> wrapper) {
+    public <X> Children isNull(boolean condition, String alias, Class<X> clazz, MFunction<MPJLambdaWrapper<X>> wrapper) {
         return maybeDo(condition, () -> appendSqlSegments(() ->
                 WrapperUtils.buildUnionSqlByWrapper(clazz, wrapper.apply(fromInstance(clazz))), IS_NULL));
     }
@@ -481,7 +481,7 @@ public abstract class JoinAbstractWrapper<T, Children extends JoinAbstractWrappe
     }
 
     @Override
-    public <X> Children isNotNull(boolean condition, String alias, Class<X> clazz, MFunction<JoinQueryWrapper<X>> wrapper) {
+    public <X> Children isNotNull(boolean condition, String alias, Class<X> clazz, MFunction<MPJLambdaWrapper<X>> wrapper) {
         return maybeDo(condition, () -> appendSqlSegments(() ->
                 WrapperUtils.buildUnionSqlByWrapper(clazz, wrapper.apply(fromInstance(clazz))), IS_NOT_NULL));
     }
@@ -492,7 +492,7 @@ public abstract class JoinAbstractWrapper<T, Children extends JoinAbstractWrappe
     }
 
     @Override
-    public <X, Y> Children in(boolean condition, String alias, SFunction<X, ?> column, Class<Y> clazz, MFunction<JoinQueryWrapper<Y>> wrapper) {
+    public <X, Y> Children in(boolean condition, String alias, SFunction<X, ?> column, Class<Y> clazz, MFunction<MPJLambdaWrapper<Y>> wrapper) {
         return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(index, alias, column, false), IN, () ->
                 WrapperUtils.buildUnionSqlByWrapper(clazz, wrapper.apply(fromInstance(clazz)))));
     }
@@ -508,7 +508,7 @@ public abstract class JoinAbstractWrapper<T, Children extends JoinAbstractWrappe
     }
 
     @Override
-    public <X, Y> Children notIn(boolean condition, String alias, SFunction<X, ?> column, Class<Y> clazz, MFunction<JoinQueryWrapper<Y>> wrapper) {
+    public <X, Y> Children notIn(boolean condition, String alias, SFunction<X, ?> column, Class<Y> clazz, MFunction<MPJLambdaWrapper<Y>> wrapper) {
         return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(index, alias, column, false), NOT_IN, () ->
                 WrapperUtils.buildUnionSqlByWrapper(clazz, wrapper.apply(fromInstance(clazz)))));
     }
@@ -776,7 +776,7 @@ public abstract class JoinAbstractWrapper<T, Children extends JoinAbstractWrappe
                 () -> formatParam(null, val)));
     }
 
-    protected <X, R> Children addCondition(boolean condition, String alias, SFunction<X, ?> column, SqlKeyword sqlKeyword, Class<R> clazz, JoinQueryWrapper<R> val) {
+    protected <X, R> Children addCondition(boolean condition, String alias, SFunction<X, ?> column, SqlKeyword sqlKeyword, Class<R> clazz, MPJLambdaWrapper<R> val) {
         return maybeDo(condition, () -> appendSqlSegments(columnToSqlSegment(index, alias, column, false), sqlKeyword,
                 () -> WrapperUtils.buildUnionSqlByWrapper(clazz, val)));
     }

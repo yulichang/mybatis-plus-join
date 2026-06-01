@@ -27,7 +27,7 @@ public class FieldNameTest {
 
     @Test
     void testFieldName() {
-        List<AreaDO> list = areaMapper.selectList(AreaDO.class, JoinWrappers.query(AreaDO.class)
+        List<AreaDO> list = areaMapper.selectJoinList(AreaDO.class, JoinWrappers.lambda(AreaDO.class)
                 .select(AreaDO::getPostcode)
                 .leftJoin(UserDto.class,UserDto::getId,AreaDO::getId));
 
@@ -37,7 +37,7 @@ public class FieldNameTest {
 
     @Test
     void testFieldName1() {
-        List<AreaDTO> list = areaMapper.selectList(AreaDTO.class, JoinWrappers.query(AreaDO.class)
+        List<AreaDTO> list = areaMapper.selectJoinList(AreaDTO.class, JoinWrappers.lambda(AreaDO.class)
                 .selectAs(AreaDO::getPostcode,AreaDTO::getPostcode)
                 .leftJoin(UserDto.class,UserDto::getId,AreaDO::getId));
 

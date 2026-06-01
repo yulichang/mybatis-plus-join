@@ -35,7 +35,7 @@ public class StringColumTest {
                 "t1.address, t1.del FROM `user` t LEFT JOIN address t1 ON (t1.user_id = t.id) WHERE t.del = false AND t1.del = false");
         UserDOCol u = UserDOCol.build();
         AddressDOCol addr = AddressDOCol.build();
-        List<UserDTO> l3 = userMapper.selectList(UserDTO.class, new AptQueryWrapper<>(u)
+        List<UserDTO> l3 = userMapper.selectJoinList(UserDTO.class, new AptQueryWrapper<>(u)
                 .select("(select id from `user` u where u.id = t.id) id")
                 .select("t.`name` as PName")
                 .select("t.`name` PName")

@@ -4,7 +4,7 @@ import com.github.yulichang.test.join.entity.AddressDO;
 import com.github.yulichang.test.join.entity.UserDO;
 import com.github.yulichang.test.util.Reset;
 import com.github.yulichang.toolkit.JoinWrappers;
-import com.github.yulichang.wrapper.JoinQueryWrapper;
+import com.github.yulichang.wrapper.MPJLambdaWrapper;
 import com.github.yulichang.wrapper.segments.Fun;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -22,7 +22,7 @@ public class CloneTest {
 
     @Test
     void cloneTest() {
-        JoinQueryWrapper<UserDO> wrapper = JoinWrappers.query(UserDO.class)
+        MPJLambdaWrapper<UserDO> wrapper = JoinWrappers.lambda(UserDO.class)
                 .selectAll(UserDO.class)
                 .leftJoin(AddressDO.class, AddressDO::getUserId, UserDO::getId)
                 .applyFunc("concat(%s,%s,{0}) is not null", arg -> arg.accept(UserDO::getId, AddressDO::getUserId), "12")
@@ -32,7 +32,7 @@ public class CloneTest {
 
         wrapper.list().forEach(System.out::println);
 
-        JoinQueryWrapper<UserDO> clone = wrapper.clone();
+        MPJLambdaWrapper<UserDO> clone = wrapper.clone();
 
         clone.list().forEach(System.out::println);
     }

@@ -30,7 +30,7 @@ public class FieldNameTest {
     void testFieldName() {
         AreaDOCol ar = AreaDOCol.build();
         UserDtoCol ud = UserDtoCol.build();
-        List<AreaDO> list = areaMapper.selectList(AreaDO.class, AptWrappers.query(ar)
+        List<AreaDO> list = areaMapper.selectJoinList(AreaDO.class, AptWrappers.query(ar)
                 .select(ar.Postcode)
                 .leftJoin(ud, ud.id, ar.id));
 
@@ -41,7 +41,7 @@ public class FieldNameTest {
     void testFieldName1() {
         AreaDOCol ar = AreaDOCol.build();
         UserDtoCol ud = UserDtoCol.build();
-        List<AreaDTO> list = areaMapper.selectList(AreaDTO.class, AptWrappers.query(ar)
+        List<AreaDTO> list = areaMapper.selectJoinList(AreaDTO.class, AptWrappers.query(ar)
                 .selectAs(ar.Postcode, AreaDTO::getPostcode)
                 .leftJoin(ud, ud.id, ar.id));
 

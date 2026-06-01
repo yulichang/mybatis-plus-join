@@ -3,7 +3,7 @@ package com.github.yulichang.test.join.apt;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.github.yulichang.adapter.tookit.VersionUtils;
+import com.github.yulichang.adapter.base.tookit.VersionUtils;
 import com.github.yulichang.extension.apt.AptQueryWrapper;
 import com.github.yulichang.extension.apt.toolkit.AptWrappers;
 import com.github.yulichang.test.join.dto.AddressDTO;
@@ -69,14 +69,14 @@ class AptWrapperTest {
 
         AptQueryWrapper<UserTenantDO> lambda = AptWrappers.query(ut)
                 .selectAsClass(ut, UserTenantDTO.class);
-        List<UserTenantDO> list = userTenantMapper.selectList(UserTenantDO.class, lambda);
+        List<UserTenantDO> list = userTenantMapper.selectJoinList(UserTenantDO.class, lambda);
         assert list.size() == 5 && list.get(0).getIdea() != null;
 
 
         ThreadLocalUtils.set("SELECT t.tenant_id, t.user_id, t.id FROM user_tenant t WHERE t.tenant_id = 1");
         AptQueryWrapper<UserTenantDO> lambda1 = AptWrappers.query(ut)
                 .selectAsClass(ut, UserTenantDescDTO.class);
-        List<UserTenantDO> list1 = userTenantMapper.selectList(UserTenantDO.class, lambda1);
+        List<UserTenantDO> list1 = userTenantMapper.selectJoinList(UserTenantDO.class, lambda1);
         assert list1.size() == 5 && list1.get(0).getIdea() != null;
     }
 
@@ -139,7 +139,7 @@ class AptWrapperTest {
                 .le(u.id, 10000)
                 .orderByDesc(u.id);
 
-        List<UserDTO> list = userMapper.selectList(UserDTO.class, wrapper);
+        List<UserDTO> list = userMapper.selectJoinList(UserDTO.class, wrapper);
 
         assert wrapper.checkJoinTable(AddressDO.class);
         assert wrapper.checkJoinTable(AreaDO.class);
@@ -184,7 +184,7 @@ class AptWrapperTest {
                 .leftJoin(addr, addr.userId, u.id)
                 .le(u.id, 10000)
                 .orderByDesc(u.id);
-        List<UserDTO> list = userMapper.selectList(UserDTO.class, wrapper);
+        List<UserDTO> list = userMapper.selectJoinList(UserDTO.class, wrapper);
 
         assert list.get(0).getAddressIds() != null;
         list.forEach(System.out::println);
@@ -237,7 +237,7 @@ class AptWrapperTest {
                 .leftJoin(addr, addr.userId, u.id)
                 .leftJoin(ar, ar.id, addr.areaId)
                 .orderByDesc(u.id);
-        List<UserDTO> list = userMapper.selectList(UserDTO.class, wrapper);
+        List<UserDTO> list = userMapper.selectJoinList(UserDTO.class, wrapper);
 
         assert list.get(0).getAddressList().get(0).getId() != null;
         list.forEach(System.out::println);
@@ -266,7 +266,7 @@ class AptWrapperTest {
                 .select(u.id)
                 .leftJoin(addr, addr.userId, u.id)
                 .leftJoin(ar, ar.id, addr.areaId);
-        List<Integer> list = userMapper.selectList(Integer.class, wrapper);
+        List<Integer> list = userMapper.selectJoinList(Integer.class, wrapper);
 
         assert list.get(0) != null;
         System.out.println(list);
@@ -285,7 +285,7 @@ class AptWrapperTest {
                 .select(u.createTime)
                 .leftJoin(addr, addr.userId, u.id)
                 .leftJoin(ar, ar.id, addr.areaId);
-        List<Timestamp> list1 = userMapper.selectList(Timestamp.class, wrapper1);
+        List<Timestamp> list1 = userMapper.selectJoinList(Timestamp.class, wrapper1);
 
         assert list1.get(0) != null;
         System.out.println(list);
@@ -363,7 +363,7 @@ class AptWrapperTest {
                 .le(ua.id, 100)
                 .ge(ub.id, 0);
 
-        List<UserDto> userDtos = userDTOMapper.selectList(UserDto.class, wrapper);
+        List<UserDto> userDtos = userDTOMapper.selectJoinList(UserDto.class, wrapper);
         assert StrUtils.isNotBlank(userDtos.get(0).getUserName());
         assert StrUtils.isNotBlank(userDtos.get(0).getCreateName());
         assert StrUtils.isNotBlank(userDtos.get(0).getUpdateName());
@@ -409,7 +409,7 @@ class AptWrapperTest {
                 .eq(ua1.img, ut.name)
                 .eq(ut.id, ua1.id);
 
-        userMapper.selectList(UserDO.class, w);
+        userMapper.selectJoinList(UserDO.class, w);
         System.out.println(1);
     }
 
@@ -458,7 +458,7 @@ class AptWrapperTest {
                 .selectCollection(ua, UserDO::getChildren)
                 .leftJoin(ua, ua.pid, u.id)
                 .gt(u.id, 0);
-        List<UserDO> list = userMapper.selectList(UserDO.class, wrapper);
+        List<UserDO> list = userMapper.selectJoinList(UserDO.class, wrapper);
         System.out.println(list);
 
         ThreadLocalUtils.set("""
@@ -496,7 +496,7 @@ class AptWrapperTest {
                 .leftJoin(uub, uub.id, uu.updateBy)
                 .eq(uub.id, uu.updateBy)
                 .eq(uu.id, uua.id);
-        List<UserDO> dos = userMapper.selectList(UserDO.class, w);
+        List<UserDO> dos = userMapper.selectJoinList(UserDO.class, w);
         assert dos.get(0).getCreateName() != null && dos.get(0).getUpdateName() != null;
 
 
@@ -558,7 +558,7 @@ class AptWrapperTest {
                 .leftJoin(uuub, uuub.pid, uuua.id)
                 .le(uuua.id, 5)
                 .le(uuu.id, 4);
-        List<UserDO> list1 = userMapper.selectList(UserDO.class, wrapper1);
+        List<UserDO> list1 = userMapper.selectJoinList(UserDO.class, wrapper1);
         System.out.println(list1);
     }
 
@@ -568,12 +568,12 @@ class AptWrapperTest {
     @Test
     void testLogicDel() {
         UserDOCol u1 = UserDOCol.build();
-        List<UserDTO> l1 = userMapper.selectList(UserDTO.class, new AptQueryWrapper<>(u1));
+        List<UserDTO> l1 = userMapper.selectJoinList(UserDTO.class, new AptQueryWrapper<>(u1));
         assert l1.size() == 14;
 
         UserDOCol u2 = UserDOCol.build();
         AddressDOCol addr2 = AddressDOCol.build();
-        List<UserDTO> l2 = userMapper.selectList(UserDTO.class, new AptQueryWrapper<>(u2)
+        List<UserDTO> l2 = userMapper.selectJoinList(UserDTO.class, new AptQueryWrapper<>(u2)
                 .selectAll()
                 .select(addr2.address)
                 .leftJoin(addr2, addr2.userId, u2.id));
@@ -581,7 +581,7 @@ class AptWrapperTest {
 
         UserDOCol u3 = UserDOCol.build();
         AddressDOCol addr3 = AddressDOCol.build();
-        List<UserDTO> l3 = userMapper.selectList(UserDTO.class, new AptQueryWrapper<>(u3)
+        List<UserDTO> l3 = userMapper.selectJoinList(UserDTO.class, new AptQueryWrapper<>(u3)
                 .disableSubLogicDel()
                 .selectAll()
                 .selectCollection(addr3, UserDTO::getAddressList)
@@ -590,7 +590,7 @@ class AptWrapperTest {
 
         UserDOCol u4 = UserDOCol.build();
         AddressDOCol addr4 = AddressDOCol.build();
-        List<UserDTO> l4 = userMapper.selectList(UserDTO.class, new AptQueryWrapper<>(u4)
+        List<UserDTO> l4 = userMapper.selectJoinList(UserDTO.class, new AptQueryWrapper<>(u4)
                 .disableSubLogicDel()
                 .selectAll()
                 .selectCollection(addr4, UserDTO::getAddressList)
@@ -613,7 +613,7 @@ class AptWrapperTest {
                 .selectAll()
                 .selectCollection(uu, UserDO::getChildren)
                 .leftJoin(uu, uu.pid, u.id);
-        List<UserDO> list = userMapper.selectList(UserDO.class, wrapper);
+        List<UserDO> list = userMapper.selectJoinList(UserDO.class, wrapper);
         assert list.get(0).getName() != null && list.get(0).getChildren().get(0).getName() != null;
         assert list.get(0).getImg() != null && list.get(0).getChildren().get(0).getImg() != null;
         System.out.println(list);
@@ -670,7 +670,7 @@ class AptWrapperTest {
                 .selectAll(addr)
 //                .selectCollection(UserDO.class, UserDO::getChildren)
                 .leftJoin(addr, addr.userId, u.id);
-        List<UserDO> list = userMapper.selectList(UserDO.class, wrapper);
+        List<UserDO> list = userMapper.selectJoinList(UserDO.class, wrapper);
 
         System.out.println(list);
     }
@@ -688,7 +688,7 @@ class AptWrapperTest {
                 .selectCollection(addr2, UserDO::getAddressList2)
                 .leftJoin(addr1, addr1.id, u.addressId)
                 .leftJoin(addr2, addr2.id, u.addressId2);
-        List<UserDO> list = userMapper.selectList(UserDO.class, wrapper);
+        List<UserDO> list = userMapper.selectJoinList(UserDO.class, wrapper);
 
         assert list.get(0).getAddressList().get(0).getAddress() != null;
         assert list.get(0).getAddressList2().get(0).getAddress() != null;
@@ -707,7 +707,7 @@ class AptWrapperTest {
 
         Page<UserDTO> page = new Page<>(1, 10);
         page.setSearchCount(false);
-        IPage<UserDTO> iPage = userMapper.selectPage(page, UserDTO.class, AptWrappers.query(u)
+        IPage<UserDTO> iPage = userMapper.selectJoinPage(page, UserDTO.class, AptWrappers.query(u)
                 .selectAll()
                 .select(addr.address)
                 .select(ar.province)
@@ -750,7 +750,7 @@ class AptWrapperTest {
         UserDOCol u = UserDOCol.build();
         AddressDOCol addr = AddressDOCol.build();
 
-        IPage<UserDTO> page = userMapper.selectPage(new Page<>(1, 10), UserDTO.class, AptWrappers.query(u)
+        IPage<UserDTO> page = userMapper.selectJoinPage(new Page<>(1, 10), UserDTO.class, AptWrappers.query(u)
                 .selectAll()
                 .select(addr.address)
                 .leftJoin(addr, on -> on
@@ -778,7 +778,7 @@ class AptWrapperTest {
                 .selectMax(u.id, UserDTO::getHeadImg)
                 .leftJoin(addr, addr.userId, u.id);
 
-        UserDTO one = userMapper.selectOne(UserDTO.class, wrapper);
+        UserDTO one = userMapper.selectJoinOne(UserDTO.class, wrapper);
         System.out.println(one);
     }
 
@@ -804,7 +804,7 @@ class AptWrapperTest {
     void test7() {
         UserDOCol u = UserDOCol.build();
         AddressDOCol addr = AddressDOCol.build();
-        List<Map<String, Object>> list = userMapper.selectMaps(AptWrappers.query(u)
+        List<Map<String, Object>> list = userMapper.selectJoinMaps(AptWrappers.query(u)
                 .selectAll()
                 .select(addr.address)
                 .leftJoin(addr, addr.userId, u.id));
@@ -843,7 +843,7 @@ class AptWrapperTest {
                 .selectAll()
                 .le(addr.id, 10000)
                 .orderByDesc(addr.id);
-        List<AddressDTO> list = addressMapper.selectList(AddressDTO.class, wrapper);
+        List<AddressDTO> list = addressMapper.selectJoinList(AddressDTO.class, wrapper);
         assert Objects.equals("[AddressDTO(id=22, userId=22, areaId=10022, tel=10000000022, address=朝阳22, del=false, areaList=null, area=null), AddressDTO(id=21, userId=21, areaId=10021, tel=10000000021, address=朝阳21, del=false, areaList=null, area=null), AddressDTO(id=20, userId=20, areaId=10020, tel=10000000020, address=朝阳20, del=false, areaList=null, area=null), AddressDTO(id=19, userId=19, areaId=10019, tel=10000000019, address=朝阳19, del=false, areaList=null, area=null), AddressDTO(id=18, userId=18, areaId=10018, tel=10000000018, address=朝阳18, del=false, areaList=null, area=null), AddressDTO(id=17, userId=17, areaId=10017, tel=10000000017, address=朝阳17, del=false, areaList=null, area=null), AddressDTO(id=16, userId=16, areaId=10016, tel=10000000016, address=朝阳16, del=false, areaList=null, area=null), AddressDTO(id=15, userId=15, areaId=10015, tel=10000000015, address=朝阳15, del=false, areaList=null, area=null), AddressDTO(id=14, userId=14, areaId=10014, tel=10000000014, address=朝阳14, del=false, areaList=null, area=null), AddressDTO(id=13, userId=13, areaId=10013, tel=10000000013, address=朝阳13, del=false, areaList=null, area=null), AddressDTO(id=12, userId=12, areaId=10012, tel=10000000012, address=朝阳12, del=false, areaList=null, area=null), AddressDTO(id=11, userId=11, areaId=10011, tel=10000000011, address=朝阳11, del=false, areaList=null, area=null), AddressDTO(id=10, userId=10, areaId=10010, tel=10000000010, address=朝阳10, del=false, areaList=null, area=null), AddressDTO(id=5, userId=1, areaId=10005, tel=10000000005, address=朝阳05, del=false, areaList=null, area=null), AddressDTO(id=4, userId=1, areaId=10004, tel=10000000004, address=朝阳04, del=false, areaList=null, area=null), AddressDTO(id=3, userId=1, areaId=10003, tel=10000000003, address=朝阳03, del=false, areaList=null, area=null), AddressDTO(id=2, userId=1, areaId=10002, tel=10000000002, address=朝阳02, del=false, areaList=null, area=null), AddressDTO(id=1, userId=1, areaId=10001, tel=10000000001, address=朝阳01, del=false, areaList=null, area=null)]"
                 , list.toString());
     }
@@ -872,7 +872,7 @@ class AptWrapperTest {
         AptQueryWrapper<UserDO> wrapper1 = new AptQueryWrapper<>(u1)
                 .leftJoin(addr1, addr1.userId, u1.id)
                 .leftJoin(ar1, ar1.id, addr1.areaId);
-        Long aLong1 = userMapper.selectCount(wrapper1);
+        Long aLong1 = userMapper.selectJoinCount(wrapper1);
     }
 
 
@@ -898,7 +898,7 @@ class AptWrapperTest {
                 .orderByDesc(u.id)
                 .setTableName(name -> String.format("(select * from %s)", name));
 
-        List<UserDTO> list = userMapper.selectList(UserDTO.class, wrapper);
+        List<UserDTO> list = userMapper.selectJoinList(UserDTO.class, wrapper);
     }
 
 
@@ -951,7 +951,7 @@ class AptWrapperTest {
                 .leftJoin(ar, ar.id, addr.areaId)
                 .le(u.id, 10000)
                 .orderByDesc(u.id);
-        List<UserDTO> list = userMapper.selectList(UserDTO.class, wrapper);
+        List<UserDTO> list = userMapper.selectJoinList(UserDTO.class, wrapper);
 
         assert list.get(0).getAddressList() != null && list.get(0).getAddressList().get(0).getId() != null;
         list.forEach(System.out::println);

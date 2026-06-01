@@ -39,6 +39,7 @@ import static java.util.stream.Collectors.toMap;
  * @author hcl
  * @since 2016-09-22
  */
+@SuppressWarnings("All")
 public final class ReflectionKit {
     /**
      * class field cache
@@ -46,7 +47,6 @@ public final class ReflectionKit {
     private static final Map<Class<?>, List<Field>> CLASS_FIELD_CACHE = new ConcurrentHashMap<>();
 
     @Deprecated
-    @SuppressWarnings("DeprecatedIsStillUsed")
     private static final Map<Class<?>, Class<?>> PRIMITIVE_WRAPPER_TYPE_MAP = new IdentityHashMap<>(8);
 
     private static final Map<Class<?>, Class<?>> PRIMITIVE_TYPE_TO_WRAPPER_MAP = new IdentityHashMap<>(8);
@@ -185,5 +185,9 @@ public final class ReflectionKit {
     public static boolean isPrimitiveOrWrapper(Class<?> clazz) {
         Assert.notNull(clazz, "Class must not be null");
         return (clazz.isPrimitive() || PRIMITIVE_WRAPPER_TYPE_MAP.containsKey(clazz));
+    }
+
+    public static Class<?> resolvePrimitiveIfNecessary(Class<?> clazz) {
+        return (clazz.isPrimitive() && clazz != void.class ? PRIMITIVE_TYPE_TO_WRAPPER_MAP.get(clazz) : clazz);
     }
 }

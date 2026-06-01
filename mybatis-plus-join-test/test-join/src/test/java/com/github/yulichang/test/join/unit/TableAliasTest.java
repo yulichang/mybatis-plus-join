@@ -8,7 +8,7 @@ import com.github.yulichang.test.util.EnabledIfConfig;
 import com.github.yulichang.test.util.Reset;
 import com.github.yulichang.test.util.ThreadLocalUtils;
 import com.github.yulichang.toolkit.JoinWrappers;
-import com.github.yulichang.wrapper.JoinQueryWrapper;
+import com.github.yulichang.wrapper.MPJLambdaWrapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,14 +36,14 @@ public class TableAliasTest {
                 "LEFT JOIN area area1 ON (area1.id = addr1.area_id) " +
                 "WHERE t.del = false AND addr1.del = false AND addr2.del = false AND area1.del = false " +
                 "GROUP BY t.id");
-        JoinQueryWrapper<UserDO> wrapper = JoinWrappers.query(UserDO.class)
+        MPJLambdaWrapper<UserDO> wrapper = JoinWrappers.lambda(UserDO.class)
                 .selectAll(UserDO.class)
                 .leftJoin(AddressDO.class, "addr1", AddressDO::getId, UserDO::getAddressId)
                 .leftJoin(AddressDO.class, "addr2", AddressDO::getId, UserDO::getAddressId2)
                 .leftJoin(AreaDO.class, "area1", AreaDO::getId, "addr1", AddressDO::getAreaId)
                 .groupBy(UserDO::getId);
 
-        List<UserDO> dos = userMapper.selectList(UserDO.class, wrapper);
+        List<UserDO> dos = userMapper.selectJoinList(UserDO.class, wrapper);
         dos.forEach(System.out::println);
     }
 
@@ -55,7 +55,7 @@ public class TableAliasTest {
                 "LEFT JOIN area area1 ON (area1.id = addr2.area_id) " +
                 "WHERE t.del = false AND addr1.del = false AND addr2.del = false AND area1.del = false " +
                 "GROUP BY t.id,addr1.id ORDER BY addr1.id DESC");
-        JoinQueryWrapper<UserDO> wrapper = JoinWrappers.query(UserDO.class)
+        MPJLambdaWrapper<UserDO> wrapper = JoinWrappers.lambda(UserDO.class)
                 .selectAll(UserDO.class)
                 .leftJoin(AddressDO.class, "addr1", AddressDO::getId, UserDO::getAddressId)
                 .leftJoin(AddressDO.class, "addr2", AddressDO::getId, UserDO::getAddressId2)
@@ -64,7 +64,7 @@ public class TableAliasTest {
                 .groupBy("addr1", AddressDO::getId)
                 .orderByDesc("addr1", AddressDO::getId);
 
-        List<UserDO> dos = userMapper.selectList(UserDO.class, wrapper);
+        List<UserDO> dos = userMapper.selectJoinList(UserDO.class, wrapper);
         dos.forEach(System.out::println);
     }
 
@@ -76,7 +76,7 @@ public class TableAliasTest {
                 "LEFT JOIN address addr2 ON (addr2.id = t.address_id2) " +
                 "LEFT JOIN area area1 ON (area1.id = addr2.area_id) WHERE t.del = false AND addr1.del = false AND addr2.del = false AND area1.del = false " +
                 "AND (addr1.id = ? AND addr2.id = ? AND addr1.id = ?)");
-        JoinQueryWrapper<UserDO> wrapper = JoinWrappers.query(UserDO.class)
+        MPJLambdaWrapper<UserDO> wrapper = JoinWrappers.lambda(UserDO.class)
                 .selectAll(UserDO.class)
                 .leftJoin(AddressDO.class, "addr1", AddressDO::getId, UserDO::getAddressId)
                 .leftJoin(AddressDO.class, "addr2", AddressDO::getId, UserDO::getAddressId2)
@@ -85,7 +85,7 @@ public class TableAliasTest {
                 .eq("addr2", AddressDO::getId, 2)
                 .eq("addr1", AddressDO::getId, 3);
 
-        List<UserDO> dos = userMapper.selectList(UserDO.class, wrapper);
+        List<UserDO> dos = userMapper.selectJoinList(UserDO.class, wrapper);
         dos.forEach(System.out::println);
     }
 
@@ -95,7 +95,7 @@ public class TableAliasTest {
                 "aaa.address_id, aaa.address_id2, aaa.del, aaa.create_by, aaa.update_by FROM `user` aaa WHERE aaa.`name` = ? AND aaa.del = false");
         UserDO userDO = new UserDO();
         userDO.setName("aaa");
-        JoinQueryWrapper<UserDO> wrapper = JoinWrappers.query("aaa", userDO);
+        MPJLambdaWrapper<UserDO> wrapper = JoinWrappers.lambda("aaa", userDO);
         wrapper.list();
     }
 }

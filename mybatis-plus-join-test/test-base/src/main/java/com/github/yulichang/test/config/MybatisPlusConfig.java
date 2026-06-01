@@ -77,6 +77,24 @@ public class MybatisPlusConfig {
     public ISqlInjector sqlInjector() {
         return new MPJSqlInjector() {
             @Override
+            @SuppressWarnings("deprecation")
+            public List<AbstractMethod> getMethodList(Class<?> mapperClass) {
+                List<AbstractMethod> list = super.getMethodList(mapperClass);
+                //添加你的方法
+                list.add(new InsertBatchSomeColumn());
+                return list;
+            }
+
+            @Override
+            @SuppressWarnings("deprecation")
+            public List<AbstractMethod> getMethodList(Class<?> mapperClass, TableInfo tableInfo) {
+                List<AbstractMethod> list = super.getMethodList(mapperClass, tableInfo);
+                //添加你的方法
+                list.add(new InsertBatchSomeColumn());
+                return list;
+            }
+
+            @Override
             public List<AbstractMethod> getMethodList(org.apache.ibatis.session.Configuration configuration, Class<?> mapperClass, TableInfo tableInfo) {
                 List<AbstractMethod> list = super.getMethodList(configuration, mapperClass, tableInfo);
                 //添加你的方法
@@ -89,7 +107,6 @@ public class MybatisPlusConfig {
     /**
      * 校验sql
      */
-    @SuppressWarnings("ReplaceAllNonRegex")
     public static class SqlInterceptor implements InnerInterceptor {
 
         private DbType dbType;

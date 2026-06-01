@@ -8,7 +8,7 @@ import com.github.yulichang.test.util.EnabledIfConfig;
 import com.github.yulichang.test.util.Reset;
 import com.github.yulichang.test.util.ThreadLocalUtils;
 import com.github.yulichang.toolkit.JoinWrappers;
-import com.github.yulichang.wrapper.JoinQueryWrapper;
+import com.github.yulichang.wrapper.MPJLambdaWrapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -32,7 +32,7 @@ public class OrderByTest {
                 "FROM `user` t WHERE t.del = false AND (t.id = ?) ORDER BY t.id ASC, t.`name` ASC, t.pid ASC");
         List<SFunction<UserDO, ?>> columList = Arrays.asList(UserDO::getId, UserDO::getName, UserDO::getPid);
 
-        JoinQueryWrapper<UserDO> wrapper = JoinWrappers.query(UserDO.class)
+        MPJLambdaWrapper<UserDO> wrapper = JoinWrappers.lambda(UserDO.class)
                 .selectAll(UserDO.class)
                 .eq(UserDO::getId, 1)
                 .orderByAsc(columList);
@@ -48,7 +48,7 @@ public class OrderByTest {
                 "FROM `user` t WHERE t.del = false AND (t.id = ?) GROUP BY t.id, t.`name`, t.pid");
         List<SFunction<UserDO, ?>> columList = Arrays.asList(UserDO::getId, UserDO::getName, UserDO::getPid);
 
-        JoinQueryWrapper<UserDO> wrapper = JoinWrappers.query(UserDO.class)
+        MPJLambdaWrapper<UserDO> wrapper = JoinWrappers.lambda(UserDO.class)
                 .selectAll(UserDO.class)
                 .eq(UserDO::getId, 1)
                 .groupBy(columList);
@@ -63,7 +63,7 @@ public class OrderByTest {
 
     @Test
     void orderBy2() {
-        JoinQueryWrapper<UserDO> wrapper = JoinWrappers.query(UserDO.class)
+        MPJLambdaWrapper<UserDO> wrapper = JoinWrappers.lambda(UserDO.class)
                 .selectAll(UserDO.class)
                 .selectAs(AddressDO::getId, UserDTO::getAddress)
                 .leftJoin(AddressDO.class, AddressDO::getUserId, UserDO::getId)

@@ -2,7 +2,7 @@ package com.github.yulichang.extension.kt.interfaces;
 
 import com.github.yulichang.interfaces.MPJBaseJoin;
 import com.github.yulichang.extension.kt.KtAbstractLambdaWrapper;
-import com.github.yulichang.wrapper.interfaces.StringJoin;
+import com.github.yulichang.query.interfaces.StringJoin;
 import com.github.yulichang.toolkit.Constant;
 import com.github.yulichang.wrapper.interfaces.MFunction;
 import kotlin.reflect.KProperty;

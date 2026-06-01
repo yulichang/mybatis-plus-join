@@ -1,9 +1,9 @@
 package com.github.yulichang.wrapper.interfaces;
 
-import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.github.yulichang.interfaces.MPJBaseJoin;
 import com.github.yulichang.toolkit.SqlHelper;
 
 import java.util.List;
@@ -15,13 +15,13 @@ import java.util.Optional;
  * <p>
  * 构造方法必须传 class 或 entity 否则会报错<br />
  * new MPJLambdaWrapper(User.class)<br />
- * JoinWrappers.query(User.class)<br />
+ * JoinWrappers.lambda(User.class)<br />
  *
  * @author yulichang
  * @since 1.4.4
  */
-@SuppressWarnings({"unused", "unchecked"})
-public interface Chain<T> {
+@SuppressWarnings("unused")
+public interface Chain<T> extends MPJBaseJoin<T> {
 
     Class<T> getEntityClass();
 
@@ -32,10 +32,10 @@ public interface Chain<T> {
      * <p>
      * 构造方法必须传 class 或 entity 否则会报错 <br />
      * new MPJLambdaWrapper(User.class)<br />
-     * JoinWrappers.query(User.class)<br />
+     * JoinWrappers.lambda(User.class)<br />
      */
     default Long count() {
-        return SqlHelper.exec(getEntityClass(), mapper -> mapper.selectCount((Wrapper<T>) this));
+        return SqlHelper.exec(getEntityClass(), mapper -> mapper.selectJoinCount(this));
     }
 
     /**
@@ -43,10 +43,10 @@ public interface Chain<T> {
      * <p>
      * 构造方法必须传 class 或 entity 否则会报错<br />
      * new MPJLambdaWrapper(User.class)<br />
-     * JoinWrappers.query(User.class)<br />
+     * JoinWrappers.lambda(User.class)<br />
      */
     default T one() {
-        return SqlHelper.exec(getEntityClass(), mapper -> mapper.selectOne(getEntityClass(), (Wrapper<T>) this));
+        return SqlHelper.exec(getEntityClass(), mapper -> mapper.selectJoinOne(getEntityClass(), this));
     }
 
     /**
@@ -54,10 +54,10 @@ public interface Chain<T> {
      * <p>
      * 构造方法必须传 class 或 entity 否则会报错<br />
      * new MPJLambdaWrapper(User.class)<br />
-     * JoinWrappers.query(User.class)<br />
+     * JoinWrappers.lambda(User.class)<br />
      */
     default <R> R one(Class<R> resultType) {
-        return SqlHelper.exec(getEntityClass(), mapper -> mapper.selectOne(resultType, (Wrapper<T>) this));
+        return SqlHelper.exec(getEntityClass(), mapper -> mapper.selectJoinOne(resultType, this));
     }
 
     /**
@@ -65,7 +65,7 @@ public interface Chain<T> {
      * <p>
      * 构造方法必须传 class 或 entity 否则会报错<br />
      * new MPJLambdaWrapper(User.class)<br />
-     * JoinWrappers.query(User.class)<br />
+     * JoinWrappers.lambda(User.class)<br />
      */
     default T first() {
         List<T> list = this.isResultMapCollection() ? list() :
@@ -78,7 +78,7 @@ public interface Chain<T> {
      * <p>
      * 构造方法必须传 class 或 entity 否则会报错<br />
      * new MPJLambdaWrapper(User.class)<br />
-     * JoinWrappers.query(User.class)<br />
+     * JoinWrappers.lambda(User.class)<br />
      */
     default <R> R first(Class<R> resultType) {
         List<R> list = this.isResultMapCollection() ? list(resultType) :
@@ -90,64 +90,57 @@ public interface Chain<T> {
      * 链式调用
      * 构造方法必须传 class 或 entity 否则会报错<br />
      * new MPJLambdaWrapper(User.class)<br />
-     * JoinWrappers.query(User.class)<br />
+     * JoinWrappers.lambda(User.class)<br />
      */
     default List<T> list() {
-        return SqlHelper.exec(getEntityClass(), mapper -> mapper.selectList(getEntityClass(), (Wrapper<T>) this));
+        return SqlHelper.exec(getEntityClass(), mapper -> mapper.selectJoinList(getEntityClass(), this));
     }
 
     /**
      * 链式调用
      * 构造方法必须传 class 或 entity 否则会报错<br />
      * new MPJLambdaWrapper(User.class)<br />
-     * JoinWrappers.query(User.class)<br />
+     * JoinWrappers.lambda(User.class)<br />
      */
     default <R> List<R> list(Class<R> resultType) {
-        return SqlHelper.exec(getEntityClass(), mapper -> mapper.selectList(resultType, (Wrapper<T>) this));
+        return SqlHelper.exec(getEntityClass(), mapper -> mapper.selectJoinList(resultType, this));
     }
 
     /**
      * 链式调用
      * 构造方法必须传 class 或 entity 否则会报错<br />
      * new MPJLambdaWrapper(User.class)<br />
-     * JoinWrappers.query(User.class)<br />
+     * JoinWrappers.lambda(User.class)<br />
      */
     default <P extends IPage<T>> P page(P page) {
-        return SqlHelper.exec(getEntityClass(), mapper -> mapper.selectPage(page, getEntityClass(), (Wrapper<T>) this));
+        return SqlHelper.exec(getEntityClass(), mapper -> mapper.selectJoinPage(page, getEntityClass(), this));
     }
 
     /**
      * 链式调用
      * 构造方法必须传 class 或 entity 否则会报错<br />
      * new MPJLambdaWrapper(User.class)<br />
-     * JoinWrappers.query(User.class)<br />
+     * JoinWrappers.lambda(User.class)<br />
      */
     default <R, P extends IPage<R>> P page(P page, Class<R> resultType) {
-        return SqlHelper.exec(getEntityClass(), mapper -> mapper.selectPage(page, resultType, (Wrapper<T>) this));
+        return SqlHelper.exec(getEntityClass(), mapper -> mapper.selectJoinPage(page, resultType, this));
     }
 
     /**
      * 链式调用
      * 构造方法必须传 class 或 entity 否则会报错<br />
      * new MPJLambdaWrapper(User.class)<br />
-     * JoinWrappers.query(User.class)<br />
+     * JoinWrappers.lambda(User.class)<br />
      */
     default Map<String, Object> mapOne() {
-        return SqlHelper.exec(getEntityClass(), mapper -> {
-            List<Map<String, Object>> maps = mapper.selectMaps((Wrapper<T>) this);
-            if (CollectionUtils.isNotEmpty(maps)) {
-                return maps.get(0);
-            } else {
-                return null;
-            }
-        });
+        return SqlHelper.exec(getEntityClass(), mapper -> mapper.selectJoinMap(this));
     }
 
     /**
      * 链式调用
      * 构造方法必须传 class 或 entity 否则会报错<br />
      * new MPJLambdaWrapper(User.class)<br />
-     * JoinWrappers.query(User.class)<br />
+     * JoinWrappers.lambda(User.class)<br />
      */
     default Map<String, Object> mapFirst() {
         List<Map<String, Object>> mapList = mapPage(new Page<Map<String, Object>>(1, 1).setSearchCount(false)).getRecords();
@@ -158,19 +151,19 @@ public interface Chain<T> {
      * 链式调用
      * 构造方法必须传 class 或 entity 否则会报错<br />
      * new MPJLambdaWrapper(User.class)<br />
-     * JoinWrappers.query(User.class)<br />
+     * JoinWrappers.lambda(User.class)<br />
      */
     default List<Map<String, Object>> mapList() {
-        return SqlHelper.exec(getEntityClass(), mapper -> mapper.selectMaps((Wrapper<T>) this));
+        return SqlHelper.exec(getEntityClass(), mapper -> mapper.selectJoinMaps(this));
     }
 
     /**
      * 链式调用
      * 构造方法必须传 class 或 entity 否则会报错<br />
      * new MPJLambdaWrapper(User.class)<br />
-     * JoinWrappers.query(User.class)<br />
+     * JoinWrappers.lambda(User.class)<br />
      */
     default <P extends IPage<Map<String, Object>>> P mapPage(P page) {
-        return SqlHelper.exec(getEntityClass(), mapper -> mapper.selectMapsPage(page, (Wrapper<T>) this));
+        return SqlHelper.exec(getEntityClass(), mapper -> mapper.selectJoinMapsPage(page, this));
     }
 }

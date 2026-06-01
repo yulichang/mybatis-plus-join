@@ -13,8 +13,14 @@ import org.apache.ibatis.mapping.SqlSource;
  *
  * @author yulichang
  */
-public class SelectJoinOne extends JoinAbstractMethod {
+public class SelectJoinOne extends MPJAbstractMethod {
 
+    @SuppressWarnings("deprecation")
+    public SelectJoinOne() {
+        super();
+    }
+
+    @SuppressWarnings("unused")
     public SelectJoinOne(String name) {
         super(name);
     }
@@ -33,11 +39,4 @@ public class SelectJoinOne extends JoinAbstractMethod {
         return super.sqlComment() + StringPool.NEWLINE + SqlScriptUtils.convertIf("${ew.unionSql}", String.format("%s != null and (%s instanceof %s)",
                 Constants.WRAPPER, Constants.WRAPPER, MPJBaseJoin.class.getName()), true);
     }
-
-    public String getSql(TableInfo tableInfo) {
-        SqlMethod sqlMethod = SqlMethod.SELECT_JOIN_ONE;
-        return String.format(sqlMethod.getSql(), sqlFirst(), sqlDistinct(), sqlSelectColumns(tableInfo, true),
-                mpjTableName(tableInfo), sqlAlias(), sqlFrom(), sqlWhereEntityWrapper(true, tableInfo), sqlComment());
-    }
-
 }

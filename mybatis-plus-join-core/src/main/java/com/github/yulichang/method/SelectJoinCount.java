@@ -10,8 +10,14 @@ import org.apache.ibatis.mapping.SqlSource;
  * @author yulichang
  * @since 1.1.8
  */
-public class SelectJoinCount extends JoinAbstractMethod {
+public class SelectJoinCount extends MPJAbstractMethod {
 
+    @SuppressWarnings("deprecation")
+    public SelectJoinCount() {
+        super();
+    }
+
+    @SuppressWarnings("unused")
     public SelectJoinCount(String name) {
         super(name);
     }
@@ -23,11 +29,5 @@ public class SelectJoinCount extends JoinAbstractMethod {
                 mpjTableName(tableInfo), sqlAlias(), sqlFrom(), sqlWhereEntityWrapper(true, tableInfo), sqlComment());
         SqlSource sqlSource = languageDriver.createSqlSource(configuration, removeExtraWhitespaces(sql), modelClass);
         return this.addSelectMappedStatementForOther(mapperClass, sqlMethod.getMethod(), sqlSource, Long.class);
-    }
-
-    public String getSql(TableInfo tableInfo) {
-        SqlMethod sqlMethod = SqlMethod.SELECT_JOIN_COUNT;
-        return String.format(sqlMethod.getSql(), sqlFirst(), sqlCount(),
-                mpjTableName(tableInfo), sqlAlias(), sqlFrom(), sqlWhereEntityWrapper(true, tableInfo), sqlComment());
     }
 }

@@ -16,7 +16,7 @@
     <img alt="code style" src="https://img.shields.io/badge/license-Apache%202-4EB1BA.svg?style=flat-square">
   </a>
   <a href="https://github.com/yulichang/mybatis-plus-join" target="_blank">
-    <img src="https://img.shields.io/github/stars/yulichang/mybatis-plus-join.svg?style=social" alt=""/>
+    <img src="https://img.shields.io/github/stars/yulichang/mybatis-plus-join?style=social" alt=""/>
   </a>
   <a href="https://gitee.com/yulichang/mybatis-plus-join" target="_blank">
     <img src="https://gitee.com/yulichang/mybatis-plus-join/badge/star.svg?theme=dark" alt=""/>
@@ -75,17 +75,12 @@ class test {
     private UserMapper userMapper;
 
     void testJoin() {
-        //和Mybatis plus一致，MPJLambdaWrapper的泛型必须是主表的泛型，并且要用主表的Mapper来调用
         MPJLambdaWrapper<UserDO> wrapper = JoinWrappers.lambda(UserDO.class)
-                .selectAll(UserDO.class)//查询user表全部字段
-                .select(UserAddressDO::getTel)//查询user_address tel 字段
-                .selectAs(UserAddressDO::getAddress, UserDTO::getUserAddress)//别名
-                .select(AreaDO::getProvince, AreaDO::getCity)
-                .leftJoin(UserAddressDO.class, UserAddressDO::getUserId, UserDO::getId)
-                .leftJoin(AreaDO.class, AreaDO::getId, UserAddressDO::getAreaId)
+                .selectAll(UserDO.class)
+                .select(AddressDO::getTel)
+                .leftJoin(AddressDO.class, AddressDO::getUserId, UserDO::getId)
                 .eq(UserDO::getId, 1)
-                .like(UserAddressDO::getTel, "1")
-                .gt(UserDO::getId, 5);
+                .like(AddressDO::getTel, "1");
 
         //连表查询 返回自定义ResultType
         List<UserDTO> list = userMapper.selectJoinList(UserDTO.class, wrapper);
@@ -101,16 +96,10 @@ class test {
 ```
 SELECT  
     t.id, t.name, t.sex, t.head_img, 
-    t1.tel, t1.address AS userAddress,
-    t2.province, t2.city 
-FROM 
-    user t 
-    LEFT JOIN user_address t1 ON t1.user_id = t.id 
-    LEFT JOIN area t2 ON t2.id = t1.area_id 
-WHERE (
-    t.id = ? 
-    AND t1.tel LIKE ? 
-    AND t.id > ?)
+    t1.tel
+FROM user t 
+    LEFT JOIN address t1 ON t1.user_id = t.id
+WHERE ( t.id = ? AND t1.tel LIKE ? )
 ```
 
 # <a href="https://mybatis-plus-join.github.io" target="_blank">完整使用文档 wiki</a>

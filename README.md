@@ -16,7 +16,7 @@
     <img alt="code style" src="https://img.shields.io/badge/license-Apache%202-4EB1BA.svg?style=flat-square">
   </a>
   <a href="https://github.com/yulichang/mybatis-plus-join" target="_blank">
-    <img src="https://img.shields.io/github/stars/yulichang/mybatis-plus-join?style=social" alt=""/>
+    <img src="https://img.shields.io/github/stars/yulichang/mybatis-plus-join" alt=""/>
   </a>
   <a href="https://gitee.com/yulichang/mybatis-plus-join" target="_blank">
     <img src="https://gitee.com/yulichang/mybatis-plus-join/badge/star.svg?theme=dark" alt=""/>
@@ -33,7 +33,7 @@
 </p>
 
 <p align="center">
-<a href="https://gitee.com/best_handsome/mybatis-plus-join/issues/I65N2M" target="_blank">可添加作者微信，咨询问题或提供意见与建议</a>
+可添加作者微信，咨询问题或提供意见与建议
 <br/>
 <img width="200px" height="200px" src="https://github.com/yulichang/mybatis-plus-join/assets/33247410/6a2aedfa-c67d-4691-9441-204f28b6c73d"  alt="添加作者微信，备注MPJ，加入微信群"/>
 </p>

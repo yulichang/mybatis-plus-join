@@ -68,7 +68,11 @@ public final class MPJReflectionKit {
             Type[] types = ((WildcardType) argument).getUpperBounds();
             return (Class<?>) types[0];
         }
-        return (Class<?>) argument;
+        try {
+            return (Class<?>) argument;
+        } catch (ClassCastException e) {
+            return Object.class;
+        }
     }
 
     /**

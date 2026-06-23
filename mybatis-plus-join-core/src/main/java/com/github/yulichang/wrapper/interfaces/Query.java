@@ -80,9 +80,8 @@ public interface Query<Children> extends Serializable {
     <E> Children select(SFunction<E, ?>... columns);
 
     /**
-     * String 查询
-     *
-     * @param columns 列
+     * 与MyBatis-Plus的`QueryWrapper`一致，`MPJLambdaWrapper`字符串列明默认关闭sql注入检查,
+     * 建议面向可信输入,如果需要开启检查请使用`wrapper.checkSqlInjection()`
      */
     default Children select(String... columns) {
         getSelectColum().add(new SelectString(String.join(StringPool.COMMA, columns), null));
@@ -91,6 +90,10 @@ public interface Query<Children> extends Serializable {
 
     /**
      * String 查询
+     * <p>
+     * 与MyBatis-Plus的`QueryWrapper`一致，`MPJLambdaWrapper`字符串列明默认关闭sql注入检查,
+     * 建议面向可信输入,如果需要开启检查请使用`wrapper.checkSqlInjection()`
+     * ault Children select(String... columns) {
      *
      * @param column 列
      */

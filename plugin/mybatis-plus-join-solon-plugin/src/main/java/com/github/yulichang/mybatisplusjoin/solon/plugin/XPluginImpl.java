@@ -7,6 +7,7 @@ import com.github.yulichang.config.enums.IfExistsEnum;
 import com.github.yulichang.config.enums.LogicDelTypeEnum;
 import com.github.yulichang.extension.mapping.config.MappingConfig;
 import com.github.yulichang.injector.MPJSqlInjector;
+import com.github.yulichang.interceptor.MPJInterceptor;
 import com.github.yulichang.toolkit.SpringContentUtils;
 import com.github.yulichang.toolkit.reflect.GenericTypeUtils;
 import com.github.yulichang.wrapper.enums.IfExistsSqlKeyWordEnum;
@@ -51,7 +52,6 @@ public class XPluginImpl implements Plugin {
         // 读取配置
         Prop prop = new Prop(context.cfg());
         ConfigProperties.banner = prop.get("banner", Boolean::parseBoolean);
-        ConfigProperties.msCache = prop.get("msCache", Boolean::parseBoolean);
         ConfigProperties.tableAlias = prop.get("tableAlias", Function.identity());
         ConfigProperties.joinPrefix = prop.get("joinPrefix", Function.identity());
         ConfigProperties.logicDelType = prop.get("logicDelType", val ->
@@ -68,7 +68,7 @@ public class XPluginImpl implements Plugin {
         context.onEvent(AppLoadEndEvent.class, e -> {
             List<SqlSessionFactory> sqlSessionFactoryList = MybatisAdapterManager.getAll().values().stream()
                     .map(MybatisAdapter::getFactory).collect(Collectors.toList());
-            new MPJInterceptorConfig(sqlSessionFactoryList, ConfigProperties.banner);
+            new MPJInterceptorConfig(sqlSessionFactoryList, new MPJInterceptor(), ConfigProperties.banner);
             MappingConfig.init();
         });
     }

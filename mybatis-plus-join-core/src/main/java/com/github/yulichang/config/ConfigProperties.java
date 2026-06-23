@@ -20,10 +20,6 @@ public class ConfigProperties {
      */
     public static boolean subTableLogic = true;
     /**
-     * 是否开启 ms 缓存
-     */
-    public static boolean msCache = true;
-    /**
      * 表别名
      */
     public static String tableAlias = "t";

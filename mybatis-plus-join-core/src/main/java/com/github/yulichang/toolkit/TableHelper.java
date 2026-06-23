@@ -54,6 +54,9 @@ public class TableHelper {
         while (Object.class != currentClass) {
             currentClass = currentClass.getSuperclass();
             info = TABLE_INFO_CACHE.get(ClassUtils.getUserClass(currentClass));
+            if (Objects.nonNull(info)) {
+                break;
+            }
         }
         if (Objects.nonNull(info)) {
             TABLE_INFO_CACHE.put(currentClass, info);

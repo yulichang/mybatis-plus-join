@@ -57,7 +57,7 @@
       "description": "子查询表别名."
     },
     {
-      "name": "mybatis-plus-join.if-exist",
+      "name": "mybatis-plus-join.if-exists",
       "defaultValue": "com.github.yulichang.config.enums.IfExistsEnum.NOT_EMPTY",
       "type": "com.github.yulichang.config.enums.IfExistsEnum",
       "description": "IfExists方法判断策略,如需自定义请用@Bean形式MybatisPlusJoinIfExistsConsumer."

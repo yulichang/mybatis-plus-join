@@ -4,11 +4,13 @@ import com.baomidou.mybatisplus.core.conditions.SharedString;
 import com.baomidou.mybatisplus.core.conditions.segments.MergeSegments;
 import com.baomidou.mybatisplus.core.metadata.TableFieldInfo;
 import com.baomidou.mybatisplus.core.metadata.TableInfo;
-import com.baomidou.mybatisplus.core.toolkit.*;
+import com.baomidou.mybatisplus.core.toolkit.Assert;
+import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
+import com.baomidou.mybatisplus.core.toolkit.Constants;
+import com.baomidou.mybatisplus.core.toolkit.StringPool;
 import com.github.yulichang.adapter.AdapterHelper;
 import com.github.yulichang.extension.kt.interfaces.Update;
 import com.github.yulichang.toolkit.*;
-import com.github.yulichang.toolkit.ReflectionKit;
 import com.github.yulichang.wrapper.interfaces.UpdateChain;
 import kotlin.reflect.KProperty;
 import lombok.AllArgsConstructor;
@@ -29,10 +31,6 @@ import java.util.stream.Collectors;
 @SuppressWarnings({"unused", "DuplicatedCode"})
 public class KtUpdateJoinWrapper<T> extends KtAbstractLambdaWrapper<T, KtUpdateJoinWrapper<T>>
         implements Update<KtUpdateJoinWrapper<T>>, UpdateChain<T> {
-    /**
-     * SQL 更新字段内容，例如：name='1', age=2
-     */
-    private final SharedString sqlSetStr = new SharedString();
     /**
      * SQL 更新字段内容，例如：name='1', age=2
      */
@@ -150,9 +148,6 @@ public class KtUpdateJoinWrapper<T> extends KtAbstractLambdaWrapper<T, KtUpdateJ
 
     @Override
     public String getSqlSet() {
-        if (StrUtils.isNotBlank(sqlSetStr.getStringValue())) {
-            return sqlSetStr.getStringValue();
-        }
         StringBuilder set = new StringBuilder(StringPool.EMPTY);
         if (CollectionUtils.isNotEmpty(updateSet)) {
             set = new StringBuilder(updateSet.stream().map(i -> {
@@ -175,7 +170,6 @@ public class KtUpdateJoinWrapper<T> extends KtAbstractLambdaWrapper<T, KtUpdateJ
         if (CollectionUtils.isNotEmpty(updateEntityNull)) {
             getSqlByEntity(set, false, updateEntityNull);
         }
-        sqlSetStr.setStringValue(set.toString());
         return set.toString();
     }
 
@@ -254,7 +248,6 @@ public class KtUpdateJoinWrapper<T> extends KtAbstractLambdaWrapper<T, KtUpdateJ
     @Override
     public void clear() {
         super.clear();
-        sqlSetStr.toNull();
         if (CollectionUtils.isNotEmpty(sqlSet)) {
             sqlSet.clear();
         }

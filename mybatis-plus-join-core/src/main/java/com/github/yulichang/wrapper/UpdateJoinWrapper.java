@@ -7,9 +7,9 @@ import com.baomidou.mybatisplus.core.metadata.TableInfo;
 import com.baomidou.mybatisplus.core.toolkit.*;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.github.yulichang.adapter.AdapterHelper;
+import com.github.yulichang.toolkit.*;
 import com.github.yulichang.toolkit.LambdaUtils;
 import com.github.yulichang.toolkit.ReflectionKit;
-import com.github.yulichang.toolkit.*;
 import com.github.yulichang.wrapper.interfaces.MFunction;
 import com.github.yulichang.wrapper.interfaces.Update;
 import com.github.yulichang.wrapper.interfaces.UpdateChain;
@@ -29,10 +29,6 @@ import java.util.stream.Collectors;
 @SuppressWarnings("unused")
 public class UpdateJoinWrapper<T> extends JoinAbstractLambdaWrapper<T, UpdateJoinWrapper<T>>
         implements Update<UpdateJoinWrapper<T>>, UpdateChain<T> {
-    /**
-     * SQL 更新字段内容，例如：name='1', age=2
-     */
-    private final SharedString sqlSetStr = new SharedString();
     /**
      * SQL 更新字段内容，例如：name='1', age=2
      */
@@ -155,9 +151,6 @@ public class UpdateJoinWrapper<T> extends JoinAbstractLambdaWrapper<T, UpdateJoi
     @SuppressWarnings("DuplicatedCode")
     @Override
     public String getSqlSet() {
-        if (StrUtils.isNotBlank(sqlSetStr.getStringValue())) {
-            return sqlSetStr.getStringValue();
-        }
         StringBuilder set = new StringBuilder(StringPool.EMPTY);
         if (CollectionUtils.isNotEmpty(updateSet)) {
             String setSql = updateSet.stream().map(i -> {
@@ -193,7 +186,6 @@ public class UpdateJoinWrapper<T> extends JoinAbstractLambdaWrapper<T, UpdateJoi
         if (CollectionUtils.isNotEmpty(updateEntityNull)) {
             getSqlByEntity(set, false, updateEntityNull);
         }
-        sqlSetStr.setStringValue(set.toString());
         return set.toString();
     }
 
@@ -282,7 +274,6 @@ public class UpdateJoinWrapper<T> extends JoinAbstractLambdaWrapper<T, UpdateJoi
     @SuppressWarnings("DuplicatedCode")
     public void clear() {
         super.clear();
-        sqlSetStr.toNull();
         if (CollectionUtils.isNotEmpty(sqlSet)) {
             sqlSet.clear();
         }

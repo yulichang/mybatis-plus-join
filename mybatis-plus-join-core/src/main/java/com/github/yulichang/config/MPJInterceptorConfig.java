@@ -24,8 +24,8 @@ public class MPJInterceptorConfig {
 
     private static final Log logger = LogFactory.getLog(MPJInterceptorConfig.class);
 
-    public MPJInterceptorConfig(List<SqlSessionFactory> sqlSessionFactoryList, Boolean banner) {
-        replaceInterceptorChain(sqlSessionFactoryList);
+    public MPJInterceptorConfig(List<SqlSessionFactory> sqlSessionFactoryList, MPJInterceptor mpjInterceptor, Boolean banner) {
+        replaceInterceptorChain(sqlSessionFactoryList, mpjInterceptor);
         if (banner) {
             //打印banner
             System.out.println(" _ _   |_  _ _|_. ___ _ |    _  .  _  .  _  \n" +
@@ -35,7 +35,7 @@ public class MPJInterceptorConfig {
         }
     }
 
-    private void replaceInterceptorChain(List<SqlSessionFactory> sqlSessionFactoryList) {
+    private void replaceInterceptorChain(List<SqlSessionFactory> sqlSessionFactoryList, MPJInterceptor mpjInterceptor) {
         if (CollectionUtils.isEmpty(sqlSessionFactoryList)) {
             return;
         }
@@ -53,7 +53,7 @@ public class MPJInterceptorConfig {
                 } else {
                     interceptors.set(chain, new InterceptorList<>(list));
                 }
-                chain.addInterceptor(new MPJInterceptor());
+                chain.addInterceptor(mpjInterceptor);
             } catch (NoSuchFieldException | IllegalAccessException e) {
                 logger.error("初始化 MPJ 拦截器失败", e);
             }

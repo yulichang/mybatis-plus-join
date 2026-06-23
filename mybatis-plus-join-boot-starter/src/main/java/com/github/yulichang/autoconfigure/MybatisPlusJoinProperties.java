@@ -33,11 +33,6 @@ public class MybatisPlusJoinProperties {
     private Boolean subTableLogic = true;
 
     /**
-     * MappedStatement缓存
-     */
-    private boolean msCache = true;
-
-    /**
      * 连表查询重复字段名前缀
      */
     private String joinPrefix = "join";

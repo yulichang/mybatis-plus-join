@@ -66,7 +66,6 @@ public class MybatisPlusJoinAutoConfiguration {
                                             ObjectProvider<MybatisPlusJoinIfExistsConsumer> IfExistsConsumers) {
         this.properties = Optional.ofNullable(propertiesConsumers.getIfAvailable()).map(c -> c.config(properties)).orElse(properties);
         ConfigProperties.banner = this.properties.getBanner();
-        ConfigProperties.msCache = this.properties.isMsCache();
         ConfigProperties.tableAlias = this.properties.getTableAlias();
         ConfigProperties.joinPrefix = this.properties.getJoinPrefix();
         ConfigProperties.logicDelType = this.properties.getLogicDelType();
@@ -95,8 +94,8 @@ public class MybatisPlusJoinAutoConfiguration {
     @Bean
     @Order(Ordered.HIGHEST_PRECEDENCE)
     @ConditionalOnClass({SqlSessionFactory.class, SqlSessionFactoryBean.class})
-    public MPJInterceptorConfig mpjInterceptorConfig(List<SqlSessionFactory> sqlSessionFactoryList) {
-        return new MPJInterceptorConfig(sqlSessionFactoryList, properties.getBanner());
+    public MPJInterceptorConfig mpjInterceptorConfig(List<SqlSessionFactory> sqlSessionFactoryList, MPJInterceptor mpjInterceptor) {
+        return new MPJInterceptorConfig(sqlSessionFactoryList, mpjInterceptor, properties.getBanner());
     }
 
     /**

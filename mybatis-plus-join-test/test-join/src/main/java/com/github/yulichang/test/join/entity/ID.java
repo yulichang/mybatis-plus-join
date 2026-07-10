@@ -1,7 +1,7 @@
 package com.github.yulichang.test.join.entity;
 
 import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.extension.activerecord.Model;
+import com.baomidou.mybatisplus.spring.activerecord.Model;
 import lombok.Getter;
 import lombok.Setter;
 

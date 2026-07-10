@@ -3,6 +3,8 @@ package com.github.yulichang.adapter.base.tookit;
 import com.baomidou.mybatisplus.core.MybatisPlusVersion;
 import com.baomidou.mybatisplus.core.toolkit.ExceptionUtils;
 
+import java.security.CodeSource;
+
 /**
  * 版本工具类
  *
@@ -11,7 +13,7 @@ import com.baomidou.mybatisplus.core.toolkit.ExceptionUtils;
  */
 public class VersionUtils {
 
-    public static String version = MybatisPlusVersion.getVersion();
+    public static String version = resolveMybatisPlusVersion();
 
     @SuppressWarnings("unused")
     public static void setMybatisPlusVersion(String version) {
@@ -25,6 +27,24 @@ public class VersionUtils {
             throw ExceptionUtils.mpe("mybatis-plus version is blank, " +
                     "please add VersionUtils.setMybatisPlusVersion(?) code before running application");
         }
+    }
+
+    private static String resolveMybatisPlusVersion() {
+        String version = MybatisPlusVersion.getVersion();
+        if (version != null) {
+            return version;
+        }
+        CodeSource codeSource = MybatisPlusVersion.class.getProtectionDomain().getCodeSource();
+        if (codeSource != null && codeSource.getLocation() != null) {
+            String location = codeSource.getLocation().toExternalForm();
+            String prefix = "mybatis-plus-core-";
+            int start = location.lastIndexOf(prefix);
+            int end = location.indexOf(".jar", start);
+            if (start >= 0 && end > start) {
+                return location.substring(start + prefix.length(), end);
+            }
+        }
+        return null;
     }
 
     public static int compare(String v1, String v2) {

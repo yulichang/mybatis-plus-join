@@ -1,6 +1,6 @@
 package com.github.yulichang.base;
 
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.baomidou.mybatisplus.spring.service.impl.ServiceImpl;
 
 /**
  * @author yulichang

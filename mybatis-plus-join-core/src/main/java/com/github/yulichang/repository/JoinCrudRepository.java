@@ -1,7 +1,7 @@
 package com.github.yulichang.repository;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.baomidou.mybatisplus.extension.repository.CrudRepository;
+import com.baomidou.mybatisplus.spring.repository.CrudRepository;
 
 /**
  * {@link CrudRepository}

@@ -49,17 +49,20 @@
   <dependency>
       <groupId>com.github.yulichang</groupId>
       <artifactId>mybatis-plus-join-boot-starter</artifactId>
-      <version>1.5.7</version>
+      <version>1.5.9</version>
   </dependency>
   ```
 - Gradle
   ```
-   implementation 'com.github.yulichang:mybatis-plus-join-boot-starter:1.5.7'
+   implementation 'com.github.yulichang:mybatis-plus-join-boot-starter:1.5.9'
   ```
-  或者clone代码到本地执行 `mvn install`, 再引入以上依赖  
-  <br>
-  注意: MyBatis Plus版本需要3.1.2+
-  <br>
+  或者clone代码到本地执行 `mvn install`, 再引入以上依赖
+
+### 版本对应关系：
+| Mybatis-Plus-Join | Mybatis-Plus   |
+|-------------------|----------------|
+| 1.5.9             | 3.5.18+        |
+| 1.5.8             | 3.1.2 - 3.5.17 |
 
 ### 使用
 
